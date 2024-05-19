@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GeneralExceptionHandler {
 
     @ExceptionHandler(GeneralException.class)
-    protected ResponseEntity<ErrorDTO> handleCustom400Exception(GeneralException ex) {
+    protected ResponseEntity<Object> handleCustom400Exception(GeneralException ex) {
         log.warn(
             String.format("http-status={%s} code={%s} msg={%s} detail={%s}", ex.getStatus().value(),
                 ex.getErrorCode(), ex.getErrorMsg(), ex.getDetail())
