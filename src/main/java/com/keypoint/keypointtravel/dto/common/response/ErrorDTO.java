@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.dto.common.response;
 
-import com.keypoint.keypointtravel.common.handler.GeneralException;
+import com.keypoint.keypointtravel.common.exception.GeneralException;
 import lombok.Builder;
 import org.springframework.http.ResponseEntity;
 
@@ -11,7 +11,7 @@ public class ErrorDTO {
     private String msg;
     private Object detail;
 
-    public static ResponseEntity<ErrorDTO> toResponseEntity(GeneralException ex) {
+    public static ResponseEntity<Object> toResponseEntity(GeneralException ex) {
         Object detail = ex.getDetail();
         return ResponseEntity
             .status(ex.getStatus())

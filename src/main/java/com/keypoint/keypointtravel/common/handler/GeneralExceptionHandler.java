@@ -1,6 +1,6 @@
-package com.keypoint.keypointtravel.common.exception;
+package com.keypoint.keypointtravel.common.handler;
 
-import com.keypoint.keypointtravel.common.handler.GeneralException;
+import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.common.handler;
+package com.keypoint.keypointtravel.common.exception;
 
 import com.keypoint.keypointtravel.common.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.common.enumType.error.ErrorCode;
