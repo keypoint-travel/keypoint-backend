@@ -1,0 +1,23 @@
+package com.keypoint.keypointtravel.common.exception;
+
+import com.keypoint.keypointtravel.common.handler.GeneralException;
+import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+@Slf4j
+@ControllerAdvice
+public class GeneralExceptionHandler {
+
+    @ExceptionHandler(GeneralException.class)
+    protected ResponseEntity<ErrorDTO> handleCustom400Exception(GeneralException ex) {
+        log.warn(
+            String.format("http-status={%s} code={%s} msg={%s} detail={%s}", ex.getStatus().value(),
+                ex.getErrorCode(), ex.getErrorMsg(), ex.getDetail())
+        );
+
+        return ErrorDTO.toResponseEntity(ex);
+    }
+}
