@@ -1,6 +1,6 @@
 spring:
   profiles:
     group:
-      local: "local"
-      dev: "dev"
+      local: "local, key"
+      dev: "dev, key"
     active: local
