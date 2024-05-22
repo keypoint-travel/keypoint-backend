@@ -1,3 +1,9 @@
 key:
   aes:
     secret-key: 36114567890121556789012326673001
+  azure:
+    key1: a4471a1b0bbf48908b9714eb7ff430ee
+    key2: 06d02571cc2c4b2a9f49fec2352b8c43
+    local: koreacentral
+    endpoint: https://keypoint-travel-api.cognitiveservices.azure.com/
+    api-version: 2023-07-31

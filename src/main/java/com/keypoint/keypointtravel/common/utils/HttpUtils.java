@@ -5,7 +5,6 @@ import com.keypoint.keypointtravel.common.exception.GeneralException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,36 +19,35 @@ public class HttpUtils {
 
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
 
-            ResponseEntity<T> response = restTemplate.exchange(uriBuilder.toUriString(),
-                HttpMethod.GET, entity, className
+            ResponseEntity<T> response = restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                entity,
+                className
             );
-
-            if (response.getStatusCode() != HttpStatus.OK) {
-                throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
-            }
 
             return response;
         } catch (Exception ex) {
-            throw new GeneralException(ex);
+            throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL, ex.getMessage());
         }
     }
 
-    public static <T> ResponseEntity<T> post(String url, HttpHeaders headers, String body,
-        Class<T> className) {
+    public static <T> ResponseEntity<T> post(
+        String url,
+        HttpHeaders headers,
+        Object body,
+        Class<T> className
+    ) {
         try {
             RestTemplate restTemplate = new RestTemplate();
 
-            HttpEntity<String> entity = new HttpEntity<>(body, headers);
+            HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
 
             ResponseEntity<T> response = restTemplate.postForEntity(url, entity, className);
 
-            if (response.getStatusCode() != HttpStatus.OK) {
-                throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
-            }
-
             return response;
         } catch (Exception ex) {
-            throw new GeneralException(ex);
+            throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL, ex.getMessage());
         }
     }
 }
