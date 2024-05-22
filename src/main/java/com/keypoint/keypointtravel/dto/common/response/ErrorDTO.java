@@ -2,8 +2,10 @@ package com.keypoint.keypointtravel.dto.common.response;
 
 import com.keypoint.keypointtravel.common.exception.GeneralException;
 import lombok.Builder;
+import lombok.Data;
 import org.springframework.http.ResponseEntity;
 
+@Data
 @Builder
 public class ErrorDTO {
 

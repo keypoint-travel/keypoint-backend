@@ -46,6 +46,9 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // azure
+    implementation group: 'com.azure', name: 'azure-ai-formrecognizer', version: '4.1.0'
 }
 
 def querydslDir = "$buildDir/generated/querydsl"
