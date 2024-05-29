@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.dto.api.azure.response;
 
+import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
 import com.azure.ai.formrecognizer.documentanalysis.models.BoundingRegion;
 import com.azure.ai.formrecognizer.documentanalysis.models.DocumentSpan;
 import java.util.List;
@@ -12,6 +13,6 @@ public class OCRDocumentResponse {
     private String docType;
     private List<BoundingRegion> boundingRegions;
     private float confidence;
-    private Map<String, OCRDocumentFieldResponse> fields;
+    private Map<String, DocumentField> fields;
     private List<DocumentSpan> spans;
 }

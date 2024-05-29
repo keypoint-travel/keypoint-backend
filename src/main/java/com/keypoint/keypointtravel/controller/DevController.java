@@ -17,6 +17,6 @@ public class DevController {
 
     @GetMapping("/azure/ocr")
     public OCRResultResponse getReceiptResult() {
-        return azureOCRService.getOCRResult();
+        return azureOCRService.analyzeReceipt();
     }
 }

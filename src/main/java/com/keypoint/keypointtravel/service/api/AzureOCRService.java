@@ -1,8 +1,13 @@
 package com.keypoint.keypointtravel.service.api;
 
+import com.keypoint.keypointtravel.common.enumType.api.OCROperationStatus;
+import com.keypoint.keypointtravel.common.enumType.error.ReceiptError;
+import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.common.utils.HttpUtils;
 import com.keypoint.keypointtravel.dto.api.azure.request.OCRAnalysisRequest;
 import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +24,10 @@ public class AzureOCRService {
     private static String RECEIPT_MODEL_ID = "prebuilt-receipt";
     private static String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
     private static String OCR_RESULT_HEADER = "Operation-Location";
+    private static List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
+        OCROperationStatus.FAILED,
+        OCROperationStatus.SUCCEEDED
+    );
 
     @Value("${key.azure.endpoint}")
     private String endpoint;
@@ -51,7 +60,8 @@ public class AzureOCRService {
      */
     private String requestOCRAnalysis() {
         String url = getOCRAnalysisUrl();
-        String documentUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/receipt.png";
+        //String documentUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/receipt.png";
+        String documentUrl = "https://github.com/chea-young/Dev_Springboot/assets/63410509/ce667733-4fed-4109-bae2-08c65058bb1c";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(AZURE_KEY_HEADER, apiKey);
@@ -64,6 +74,7 @@ public class AzureOCRService {
     }
 
     private OCRResultResponse requestOCRResult(String url) {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(AZURE_KEY_HEADER, apiKey);
@@ -77,12 +88,31 @@ public class AzureOCRService {
         return response.getBody();
     }
 
-    public OCRResultResponse getOCRResult() {
-        String ocrResultUrl = requestOCRAnalysis();
-        OCRResultResponse ocrResult = requestOCRResult(
-            ocrResultUrl); // TODO: status 가 succeeded까지 호출 필요
 
-        return ocrResult;
+    public OCRResultResponse analyzeReceipt() {
+        String ocrResultUrl = requestOCRAnalysis();
+        OCRResultResponse response = getOCRResult(ocrResultUrl);
+
+        // OCRResultResponse -> ReceiptDTO로 변환
+        return response;
+    }
+
+    private OCRResultResponse getOCRResult(String ocrResultUrl) {
+        OCROperationStatus status;
+        OCRResultResponse ocrResult;
+
+        do {
+            ocrResult = requestOCRResult(
+                ocrResultUrl
+            );
+            status = ocrResult.getStatus();
+        } while (!VALID_OCR_STATUS.contains(status));
+
+        if (status == OCROperationStatus.SUCCEEDED) {
+            return ocrResult;
+        } else {
+            throw new GeneralException(ReceiptError.RECEIPT_RECOGNITION_FAILED);
+        }
     }
 
 }
