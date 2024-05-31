@@ -2,7 +2,7 @@
 name: Bug/Hotfix
 about: Bug, Hotfix 시 사용해주세요.
 title: ''
-labels: ''
+labels: 'Type: Bug'
 assignees: ''
 
 ---

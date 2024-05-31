@@ -2,7 +2,7 @@
 name: Enviroment
 about: Enviroment 시, 사용해주세요.
 title: ''
-labels: ''
+labels: 'Type: Environment'
 assignees: ''
 
 ---

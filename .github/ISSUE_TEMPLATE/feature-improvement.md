@@ -2,7 +2,7 @@
 name: Feature/Improvement
 about: Feature, Improvement 시, 사용해주세요.
 title: ''
-labels: ''
+labels: 'Type: Feature, Type: Improvement'
 assignees: ''
 
 ---
