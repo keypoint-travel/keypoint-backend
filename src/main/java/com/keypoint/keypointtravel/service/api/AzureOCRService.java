@@ -24,21 +24,24 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
+
 public class AzureOCRService {
 
-    private static String RECEIPT_MODEL_ID = "prebuilt-receipt";
-    private static String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
-    private static String OCR_RESULT_HEADER = "Operation-Location";
-    private static List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
+  private static final String RECEIPT_MODEL_ID = "prebuilt-receipt";
+  private static final String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
+  private static final String OCR_RESULT_HEADER = "Operation-Location";
+  private static final List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
         OCROperationStatus.FAILED,
         OCROperationStatus.SUCCEEDED
     );
 
-    @Value("${key.azure.endpoint}")
+
+  @Value("${key.azure.endpoint}")
     private String endpoint;
 
     @Value("${key.azure.key1}")
@@ -62,7 +65,8 @@ public class AzureOCRService {
         );
     }
 
-    private HttpHeaders createHeader() {
+
+  private HttpHeaders createHeader() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(AZURE_KEY_HEADER, apiKey);
@@ -70,7 +74,8 @@ public class AzureOCRService {
         return headers;
     }
 
-    /**
+
+  /**
      * OCR 분석 요청하는 함수
      *
      * @return OCR 결과 url
@@ -186,4 +191,5 @@ public class AzureOCRService {
             throw new GeneralException(ReceiptError.RECEIPT_RECOGNITION_FAILED);
         }
     }
+
 }

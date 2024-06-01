@@ -2,7 +2,7 @@
 name: Refactor
 about: Refactor 생성 시, 사용해주세요.
 title: ''
-labels: ''
+labels: 'Type: Refactor'
 assignees: ''
 
 ---
