@@ -1,6 +1,9 @@
 package com.keypoint.keypointtravel.common.handler;
 
+import com.keypoint.keypointtravel.common.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.common.enumType.error.ErrorCode;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
+import com.keypoint.keypointtravel.common.exception.HttpClientException;
 import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +22,19 @@ public class GeneralExceptionHandler {
         );
 
         return ErrorDTO.toResponseEntity(ex);
+    }
+
+    @ExceptionHandler(HttpClientException.class)
+    public ResponseEntity<Object> handleHttpClientException(HttpClientException ex) {
+        ErrorCode code = CommonErrorCode.OPEN_API_REQUEST_FAIL;
+        log.warn(
+            String.format("http-status={%s} code={%s} msg={%s}",
+                ex.getStatusCode(),
+                code,
+                ex.getMessage()
+            )
+        );
+
+        return ErrorDTO.toResponseEntity(ex, code);
     }
 }

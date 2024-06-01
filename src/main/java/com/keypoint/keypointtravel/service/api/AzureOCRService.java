@@ -1,26 +1,47 @@
 package com.keypoint.keypointtravel.service.api;
 
+import com.keypoint.keypointtravel.common.enumType.error.ReceiptError;
+import com.keypoint.keypointtravel.common.enumType.ocr.OCROperationStatus;
+import com.keypoint.keypointtravel.common.exception.GeneralException;
+import com.keypoint.keypointtravel.common.exception.HttpClientException;
 import com.keypoint.keypointtravel.common.utils.HttpUtils;
+import com.keypoint.keypointtravel.common.utils.MultiPartFileUtils;
+import com.keypoint.keypointtravel.common.utils.StringUtils;
 import com.keypoint.keypointtravel.dto.api.azure.request.OCRAnalysisRequest;
 import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
+import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
+
 public class AzureOCRService {
 
-    private static String RECEIPT_MODEL_ID = "prebuilt-receipt";
-    private static String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
-    private static String OCR_RESULT_HEADER = "Operation-Location";
+  private static final String RECEIPT_MODEL_ID = "prebuilt-receipt";
+  private static final String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
+  private static final String OCR_RESULT_HEADER = "Operation-Location";
+  private static final List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
+        OCROperationStatus.FAILED,
+        OCROperationStatus.SUCCEEDED
+    );
 
-    @Value("${key.azure.endpoint}")
+
+  @Value("${key.azure.endpoint}")
     private String endpoint;
 
     @Value("${key.azure.key1}")
@@ -44,45 +65,131 @@ public class AzureOCRService {
         );
     }
 
-    /**
+
+  private HttpHeaders createHeader() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(AZURE_KEY_HEADER, apiKey);
+
+        return headers;
+    }
+
+
+  /**
      * OCR 분석 요청하는 함수
      *
      * @return OCR 결과 url
      */
-    private String requestOCRAnalysis() {
-        String url = getOCRAnalysisUrl();
-        String documentUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/rest-api/receipt.png";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(AZURE_KEY_HEADER, apiKey);
+    private String requestOCRAnalysis(String documentURL) {
+        String requestURL = getOCRAnalysisUrl();
+        HttpHeaders headers = createHeader();
+        OCRAnalysisRequest request = OCRAnalysisRequest.toRequest(documentURL);
 
-        OCRAnalysisRequest request = OCRAnalysisRequest.toRequest(documentUrl);
-
-        ResponseEntity<String> response = HttpUtils.post(url, headers, request, String.class);
-
-        return response.getHeaders().get(OCR_RESULT_HEADER).get(0);
+        while (true) {
+            try {
+                ResponseEntity<String> response = HttpUtils.post(requestURL, headers, request,
+                    String.class);
+                return response.getHeaders().get(OCR_RESULT_HEADER).get(0);
+            } catch (HttpClientErrorException ex) {
+                handleHttpClientErrorException(ex);
+            }
+        }
     }
 
+    /**
+     * OCR 결과를 요청하는 함수
+     *
+     * @param url
+     * @return
+     */
     private OCRResultResponse requestOCRResult(String url) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(AZURE_KEY_HEADER, apiKey);
+        HttpHeaders headers = createHeader();
 
-        ResponseEntity<OCRResultResponse> response = HttpUtils.get(
-            url,
-            headers,
-            OCRResultResponse.class
-        );
+        while (true) {
+            try {
+                ResponseEntity<OCRResultResponse> response = HttpUtils.get(
+                    url,
+                    headers,
+                    OCRResultResponse.class
+                );
 
-        return response.getBody();
+                return response.getBody();
+            } catch (HttpClientErrorException ex) {
+                handleHttpClientErrorException(ex);
+            }
+        }
     }
 
-    public OCRResultResponse getOCRResult() {
-        String ocrResultUrl = requestOCRAnalysis();
-        OCRResultResponse ocrResult = requestOCRResult(
-            ocrResultUrl); // TODO: status 가 succeeded까지 호출 필요
+    /**
+     * HttpClientErrorException 에 대한 예외 처리 진행
+     *
+     * @param ex
+     */
+    private void handleHttpClientErrorException(HttpClientErrorException ex) {
+        if (ex.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+            String retrySec = ex.getResponseHeaders().get("Retry-After").get(0);
+            Integer sec = StringUtils.convertToInteger(retrySec);
 
-        return ocrResult;
+            try {
+                Thread.sleep(sec * 1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        } else {
+            throw new HttpClientException(ex);
+        }
+    }
+
+    /**
+     * (Multipart) 영수증을 분석하는 함수
+     *
+     * @param file
+     * @return
+     */
+    public ReceiptDTO analyzeReceipt(MultipartFile file) {
+        try {
+            String base64Source = MultiPartFileUtils.convertToBase64(file);
+            String ocrResultUrl = requestOCRAnalysis(base64Source);
+            OCRResultResponse response = getOCRResult(ocrResultUrl);
+
+            return ReceiptDTO.toDTO(
+                response.getAnalyzeResult().getDocuments().get(0));
+        } catch (HttpClientException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    /**
+     * OCR 결과를 가져오는 함수
+     * @param ocrResultUrl
+     * @return
+     */
+    private OCRResultResponse getOCRResult(String ocrResultUrl) {
+        OCROperationStatus status;
+        OCRResultResponse ocrResult;
+
+        // 1. OCR 이미지 분석이 마무리 될 때까지 요청
+        do {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            ocrResult = requestOCRResult(
+                ocrResultUrl
+            );
+            status = ocrResult.getStatus();
+        } while (!VALID_OCR_STATUS.contains(status));
+
+        // 2. 결과가 성공인 경우에만 결과 반환
+        if (status == OCROperationStatus.SUCCEEDED) {
+            return ocrResult;
+        } else {
+            throw new GeneralException(ReceiptError.RECEIPT_RECOGNITION_FAILED);
+        }
     }
 
 }

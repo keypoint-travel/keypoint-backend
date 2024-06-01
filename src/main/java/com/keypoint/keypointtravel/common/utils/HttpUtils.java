@@ -2,31 +2,40 @@ package com.keypoint.keypointtravel.common.utils;
 
 import com.keypoint.keypointtravel.common.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
+import com.keypoint.keypointtravel.common.interceptor.HttpLoggingInterceptor;
+import java.util.List;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class HttpUtils {
 
+    private static RestTemplate restTemplate;
+
+    static {
+        restTemplate = new RestTemplate();
+        List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
+        interceptors.add(new HttpLoggingInterceptor());
+    }
+
     public static <T> ResponseEntity<T> get(String url, HttpHeaders headers, Class<T> className) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
             HttpEntity entity = new HttpEntity(headers);
-
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
 
-            ResponseEntity<T> response = restTemplate.exchange(
+            return restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
                 entity,
                 className
             );
-
-            return response;
+        } catch (HttpClientErrorException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL, ex.getMessage());
         }
@@ -39,13 +48,11 @@ public class HttpUtils {
         Class<T> className
     ) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
             HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
-
-            ResponseEntity<T> response = restTemplate.postForEntity(url, entity, className);
-
-            return response;
+            
+            return restTemplate.postForEntity(url, entity, className);
+        } catch (HttpClientErrorException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL, ex.getMessage());
         }
