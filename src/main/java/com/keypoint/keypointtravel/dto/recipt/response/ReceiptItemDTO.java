@@ -27,8 +27,8 @@ public class ReceiptItemDTO {
         String productCode,
         String quantityUnit
     ) {
-        this.totalPrice = StringUtils.changeStringToFloat(totalPrice);
-        this.quantity = StringUtils.changeStringToFloat(quantity);
+        this.totalPrice = StringUtils.convertToFloat(totalPrice);
+        this.quantity = StringUtils.convertToFloat(quantity);
         this.description = description;
         this.productCode = productCode;
         this.quantityUnit = quantityUnit;

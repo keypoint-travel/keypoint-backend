@@ -46,13 +46,13 @@ public class ReceiptDTO {
         this.merchantName = merchantName;
         this.merchantPhoneNumber = merchantPhoneNumber;
         this.merchantAddress = merchantAddress;
-        this.total = StringUtils.changeStringToFloat(total);
+        this.total = StringUtils.convertToFloat(total);
         this.currencyCode = currencyCode;
         this.transactionDate = transactionDate;
         this.transactionTime = transactionTime;
-        this.subtotal = StringUtils.changeStringToFloat(subtotal);
-        this.tax = StringUtils.changeStringToFloat(tax);
-        this.tip = StringUtils.changeStringToFloat(tip);
+        this.subtotal = StringUtils.convertToFloat(subtotal);
+        this.tax = StringUtils.convertToFloat(tax);
+        this.tip = StringUtils.convertToFloat(tip);
         this.items = items;
     }
 

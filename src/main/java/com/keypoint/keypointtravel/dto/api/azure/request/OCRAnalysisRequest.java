@@ -5,10 +5,10 @@ import lombok.Data;
 @Data
 public class OCRAnalysisRequest {
 
-    private String urlSource;
+    private String base64Source; //base64Source
 
     public OCRAnalysisRequest(String urlSource) {
-        this.urlSource = urlSource;
+        this.base64Source = urlSource;
     }
 
     public static OCRAnalysisRequest toRequest(String urlSource) {

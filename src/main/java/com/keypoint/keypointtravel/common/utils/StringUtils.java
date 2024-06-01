@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StringUtils {
 
-  public static Float changeStringToFloat(String str) {
+  public static Float convertToFloat(String str) {
     return str == null ? null : Float.parseFloat(str);
   }
 }

@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.common.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.common.enumType.ocr.OCROperationStatus;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.common.utils.HttpUtils;
+import com.keypoint.keypointtravel.common.utils.MultiPartFileUtils;
 import com.keypoint.keypointtravel.dto.api.azure.request.OCRAnalysisRequest;
 import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
 import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -97,18 +99,23 @@ public class AzureOCRService {
     }
 
     /**
-     * 영수증을 분석하는 함수
+     * (Multipart) 영수증을 분석하는 함수
      *
-     * @param url
+     * @param file
      * @return
      */
-    public ReceiptDTO analyzeReceipt(String url) {
-        String ocrResultUrl = requestOCRAnalysis(url);
-        OCRResultResponse response = getOCRResult(ocrResultUrl);
+    public ReceiptDTO analyzeReceipt(MultipartFile file) {
+        try {
+            String base64Source = MultiPartFileUtils.convertToBase64(file);
+            String ocrResultUrl = requestOCRAnalysis(base64Source);
+            OCRResultResponse response = getOCRResult(ocrResultUrl);
 
-        ReceiptDTO receiptDTO = ReceiptDTO.toDTO(
-            response.getAnalyzeResult().getDocuments().get(0));
-        return receiptDTO;
+            ReceiptDTO receiptDTO = ReceiptDTO.toDTO(
+                response.getAnalyzeResult().getDocuments().get(0));
+            return receiptDTO;
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
     }
 
     /**
