@@ -1,9 +1,11 @@
 package com.keypoint.keypointtravel.controller;
 
-import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
+import com.keypoint.keypointtravel.dto.recipt.request.ReceiptRequest;
+import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
 import com.keypoint.keypointtravel.service.api.AzureOCRService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,8 +17,8 @@ public class DevController {
 
     private final AzureOCRService azureOCRService;
 
-    @GetMapping("/azure/ocr")
-    public OCRResultResponse getReceiptResult() {
-        return azureOCRService.analyzeReceipt();
+    @PostMapping("/azure/ocr")
+    public ReceiptDTO getReceiptResult(@RequestBody ReceiptRequest request) {
+        return azureOCRService.analyzeReceipt(request.getUrl());
     }
 }
