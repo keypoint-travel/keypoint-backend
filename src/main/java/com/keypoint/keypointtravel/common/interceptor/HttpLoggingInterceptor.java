@@ -1,12 +1,14 @@
 package com.keypoint.keypointtravel.common.interceptor;
 
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class HttpLoggingInterceptor implements ClientHttpRequestInterceptor {
 
@@ -16,19 +18,16 @@ public class HttpLoggingInterceptor implements ClientHttpRequestInterceptor {
       byte[] body,
       ClientHttpRequestExecution execution
   ) throws IOException {
-    logRequest(request, body);
     ClientHttpResponse response = execution.execute(request, body);
-    logResponse(response);
+    addLog(request, response);
     return response;
   }
 
-  private void logRequest(HttpRequest request, byte[] body) throws IOException {
-    System.out.println("URI         : " + request.getURI());
-    System.out.println("Method      : " + request.getMethod());
-  }
-
-  private void logResponse(ClientHttpResponse response) throws IOException {
-    System.out.println("Status code  : " + response.getStatusCode());
-    System.out.println("Status text  : " + response.getStatusText());
+  private void addLog(HttpRequest request, ClientHttpResponse response) throws IOException {
+    log.info(String.format("uri={%s} http-method={%s} status code={%s}",
+        request.getURI(),
+        request.getMethod(),
+        response.getStatusCode()
+    ));
   }
 }

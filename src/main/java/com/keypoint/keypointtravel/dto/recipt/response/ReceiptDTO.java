@@ -57,6 +57,10 @@ public class ReceiptDTO {
     }
 
     public static ReceiptDTO toDTO(OCRDocumentResponse response) {
+        if (response == null) {
+            return null;
+        }
+
         Map<String, DocumentField> fieldMap = response.getFields();
 
         return ReceiptDTO.builder()

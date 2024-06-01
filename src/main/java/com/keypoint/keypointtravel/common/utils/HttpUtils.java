@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -26,14 +27,15 @@ public class HttpUtils {
         try {
             HttpEntity entity = new HttpEntity(headers);
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
-            ResponseEntity<T> response = restTemplate.exchange(
+
+            return restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
                 entity,
                 className
             );
-
-            return response;
+        } catch (HttpClientErrorException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL, ex.getMessage());
         }
@@ -47,9 +49,10 @@ public class HttpUtils {
     ) {
         try {
             HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
-            ResponseEntity<T> response = restTemplate.postForEntity(url, entity, className);
-
-            return response;
+            
+            return restTemplate.postForEntity(url, entity, className);
+        } catch (HttpClientErrorException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL, ex.getMessage());
         }

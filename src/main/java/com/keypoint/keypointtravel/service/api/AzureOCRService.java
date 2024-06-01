@@ -3,8 +3,10 @@ package com.keypoint.keypointtravel.service.api;
 import com.keypoint.keypointtravel.common.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.common.enumType.ocr.OCROperationStatus;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
+import com.keypoint.keypointtravel.common.exception.HttpClientException;
 import com.keypoint.keypointtravel.common.utils.HttpUtils;
 import com.keypoint.keypointtravel.common.utils.MultiPartFileUtils;
+import com.keypoint.keypointtravel.common.utils.StringUtils;
 import com.keypoint.keypointtravel.dto.api.azure.request.OCRAnalysisRequest;
 import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
 import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
@@ -14,10 +16,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -58,6 +62,14 @@ public class AzureOCRService {
         );
     }
 
+    private HttpHeaders createHeader() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(AZURE_KEY_HEADER, apiKey);
+
+        return headers;
+    }
+
     /**
      * OCR 분석 요청하는 함수
      *
@@ -65,16 +77,18 @@ public class AzureOCRService {
      */
     private String requestOCRAnalysis(String documentURL) {
         String requestURL = getOCRAnalysisUrl();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(AZURE_KEY_HEADER, apiKey);
-
+        HttpHeaders headers = createHeader();
         OCRAnalysisRequest request = OCRAnalysisRequest.toRequest(documentURL);
 
-        ResponseEntity<String> response = HttpUtils.post(requestURL, headers, request,
-            String.class);
-
-        return response.getHeaders().get(OCR_RESULT_HEADER).get(0);
+        while (true) {
+            try {
+                ResponseEntity<String> response = HttpUtils.post(requestURL, headers, request,
+                    String.class);
+                return response.getHeaders().get(OCR_RESULT_HEADER).get(0);
+            } catch (HttpClientErrorException ex) {
+                handleHttpClientErrorException(ex);
+            }
+        }
     }
 
     /**
@@ -84,18 +98,41 @@ public class AzureOCRService {
      * @return
      */
     private OCRResultResponse requestOCRResult(String url) {
+        HttpHeaders headers = createHeader();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(AZURE_KEY_HEADER, apiKey);
+        while (true) {
+            try {
+                ResponseEntity<OCRResultResponse> response = HttpUtils.get(
+                    url,
+                    headers,
+                    OCRResultResponse.class
+                );
 
-        ResponseEntity<OCRResultResponse> response = HttpUtils.get(
-            url,
-            headers,
-            OCRResultResponse.class
-        );
+                return response.getBody();
+            } catch (HttpClientErrorException ex) {
+                handleHttpClientErrorException(ex);
+            }
+        }
+    }
 
-        return response.getBody();
+    /**
+     * HttpClientErrorException 에 대한 예외 처리 진행
+     *
+     * @param ex
+     */
+    private void handleHttpClientErrorException(HttpClientErrorException ex) {
+        if (ex.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+            String retrySec = ex.getResponseHeaders().get("Retry-After").get(0);
+            Integer sec = StringUtils.convertToInteger(retrySec);
+
+            try {
+                Thread.sleep(sec * 1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        } else {
+            throw new HttpClientException(ex);
+        }
     }
 
     /**
@@ -110,9 +147,10 @@ public class AzureOCRService {
             String ocrResultUrl = requestOCRAnalysis(base64Source);
             OCRResultResponse response = getOCRResult(ocrResultUrl);
 
-            ReceiptDTO receiptDTO = ReceiptDTO.toDTO(
+            return ReceiptDTO.toDTO(
                 response.getAnalyzeResult().getDocuments().get(0));
-            return receiptDTO;
+        } catch (HttpClientException e) {
+            throw e;
         } catch (Exception e) {
             throw new GeneralException(e);
         }
@@ -130,8 +168,9 @@ public class AzureOCRService {
         // 1. OCR 이미지 분석이 마무리 될 때까지 요청
         do {
             try {
-                Thread.sleep(1 * 1000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
 
             ocrResult = requestOCRResult(
@@ -147,5 +186,4 @@ public class AzureOCRService {
             throw new GeneralException(ReceiptError.RECEIPT_RECOGNITION_FAILED);
         }
     }
-
 }
