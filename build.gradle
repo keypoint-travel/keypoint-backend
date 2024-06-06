@@ -27,6 +27,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'commons-codec:commons-codec'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.30.1'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -50,6 +54,11 @@ dependencies {
 
     // azure
     implementation group: 'com.azure', name: 'azure-ai-formrecognizer', version: '4.1.0'
+
+    // jwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 }
 
 def querydslDir = "$buildDir/generated/querydsl"
