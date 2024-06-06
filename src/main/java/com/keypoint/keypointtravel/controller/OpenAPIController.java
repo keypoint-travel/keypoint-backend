@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.controller;
 
+import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;
 import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
 import com.keypoint.keypointtravel.service.api.AzureOCRService;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/open-api")
 public class OpenAPIController {
 
-  private final AzureOCRService azureOCRService;
+    private final AzureOCRService azureOCRService;
 
-  @PostMapping("/ocr")
-  public ReceiptDTO getReceiptResult(@RequestPart MultipartFile file) {
-    return azureOCRService.analyzeReceipt(file);
-  }
+    @PostMapping("/ocr")
+    public APIResponseEntity<ReceiptDTO> getReceiptResult(@RequestPart("file") MultipartFile file) {
+        ReceiptDTO result = azureOCRService.analyzeReceipt(file);
+        return APIResponseEntity.<ReceiptDTO>builder()
+            .data(result)
+            .build();
+    }
 }
