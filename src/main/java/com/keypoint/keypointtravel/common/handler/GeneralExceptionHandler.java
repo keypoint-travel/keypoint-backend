@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.common.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.common.enumType.error.ErrorCode;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.common.exception.HttpClientException;
+import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;
 import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,26 +16,33 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GeneralExceptionHandler {
 
     @ExceptionHandler(GeneralException.class)
-    public ResponseEntity<Object> handleGeneralException(GeneralException ex) {
+    public ResponseEntity<APIResponseEntity<ErrorDTO>> handleGeneralException(
+        GeneralException exception) {
         log.warn(
-            String.format("http-status={%s} code={%s} msg={%s} detail={%s}", ex.getStatus().value(),
-                ex.getErrorCode(), ex.getErrorMsg(), ex.getDetail())
-        );
-
-        return ErrorDTO.toResponseEntity(ex);
-    }
-
-    @ExceptionHandler(HttpClientException.class)
-    public ResponseEntity<Object> handleHttpClientException(HttpClientException ex) {
-        ErrorCode code = CommonErrorCode.OPEN_API_REQUEST_FAIL;
-        log.warn(
-            String.format("http-status={%s} code={%s} msg={%s}",
-                ex.getStatusCode(),
-                code,
-                ex.getMessage()
+            String.format("http-status={%s} code={%s} msg={%s} detail={%s}",
+                exception.getStatus().value(),
+                exception.getErrorCode(),
+                exception.getErrorMsg(),
+                exception.getDetail()
             )
         );
 
-        return ErrorDTO.toResponseEntity(ex, code);
+        return ErrorDTO.toResponseEntity(exception);
+    }
+
+    @ExceptionHandler(HttpClientException.class)
+    public ResponseEntity<APIResponseEntity<ErrorDTO>> handleHttpClientException(
+        HttpClientException exception
+    ) {
+        ErrorCode code = CommonErrorCode.OPEN_API_REQUEST_FAIL;
+        log.warn(
+            String.format("http-status={%s} code={%s} msg={%s}",
+                exception.getStatusCode(),
+                code,
+                exception.getMessage()
+            )
+        );
+
+        return ErrorDTO.toResponseEntity(exception, code);
     }
 }

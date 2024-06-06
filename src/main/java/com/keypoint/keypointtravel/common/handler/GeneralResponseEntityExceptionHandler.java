@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.common.handler;
 
 import com.keypoint.keypointtravel.common.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
+import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;
 import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +23,8 @@ public class GeneralResponseEntityExceptionHandler extends ResponseEntityExcepti
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
-        HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        HttpHeaders headers, HttpStatusCode status, WebRequest request
+    ) {
         String errorMsg = null;
         FieldError fieldError = ex.getBindingResult().getFieldError();
         if (fieldError != null) {
@@ -34,22 +36,27 @@ public class GeneralResponseEntityExceptionHandler extends ResponseEntityExcepti
 
         GeneralException exception = new GeneralException(
             CommonErrorCode.INVALID_REQUEST_DATA, errorMsg);
+        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.toAPIResponseEntity(exception);
 
-        return ErrorDTO.toResponseEntity(exception);
+        return new ResponseEntity<>(apiResponse, headers, status);
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(
         TypeMismatchException ex,
-        HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String errorMsg = String.format("property: %s, message: %s", ex.getPropertyName(),
-            ex.getMessage());
+        HttpHeaders headers, HttpStatusCode status, WebRequest request
+    ) {
+        String errorMsg = String.format("property: %s, message: %s",
+            ex.getPropertyName(),
+            ex.getMessage()
+        );
         GeneralException exception = new GeneralException(
             CommonErrorCode.INVALID_REQUEST_DATA,
             errorMsg
         );
+        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.toAPIResponseEntity(exception);
 
-        return ErrorDTO.toResponseEntity(exception);
+        return new ResponseEntity<>(apiResponse, headers, status);
     }
 
     @Override
@@ -61,7 +68,8 @@ public class GeneralResponseEntityExceptionHandler extends ResponseEntityExcepti
             CommonErrorCode.INVALID_REQUEST_DATA,
             ex.getMessage()
         );
+        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.toAPIResponseEntity(exception);
 
-        return ErrorDTO.toResponseEntity(exception);
+        return new ResponseEntity<>(apiResponse, headers, status);
     }
 }
