@@ -31,14 +31,23 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String password;
+
     @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted; // 삭제 여부
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType role;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OauthProviderType oauthProviderType;
+
+    public Member(String email, OauthProviderType oauthProviderType) {
+        this.email = email;
+        this.oauthProviderType = oauthProviderType;
+        this.isDeleted = false;
+        this.role = RoleType.ROLE_CERTIFIED_USER;
+    }
 }
