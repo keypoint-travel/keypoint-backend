@@ -1,9 +1,11 @@
 package com.keypoint.keypointtravel.entity.member;
 
+import com.keypoint.keypointtravel.common.converter.AES256ToStringConverter;
 import com.keypoint.keypointtravel.common.enumType.RoleType;
 import com.keypoint.keypointtravel.common.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.entity.common.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,6 +33,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Convert(converter = AES256ToStringConverter.class)
     private String password;
 
     @Column(nullable = false, name = "is_deleted")
@@ -45,6 +48,13 @@ public class Member extends BaseEntity {
     private OauthProviderType oauthProviderType;
 
     public Member(String email, OauthProviderType oauthProviderType) {
+        this.email = email;
+        this.oauthProviderType = oauthProviderType;
+        this.isDeleted = false;
+        this.role = RoleType.ROLE_CERTIFIED_USER;
+    }
+
+    public Member(String email, String password, OauthProviderType oauthProviderType) {
         this.email = email;
         this.oauthProviderType = oauthProviderType;
         this.isDeleted = false;
