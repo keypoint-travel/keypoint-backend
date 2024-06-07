@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.common.utils.provider;
 import com.keypoint.keypointtravel.common.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.vo.TokenInfoVO;
+import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -55,7 +55,7 @@ public class JwtTokenProvider implements InitializingBean {
      *
      * @return access token과 refresh token이 담긴 jwt 토큰 객체
      */
-    public TokenInfoVO createToken(Authentication authentication) {
+    public TokenInfoDTO createToken(Authentication authentication) {
         // 1. 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
@@ -81,7 +81,7 @@ public class JwtTokenProvider implements InitializingBean {
             .signWith(SignatureAlgorithm.HS256, jwtKey)
             .compact();
 
-        return TokenInfoVO.toVO(GRANT_TYPE, accessToken, refreshToken);
+        return TokenInfoDTO.toDTO(GRANT_TYPE, accessToken, refreshToken);
     }
 
     /**
