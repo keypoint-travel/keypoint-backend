@@ -1,8 +1,7 @@
 package com.keypoint.keypointtravel.common.handler;
 
 import com.keypoint.keypointtravel.common.utils.provider.JwtTokenProvider;
-import com.keypoint.keypointtravel.vo.TokenInfoVO;
-import jakarta.servlet.ServletException;
+import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         HttpServletRequest request,
         HttpServletResponse response,
         Authentication authentication
-    ) throws IOException, ServletException {
+    ) throws IOException {
         String targetURL = determineTargetUrl(response, authentication);
 
         getRedirectStrategy().sendRedirect(request, response, targetURL);
@@ -37,8 +36,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         HttpServletResponse response,
         Authentication authentication
     ) {
-        TokenInfoVO tokenInfoVO = tokenProvider.createToken(authentication);
-        String jsonResponse = "{\"accessToken\": \"" + tokenInfoVO.getAccessToken() + "\"}";
+        TokenInfoDTO tokenInfoDTO = tokenProvider.createToken(authentication);
+        String jsonResponse = "{\"accessToken\": \"" + tokenInfoDTO.getAccessToken() + "\"}";
 
         try {
             PrintWriter writer = response.getWriter();
@@ -52,8 +51,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         return UriComponentsBuilder.fromUriString(redirectUri)
             .queryParam("success", true)
-            .queryParam("accessToken", tokenInfoVO.getAccessToken())
-            .queryParam("refreshToken", tokenInfoVO.getRefreshToken())
+            .queryParam("accessToken", tokenInfoDTO.getAccessToken())
+            .queryParam("refreshToken", tokenInfoDTO.getRefreshToken())
             .build().toUriString();
     }
 }

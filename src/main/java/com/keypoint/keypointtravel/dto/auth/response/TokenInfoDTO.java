@@ -1,17 +1,17 @@
-package com.keypoint.keypointtravel.vo;
+package com.keypoint.keypointtravel.dto.auth.response;
 
 import lombok.Data;
 import lombok.Getter;
 
 @Data
 @Getter
-public class TokenInfoVO {
+public class TokenInfoDTO {
 
     private String grandType;
     private String accessToken;
     private String refreshToken;
 
-    public TokenInfoVO(
+    public TokenInfoDTO(
         String grandType,
         String accessToken,
         String refreshToken
@@ -21,12 +21,12 @@ public class TokenInfoVO {
         this.refreshToken = refreshToken;
     }
 
-    public static TokenInfoVO toVO(
+    public static TokenInfoDTO toDTO(
         String grandType,
         String accessToken,
         String refreshToken
     ) {
-        return new TokenInfoVO(grandType, accessToken, refreshToken);
+        return new TokenInfoDTO(grandType, accessToken, refreshToken);
     }
 
 }
