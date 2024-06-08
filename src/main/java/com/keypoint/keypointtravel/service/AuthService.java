@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +28,6 @@ public class AuthService {
     private final JwtTokenProvider tokenProvider;
     private final MemberService memberService;
     private final AuthenticationManagerBuilder managerBuilder;
-    private final PasswordEncoder passwordEncoder;
-
 
     /**
      * JWT 토큰을 재발급하는 함수
@@ -65,25 +62,31 @@ public class AuthService {
         }
     }
 
+    /**
+     * 로그인 함수
+     *
+     * @param request
+     * @return
+     */
     @Transactional(noRollbackFor = GeneralException.class)
     public TokenInfoDTO login(LoginRequest request) {
-//        try {
-        String email = request.getEmail();
-        String password = request.getPassword();
+        try {
+            String email = request.getEmail();
+            String password = request.getPassword();
 
-        // 1. 이메일 유효성 검사
-        Member user = validateMemberForLogin(email);
+            // 1. 이메일 유효성 검사
+            Member user = validateMemberForLogin(email);
 
-        // 2. 비밃번호 유효성 검사
-        if (!StringUtils.checkPasswordValidation(password)) {
-            throw new GeneralException(MemberErrorCode.INVALID_LOGIN_CREDENTIALS);
+            // 2. 비밃번호 유효성 검사
+            if (!StringUtils.checkPasswordValidation(password)) {
+                throw new GeneralException(MemberErrorCode.INVALID_LOGIN_CREDENTIALS);
+            }
+
+            // 3. JWT 토큰 생성
+            return getJwtTokenInfo(user.getEmail(), password);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
         }
-
-        // 3. JWT 토큰 생성
-        return getJwtTokenInfo(user.getEmail(), password);
-//        } catch (Exception ex) {
-//            throw new GeneralException(ex);
-//        }
     }
 
     public TokenInfoDTO getJwtTokenInfo(String email, String password) {
