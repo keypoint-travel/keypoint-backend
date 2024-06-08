@@ -56,6 +56,7 @@ public class Member extends BaseEntity {
 
     public Member(String email, String password, OauthProviderType oauthProviderType) {
         this.email = email;
+        this.password = password;
         this.oauthProviderType = oauthProviderType;
         this.isDeleted = false;
         this.role = RoleType.ROLE_CERTIFIED_USER;
