@@ -1,14 +1,21 @@
 package com.keypoint.keypointtravel.service;
 
+import com.keypoint.keypointtravel.common.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.common.enumType.error.TokenErrorCode;
+import com.keypoint.keypointtravel.common.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.common.utils.StringUtils;
 import com.keypoint.keypointtravel.common.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.dto.member.request.LoginRequest;
+import com.keypoint.keypointtravel.entity.member.Member;
 import com.keypoint.keypointtravel.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +28,9 @@ public class AuthService {
 
     private final JwtTokenProvider tokenProvider;
     private final MemberService memberService;
+    private final AuthenticationManagerBuilder managerBuilder;
+    private final PasswordEncoder passwordEncoder;
+
 
     /**
      * JWT 토큰을 재발급하는 함수
@@ -53,5 +63,55 @@ public class AuthService {
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
+    }
+
+    @Transactional(noRollbackFor = GeneralException.class)
+    public TokenInfoDTO login(LoginRequest request) {
+//        try {
+        String email = request.getEmail();
+        String password = request.getPassword();
+
+        // 1. 이메일 유효성 검사
+        Member user = validateMemberForLogin(email);
+
+        // 2. 비밃번호 유효성 검사
+        if (!StringUtils.checkPasswordValidation(password)) {
+            throw new GeneralException(MemberErrorCode.INVALID_LOGIN_CREDENTIALS);
+        }
+
+        // 3. JWT 토큰 생성
+        return getJwtTokenInfo(user.getEmail(), password);
+//        } catch (Exception ex) {
+//            throw new GeneralException(ex);
+//        }
+    }
+
+    public TokenInfoDTO getJwtTokenInfo(String email, String password) {
+        // 1. Authentication 객체 생성
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            email, password);
+
+        // 2. 실제 검증 진행
+        Authentication authentication = managerBuilder.getObject()
+            .authenticate(authenticationToken);
+
+        // 3. 인증 정보를 기반으로 JWT 토큰 생성
+        return tokenProvider.createToken(authentication);
+    }
+
+    /**
+     * 이메일 유효성 검사를 한 후, 유효성 검사에 통과한 경우, User를 반환하는 함수
+     *
+     * @param email
+     * @return
+     */
+    private Member validateMemberForLogin(String email) {
+        Member member = memberService.findMemberByEmail(email);
+
+        if (member.getOauthProviderType() != OauthProviderType.NONE) {
+            throw new GeneralException(MemberErrorCode.REGISTERED_EMAIL_FOR_THE_OTHER);
+        }
+
+        return member;
     }
 }
