@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.dto.recipt.response;
 
 import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
+import com.keypoint.keypointtravel.common.enumType.ocr.CurrencyCode;
 import com.keypoint.keypointtravel.common.enumType.ocr.OCRFieldName;
 import com.keypoint.keypointtravel.common.utils.AzureOCRUtils;
 import com.keypoint.keypointtravel.common.utils.StringUtils;
@@ -18,7 +19,7 @@ public class ReceiptDTO {
     private String merchantName;
     private String merchantPhoneNumber;
     private Float total;
-    private String currencyCode; // 돈 단위 (ISO 4217 기준)
+    private CurrencyCode currencyCode; // 돈 단위 (ISO 4217 기준)
     private String transactionDate; // YYYY-MM-DD
     private String transactionTime; // HH:mm:ss
     private Float subtotal; // total에서 tax를 뺀 금액
@@ -34,7 +35,7 @@ public class ReceiptDTO {
         String merchantPhoneNumber,
         String merchantAddress,
         String total,
-        String currencyCode,
+        CurrencyCode currencyCode,
         String transactionDate,
         String transactionTime,
         String subtotal,
@@ -118,11 +119,7 @@ public class ReceiptDTO {
                         .getValueArray()
                 )
             )
-            .currencyCode(AzureOCRUtils.getDocumentValue(
-                    OCRFieldName.TAX_DETAILS,
-                    fieldMap
-                )
-            )
+            .currencyCode(response.getCurrencyCode())
             .build();
     }
 }
