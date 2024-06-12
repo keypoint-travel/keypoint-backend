@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.entity.common;
 
-import com.keypoint.keypointtravel.common.converter.TimestampConverter;
+import com.keypoint.keypointtravel.global.converter.TimestampConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.EntityListeners;

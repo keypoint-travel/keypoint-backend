@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.service.member;
 
-import com.keypoint.keypointtravel.common.enumType.error.MemberErrorCode;
-import com.keypoint.keypointtravel.common.enumType.member.OauthProviderType;
-import com.keypoint.keypointtravel.common.exception.GeneralException;
-import com.keypoint.keypointtravel.common.utils.StringUtils;
+import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.dto.member.request.SignUpRequest;
 import com.keypoint.keypointtravel.dto.member.response.MemberDTO;
 import com.keypoint.keypointtravel.entity.member.Member;

@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.entity.member;
 
-import com.keypoint.keypointtravel.common.converter.AES256ToStringConverter;
-import com.keypoint.keypointtravel.common.enumType.RoleType;
-import com.keypoint.keypointtravel.common.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.converter.AES256ToStringConverter;
+import com.keypoint.keypointtravel.global.enumType.RoleType;
+import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.entity.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.dto.common.response;
 
-import com.keypoint.keypointtravel.common.enumType.error.ErrorCode;
-import com.keypoint.keypointtravel.common.exception.GeneralException;
-import com.keypoint.keypointtravel.common.exception.HttpClientException;
+import com.keypoint.keypointtravel.global.enumType.error.ErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.exception.HttpClientException;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.config.security.filter;
 
-import com.keypoint.keypointtravel.common.constants.HeaderConstants;
-import com.keypoint.keypointtravel.common.enumType.error.TokenErrorCode;
-import com.keypoint.keypointtravel.common.exception.GeneralException;
-import com.keypoint.keypointtravel.common.utils.provider.JwtTokenProvider;
+import com.keypoint.keypointtravel.global.constants.HeaderConstants;
+import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
