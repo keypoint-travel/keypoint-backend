@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.common.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.common.enumType.ocr.OCROperationStatus;
 import com.keypoint.keypointtravel.common.exception.GeneralException;
 import com.keypoint.keypointtravel.common.exception.HttpClientException;
+import com.keypoint.keypointtravel.common.utils.AzureOCRUtils;
 import com.keypoint.keypointtravel.common.utils.HttpUtils;
 import com.keypoint.keypointtravel.common.utils.MultiPartFileUtils;
 import com.keypoint.keypointtravel.common.utils.StringUtils;
@@ -32,16 +33,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class AzureOCRService {
 
-  private static final String RECEIPT_MODEL_ID = "prebuilt-receipt";
-  private static final String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
-  private static final String OCR_RESULT_HEADER = "Operation-Location";
-  private static final List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
+    private static final String RECEIPT_MODEL_ID = "prebuilt-receipt";
+    private static final String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
+    private static final String OCR_RESULT_HEADER = "Operation-Location";
+    private static final List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
         OCROperationStatus.FAILED,
         OCROperationStatus.SUCCEEDED
     );
 
 
-  @Value("${key.azure.endpoint}")
+    @Value("${key.azure.endpoint}")
     private String endpoint;
 
     @Value("${key.azure.key1}")
@@ -49,7 +50,6 @@ public class AzureOCRService {
 
     @Value("${key.azure.api-version}")
     private String appVersion;
-
 
     /**
      * OCR 분석 요청을 하는 API url 반환하는 함수
@@ -65,8 +65,7 @@ public class AzureOCRService {
         );
     }
 
-
-  private HttpHeaders createHeader() {
+    private HttpHeaders createHeader() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(AZURE_KEY_HEADER, apiKey);
@@ -74,8 +73,7 @@ public class AzureOCRService {
         return headers;
     }
 
-
-  /**
+    /**
      * OCR 분석 요청하는 함수
      *
      * @return OCR 결과 url
@@ -152,8 +150,9 @@ public class AzureOCRService {
             String ocrResultUrl = requestOCRAnalysis(base64Source);
             OCRResultResponse response = getOCRResult(ocrResultUrl);
 
-            return ReceiptDTO.toDTO(
-                response.getAnalyzeResult().getDocuments().get(0));
+            ReceiptDTO receiptDTO = processReceiptResponse(response);
+
+            return receiptDTO;
         } catch (HttpClientException e) {
             throw e;
         } catch (Exception e) {
@@ -162,7 +161,27 @@ public class AzureOCRService {
     }
 
     /**
+     * OCR 결과를 가공하여 ReceiptDTO를 생성하는 함수
+     *
+     * @param response
+     * @return
+     */
+    private ReceiptDTO processReceiptResponse(OCRResultResponse response) {
+        ReceiptDTO receiptDTO = ReceiptDTO.toDTO(
+            response.getAnalyzeResult().getDocuments().get(0));
+        String content = response.getAnalyzeResult().getContent();
+
+        receiptDTO.setCardNumber(AzureOCRUtils.extractCardNumber(content));
+        receiptDTO.setApprovalNumber(AzureOCRUtils.extractApprovalNumber(content));
+        receiptDTO.setRewardPoint(AzureOCRUtils.extractRewardPoints(content));
+        receiptDTO.setAvailablePoint(AzureOCRUtils.extractAvailablePoints(content));
+
+        return receiptDTO;
+    }
+
+    /**
      * OCR 결과를 가져오는 함수
+     *
      * @param ocrResultUrl
      * @return
      */
