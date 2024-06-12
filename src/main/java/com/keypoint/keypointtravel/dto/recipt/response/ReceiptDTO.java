@@ -26,6 +26,11 @@ public class ReceiptDTO {
     private Float tax;
     private Float tip;
 
+    private String cardNumber; // 카드 번호
+    private String approvalNumber; // 승인 번호
+    private String rewardPoint; // 적립 포인트
+    private String availablePoint; // 가용 포인트
+
     private List<ReceiptItemDTO> items; // 결제 항목에 대한 세부 데이터
 
     @Builder
@@ -121,5 +126,21 @@ public class ReceiptDTO {
             )
             .currencyCode(response.getCurrencyCode())
             .build();
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public void setApprovalNumber(String approvalNumber) {
+        this.approvalNumber = approvalNumber;
+    }
+
+    public void setRewardPoint(String rewardPoint) {
+        this.rewardPoint = rewardPoint;
+    }
+
+    public void setAvailablePoint(String availablePoint) {
+        this.availablePoint = availablePoint;
     }
 }

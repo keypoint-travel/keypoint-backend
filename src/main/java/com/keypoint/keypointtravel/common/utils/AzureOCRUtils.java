@@ -5,6 +5,8 @@ import com.azure.ai.formrecognizer.documentanalysis.implementation.models.Docume
 import com.keypoint.keypointtravel.common.enumType.ocr.OCRFieldName;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -64,7 +66,7 @@ public class AzureOCRUtils {
     }
 
     private static String getCurrencyValue(DocumentField fieldData) {
-        if (fieldData.getValueArray() == null || fieldData.getValueArray().isEmpty()){
+        if (fieldData.getValueArray() == null || fieldData.getValueArray().isEmpty()) {
             return null;
         }
 
@@ -73,12 +75,49 @@ public class AzureOCRUtils {
             return null;
         }
 
-        DocumentField accountField = taxDetailsField.getValueObject().get(OCRFieldName.AMOUNT.getFieldName());
+        DocumentField accountField = taxDetailsField.getValueObject()
+            .get(OCRFieldName.AMOUNT.getFieldName());
         if (accountField == null) {
             return null;
         }
 
         CurrencyValue currencyValue = accountField.getValueCurrency();
         return currencyValue == null ? null : currencyValue.getCurrencyCode();
+    }
+
+    public static String extractCardNumber(String data) {
+        Pattern pattern = Pattern.compile("\\[\\s*카드번호\\s*\\]\\s*(\\d{4}\\s*\\*+\\s*\\d{4})");
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            return matcher.group(1).replaceAll("\\s+", "");
+        }
+        return null;
+    }
+
+    public static String extractApprovalNumber(String data) {
+        Pattern pattern = Pattern.compile("\\[\\s*승인번호\\s*\\] (\\d+)");
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    public static String extractRewardPoints(String data) {
+        Pattern pattern = Pattern.compile("\\[\\s*적립포인트\\s*\\] (\\d+)");
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    public static String extractAvailablePoints(String data) {
+        Pattern pattern = Pattern.compile("\\[\\s*가용포인트\\s*\\] (\\d+,\\d+)");
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
