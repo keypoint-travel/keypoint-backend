@@ -1,11 +1,11 @@
 package com.keypoint.keypointtravel.service;
 
-import com.keypoint.keypointtravel.common.enumType.error.MemberErrorCode;
-import com.keypoint.keypointtravel.common.enumType.error.TokenErrorCode;
-import com.keypoint.keypointtravel.common.enumType.member.OauthProviderType;
-import com.keypoint.keypointtravel.common.exception.GeneralException;
-import com.keypoint.keypointtravel.common.utils.StringUtils;
-import com.keypoint.keypointtravel.common.utils.provider.JwtTokenProvider;
+import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
+import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
+import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
 import com.keypoint.keypointtravel.dto.member.request.LoginRequest;
 import com.keypoint.keypointtravel.entity.member.Member;

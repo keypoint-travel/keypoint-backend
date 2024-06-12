@@ -1,10 +1,10 @@
 package com.keypoint.keypointtravel.dto.recipt.response;
 
 import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
-import com.keypoint.keypointtravel.common.enumType.ocr.CurrencyCode;
-import com.keypoint.keypointtravel.common.enumType.ocr.OCRFieldName;
-import com.keypoint.keypointtravel.common.utils.AzureOCRUtils;
-import com.keypoint.keypointtravel.common.utils.StringUtils;
+import com.keypoint.keypointtravel.global.enumType.ocr.CurrencyCode;
+import com.keypoint.keypointtravel.global.enumType.ocr.OCRFieldName;
+import com.keypoint.keypointtravel.global.utils.AzureOCRUtils;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.dto.api.azure.response.OCRDocumentResponse;
 import java.util.List;
 import java.util.Map;

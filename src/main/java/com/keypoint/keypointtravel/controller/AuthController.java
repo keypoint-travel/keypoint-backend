@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.controller;
 
-import com.keypoint.keypointtravel.common.constants.HeaderConstants;
+import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.dto.auth.request.RefreshTokenRequest;
 import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
 import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;

@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.dto.recipt.response;
 
 import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
-import com.keypoint.keypointtravel.common.enumType.ocr.OCRFieldName;
-import com.keypoint.keypointtravel.common.utils.AzureOCRUtils;
-import com.keypoint.keypointtravel.common.utils.StringUtils;
+import com.keypoint.keypointtravel.global.enumType.ocr.OCRFieldName;
+import com.keypoint.keypointtravel.global.utils.AzureOCRUtils;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;

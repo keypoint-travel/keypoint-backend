@@ -1,13 +1,13 @@
 package com.keypoint.keypointtravel.service.api;
 
-import com.keypoint.keypointtravel.common.enumType.error.ReceiptError;
-import com.keypoint.keypointtravel.common.enumType.ocr.OCROperationStatus;
-import com.keypoint.keypointtravel.common.exception.GeneralException;
-import com.keypoint.keypointtravel.common.exception.HttpClientException;
-import com.keypoint.keypointtravel.common.utils.AzureOCRUtils;
-import com.keypoint.keypointtravel.common.utils.HttpUtils;
-import com.keypoint.keypointtravel.common.utils.MultiPartFileUtils;
-import com.keypoint.keypointtravel.common.utils.StringUtils;
+import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
+import com.keypoint.keypointtravel.global.enumType.ocr.OCROperationStatus;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.exception.HttpClientException;
+import com.keypoint.keypointtravel.global.utils.AzureOCRUtils;
+import com.keypoint.keypointtravel.global.utils.HttpUtils;
+import com.keypoint.keypointtravel.global.utils.MultiPartFileUtils;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.dto.api.azure.request.OCRAnalysisRequest;
 import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
 import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
