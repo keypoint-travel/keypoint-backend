@@ -1,11 +1,11 @@
 package com.keypoint.keypointtravel.global.handler;
 
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.dto.response.ErrorDTO;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.ErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.exception.HttpClientException;
-import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;
-import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

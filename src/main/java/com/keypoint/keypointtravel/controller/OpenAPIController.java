@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.controller;
 
-import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;
 import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.service.api.AzureOCRService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

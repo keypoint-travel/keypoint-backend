@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.global.handler;
 
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.dto.response.ErrorDTO;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.dto.common.response.APIResponseEntity;
-import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
