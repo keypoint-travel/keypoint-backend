@@ -1,14 +1,14 @@
-package com.keypoint.keypointtravel.config;
+package com.keypoint.keypointtravel.global.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.keypoint.keypointtravel.global.config.security.entryPoint.JwtAuthenticationEntryPoint;
+import com.keypoint.keypointtravel.global.config.security.filter.JwtFilter;
 import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.handler.JwtAccessDeniedHandler;
 import com.keypoint.keypointtravel.global.handler.OAuth2AuthenticationFailureHandler;
 import com.keypoint.keypointtravel.global.handler.OAuth2AuthenticationSuccessHandler;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
-import com.keypoint.keypointtravel.config.security.entryPoint.JwtAuthenticationEntryPoint;
-import com.keypoint.keypointtravel.config.security.filter.JwtFilter;
 import com.keypoint.keypointtravel.service.member.Oauth2UserService;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;

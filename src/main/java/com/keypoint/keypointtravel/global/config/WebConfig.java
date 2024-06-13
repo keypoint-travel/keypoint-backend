@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.config;
+package com.keypoint.keypointtravel.global.config;
 
 import com.keypoint.keypointtravel.global.interceptor.ServiceKeyInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

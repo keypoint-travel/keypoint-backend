@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.global.utils.provider;
 
+import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

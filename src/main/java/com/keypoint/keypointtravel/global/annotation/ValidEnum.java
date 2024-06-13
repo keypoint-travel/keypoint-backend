@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.global.annotation;
 
-import com.keypoint.keypointtravel.validator.EnumValidator;
+import com.keypoint.keypointtravel.global.validator.EnumValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
