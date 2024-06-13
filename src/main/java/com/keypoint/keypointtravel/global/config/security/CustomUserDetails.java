@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.config.security;
+package com.keypoint.keypointtravel.global.config.security;
 
 import com.keypoint.keypointtravel.entity.member.Member;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.config.security.filter;
+package com.keypoint.keypointtravel.global.config.security.filter;
 
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;

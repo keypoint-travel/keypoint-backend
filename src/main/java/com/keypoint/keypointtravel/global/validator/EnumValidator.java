@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.validator;
+package com.keypoint.keypointtravel.global.validator;
 
 import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import jakarta.validation.ConstraintValidator;

@@ -1,9 +1,9 @@
-package com.keypoint.keypointtravel.config.security.attribute;
+package com.keypoint.keypointtravel.global.config.security.attribute;
 
+import com.keypoint.keypointtravel.entity.member.Member;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.entity.member.Member;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;

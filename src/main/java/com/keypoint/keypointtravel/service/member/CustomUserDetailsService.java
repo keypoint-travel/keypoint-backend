@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.service.member;
 
+import com.keypoint.keypointtravel.entity.member.Member;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.entity.member.Member;
 import com.keypoint.keypointtravel.repository.member.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

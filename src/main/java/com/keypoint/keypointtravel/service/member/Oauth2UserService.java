@@ -2,14 +2,14 @@ package com.keypoint.keypointtravel.service.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.keypoint.keypointtravel.entity.member.Member;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
+import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
 import com.keypoint.keypointtravel.global.enumType.RoleType;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
-import com.keypoint.keypointtravel.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.config.security.attribute.OAuthAttributes;
-import com.keypoint.keypointtravel.config.security.session.SessionUser;
-import com.keypoint.keypointtravel.entity.member.Member;
 import com.keypoint.keypointtravel.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;

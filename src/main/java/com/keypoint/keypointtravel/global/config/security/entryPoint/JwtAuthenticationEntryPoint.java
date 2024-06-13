@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.config.security.entryPoint;
+package com.keypoint.keypointtravel.global.config.security.entryPoint;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

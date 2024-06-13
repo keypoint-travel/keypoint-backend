@@ -1,7 +1,7 @@
-package com.keypoint.keypointtravel.config.security.session;
+package com.keypoint.keypointtravel.global.config.security.session;
 
-import com.keypoint.keypointtravel.global.enumType.RoleType;
 import com.keypoint.keypointtravel.entity.member.Member;
+import com.keypoint.keypointtravel.global.enumType.RoleType;
 import lombok.Getter;
 
 @Getter

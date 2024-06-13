@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.config;
+package com.keypoint.keypointtravel.global.config;
 
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
