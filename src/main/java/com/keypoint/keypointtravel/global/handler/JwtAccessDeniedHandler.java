@@ -1,9 +1,9 @@
 package com.keypoint.keypointtravel.global.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.keypoint.keypointtravel.global.dto.response.ErrorDTO;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.dto.common.response.ErrorDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.global.handler;
 
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
-import com.keypoint.keypointtravel.dto.auth.response.TokenInfoDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

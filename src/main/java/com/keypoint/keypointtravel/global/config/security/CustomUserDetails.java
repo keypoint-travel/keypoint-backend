@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.global.config.security;
 
-import com.keypoint.keypointtravel.entity.member.Member;
+import com.keypoint.keypointtravel.member.entity.Member;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
