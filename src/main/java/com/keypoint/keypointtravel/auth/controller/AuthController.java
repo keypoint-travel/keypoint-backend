@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.auth.controller;
 
-import com.keypoint.keypointtravel.auth.dto.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.dto.request.RefreshTokenRequest;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.service.AuthService;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;

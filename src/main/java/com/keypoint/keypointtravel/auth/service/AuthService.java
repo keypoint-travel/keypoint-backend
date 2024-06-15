@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.auth.service;
 
 
-import com.keypoint.keypointtravel.auth.dto.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
@@ -56,9 +56,7 @@ public class AuthService {
             Authentication authentication = tokenProvider.getAuthentication(token);
 
             // 3. JWT 토큰 재발급
-            TokenInfoDTO tokenInfoDTO = tokenProvider.createToken(authentication);
-
-            return tokenInfoDTO;
+            return tokenProvider.createToken(authentication);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -91,6 +89,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * JWT 토큰 생성 함수
+     *
+     * @param email
+     * @param password
+     * @return
+     */
     public TokenInfoDTO getJwtTokenInfo(String email, String password) {
         // 1. Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

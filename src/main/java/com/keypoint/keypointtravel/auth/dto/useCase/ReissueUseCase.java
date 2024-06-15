@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.auth.dto;
+package com.keypoint.keypointtravel.auth.dto.useCase;
 
 import lombok.Getter;
 
