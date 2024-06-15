@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.auth.service;
 
 
+import com.keypoint.keypointtravel.auth.dto.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
@@ -33,13 +34,13 @@ public class AuthService {
     /**
      * JWT 토큰을 재발급하는 함수
      *
-     * @param accessToken
-     * @param refreshToken
+     * @param useCase
      * @return
      */
-    public TokenInfoDTO reissueToken(String accessToken, String refreshToken) {
-
+    public TokenInfoDTO reissueToken(ReissueUseCase useCase) {
         try {
+            String accessToken = useCase.getAccessToken();
+            String refreshToken = useCase.getRefreshToken();
             String token = StringUtils.parseGrantTypeInToken(
                 TOKEN_GRANT_TYPE,
                 accessToken
