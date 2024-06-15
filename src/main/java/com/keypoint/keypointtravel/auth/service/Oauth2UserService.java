@@ -63,25 +63,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
         OAuth2User oAuth2User;
         if (registrationId.contains(APPLE_REGISTRATION_ID)) {
-            String idToken = userRequest.getAdditionalParameters().get(ID_TOKEN).toString();
-            Map<String, Object> attributes = null;
-            try {
-                attributes = decodeJwtTokenPayload(idToken);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            attributes.put(ID_TOKEN, idToken);
-            Map<String, Object> userAttributes = new HashMap<>();
-            userAttributes.put("resultcode", "00");
-            userAttributes.put("message", "success");
-            userAttributes.put("response", attributes);
-
-            oAuth2User = new DefaultOAuth2User(
-                Collections.singleton(
-                    new SimpleGrantedAuthority(ROLE_USER.toString())),
-                userAttributes,
-                "response"
-            );
+            oAuth2User = loadAppleUser(userRequest);
         } else {
             oAuth2User = delegate.loadUser(userRequest);
         }
@@ -93,14 +75,41 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         }
     }
 
+    private OAuth2User loadAppleUser(OAuth2UserRequest userRequest) {
+        String idToken = userRequest.getAdditionalParameters().get(ID_TOKEN).toString();
+        Map<String, Object> attributes;
+
+        try {
+            attributes = decodeJwtTokenPayload(idToken);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to decode JWT token payload", e);
+        }
+
+        attributes.put(ID_TOKEN, idToken);
+
+        Map<String, Object> userAttributes = new HashMap<>();
+        userAttributes.put("resultcode", "00");
+        userAttributes.put("message", "success");
+        userAttributes.put("response", attributes);
+
+        return new DefaultOAuth2User(
+            Collections.singleton(new SimpleGrantedAuthority(ROLE_USER.toString())),
+            userAttributes,
+            "response"
+        );
+    }
+
     private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User oAuth2User)
         throws IOException {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
             .getUserInfoEndpoint().getUserNameAttributeName();
 
-        OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName,
-            oAuth2User.getAttributes());
+        OAuthAttributes attributes = OAuthAttributes.of(
+            registrationId,
+            userNameAttributeName,
+            oAuth2User.getAttributes()
+        );
         Member member = saveOrUpdate(attributes);
         httpSession.setAttribute("member", SessionUser.from(member));
         return CustomUserDetails.of(member, oAuth2User.getAttributes());
