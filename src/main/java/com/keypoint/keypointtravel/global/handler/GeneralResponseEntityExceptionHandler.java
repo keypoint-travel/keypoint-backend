@@ -36,7 +36,7 @@ public class GeneralResponseEntityExceptionHandler extends ResponseEntityExcepti
 
         GeneralException exception = new GeneralException(
             CommonErrorCode.INVALID_REQUEST_DATA, errorMsg);
-        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.toAPIResponseEntity(exception);
+        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.from(exception);
 
         return new ResponseEntity<>(apiResponse, headers, status);
     }
@@ -54,7 +54,7 @@ public class GeneralResponseEntityExceptionHandler extends ResponseEntityExcepti
             CommonErrorCode.INVALID_REQUEST_DATA,
             errorMsg
         );
-        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.toAPIResponseEntity(exception);
+        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.from(exception);
 
         return new ResponseEntity<>(apiResponse, headers, status);
     }
@@ -68,7 +68,7 @@ public class GeneralResponseEntityExceptionHandler extends ResponseEntityExcepti
             CommonErrorCode.INVALID_REQUEST_DATA,
             ex.getMessage()
         );
-        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.toAPIResponseEntity(exception);
+        APIResponseEntity<ErrorDTO> apiResponse = ErrorDTO.from(exception);
 
         return new ResponseEntity<>(apiResponse, headers, status);
     }

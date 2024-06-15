@@ -34,7 +34,7 @@ public class ReceiptItemDTO {
         this.quantityUnit = quantityUnit;
     }
 
-    public static ReceiptItemDTO toDTO(DocumentField field) {
+    public static ReceiptItemDTO from(DocumentField field) {
         Map<String, DocumentField> fieldMap = field.getValueObject();
         return ReceiptItemDTO.builder()
             .totalPrice(
@@ -66,7 +66,7 @@ public class ReceiptItemDTO {
 
     public static List<ReceiptItemDTO> toDTOList(List<DocumentField> fieldList) {
         return fieldList.stream()
-            .map(field -> ReceiptItemDTO.toDTO(field))
+            .map(field -> ReceiptItemDTO.from(field))
             .toList();
     }
 }

@@ -81,7 +81,7 @@ public class AzureOCRService {
     private String requestOCRAnalysis(String documentURL) {
         String requestURL = getOCRAnalysisUrl();
         HttpHeaders headers = createHeader();
-        OCRAnalysisRequest request = OCRAnalysisRequest.toRequest(documentURL);
+        OCRAnalysisRequest request = OCRAnalysisRequest.from(documentURL);
 
         while (true) {
             try {
@@ -167,7 +167,7 @@ public class AzureOCRService {
      * @return
      */
     private ReceiptDTO processReceiptResponse(OCRResultResponse response) {
-        ReceiptDTO receiptDTO = ReceiptDTO.toDTO(
+        ReceiptDTO receiptDTO = ReceiptDTO.from(
             response.getAnalyzeResult().getDocuments().get(0));
         String content = response.getAnalyzeResult().getContent();
 

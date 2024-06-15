@@ -61,7 +61,7 @@ public class MemberService {
             Member member = new Member(email, encodePassword(password), OauthProviderType.NONE);
             memberRepository.save(member);
 
-            return MemberDTO.toDTO(member);
+            return MemberDTO.from(member);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

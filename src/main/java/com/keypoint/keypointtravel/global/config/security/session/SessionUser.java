@@ -16,7 +16,7 @@ public class SessionUser {
         this.role = member.getRole();
     }
 
-    public static SessionUser of(Member member) {
+    public static SessionUser from(Member member) {
         return new SessionUser(member);
     }
 }

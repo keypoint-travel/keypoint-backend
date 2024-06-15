@@ -102,8 +102,8 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName,
             oAuth2User.getAttributes());
         Member member = saveOrUpdate(attributes);
-        httpSession.setAttribute("member", SessionUser.of(member));
-        return CustomUserDetails.toCustomUserDetails(member, oAuth2User.getAttributes());
+        httpSession.setAttribute("member", SessionUser.from(member));
+        return CustomUserDetails.of(member, oAuth2User.getAttributes());
     }
 
     public Member saveOrUpdate(OAuthAttributes attributes)

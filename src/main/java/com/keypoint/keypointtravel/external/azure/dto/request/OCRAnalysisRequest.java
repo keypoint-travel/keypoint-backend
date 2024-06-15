@@ -11,7 +11,7 @@ public class OCRAnalysisRequest {
         this.base64Source = base64Source;
     }
 
-    public static OCRAnalysisRequest toRequest(String base64Source) {
+    public static OCRAnalysisRequest from(String base64Source) {
         return new OCRAnalysisRequest(base64Source);
     }
 }
