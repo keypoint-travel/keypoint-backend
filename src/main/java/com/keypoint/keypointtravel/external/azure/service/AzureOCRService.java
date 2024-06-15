@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.external.azure.service;
 
 import com.keypoint.keypointtravel.api.dto.response.ReceiptDTO;
+import com.keypoint.keypointtravel.api.dto.useCase.ReceiptUseCase;
 import com.keypoint.keypointtravel.external.azure.dto.request.OCRAnalysisRequest;
 import com.keypoint.keypointtravel.external.azure.dto.response.OCRResultResponse;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
@@ -140,12 +141,12 @@ public class AzureOCRService {
 
     /**
      * (Multipart) 영수증을 분석하는 함수
-     *
-     * @param file
+     * @param useCase
      * @return
      */
-    public ReceiptDTO analyzeReceipt(MultipartFile file) {
+    public ReceiptDTO analyzeReceipt(ReceiptUseCase useCase) {
         try {
+            MultipartFile file = useCase.getFile();
             String base64Source = MultiPartFileUtils.convertToBase64(file);
             String ocrResultUrl = requestOCRAnalysis(base64Source);
             OCRResultResponse response = getOCRResult(ocrResultUrl);

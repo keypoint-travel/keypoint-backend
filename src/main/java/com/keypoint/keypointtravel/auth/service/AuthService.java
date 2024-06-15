@@ -8,7 +8,7 @@ import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
-import com.keypoint.keypointtravel.member.dto.request.LoginRequest;
+import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -66,14 +66,14 @@ public class AuthService {
     /**
      * 로그인 함수
      *
-     * @param request
+     * @param useCase
      * @return
      */
     @Transactional(noRollbackFor = GeneralException.class)
-    public TokenInfoDTO login(LoginRequest request) {
+    public TokenInfoDTO login(LoginUseCase useCase) {
         try {
-            String email = request.getEmail();
-            String password = request.getPassword();
+            String email = useCase.getEmail();
+            String password = useCase.getPassword();
 
             // 1. 이메일 유효성 검사
             Member user = validateMemberForLogin(email);

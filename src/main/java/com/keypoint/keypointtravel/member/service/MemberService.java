@@ -4,8 +4,8 @@ import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
-import com.keypoint.keypointtravel.member.dto.request.SignUpRequest;
 import com.keypoint.keypointtravel.member.dto.response.MemberDTO;
+import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
 import java.util.List;
@@ -40,14 +40,14 @@ public class MemberService {
     /**
      * Member 생성하는 함수 (일반 회원가입)
      *
-     * @param request
+     * @param useCase
      * @return
      */
     @Transactional
-    public MemberDTO registerMember(SignUpRequest request) {
+    public MemberDTO registerMember(SignUpUseCase useCase) {
         try {
-            String email = request.getEmail();
-            String password = request.getPassword();
+            String email = useCase.getEmail();
+            String password = useCase.getPassword();
 
             // 1. 이메일 유효성 검사
             validateEmailForSignUp(email);
