@@ -62,7 +62,7 @@ public class ReceiptDTO {
         this.items = items;
     }
 
-    public static ReceiptDTO toDTO(OCRDocumentResponse response) {
+    public static ReceiptDTO from(OCRDocumentResponse response) {
         if (response == null) {
             return null;
         }

@@ -27,7 +27,9 @@ public class GeneralExceptionHandler {
             )
         );
 
-        return ErrorDTO.toResponseEntity(exception);
+        return ResponseEntity
+            .status(exception.getStatus())
+            .body(ErrorDTO.from(exception));
     }
 
     @ExceptionHandler(HttpClientException.class)
@@ -43,6 +45,6 @@ public class GeneralExceptionHandler {
             )
         );
 
-        return ErrorDTO.toResponseEntity(exception, code);
+        return ErrorDTO.of(exception, code);
     }
 }

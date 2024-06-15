@@ -42,7 +42,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         this.authorities = authorities;
     }
 
-    public static CustomUserDetails toCustomUserDetails(Member member) {
+    public static CustomUserDetails from(Member member) {
         List<GrantedAuthority> authorities = Collections.
             singletonList(new SimpleGrantedAuthority(member.getRole().name()));
 
@@ -54,16 +54,16 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         );
     }
 
-    public static CustomUserDetails toCustomUserDetails(
+    public static CustomUserDetails of(
         Member member,
         Map<String, Object> attributes
     ) {
-        CustomUserDetails userDetails = CustomUserDetails.toCustomUserDetails(member);
+        CustomUserDetails userDetails = CustomUserDetails.from(member);
         userDetails.setAttributes(attributes);
         return userDetails;
     }
 
-    public static CustomUserDetails toCustomUserDetails(
+    public static CustomUserDetails of(
         Long id,
         String email,
         Collection<? extends GrantedAuthority> authorities

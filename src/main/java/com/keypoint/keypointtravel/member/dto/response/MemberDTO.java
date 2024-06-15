@@ -15,7 +15,7 @@ public class MemberDTO {
         this.email = email;
     }
 
-    public static MemberDTO toDTO(Member member) {
+    public static MemberDTO from(Member member) {
         return new MemberDTO(member.getId(), member.getEmail());
     }
 }

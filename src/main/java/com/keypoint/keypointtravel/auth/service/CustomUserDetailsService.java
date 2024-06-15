@@ -27,6 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL);
         }
 
-        return CustomUserDetails.toCustomUserDetails(members.get(0));
+        return CustomUserDetails.from(members.get(0));
     }
 }

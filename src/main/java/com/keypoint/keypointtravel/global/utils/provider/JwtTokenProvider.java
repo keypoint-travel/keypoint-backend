@@ -82,7 +82,7 @@ public class JwtTokenProvider implements InitializingBean {
             .signWith(SignatureAlgorithm.HS256, jwtKey)
             .compact();
 
-        return TokenInfoDTO.toDTO(GRANT_TYPE, accessToken, refreshToken);
+        return TokenInfoDTO.of(GRANT_TYPE, accessToken, refreshToken);
     }
 
     /**
@@ -114,7 +114,7 @@ public class JwtTokenProvider implements InitializingBean {
         Long userId = Long.parseLong((String) claims.get(ID_KEY));
 
         // 5. CustomUserDetails 생성
-        CustomUserDetails principal = CustomUserDetails.toCustomUserDetails(
+        CustomUserDetails principal = CustomUserDetails.of(
             userId,
             claims.getSubject(),
             authorities

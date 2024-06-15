@@ -21,7 +21,7 @@ public class TokenInfoDTO {
         this.refreshToken = refreshToken;
     }
 
-    public static TokenInfoDTO toDTO(
+    public static TokenInfoDTO of(
         String grandType,
         String accessToken,
         String refreshToken
