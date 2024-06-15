@@ -14,6 +14,7 @@ import com.keypoint.keypointtravel.global.utils.MultiPartFileUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,8 @@ public class AzureOCRService {
     private static final String RECEIPT_MODEL_ID = "prebuilt-receipt";
     private static final String AZURE_KEY_HEADER = "Ocp-Apim-Subscription-Key";
     private static final String OCR_RESULT_HEADER = "Operation-Location";
+    private static final long POLLING_INTERVAL_MS = 1000;
+    private static final long TIMEOUT_MS = 600000; // 10 min
     private static final List<OCROperationStatus> VALID_OCR_STATUS = Arrays.asList(
         OCROperationStatus.FAILED,
         OCROperationStatus.SUCCEEDED
@@ -88,7 +91,7 @@ public class AzureOCRService {
             try {
                 ResponseEntity<String> response = HttpUtils.post(requestURL, headers, request,
                     String.class);
-                return response.getHeaders().get(OCR_RESULT_HEADER).get(0);
+                return Objects.requireNonNull(response.getHeaders().get(OCR_RESULT_HEADER)).get(0);
             } catch (HttpClientErrorException ex) {
                 handleHttpClientErrorException(ex);
             }
@@ -126,11 +129,15 @@ public class AzureOCRService {
      */
     private void handleHttpClientErrorException(HttpClientErrorException ex) {
         if (ex.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
-            String retrySec = ex.getResponseHeaders().get("Retry-After").get(0);
+            String retrySec = Objects.requireNonNull(
+                Objects.requireNonNull(
+                    ex.getResponseHeaders()
+                ).get("Retry-After")
+            ).get(0);
             Integer sec = StringUtils.convertToInteger(retrySec);
 
             try {
-                Thread.sleep(sec * 1000);
+                Thread.sleep(sec * POLLING_INTERVAL_MS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -151,9 +158,7 @@ public class AzureOCRService {
             String ocrResultUrl = requestOCRAnalysis(base64Source);
             OCRResultResponse response = getOCRResult(ocrResultUrl);
 
-            ReceiptDTO receiptDTO = processReceiptResponse(response);
-
-            return receiptDTO;
+            return processReceiptResponse(response);
         } catch (HttpClientException e) {
             throw e;
         } catch (Exception e) {
@@ -189,11 +194,12 @@ public class AzureOCRService {
     private OCRResultResponse getOCRResult(String ocrResultUrl) {
         OCROperationStatus status;
         OCRResultResponse ocrResult;
+        long startTime = System.currentTimeMillis();
 
         // 1. OCR 이미지 분석이 마무리 될 때까지 요청
         do {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(POLLING_INTERVAL_MS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -202,6 +208,10 @@ public class AzureOCRService {
                 ocrResultUrl
             );
             status = ocrResult.getStatus();
+
+            if (System.currentTimeMillis() - startTime > TIMEOUT_MS) {
+                throw new GeneralException(ReceiptError.RECEIPT_RECOGNITION_FAILED);
+            }
         } while (!VALID_OCR_STATUS.contains(status));
 
         // 2. 결과가 성공인 경우에만 결과 반환
@@ -211,5 +221,4 @@ public class AzureOCRService {
             throw new GeneralException(ReceiptError.RECEIPT_RECOGNITION_FAILED);
         }
     }
-
 }
