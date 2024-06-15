@@ -6,6 +6,8 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.LoginRequest;
 import com.keypoint.keypointtravel.member.dto.request.SignUpRequest;
 import com.keypoint.keypointtravel.member.dto.response.MemberDTO;
+import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,8 @@ public class MemberController {
 
     @PostMapping("sign-up")
     public APIResponseEntity<MemberDTO> addUser(@Valid @RequestBody SignUpRequest request) {
-        MemberDTO userDTO = this.memberService.registerMember(request);
+        SignUpUseCase useCase = SignUpUseCase.from(request);
+        MemberDTO userDTO = this.memberService.registerMember(useCase);
 
         return APIResponseEntity.<MemberDTO>builder()
             .data(userDTO)
@@ -33,7 +36,8 @@ public class MemberController {
 
     @PostMapping("login")
     public APIResponseEntity<TokenInfoDTO> login(@Valid @RequestBody LoginRequest request) {
-        TokenInfoDTO result = authService.login(request);
+        LoginUseCase useCase = LoginUseCase.from(request);
+        TokenInfoDTO result = authService.login(useCase);
 
         return APIResponseEntity.<TokenInfoDTO>builder()
             .data(result)

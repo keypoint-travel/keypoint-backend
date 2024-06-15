@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.api.controller;
 
 import com.keypoint.keypointtravel.api.dto.response.ReceiptDTO;
+import com.keypoint.keypointtravel.api.dto.useCase.ReceiptUseCase;
 import com.keypoint.keypointtravel.external.azure.service.AzureOCRService;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,8 @@ public class OpenAPIController {
 
     @PostMapping("/ocr")
     public APIResponseEntity<ReceiptDTO> getReceiptResult(@RequestPart("file") MultipartFile file) {
-        ReceiptDTO result = azureOCRService.analyzeReceipt(file);
+        ReceiptUseCase useCase = ReceiptUseCase.from(file);
+        ReceiptDTO result = azureOCRService.analyzeReceipt(useCase);
         return APIResponseEntity.<ReceiptDTO>builder()
             .data(result)
             .build();
