@@ -1,5 +1,8 @@
-package com.keypoint.keypointtravel.service.api;
+package com.keypoint.keypointtravel.external.azure.service;
 
+import com.keypoint.keypointtravel.api.dto.response.ReceiptDTO;
+import com.keypoint.keypointtravel.external.azure.dto.request.OCRAnalysisRequest;
+import com.keypoint.keypointtravel.external.azure.dto.response.OCRResultResponse;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.enumType.ocr.OCROperationStatus;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -8,9 +11,6 @@ import com.keypoint.keypointtravel.global.utils.AzureOCRUtils;
 import com.keypoint.keypointtravel.global.utils.HttpUtils;
 import com.keypoint.keypointtravel.global.utils.MultiPartFileUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
-import com.keypoint.keypointtravel.dto.api.azure.request.OCRAnalysisRequest;
-import com.keypoint.keypointtravel.dto.api.azure.response.OCRResultResponse;
-import com.keypoint.keypointtravel.dto.recipt.response.ReceiptDTO;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.dto.api.azure.response;
+package com.keypoint.keypointtravel.external.azure.dto.response;
 
 import com.keypoint.keypointtravel.global.enumType.ocr.OCROperationStatus;
 import lombok.Getter;

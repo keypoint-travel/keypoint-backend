@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.dto.api.azure.response;
+package com.keypoint.keypointtravel.external.azure.dto.response;
 
 import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
 import com.azure.ai.formrecognizer.documentanalysis.models.BoundingRegion;
