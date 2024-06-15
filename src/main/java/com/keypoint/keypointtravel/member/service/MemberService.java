@@ -8,7 +8,7 @@ import com.keypoint.keypointtravel.member.dto.response.MemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
-import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,12 +29,8 @@ public class MemberService {
      * @return
      */
     public Member findMemberByEmail(String email) {
-        List<Member> members = memberRepository.findByEmail(email);
-        if (members.isEmpty()) {
-            throw new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL);
-        }
-
-        return members.get(0);
+        return memberRepository.findByEmail(email)
+            .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
     }
 
     /**
@@ -77,9 +73,9 @@ public class MemberService {
      * @param email
      */
     public void validateEmailForSignUp(String email) {
-        List<Member> existMembers = memberRepository.findByEmail(email);
-        if (!existMembers.isEmpty()) {
-            Member existMember = existMembers.get(0);
+        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        if (memberOptional.isPresent()) {
+            Member existMember = memberOptional.get();
             if (existMember.getEmail().contains(OauthProviderType.NONE.name())) {
                 throw new GeneralException(MemberErrorCode.DUPLICATED_EMAIL);
             } else {

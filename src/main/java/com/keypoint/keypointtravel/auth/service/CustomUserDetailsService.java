@@ -5,7 +5,6 @@ import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,11 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        List<Member> members = memberRepository.findByEmail(email);
-        if (members.isEmpty()) {
-            throw new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL);
-        }
+        Member member = memberRepository.findByEmail(email)
+            .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
 
-        return CustomUserDetails.from(members.get(0));
+        return CustomUserDetails.from(member);
     }
 }

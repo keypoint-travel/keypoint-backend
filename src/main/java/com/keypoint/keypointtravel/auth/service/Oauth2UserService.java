@@ -17,8 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -121,11 +121,11 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         String email = attributes.getEmail();
 
         // 1. 이메일이 등록되어 있는지 확인
-        List<Member> memberList = memberRepository.findByEmail(email);
+        Optional<Member> memberOptional = memberRepository.findByEmail(email);
 
         // 2. 등록되지 않은 경우: 저장 / 다른 제공사로 등록되어 있는 경우 예외 발생
-        if (!memberList.isEmpty()) {
-            Member member = memberList.get(0);
+        if (memberOptional.isPresent()) {
+            Member member = memberOptional.get();
             validateOauthProvider(member, oauthProviderType);
             memberRepository.save(member);
 
