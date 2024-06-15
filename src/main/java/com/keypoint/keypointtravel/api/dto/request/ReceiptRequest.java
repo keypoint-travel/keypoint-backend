@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.dto.recipt.request;
+package com.keypoint.keypointtravel.api.dto.request;
 
 import lombok.Getter;
 

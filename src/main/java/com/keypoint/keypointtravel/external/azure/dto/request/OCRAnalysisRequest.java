@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.dto.api.azure.request;
+package com.keypoint.keypointtravel.external.azure.dto.request;
 
 import lombok.Data;
 

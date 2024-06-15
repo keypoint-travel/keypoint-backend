@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.dto.api.azure.response;
+package com.keypoint.keypointtravel.external.azure.dto.response;
 
 import java.util.List;
 import lombok.Getter;

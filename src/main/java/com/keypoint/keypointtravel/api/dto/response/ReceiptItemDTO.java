@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.dto.recipt.response;
+package com.keypoint.keypointtravel.api.dto.response;
 
 import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
 import com.keypoint.keypointtravel.global.enumType.ocr.OCRFieldName;
