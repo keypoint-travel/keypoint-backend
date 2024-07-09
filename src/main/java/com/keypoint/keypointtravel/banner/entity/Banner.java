@@ -29,15 +29,19 @@ public class Banner extends BaseEntity {
     private AreaCode areaCode;
 
     @Column(nullable = false)
-    private String cat1;
+    @Enumerated(EnumType.STRING)
+    private LargeCategory cat1;
 
     @Column(nullable = false)
-    private String cat2;
+    @Enumerated(EnumType.STRING)
+    private MiddleCategory cat2;
 
     @Column(nullable = false)
-    private String cat3;
+    @Enumerated(EnumType.STRING)
+    private SmallCategory cat3;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ContentType contentType;
 
     @Column(nullable = false)
@@ -49,9 +53,9 @@ public class Banner extends BaseEntity {
     @Column(nullable = false)
     private boolean isExposed;
 
-    public Banner(Long id, AreaCode areaCode, String cat1, String cat2, String cat3,
-        ContentType contentType,
-        String thumbnailTitle, String thumbnailImage, boolean isExposed) {
+    public Banner(Long id, AreaCode areaCode, LargeCategory cat1, MiddleCategory cat2,
+        SmallCategory cat3, ContentType contentType, String thumbnailTitle, String thumbnailImage,
+        boolean isExposed) {
         this.id = id;
         this.areaCode = areaCode;
         this.cat1 = cat1;
