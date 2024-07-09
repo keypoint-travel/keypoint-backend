@@ -38,7 +38,7 @@ public class Banner extends BaseEntity {
     private String cat3;
 
     @Column(nullable = false)
-    private String contentTypeId;
+    private ContentType contentType;
 
     @Column(nullable = false)
     private String thumbnailTitle;
@@ -50,14 +50,14 @@ public class Banner extends BaseEntity {
     private boolean isExposed;
 
     public Banner(Long id, AreaCode areaCode, String cat1, String cat2, String cat3,
-        String contentTypeId,
+        ContentType contentType,
         String thumbnailTitle, String thumbnailImage, boolean isExposed) {
         this.id = id;
         this.areaCode = areaCode;
         this.cat1 = cat1;
         this.cat2 = cat2;
         this.cat3 = cat3;
-        this.contentTypeId = contentTypeId;
+        this.contentType = contentType;
         this.thumbnailTitle = thumbnailTitle;
         this.thumbnailImage = thumbnailImage;
         this.isExposed = isExposed;
