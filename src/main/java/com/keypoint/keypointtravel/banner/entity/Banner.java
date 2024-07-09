@@ -1,0 +1,62 @@
+package com.keypoint.keypointtravel.banner.entity;
+
+import com.keypoint.keypointtravel.global.entity.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@Table(name="banner")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Banner extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "banner_id")
+    private Long id;
+
+    @Column(nullable = false)
+    private String areaCode;
+
+    @Column(nullable = false)
+    private String cat1;
+
+    @Column(nullable = false)
+    private String cat2;
+
+    @Column(nullable = false)
+    private String cat3;
+
+    @Column(nullable = false)
+    private String contentTypeId;
+
+    @Column(nullable = false)
+    private String thumbnailTitle;
+
+    @Column
+    private String thumbnailImage;
+
+    @Column(nullable = false)
+    private boolean isExposed;
+
+    public Banner(Long id, String areaCode, String cat1, String cat2, String cat3,
+        String contentTypeId,
+        String thumbnailTitle, String thumbnailImage, boolean isExposed) {
+        this.id = id;
+        this.areaCode = areaCode;
+        this.cat1 = cat1;
+        this.cat2 = cat2;
+        this.cat3 = cat3;
+        this.contentTypeId = contentTypeId;
+        this.thumbnailTitle = thumbnailTitle;
+        this.thumbnailImage = thumbnailImage;
+        this.isExposed = isExposed;
+    }
+}
