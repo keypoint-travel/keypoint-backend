@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.banner.entity;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name="banner")
+@Table(name = "banner")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Banner extends BaseEntity {
 
@@ -23,7 +25,8 @@ public class Banner extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String areaCode;
+    @Enumerated(EnumType.STRING)
+    private AreaCode areaCode;
 
     @Column(nullable = false)
     private String cat1;
@@ -46,7 +49,7 @@ public class Banner extends BaseEntity {
     @Column(nullable = false)
     private boolean isExposed;
 
-    public Banner(Long id, String areaCode, String cat1, String cat2, String cat3,
+    public Banner(Long id, AreaCode areaCode, String cat1, String cat2, String cat3,
         String contentTypeId,
         String thumbnailTitle, String thumbnailImage, boolean isExposed) {
         this.id = id;
