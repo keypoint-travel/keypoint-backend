@@ -12,8 +12,8 @@ public interface TourismApiService {
     TourismListUseCase findTourismList(
         @RequestParam("pageNo") int pageNo,
         @RequestParam("serviceKey") String serviceKey,
-        @RequestParam("areaCode") int areaCode,
-        @RequestParam("contentTypeId") int contentTypeId,
+        @RequestParam("areaCode") String areaCode,
+        @RequestParam("contentTypeId") String contentTypeId,
         @RequestParam("cat1") String cat1,
         @RequestParam("cat2") String cat2,
         @RequestParam("cat3") String cat3);
