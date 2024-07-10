@@ -27,8 +27,7 @@ public class BannerListResponse {
 
     public static BannerListResponse from(Body data) {
         return BannerListResponse.builder()
-            .contents(data.getItems().getItem().isEmpty()? new ArrayList<>()
-                :data.getItems().getItem().stream().map(BannerDetails::from).toList())
+            .contents(data.getItems().getItem().stream().map(BannerDetails::from).toList())
             .last(data.getPageNo() == getTotalPage(data.getTotalCount()))
             .totalPages(getTotalPage(data.getTotalCount()))
             .totalElements(data.getTotalCount())
@@ -40,7 +39,7 @@ public class BannerListResponse {
             .build();
     }
 
-    private static int getTotalPage(int totalCount){
-        return totalCount / 10 + ((totalCount % 10 > 0) ?1 : 0);
+    private static int getTotalPage(int totalCount) {
+        return totalCount / 10 + ((totalCount % 10 > 0) ? 1 : 0);
     }
 }
