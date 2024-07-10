@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SmallCategory {
+public enum SmallCategory implements BannerCode {
     NATIONAL_PARK("A01010100", "국립공원"),
     PROVINCIAL_PARK("A01010200", "도립공원"),
     COUNTY_PARK("A01010300", "군립공원"),
@@ -161,22 +161,4 @@ public enum SmallCategory {
 
     private final String code;
     private final String description;
-
-    public static SmallCategory getSmallCategory(String description) {
-        for (SmallCategory smallCategory : SmallCategory.values()) {
-            if (smallCategory.getDescription().equals(description)) {
-                return smallCategory;
-            }
-        }
-        return null;
-    }
-
-    public static String getDescription(String code) {
-        for (SmallCategory smallCategory : SmallCategory.values()) {
-            if (smallCategory.getCode().equals(code)) {
-                return smallCategory.getDescription();
-            }
-        }
-        return null;
-    }
 }

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ContentType {
+public enum ContentType implements BannerCode {
     TOURIST_ATTRACTIONS("12", "관광지"),
     CULTURAL_FACILITIES("14", "문화시설"),
     FESTIVALS_EVENTS_PERFORMANCES("15", "행사/공연/축제"),
@@ -17,22 +17,4 @@ public enum ContentType {
 
     private final String code;
     private final String description;
-
-    public static ContentType getContentType(String description) {
-        for (ContentType contentType : ContentType.values()) {
-            if (contentType.getDescription().equals(description)) {
-                return contentType;
-            }
-        }
-        return null;
-    }
-
-    public static String getDescription(String code) {
-        for (ContentType contentType : ContentType.values()) {
-            if (contentType.getCode().equals(code)) {
-                return contentType.getDescription();
-            }
-        }
-        return null;
-    }
 }

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MiddleCategory {
+public enum MiddleCategory implements BannerCode {
     NATURAL_TOURIST_SPOT("A0101", "자연관광지"),
     TOURIST_RESOURCE("A0102", "관광자원"),
     HISTORICAL_TOURIST_SPOT("A0201", "역사관광지"),
@@ -33,22 +33,4 @@ public enum MiddleCategory {
 
     private final String code;
     private final String description;
-
-    public static MiddleCategory getMiddleCategory(String description) {
-        for (MiddleCategory middleCategory : MiddleCategory.values()) {
-            if (middleCategory.getDescription().equals(description)) {
-                return middleCategory;
-            }
-        }
-        return null;
-    }
-
-    public static String getDescription(String code) {
-        for (MiddleCategory middleCategory : MiddleCategory.values()) {
-            if (middleCategory.getCode().equals(code)) {
-                return middleCategory.getDescription();
-            }
-        }
-        return null;
-    }
 }

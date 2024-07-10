@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.banner.entity.AreaCode;
+import com.keypoint.keypointtravel.banner.entity.BannerCode;
 import com.keypoint.keypointtravel.banner.entity.ContentType;
 import com.keypoint.keypointtravel.banner.entity.LargeCategory;
 import com.keypoint.keypointtravel.banner.entity.MiddleCategory;
@@ -37,11 +38,12 @@ public class TourismApiServiceTest {
         TourismListUseCase useCase = tourismApiService.findTourismList(
             pageNo,
             TourismApiConstants.SERVICE_KEY,
-            AreaCode.getAreaCode(region).getCode(),
-            ContentType.getContentType(tourType).getCode(),
-            LargeCategory.getLargeCategory(cat1).getCode(),
-            MiddleCategory.getMiddleCategory(cat2).getCode(),
-            SmallCategory.getSmallCategory(cat3).getCode());
+            BannerCode.getConstant(AreaCode.class, region).getCode(),
+            BannerCode.getConstant(ContentType.class, tourType).getCode(),
+            BannerCode.getConstant(LargeCategory.class, cat1).getCode(),
+            BannerCode.getConstant(MiddleCategory.class, cat2).getCode(),
+            BannerCode.getConstant(SmallCategory.class, cat3).getCode()
+        );
 
         //then
         assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();

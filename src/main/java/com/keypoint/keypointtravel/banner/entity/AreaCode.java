@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AreaCode {
+public enum AreaCode implements BannerCode {
     SEOUL("1", "서울"),
     INCHEON("2", "인천"),
     DAEJEON("3", "대전"),
@@ -27,22 +27,4 @@ public enum AreaCode {
 
     private final String code;
     private final String description;
-
-    public static AreaCode getAreaCode(String description) {
-        for (AreaCode areaCode : AreaCode.values()) {
-            if (areaCode.getDescription().equals(description)) {
-                return areaCode;
-            }
-        }
-        return null;
-    }
-
-    public static String getDescription(String code) {
-        for (AreaCode areaCode : AreaCode.values()) {
-            if (areaCode.getCode().equals(code)) {
-                return areaCode.getDescription();
-            }
-        }
-        return null;
-    }
 }

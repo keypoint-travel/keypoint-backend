@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum LargeCategory {
+public enum LargeCategory implements BannerCode {
     NATURE("A01", "자연"),
     CULTURE_ART_HISTORY("A02", "인문(문화/예술/역사)"),
     LEISURE_SPORTS("A03", "레포츠"),
@@ -16,22 +16,4 @@ public enum LargeCategory {
 
     private final String code;
     private final String description;
-
-    public static LargeCategory getLargeCategory(String description) {
-        for (LargeCategory largeCategory : LargeCategory.values()) {
-            if (largeCategory.getDescription().equals(description)) {
-                return largeCategory;
-            }
-        }
-        return null;
-    }
-
-    public static String getDescription(String code) {
-        for (LargeCategory largeCategory : LargeCategory.values()) {
-            if (largeCategory.getCode().equals(code)) {
-                return largeCategory.getDescription();
-            }
-        }
-        return null;
-    }
 }
