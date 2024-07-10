@@ -17,4 +17,15 @@ public class SmallCategoryTest {
         //then
         assertThat(actual).isEqualTo(expected);
     }
+
+    @Test
+    public void getDescriptionTest() {
+        //given
+        String code = "B02011200";
+        String expected = "홈스테이";
+        String actual = SmallCategory.getDescription(code);
+
+        //then
+        assertThat(actual).isEqualTo(expected);
+    }
 }

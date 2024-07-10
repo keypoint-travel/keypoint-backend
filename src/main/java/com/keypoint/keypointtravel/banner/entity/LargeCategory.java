@@ -25,4 +25,13 @@ public enum LargeCategory {
         }
         return null;
     }
+
+    public static String getDescription(String code) {
+        for (LargeCategory largeCategory : LargeCategory.values()) {
+            if (largeCategory.getCode().equals(code)) {
+                return largeCategory.getDescription();
+            }
+        }
+        return null;
+    }
 }

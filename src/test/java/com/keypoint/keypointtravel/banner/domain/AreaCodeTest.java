@@ -17,4 +17,15 @@ public class AreaCodeTest {
         //then
         assertThat(actual).isEqualTo(expected);
     }
+
+    @Test
+    public void getDescriptionTest() {
+        //given
+        String code = "1";
+        String expected = "서울";
+        String actual = AreaCode.getDescription(code);
+
+        //then
+        assertThat(actual).isEqualTo(expected);
+    }
 }

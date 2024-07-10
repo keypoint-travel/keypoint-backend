@@ -42,4 +42,13 @@ public enum MiddleCategory {
         }
         return null;
     }
+
+    public static String getDescription(String code) {
+        for (MiddleCategory middleCategory : MiddleCategory.values()) {
+            if (middleCategory.getCode().equals(code)) {
+                return middleCategory.getDescription();
+            }
+        }
+        return null;
+    }
 }

@@ -170,4 +170,13 @@ public enum SmallCategory {
         }
         return null;
     }
+
+    public static String getDescription(String code) {
+        for (SmallCategory smallCategory : SmallCategory.values()) {
+            if (smallCategory.getCode().equals(code)) {
+                return smallCategory.getDescription();
+            }
+        }
+        return null;
+    }
 }

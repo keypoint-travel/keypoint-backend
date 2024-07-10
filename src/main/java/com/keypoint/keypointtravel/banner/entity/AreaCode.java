@@ -36,4 +36,13 @@ public enum AreaCode {
         }
         return null;
     }
+
+    public static String getDescription(String code) {
+        for (AreaCode areaCode : AreaCode.values()) {
+            if (areaCode.getCode().equals(code)) {
+                return areaCode.getDescription();
+            }
+        }
+        return null;
+    }
 }

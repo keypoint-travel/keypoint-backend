@@ -26,4 +26,13 @@ public enum ContentType {
         }
         return null;
     }
+
+    public static String getDescription(String code) {
+        for (ContentType contentType : ContentType.values()) {
+            if (contentType.getCode().equals(code)) {
+                return contentType.getDescription();
+            }
+        }
+        return null;
+    }
 }
