@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.api.dto.useCase.tourListUseCase;
+package com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

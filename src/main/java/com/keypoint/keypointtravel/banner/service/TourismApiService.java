@@ -1,6 +1,6 @@
-package com.keypoint.keypointtravel.api.service;
+package com.keypoint.keypointtravel.banner.service;
 
-import com.keypoint.keypointtravel.api.dto.useCase.tourListUseCase.TourismListUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
