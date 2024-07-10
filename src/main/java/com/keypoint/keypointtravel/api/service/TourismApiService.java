@@ -1,0 +1,20 @@
+package com.keypoint.keypointtravel.api.service;
+
+import com.keypoint.keypointtravel.api.dto.useCase.tourListUseCase.TourismListUseCase;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@FeignClient(name = "koreanTourismApi", url = "https://apis.data.go.kr/B551011/KorService1")
+public interface TourismApiService {
+
+    @GetMapping("/areaBasedList1?MobileOS=ETC&MobileApp=keypoint&arrange=O&_type=json")
+    TourismListUseCase findTourismList(
+        @RequestParam("pageNo") int pageNo,
+        @RequestParam("serviceKey") String serviceKey,
+        @RequestParam("areaCode") int areaCode,
+        @RequestParam("contentTypeId") int contentTypeId,
+        @RequestParam("cat1") String cat1,
+        @RequestParam("cat2") String cat2,
+        @RequestParam("cat3") String cat3);
+}
