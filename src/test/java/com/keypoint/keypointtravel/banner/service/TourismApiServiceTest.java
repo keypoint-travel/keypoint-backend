@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourUseCase.TourismUseCase;
 import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
@@ -57,6 +58,18 @@ public class TourismApiServiceTest {
 
         //when
         TourismUseCase useCase = tourismApiService.findTourism(contentId, TourismApiConstants.SERVICE_KEY);
+
+        //then
+        assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();
+    }
+
+    @Test
+    public void findImageList(){
+        //given
+        String contentId = "126508";
+
+        //when
+        ImageListUseCase useCase = tourismApiService.findImageList(contentId, TourismApiConstants.SERVICE_KEY);
 
         //then
         assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();

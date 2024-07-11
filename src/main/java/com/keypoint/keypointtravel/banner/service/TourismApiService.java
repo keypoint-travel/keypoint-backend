@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.banner.service;
 
+import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourUseCase.TourismUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -21,6 +22,11 @@ public interface TourismApiService {
 
     @GetMapping("/detailCommon1?MobileOS=ETC&MobileApp=keypoint&_type=json&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y")
     TourismUseCase findTourism(
+        @RequestParam("contentId") String contentId,
+        @RequestParam("serviceKey") String serviceKey);
+
+    @GetMapping("/detailImage1?MobileOS=ETC&MobileApp=keypoint&_type=json&subImageYN=Y&numOfRows=20")
+    ImageListUseCase findImageList(
         @RequestParam("contentId") String contentId,
         @RequestParam("serviceKey") String serviceKey);
 }
