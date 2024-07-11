@@ -2,8 +2,8 @@ package com.keypoint.keypointtravel.banner.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.keypoint.keypointtravel.banner.entity.BannerCode;
-import com.keypoint.keypointtravel.banner.entity.SmallCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
+import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import org.junit.jupiter.api.Test;
 
 public class SmallCategoryTest {

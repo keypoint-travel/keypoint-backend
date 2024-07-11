@@ -3,12 +3,12 @@ package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.request.BannerListRequest;
 import com.keypoint.keypointtravel.banner.dto.response.BannerListResponse;
-import com.keypoint.keypointtravel.banner.entity.AreaCode;
-import com.keypoint.keypointtravel.banner.entity.BannerCode;
-import com.keypoint.keypointtravel.banner.entity.ContentType;
-import com.keypoint.keypointtravel.banner.entity.LargeCategory;
-import com.keypoint.keypointtravel.banner.entity.MiddleCategory;
-import com.keypoint.keypointtravel.banner.entity.SmallCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
+import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
+import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
+import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import com.keypoint.keypointtravel.banner.service.TourismApiService;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;

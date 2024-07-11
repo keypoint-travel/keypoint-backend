@@ -1,4 +1,5 @@
-package com.keypoint.keypointtravel.banner.entity;
+package com.keypoint.keypointtravel.global.enumType.banner;
+
 
 public interface BannerCode {
 

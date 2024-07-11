@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.banner.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
+import com.keypoint.keypointtravel.global.enumType.banner.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

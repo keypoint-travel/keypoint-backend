@@ -1,12 +1,12 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Item;
-import com.keypoint.keypointtravel.banner.entity.AreaCode;
-import com.keypoint.keypointtravel.banner.entity.BannerCode;
-import com.keypoint.keypointtravel.banner.entity.ContentType;
-import com.keypoint.keypointtravel.banner.entity.LargeCategory;
-import com.keypoint.keypointtravel.banner.entity.MiddleCategory;
-import com.keypoint.keypointtravel.banner.entity.SmallCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
+import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
+import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
+import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
