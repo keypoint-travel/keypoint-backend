@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.banner.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.tourUseCase.TourismUseCase;
 import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
@@ -25,7 +26,7 @@ public class TourismApiServiceTest {
     private TourismApiService tourismApiService;
 
     @Test
-    public void getTourismList() {
+    public void findTourismList() {
         //given
         int pageNo = 1;
         String region = "인천";
@@ -44,6 +45,18 @@ public class TourismApiServiceTest {
             BannerCode.getConstant(MiddleCategory.class, cat2).getCode(),
             BannerCode.getConstant(SmallCategory.class, cat3).getCode()
         );
+
+        //then
+        assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();
+    }
+
+    @Test
+    public void findTourism() {
+        //given
+        String contentId = "126508";
+
+        //when
+        TourismUseCase useCase = tourismApiService.findTourism(contentId, TourismApiConstants.SERVICE_KEY);
 
         //then
         assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();
