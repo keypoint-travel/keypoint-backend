@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.request.BannerListRequest;
 import com.keypoint.keypointtravel.banner.dto.response.BannerListResponse;
+import com.keypoint.keypointtravel.banner.dto.response.ImageListResponse;
+import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,7 +49,24 @@ public class CreateBannerController {
         );
 
         return APIResponseEntity.<BannerListResponse>builder()
+            .message("생성할 배너 리스트 조회")
             .data(BannerListResponse.from(useCase.getResponse().getBody()))
+            .build();
+    }
+
+    @GetMapping("/{contentId}/images")
+    public APIResponseEntity<ImageListResponse> findBannerImageList(
+        @PathVariable("contentId") String contentId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        //todo: 관리자 인증 로직 추가 예정
+
+        ImageListUseCase useCase = tourismApiService.findImageList(contentId,
+            TourismApiConstants.SERVICE_KEY);
+
+        return APIResponseEntity.<ImageListResponse>builder()
+            .message("contentId에 해당하는 이미지 리스트 조회")
+            .data(ImageListResponse.of(contentId, useCase.getResponse().getBody().getItems()))
             .build();
     }
 }
