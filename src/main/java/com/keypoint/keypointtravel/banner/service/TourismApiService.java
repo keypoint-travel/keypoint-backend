@@ -1,5 +1,11 @@
 package com.keypoint.keypointtravel.banner.service;
 
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.COMMON_OPTION;
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.COMMON_URI;
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.FIND_IMAGE_LIST;
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.FIND_TOURISM;
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.FIND_TOURISM_LIST;
+
 import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourUseCase.TourismUseCase;
@@ -7,10 +13,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "koreanTourismApi", url = "https://apis.data.go.kr/B551011/KorService1")
+@FeignClient(name = "koreanTourismApi", url = COMMON_URI)
 public interface TourismApiService {
 
-    @GetMapping("/areaBasedList1?MobileOS=ETC&MobileApp=keypoint&arrange=O&_type=json")
+    @GetMapping(FIND_TOURISM_LIST + COMMON_OPTION)
     TourismListUseCase findTourismList(
         @RequestParam("pageNo") int pageNo,
         @RequestParam("serviceKey") String serviceKey,
@@ -20,12 +26,12 @@ public interface TourismApiService {
         @RequestParam("cat2") String cat2,
         @RequestParam("cat3") String cat3);
 
-    @GetMapping("/detailCommon1?MobileOS=ETC&MobileApp=keypoint&_type=json&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y")
+    @GetMapping(FIND_TOURISM + COMMON_OPTION)
     TourismUseCase findTourism(
         @RequestParam("contentId") String contentId,
         @RequestParam("serviceKey") String serviceKey);
 
-    @GetMapping("/detailImage1?MobileOS=ETC&MobileApp=keypoint&_type=json&subImageYN=Y&numOfRows=20")
+    @GetMapping(FIND_IMAGE_LIST + COMMON_OPTION)
     ImageListUseCase findImageList(
         @RequestParam("contentId") String contentId,
         @RequestParam("serviceKey") String serviceKey);
