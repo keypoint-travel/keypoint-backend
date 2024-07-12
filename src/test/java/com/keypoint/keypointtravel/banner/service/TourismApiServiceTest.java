@@ -14,6 +14,7 @@ import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import com.keypoint.keypointtravel.global.constants.TourismApiConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -25,6 +26,9 @@ public class TourismApiServiceTest {
     private int port;
     @Autowired
     private TourismApiService tourismApiService;
+
+    @Value("${key.tourApi.key}")
+    private String serviceKey;
 
     @Test
     public void findTourismList() {
@@ -39,7 +43,7 @@ public class TourismApiServiceTest {
         //when
         TourismListUseCase useCase = tourismApiService.findTourismList(
             pageNo,
-            TourismApiConstants.SERVICE_KEY,
+            serviceKey,
             BannerCode.getConstant(AreaCode.class, region).getCode(),
             BannerCode.getConstant(ContentType.class, tourType).getCode(),
             BannerCode.getConstant(LargeCategory.class, cat1).getCode(),
@@ -57,7 +61,7 @@ public class TourismApiServiceTest {
         String contentId = "126508";
 
         //when
-        TourismUseCase useCase = tourismApiService.findTourism(contentId, TourismApiConstants.SERVICE_KEY);
+        TourismUseCase useCase = tourismApiService.findTourism(contentId, serviceKey);
 
         //then
         assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();
@@ -69,7 +73,7 @@ public class TourismApiServiceTest {
         String contentId = "126508";
 
         //when
-        ImageListUseCase useCase = tourismApiService.findImageList(contentId, TourismApiConstants.SERVICE_KEY);
+        ImageListUseCase useCase = tourismApiService.findImageList(contentId, serviceKey);
 
         //then
         assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();

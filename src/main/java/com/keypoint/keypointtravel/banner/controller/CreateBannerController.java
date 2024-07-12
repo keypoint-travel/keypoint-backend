@@ -17,10 +17,10 @@ import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import com.keypoint.keypointtravel.banner.service.TourismApiService;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.global.constants.TourismApiConstants;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,6 +41,9 @@ public class CreateBannerController {
 
     private final CreateBannerService bannerService;
 
+    @Value("${key.tourApi.key}")
+    private String serviceKey;
+
     @GetMapping
     public APIResponseEntity<BannerListResponse> findBannerList(
         @ModelAttribute BannerListRequest bannerListRequest,
@@ -50,7 +53,7 @@ public class CreateBannerController {
 
         TourismListUseCase useCase = tourismApiService.findTourismList(
             bannerListRequest.getPage(),
-            TourismApiConstants.SERVICE_KEY,
+            serviceKey,
             BannerCode.getConstant(AreaCode.class, bannerListRequest.getRegion()).getCode(),
             BannerCode.getConstant(ContentType.class, bannerListRequest.getTourType()).getCode(),
             BannerCode.getConstant(LargeCategory.class, bannerListRequest.getCat1()).getCode(),
@@ -71,8 +74,7 @@ public class CreateBannerController {
 
         //todo: 관리자 인증 로직 추가 예정
 
-        ImageListUseCase useCase = tourismApiService.findImageList(contentId,
-            TourismApiConstants.SERVICE_KEY);
+        ImageListUseCase useCase = tourismApiService.findImageList(contentId, serviceKey);
 
         return APIResponseEntity.<ImageListResponse>builder()
             .message("contentId에 해당하는 이미지 리스트 조회")
