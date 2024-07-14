@@ -11,7 +11,6 @@ import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
 import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
 import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
 import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
-import com.keypoint.keypointtravel.global.constants.TourismApiConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

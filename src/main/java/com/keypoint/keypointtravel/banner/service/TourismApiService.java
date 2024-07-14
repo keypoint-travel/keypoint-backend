@@ -13,7 +13,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "koreanTourismApi", url = COMMON_URI)
+@FeignClient(name = "koreanTourismApi", url = COMMON_URI, fallback = TourismApiServiceFallback.class)
 public interface TourismApiService {
 
     /**
