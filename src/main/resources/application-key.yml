@@ -45,3 +45,14 @@ apple:
   teamId: CML94Q2G94
   keyId: SQDWG4BH7J
   keyPath: AuthKey_SQDWG4BH7J.p8
+cloud:
+  aws:
+    credentials:
+      access-key: AKIA47CRUIKOVUZGUPEK
+      secret-access-key: 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
+    s3:
+      bucket: backend-keypoint-travel
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

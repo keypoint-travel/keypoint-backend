@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.global.utils;
 
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +26,18 @@ public class StringUtils {
 
     public static Boolean checkPasswordValidation(String password) {
         return password.matches(PASSWORD_PATTERN);
+    }
+
+    /**
+     * 파일명에서 파일 확장자를 찾는 함수
+     *
+     * @param filename
+     * @return
+     */
+    public static Optional<String> getFileExtension(String filename) {
+        return Optional.ofNullable(filename)
+            .filter(f -> f.contains("."))
+            .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 
 }

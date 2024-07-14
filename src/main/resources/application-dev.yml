@@ -4,7 +4,7 @@ spring:
       on-profile: "dev"
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://keypoint-travel-dev.c1ck4m0uiolg.ap-northeast-2.rds.amazonaws.com/keypoint_travel_dev?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mariadb://keypoint-travel-backend-dev.c1ck4m0uiolg.ap-northeast-2.rds.amazonaws.com/keypoint_travel_dev?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false
     username: keypoint
     password: Hdy9902!
   jpa:
