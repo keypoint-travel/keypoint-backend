@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.request.BannerListRequest;
 import com.keypoint.keypointtravel.banner.dto.request.BannerRequest;
-import com.keypoint.keypointtravel.banner.dto.response.BannerListResponse;
+import com.keypoint.keypointtravel.banner.dto.response.ContentListResponse;
 import com.keypoint.keypointtravel.banner.dto.response.ImageListResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.SaveUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
@@ -45,7 +45,7 @@ public class CreateBannerController {
     private String serviceKey;
 
     @GetMapping
-    public APIResponseEntity<BannerListResponse> findBannerList(
+    public APIResponseEntity<ContentListResponse> findContentList(
         @ModelAttribute BannerListRequest bannerListRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -61,14 +61,14 @@ public class CreateBannerController {
             BannerCode.getConstant(SmallCategory.class, bannerListRequest.getCat3()).getCode()
         );
 
-        return APIResponseEntity.<BannerListResponse>builder()
+        return APIResponseEntity.<ContentListResponse>builder()
             .message("생성할 배너 리스트 조회")
-            .data(BannerListResponse.from(useCase.getResponse().getBody()))
+            .data(ContentListResponse.from(useCase.getResponse().getBody()))
             .build();
     }
 
     @GetMapping("/{contentId}/images")
-    public APIResponseEntity<ImageListResponse> findBannerImageList(
+    public APIResponseEntity<ImageListResponse> findContentImageList(
         @PathVariable("contentId") String contentId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -85,7 +85,7 @@ public class CreateBannerController {
     @PostMapping
     public ResponseEntity<Void> saveBanner(
         @RequestBody @Valid BannerRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails){
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         //todo: 관리자 인증 로직 추가 예정
 

@@ -1,8 +1,9 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Body;
-import java.util.ArrayList;
+
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class BannerListResponse {
+public class ContentListResponse {
 
     //content
     private List<BannerDetails> contents;
@@ -25,8 +26,8 @@ public class BannerListResponse {
     private boolean empty;
     private int pageNumber;
 
-    public static BannerListResponse from(Body data) {
-        return BannerListResponse.builder()
+    public static ContentListResponse from(Body data) {
+        return ContentListResponse.builder()
             .contents(data.getItems().getItem().stream().map(BannerDetails::from).toList())
             .last(data.getPageNo() == getTotalPage(data.getTotalCount()))
             .totalPages(getTotalPage(data.getTotalCount()))
