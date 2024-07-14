@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -23,7 +25,7 @@ public class BannerRepositoryTest {
 
     @Test
     public void deleteBannerByIdTest() {
-        // Given
+        // given
         Banner banner = new Banner(1L, AreaCode.BUSAN, LargeCategory.ACCOMMODATION, MiddleCategory.AIR_LEISURE_SPORTS, SmallCategory.AIR_SPORTS, ContentType.ACCOMMODATION, "title", "image", false);
         banner = bannerRepository.save(banner);
         Long bannerId = banner.getId();
@@ -35,5 +37,23 @@ public class BannerRepositoryTest {
 
         //when & then
         assertThatThrownBy(() -> bannerRepository.deleteBannerById(100L)).isInstanceOf(GeneralException.class);
+    }
+
+    @Test
+    public  void findBannerListTest() {
+        //given
+        Banner banner1 = new Banner(1L, AreaCode.BUSAN, LargeCategory.ACCOMMODATION, MiddleCategory.AIR_LEISURE_SPORTS, SmallCategory.AIR_SPORTS, ContentType.ACCOMMODATION, "title", "image", true);
+        bannerRepository.save(banner1);
+        Banner banner2 = new Banner(2L, AreaCode.SEJONG, LargeCategory.CUISINE, MiddleCategory.SOLO_COURSE, SmallCategory.GATE, ContentType.DINING, "title2", "image2", false);
+        bannerRepository.save(banner2);
+        Banner banner3 = new Banner(3L, AreaCode.INCHEON, LargeCategory.SHOPPING, MiddleCategory.FAMILY_COURSE, SmallCategory.GOLF, ContentType.TOURIST_COURSE, "title3", "image3", true);
+        bannerRepository.save(banner3);
+
+        //when
+        List<Banner> bannerList = bannerRepository.findBannerList();
+
+        //then
+        assertThat(bannerList).hasSize(2);
+        assertThat(bannerList.get(0).getId()).isEqualTo(banner3.getId());
     }
 }
