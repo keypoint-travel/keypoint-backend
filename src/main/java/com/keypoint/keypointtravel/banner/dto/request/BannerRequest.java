@@ -19,6 +19,9 @@ public class BannerRequest {
     @NotBlank(message = "이미지 URL을 입력해주세요.")
     private String thumbnailImage;
 
+    private String title;
+    private Double latitude;
+    private Double longitude;
     private Long contentId;
     private String region;
     private String tourType;

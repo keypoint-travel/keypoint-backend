@@ -6,23 +6,26 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "banner")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Banner extends BaseEntity {
 
     @Id
     @Column(name = "banner_id")
     private Long id;
+
+    @Column
+    private String title;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -50,20 +53,12 @@ public class Banner extends BaseEntity {
     @Column
     private String thumbnailImage;
 
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
     @Column(nullable = false)
     private boolean isExposed;
-
-    public Banner(Long id, AreaCode areaCode, LargeCategory cat1, MiddleCategory cat2,
-        SmallCategory cat3, ContentType contentType, String thumbnailTitle, String thumbnailImage,
-        boolean isExposed) {
-        this.id = id;
-        this.areaCode = areaCode;
-        this.cat1 = cat1;
-        this.cat2 = cat2;
-        this.cat3 = cat3;
-        this.contentType = contentType;
-        this.thumbnailTitle = thumbnailTitle;
-        this.thumbnailImage = thumbnailImage;
-        this.isExposed = isExposed;
-    }
 }

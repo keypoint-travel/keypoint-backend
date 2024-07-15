@@ -27,8 +27,10 @@ public class BannerComment extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private boolean isDeleted;
 
     public BannerComment(Banner banner, Member member, String content) {

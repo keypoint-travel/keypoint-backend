@@ -17,6 +17,7 @@ import lombok.Getter;
 public class SaveUseCase {
 
     private Long contentId;
+    private String title;
     private AreaCode areaCode;
     private LargeCategory cat1;
     private MiddleCategory cat2;
@@ -24,10 +25,13 @@ public class SaveUseCase {
     private ContentType contentType;
     private String thumbnailTitle;
     private String thumbnailImage;
+    private Double latitude;
+    private Double longitude;
 
     public static SaveUseCase from(BannerRequest request){
         return SaveUseCase.builder()
             .contentId(request.getContentId())
+            .title(request.getTitle())
             .areaCode(BannerCode.getConstant(AreaCode.class, request.getRegion()))
             .cat1(BannerCode.getConstant(LargeCategory.class, request.getCat1()))
             .cat2(BannerCode.getConstant(MiddleCategory.class, request.getCat2()))
@@ -35,6 +39,8 @@ public class SaveUseCase {
             .contentType(BannerCode.getConstant(ContentType.class, request.getTourType()))
             .thumbnailTitle(request.getThumbnailTitle())
             .thumbnailImage(request.getThumbnailImage())
+            .latitude(request.getLatitude())
+            .longitude(request.getLongitude())
             .build();
     }
 }
