@@ -7,6 +7,7 @@ import config.QueryDslConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -23,20 +24,25 @@ public class BannerRepositoryTest {
     @Autowired
     private BannerRepository bannerRepository;
 
+    @Autowired
+    private TestEntityManager em;
     @Test
-    public void deleteBannerByIdTest() {
+    public void updateIsExposedByIdTest() {
         // given
-        Banner banner = new Banner(1L, AreaCode.BUSAN, LargeCategory.ACCOMMODATION, MiddleCategory.AIR_LEISURE_SPORTS, SmallCategory.AIR_SPORTS, ContentType.ACCOMMODATION, "title", "image", false);
-        banner = bannerRepository.save(banner);
-        Long bannerId = banner.getId();
+        Long bannerId = 1L;
+        boolean isExposed = true;
+        Banner banner = new Banner(bannerId, AreaCode.BUSAN, LargeCategory.ACCOMMODATION, MiddleCategory.AIR_LEISURE_SPORTS, SmallCategory.AIR_SPORTS, ContentType.ACCOMMODATION, "title", "image", isExposed);
+        bannerRepository.save(banner);
 
         // When & Then
-        assertThat(bannerRepository.findAll()).isNotEmpty();
-        bannerRepository.deleteBannerById(bannerId);
-        assertThat(bannerRepository.findAll()).isEmpty();
+        assertThat(banner.isExposed()).isTrue();
+        bannerRepository.updateIsExposedById(bannerId);
+        em.clear();
+        Banner updatedBanner = bannerRepository.findById(bannerId).get();
+        assertThat(updatedBanner.isExposed()).isFalse();
 
         //when & then
-        assertThatThrownBy(() -> bannerRepository.deleteBannerById(100L)).isInstanceOf(GeneralException.class);
+        assertThatThrownBy(() -> bannerRepository.updateIsExposedById(100L)).isInstanceOf(GeneralException.class);
     }
 
     @Test

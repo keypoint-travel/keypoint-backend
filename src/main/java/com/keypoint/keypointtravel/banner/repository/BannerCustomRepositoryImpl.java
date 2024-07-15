@@ -20,9 +20,10 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     private final QBanner banner = QBanner.banner;
 
     @Override
-    public void deleteBannerById(Long bannerId) {
+    public void updateIsExposedById(Long bannerId) {
 
-        long count = queryFactory.delete(banner)
+        long count = queryFactory.update(banner)
+            .set(banner.isExposed, false)
             .where(banner.id.eq(bannerId))
             .execute();
 

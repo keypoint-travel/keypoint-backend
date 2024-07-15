@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface BannerCustomRepository {
 
-    void deleteBannerById(Long bannerId);
+    void updateIsExposedById(Long bannerId);
 
     List<Banner> findBannerList();
 }
