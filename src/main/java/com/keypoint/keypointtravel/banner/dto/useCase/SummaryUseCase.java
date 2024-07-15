@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-public class BannerSummaryUseCase {
+public class SummaryUseCase {
 
     private Long bannerId;
     private String region;
@@ -22,8 +22,8 @@ public class BannerSummaryUseCase {
     private String title;
     private LocalDateTime modifyAt;
 
-    static public BannerSummaryUseCase from(Banner banner) {
-        return BannerSummaryUseCase.builder()
+    static public SummaryUseCase from(Banner banner) {
+        return SummaryUseCase.builder()
             .bannerId(banner.getId())
             .region(banner.getAreaCode().getDescription())
             .tourType(banner.getContentType().getDescription())
