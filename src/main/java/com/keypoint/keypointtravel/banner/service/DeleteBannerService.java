@@ -12,6 +12,11 @@ public class DeleteBannerService {
 
     private final BannerRepository bannerRepository;
 
+    /**
+     * Banner 삭제하는 함수(isExposed를 false로) (공통 배너 삭제)
+     *
+     * @Param useCase
+     */
     @Transactional
     public void deleteBanner(DeleteUseCase deleteUseCase) {
         bannerRepository.updateIsExposedById(deleteUseCase.bannerId());
