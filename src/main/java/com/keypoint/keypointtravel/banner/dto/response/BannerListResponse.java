@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
-import com.keypoint.keypointtravel.banner.dto.useCase.BannerSummaryUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.SummaryUseCase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,9 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class BannerListResponse {
 
-    List<BannerSummaryUseCase> contents;
-
-    public static BannerListResponse from(List<BannerSummaryUseCase> useCaseList) {
-        return new BannerListResponse(useCaseList);
-    }
+    List<SummaryUseCase> contents;
 }
