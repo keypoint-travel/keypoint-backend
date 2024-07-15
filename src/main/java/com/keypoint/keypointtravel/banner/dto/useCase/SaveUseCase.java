@@ -25,6 +25,8 @@ public class SaveUseCase {
     private ContentType contentType;
     private String thumbnailTitle;
     private String thumbnailImage;
+    private String address1;
+    private String address2;
     private Double latitude;
     private Double longitude;
 
@@ -39,6 +41,8 @@ public class SaveUseCase {
             .contentType(BannerCode.getConstant(ContentType.class, request.getTourType()))
             .thumbnailTitle(request.getThumbnailTitle())
             .thumbnailImage(request.getThumbnailImage())
+            .address1(request.getAddress1())
+            .address2(request.getAddress2())
             .latitude(request.getLatitude())
             .longitude(request.getLongitude())
             .build();

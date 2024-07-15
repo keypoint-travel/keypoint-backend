@@ -25,9 +25,22 @@ public class CreateBannerService {
         boolean isExposed = true;
 
         //배너 생성
-        Banner banner = new Banner(useCase.getContentId(), useCase.getTitle(), useCase.getAreaCode(), useCase.getCat1(),
-            useCase.getCat2(), useCase.getCat3(), useCase.getContentType(), useCase.getThumbnailTitle(),
-            useCase.getThumbnailImage(), useCase.getLatitude(), useCase.getLongitude(), isExposed);
+        Banner banner = Banner.builder()
+            .id(useCase.getContentId())
+            .title(useCase.getTitle())
+            .areaCode(useCase.getAreaCode())
+            .cat1(useCase.getCat1())
+            .cat2(useCase.getCat2())
+            .cat3(useCase.getCat3())
+            .contentType(useCase.getContentType())
+            .thumbnailTitle(useCase.getThumbnailTitle())
+            .thumbnailImage(useCase.getThumbnailImage())
+            .address1(useCase.getAddress1())
+            .address2(useCase.getAddress2())
+            .latitude(useCase.getLatitude())
+            .longitude(useCase.getLongitude())
+            .isExposed(isExposed)
+            .build();
 
         bannerRepository.save(banner);
     }

@@ -20,6 +20,8 @@ public class BannerRequest {
     private String thumbnailImage;
 
     private String title;
+    private String address1;
+    private String address2;
     private Double latitude;
     private Double longitude;
     private Long contentId;
@@ -28,5 +30,4 @@ public class BannerRequest {
     private String cat1;
     private String cat2;
     private String cat3;
-
 }

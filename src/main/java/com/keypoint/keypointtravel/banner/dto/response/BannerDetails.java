@@ -39,8 +39,8 @@ public class BannerDetails {
             .cat3(BannerCode.getDescription(SmallCategory.class, data.getCat3()))
             .address1(data.getAddr1())
             .address2(data.getAddr2())
-            .latitude(data.getMapx())
-            .longitude(data.getMapy())
+            .latitude(data.getMapy())
+            .longitude(data.getMapx())
             .thumbnailImage(data.getFirstimage())
             .title(data.getTitle())
             .build();
