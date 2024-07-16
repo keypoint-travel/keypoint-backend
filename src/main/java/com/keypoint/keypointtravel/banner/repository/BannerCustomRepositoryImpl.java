@@ -11,6 +11,7 @@ import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -71,6 +72,9 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     }
 
     private BooleanExpression getBannerLikeExpression(Long bannerId, Long memberId) {
+        if(memberId == null){
+            return Expressions.FALSE;
+        }
         return selectOne()
             .from(QBannerLike.bannerLike)
             .where(QBannerLike.bannerLike.member.id.eq(memberId)

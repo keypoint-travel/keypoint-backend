@@ -78,10 +78,14 @@ public class BannerRepositoryTest {
 
         //when
         CommonTourismDto dto = bannerRepository.findBannerById(bannerId, member.getId());
+        CommonTourismDto dto2 = bannerRepository.findBannerById(bannerId, null);
+        CommonTourismDto dto3 = bannerRepository.findBannerById(bannerId, member2.getId());
 
         //then
         assertThat(dto.getBannerLikesSize()).isEqualTo(1);
         assertThat(dto.isLiked()).isFalse();
+        assertThat(dto2.isLiked()).isFalse();
+        assertThat(dto3.isLiked()).isTrue();
 
         //when & then
         assertThatThrownBy(() -> bannerRepository.findBannerById(100L, member.getId())).isInstanceOf(GeneralException.class);
