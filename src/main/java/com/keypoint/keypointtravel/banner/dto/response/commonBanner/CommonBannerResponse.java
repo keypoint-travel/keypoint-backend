@@ -38,11 +38,21 @@ public class CommonBannerResponse {
             .address2(details.getCommonTourismDto().getAddress2())
             .latitude(details.getCommonTourismDto().getLatitude())
             .longitude(details.getCommonTourismDto().getLongitude())
-            .arounds(data.getItem().stream().map(AroundTourism::from).toList())
-            .comments(details.getCommentDtoList().stream().map(Comments::from).toList())
+            .arounds(createAroundTourismList(data, details))
+            .comments(createCommentsList(details))
             .totalLikes(details.getCommonTourismDto().getBannerLikesSize())
             .myLike(details.getCommonTourismDto().isLiked())
             .memberId(userDetails == null ? null : userDetails.getId())
             .build();
+    }
+
+    private static List<AroundTourism> createAroundTourismList(Items data, CommonTourismUseCase details) {
+        return data.getItem().stream()
+            .filter(item -> Integer.parseInt(item.getContentid()) != details.getCommonTourismDto().getId())
+            .map(AroundTourism::from).toList();
+    }
+
+    private static List<Comments> createCommentsList(CommonTourismUseCase details) {
+        return details.getCommentDtoList().stream().map(Comments::from).toList();
     }
 }
