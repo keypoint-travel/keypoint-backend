@@ -1,17 +1,13 @@
 package com.keypoint.keypointtravel.banner.service;
 
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.COMMON_OPTION;
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.COMMON_URI;
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.FIND_IMAGE_LIST;
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.FIND_TOURISM;
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.FIND_TOURISM_LIST;
-
 import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourUseCase.TourismUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
 @FeignClient(name = "koreanTourismApi", url = COMMON_URI, fallback = TourismApiServiceFallback.class)
 public interface TourismApiService {
@@ -52,5 +48,11 @@ public interface TourismApiService {
     @GetMapping(FIND_IMAGE_LIST + COMMON_OPTION)
     ImageListUseCase findImageList(
         @RequestParam("contentId") String contentId,
+        @RequestParam("serviceKey") String serviceKey);
+
+    @GetMapping(FIND_AROUNDS + COMMON_OPTION)
+    TourismListUseCase findArounds(
+        @RequestParam("mapX") Double mapX,
+        @RequestParam("mapY") Double mapY,
         @RequestParam("serviceKey") String serviceKey);
 }

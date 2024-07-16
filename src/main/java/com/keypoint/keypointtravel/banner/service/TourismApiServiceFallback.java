@@ -23,4 +23,9 @@ public class TourismApiServiceFallback implements TourismApiService {
     public ImageListUseCase findImageList(String contentId, String serviceKey) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }
+
+    @Override
+    public TourismListUseCase findArounds(Double mapX, Double mapY, String serviceKey) {
+        throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
+    }
 }
