@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.banner.repository;
 
+import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 
@@ -12,4 +13,6 @@ public interface BannerCustomRepository {
     List<Banner> findBannerList();
 
     CommonTourismDto findBannerById(Long bannerId, Long memberId);
+
+    List<CommentDto> findCommentListById(Long bannerId);
 }

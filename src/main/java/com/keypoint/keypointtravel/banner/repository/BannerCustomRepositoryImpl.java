@@ -1,14 +1,15 @@
 package com.keypoint.keypointtravel.banner.repository;
 
 
+import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
-import com.keypoint.keypointtravel.banner.dto.dto.QCommonTourismDto;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.QBanner;
 import com.keypoint.keypointtravel.banner.entity.QBannerComment;
 import com.keypoint.keypointtravel.banner.entity.QBannerLike;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,14 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
 
     private final QBanner banner = QBanner.banner;
 
+    private final QBannerComment bannerComment = QBannerComment.bannerComment;
+
     @Override
     public void updateIsExposedById(Long bannerId) {
-
         long count = queryFactory.update(banner)
             .set(banner.isExposed, false)
             .where(banner.id.eq(bannerId))
             .execute();
-
         if (count < 1) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
@@ -50,7 +51,7 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
 
     @Override
     public CommonTourismDto findBannerById(Long bannerId, Long memberId) {
-        return queryFactory.select(new QCommonTourismDto(
+        CommonTourismDto dto = queryFactory.select(Projections.constructor(CommonTourismDto.class,
                 banner.id,
                 banner.thumbnailTitle,
                 banner.title,
@@ -59,13 +60,14 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 banner.latitude,
                 banner.longitude,
                 banner.bannerLikes.size(),
-                getBannerLikeExpression(bannerId, memberId)
-            ))
+                getBannerLikeExpression(bannerId, memberId)))
             .from(banner)
-            .leftJoin(banner.bannerLikes, QBannerLike.bannerLike)
-            .leftJoin(banner.comments, QBannerComment.bannerComment).fetchJoin()
             .where(banner.id.eq(bannerId))
             .fetchOne();
+        if(dto == null){
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+         return dto;
     }
 
     private BooleanExpression getBannerLikeExpression(Long bannerId, Long memberId) {
@@ -74,5 +76,19 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             .where(QBannerLike.bannerLike.member.id.eq(memberId)
                 .and(QBannerLike.bannerLike.banner.id.eq(bannerId)))
             .exists();
+    }
+
+    @Override
+    public List<CommentDto> findCommentListById(Long bannerId) {
+        return queryFactory.select(Projections.constructor(CommentDto.class,
+                bannerComment.id,
+                bannerComment.content,
+                bannerComment.member.id,
+                bannerComment.member.email,
+                bannerComment.createAt))
+            .from(bannerComment)
+            .where(bannerComment.banner.id.eq(bannerId))
+            .orderBy(bannerComment.createAt.desc())
+            .fetch();
     }
 }

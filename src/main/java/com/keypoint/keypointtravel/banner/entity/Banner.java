@@ -60,7 +60,7 @@ public class Banner extends BaseEntity {
     private Double longitude;
 
     @Column(nullable = false)
-    private boolean isExposed;
+    private boolean isExposed; // 사용자에게 노출 여부
 
     @OneToMany(mappedBy = "banner", orphanRemoval = true)
     private List<BannerComment> comments = new ArrayList<>();

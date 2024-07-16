@@ -1,8 +1,14 @@
 package com.keypoint.keypointtravel.banner.repository;
 
+import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
+import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.banner.entity.BannerComment;
+import com.keypoint.keypointtravel.banner.entity.BannerLike;
 import com.keypoint.keypointtravel.global.enumType.banner.*;
+import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.entity.Member;
 import config.QueryDslConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +38,7 @@ public class BannerRepositoryTest {
         // given
         Long bannerId = 1L;
         boolean isExposed = true;
-        Banner banner = new Banner(bannerId, "test", AreaCode.BUSAN, LargeCategory.ACCOMMODATION, MiddleCategory.AIR_LEISURE_SPORTS, SmallCategory.AIR_SPORTS, ContentType.ACCOMMODATION, "title", "image", "address1", "address2", 37.0, 127.0, isExposed);
-        bannerRepository.save(banner);
+        Banner banner = buildBanner(bannerId, isExposed);
 
         // When & Then
         assertThat(banner.isExposed()).isTrue();
@@ -49,18 +54,85 @@ public class BannerRepositoryTest {
     @Test
     public void findBannerListTest() {
         //given
-        Banner banner1 = new Banner(1L, "test", AreaCode.BUSAN, LargeCategory.ACCOMMODATION, MiddleCategory.AIR_LEISURE_SPORTS, SmallCategory.AIR_SPORTS, ContentType.ACCOMMODATION, "title", "image", "address1", "address2", 37.0, 127.0, true);
-        bannerRepository.save(banner1);
-        Banner banner2 = new Banner(2L, "test", AreaCode.SEJONG, LargeCategory.CUISINE, MiddleCategory.SOLO_COURSE, SmallCategory.GATE, ContentType.DINING, "title2", "image2", "address1", "address2", 37.0, 127.0, false);
-        bannerRepository.save(banner2);
-        Banner banner3 = new Banner(3L, "test", AreaCode.INCHEON, LargeCategory.SHOPPING, MiddleCategory.FAMILY_COURSE, SmallCategory.GOLF, ContentType.TOURIST_COURSE, "title3", "image3", "address1", "address2", 37.0, 127.0, true);
-        bannerRepository.save(banner3);
-
+        Banner banner1 = buildBanner(1L, true);
+        Banner banner2 = buildBanner(2L, false);
+        Banner banner3 = buildBanner(3L, true);
+        em.flush();
         //when
         List<Banner> bannerList = bannerRepository.findBannerList();
 
         //then
         assertThat(bannerList).hasSize(2);
         assertThat(bannerList.get(0).getId()).isEqualTo(banner3.getId());
+    }
+
+    @Test
+    public void findBannerByIdTest() {
+        //given
+        Long bannerId = 1L;
+        Banner banner = buildBanner(bannerId, true);
+        Member member = buildMember("email@test.com");
+        Member member2 = buildMember("email2@test.com");
+        buildBannerLike(banner, member2);
+        em.flush();
+
+        //when
+        CommonTourismDto dto = bannerRepository.findBannerById(bannerId, member.getId());
+
+        //then
+        assertThat(dto.getBannerLikesSize()).isEqualTo(1);
+        assertThat(dto.isLiked()).isFalse();
+
+        //when & then
+        assertThatThrownBy(() -> bannerRepository.findBannerById(100L, member.getId())).isInstanceOf(GeneralException.class);
+    }
+
+    @Test
+    public void findCommentListByIdTest() {
+        //given
+        Long bannerId = 1L;
+        Banner banner = buildBanner(bannerId, true);
+        Member member = buildMember("email@test.com");
+        buildBannerComment(banner, member, "test");
+        buildBannerComment(banner, member, "test2");
+        em.flush();
+
+        //when
+        List<CommentDto> dtoList = bannerRepository.findCommentListById(bannerId);
+
+        //then
+        assertThat(dtoList).hasSize(2);
+    }
+
+    private Banner buildBanner(Long bannerId, boolean isExposed) {
+        Banner banner = Banner.builder()
+            .id(bannerId)
+            .title("test")
+            .areaCode(AreaCode.BUSAN)
+            .cat1(LargeCategory.ACCOMMODATION)
+            .cat2(MiddleCategory.AIR_LEISURE_SPORTS)
+            .cat3(SmallCategory.AIR_SPORTS)
+            .contentType(ContentType.ACCOMMODATION)
+            .thumbnailTitle("title")
+            .thumbnailImage("image")
+            .address1("address1")
+            .address2("address2")
+            .latitude(37.0)
+            .longitude(127.0)
+            .isExposed(isExposed)
+            .build();
+        return em.persist(banner);
+    }
+
+    private Member buildMember(String email) {
+        return em.persist(new Member(email, OauthProviderType.GOOGLE));
+    }
+
+    private BannerComment buildBannerComment(Banner banner, Member member, String content) {
+        return em.persist(new BannerComment(banner, member, content));
+    }
+
+    private BannerLike buildBannerLike(Banner banner, Member member) {
+        return em.persist(new BannerLike(banner, member));
     }
 }
