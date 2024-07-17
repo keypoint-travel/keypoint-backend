@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.request.CommentRequest;
 import com.keypoint.keypointtravel.banner.dto.response.commonBanner.CommentResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.CreateCommentUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.UpdateCommentUseCase;
 import com.keypoint.keypointtravel.banner.service.BannerCommentService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
@@ -33,5 +34,16 @@ public class BannerCommentController {
                 .message("bannerId에 해당하는 배너에 댓글 생성")
                 .data(CommentResponse.from(dto))
                 .build());
+    }
+
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<Void> updateComment(
+        @PathVariable Long bannerId, @PathVariable Long commentId, @RequestBody @Valid CommentRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        bannerCommentService.updateComment(
+            new UpdateCommentUseCase(bannerId, commentId, userDetails.getId(), request.getContent()));
+
+        return ResponseEntity.noContent().build();
     }
 }
