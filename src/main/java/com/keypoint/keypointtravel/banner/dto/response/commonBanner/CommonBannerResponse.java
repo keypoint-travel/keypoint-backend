@@ -23,7 +23,7 @@ public class CommonBannerResponse {
     private Double longitude;
 
     private List<AroundTourism> arounds;
-    private List<Comments> comments;
+    private List<CommentResponse> comments;
     private int totalLikes;
     private boolean myLike;
 
@@ -52,7 +52,7 @@ public class CommonBannerResponse {
             .map(AroundTourism::from).toList();
     }
 
-    private static List<Comments> createCommentsList(CommonTourismUseCase details) {
-        return details.getCommentDtoList().stream().map(Comments::from).toList();
+    private static List<CommentResponse> createCommentsList(CommonTourismUseCase details) {
+        return details.getCommentDtoList().stream().map(CommentResponse::from).toList();
     }
 }

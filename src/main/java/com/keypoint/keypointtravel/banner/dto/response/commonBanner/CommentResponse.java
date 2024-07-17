@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class Comments {
+public class CommentResponse {
     private Long commentId;
     private String content;
     private Long writerId;
     private String writerEmail;
     private LocalDateTime createAt;
 
-    public static Comments from(CommentDto data) {
-        return new Comments(data.getCommentId(), data.getContent(), data.getWriterId(), data.getWriterEmail(), data.getCreateAt());
+    public static CommentResponse from(CommentDto data) {
+        return new CommentResponse(data.getCommentId(), data.getContent(), data.getWriterId(), data.getWriterEmail(), data.getCreateAt());
     }
 }
