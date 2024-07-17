@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.banner.repository;
+package com.keypoint.keypointtravel.banner.repository.bannerComment;
 
 import com.keypoint.keypointtravel.banner.entity.BannerComment;
 import org.springframework.data.jpa.repository.JpaRepository;

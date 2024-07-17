@@ -7,7 +7,7 @@ import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.SummaryUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ThumbnailUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
-import com.keypoint.keypointtravel.banner.repository.BannerRepository;
+import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

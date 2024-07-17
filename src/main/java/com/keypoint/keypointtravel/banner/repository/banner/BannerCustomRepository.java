@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.banner.repository;
+package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;

@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.banner.repository;
 import com.keypoint.keypointtravel.banner.dto.dto.UpdateCommentDto;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.BannerComment;
+import com.keypoint.keypointtravel.banner.repository.bannerComment.BannerCommentRepository;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import org.junit.jupiter.api.Test;

@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.BannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
-import com.keypoint.keypointtravel.banner.repository.BannerRepository;
+import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
