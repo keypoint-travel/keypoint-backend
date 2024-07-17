@@ -7,7 +7,6 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Optional;
 
@@ -19,9 +18,6 @@ public class BannerCommentRepositoryTest extends RepositoryTest {
     @Autowired
     private BannerCommentRepository bannerCommentRepository;
 
-    @Autowired
-    private TestEntityManager em;
-
     @Test
     public void updateContentTest() {
         // given
@@ -30,7 +26,6 @@ public class BannerCommentRepositoryTest extends RepositoryTest {
         Member member = buildMember("khds@test.com");
         BannerComment comment = buildBannerComment(banner, member, "content");
         String newContent = "newContent";
-        System.out.println(comment.getId());
 
         // when
         bannerCommentRepository.updateContent(new UpdateCommentDto(comment.getId(), member.getId(), newContent));
@@ -46,5 +41,27 @@ public class BannerCommentRepositoryTest extends RepositoryTest {
             new UpdateCommentDto(-1L, member.getId(), newContent))).isInstanceOf(GeneralException.class);
         assertThatThrownBy(() -> bannerCommentRepository.updateContent(
             new UpdateCommentDto(comment.getId(), -1L, newContent))).isInstanceOf(GeneralException.class);
+    }
+
+    @Test
+    public void updateIsDeletedByIdTest() {
+        // given
+        Long bannerId = 1L;
+        Banner banner = buildBanner(bannerId, true);
+        Member member = buildMember("khds@test.com");
+        BannerComment comment = buildBannerComment(banner, member, "content");
+
+        // when & then
+        assertThat(comment.isDeleted()).isFalse();
+        bannerCommentRepository.updateIsDeletedById(comment.getId(), member.getId());
+        em.flush();
+        em.clear();
+        Optional<BannerComment> updatedComment = bannerCommentRepository.findById(comment.getId());
+        assertThat(updatedComment.get().isDeleted()).isTrue();
+
+        assertThatThrownBy(() -> bannerCommentRepository.updateIsDeletedById(
+            comment.getId(), -1L)).isInstanceOf(GeneralException.class);
+        assertThatThrownBy(() -> bannerCommentRepository.updateIsDeletedById(
+            -1L, member.getId())).isInstanceOf(GeneralException.class);
     }
 }

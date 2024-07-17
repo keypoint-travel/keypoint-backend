@@ -24,4 +24,15 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_COMMENT);
         }
     }
+
+    @Override
+    public void updateIsDeletedById(Long commentId, Long memberId) {
+        long count = queryFactory.update(bannerComment)
+            .set(bannerComment.isDeleted, true)
+            .where(bannerComment.id.eq(commentId), bannerComment.member.id.eq(memberId))
+            .execute();
+        if (count < 1) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_COMMENT);
+        }
+    }
 }
