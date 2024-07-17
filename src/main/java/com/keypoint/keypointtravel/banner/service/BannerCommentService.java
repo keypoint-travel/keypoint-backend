@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.banner.service;
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.UpdateCommentDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CreateCommentUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.DeleteCommentUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.UpdateCommentUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.BannerComment;
@@ -57,5 +58,16 @@ public class BannerCommentService {
     public void updateComment(UpdateCommentUseCase useCase) {
         bannerCommentRepository.updateContent(new UpdateCommentDto(
             useCase.getCommentId(), useCase.getMemberId(), useCase.getNewContent()));
+    }
+
+    /**
+     * BannerComment 삭제하는 함수(isDeleted를 true로) (배너 댓글 삭제)
+     *
+     * @Param useCase
+     */
+    @Transactional
+    public void deleteComment(DeleteCommentUseCase deleteCommentUseCase) {
+        bannerCommentRepository.updateIsDeletedById(
+            deleteCommentUseCase.getCommentId(), deleteCommentUseCase.getMemberId());
     }
 }

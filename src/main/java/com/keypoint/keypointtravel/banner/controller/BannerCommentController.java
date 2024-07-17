@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.request.CommentRequest;
 import com.keypoint.keypointtravel.banner.dto.response.commonBanner.CommentResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.CreateCommentUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.DeleteCommentUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.UpdateCommentUseCase;
 import com.keypoint.keypointtravel.banner.service.BannerCommentService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -43,6 +44,16 @@ public class BannerCommentController {
 
         bannerCommentService.updateComment(
             new UpdateCommentUseCase(bannerId, commentId, userDetails.getId(), request.getContent()));
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+        @PathVariable Long bannerId, @PathVariable Long commentId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        bannerCommentService.deleteComment(new DeleteCommentUseCase(bannerId, commentId, userDetails.getId()));
 
         return ResponseEntity.noContent().build();
     }
