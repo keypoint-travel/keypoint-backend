@@ -1,7 +1,9 @@
 package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
+import com.keypoint.keypointtravel.banner.dto.dto.UpdateCommentDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CreateCommentUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.UpdateCommentUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.BannerComment;
 import com.keypoint.keypointtravel.banner.repository.BannerCommentRepository;
@@ -25,6 +27,13 @@ public class BannerCommentService {
     private final BannerCommentRepository bannerCommentRepository;
 
 
+    /**
+     * BannerComment 생성하는 함수 (배너 댓글 생성)
+     *
+     * @Param useCase
+     *
+     * @Return
+     */
     @Transactional
     public CommentDto saveComment(CreateCommentUseCase useCase) {
 
@@ -37,5 +46,16 @@ public class BannerCommentService {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return CommentDto.from(comment);
+    }
+
+    /**
+     * BannerComment 내용 수정하는 함수 (배너 댓글 수정)
+     *
+     * @Param useCase
+     */
+    @Transactional
+    public void updateComment(UpdateCommentUseCase useCase) {
+        bannerCommentRepository.updateContent(new UpdateCommentDto(
+            useCase.getCommentId(), useCase.getMemberId(), useCase.getNewContent()));
     }
 }
