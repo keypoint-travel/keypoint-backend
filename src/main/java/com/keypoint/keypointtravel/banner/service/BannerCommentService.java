@@ -1,0 +1,41 @@
+package com.keypoint.keypointtravel.banner.service;
+
+import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.CreateCommentUseCase;
+import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.banner.entity.BannerComment;
+import com.keypoint.keypointtravel.banner.repository.BannerCommentRepository;
+import com.keypoint.keypointtravel.banner.repository.BannerRepository;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class BannerCommentService {
+
+    private final BannerRepository bannerRepository;
+
+    private final MemberRepository memberRepository;
+
+    private final BannerCommentRepository bannerCommentRepository;
+
+
+    @Transactional
+    public CommentDto saveComment(CreateCommentUseCase useCase) {
+
+        Member member = memberRepository.getReferenceById(useCase.getWriterId());
+        Banner banner = bannerRepository.getReferenceById(useCase.getBannerId());
+        BannerComment comment = new BannerComment(banner, member, useCase.getContent());
+        try {
+            comment = bannerCommentRepository.save(comment);
+        } catch (Exception e) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+        return CommentDto.from(comment);
+    }
+}
