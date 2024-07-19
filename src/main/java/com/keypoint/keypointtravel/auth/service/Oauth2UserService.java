@@ -1,17 +1,5 @@
 package com.keypoint.keypointtravel.auth.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
-import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
-import com.keypoint.keypointtravel.global.enumType.RoleType;
-import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
-import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
-import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
-import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -19,7 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -28,6 +16,21 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
+import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
+import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
+import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.repository.MemberRepository;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

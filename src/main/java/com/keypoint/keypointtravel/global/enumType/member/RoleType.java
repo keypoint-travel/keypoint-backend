@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.global.enumType;
+package com.keypoint.keypointtravel.global.enumType.member;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
