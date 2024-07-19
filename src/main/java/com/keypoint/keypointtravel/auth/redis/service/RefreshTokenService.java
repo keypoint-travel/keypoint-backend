@@ -1,0 +1,50 @@
+package com.keypoint.keypointtravel.auth.redis.service;
+
+import java.util.Date;
+
+import org.springframework.stereotype.Service;
+
+import com.keypoint.keypointtravel.auth.dto.dto.RefreshTokenEmailDTO;
+import com.keypoint.keypointtravel.auth.redis.entity.RefreshToken;
+import com.keypoint.keypointtravel.auth.redis.repository.RefreshTokenRepository;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class RefreshTokenService {
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    /**
+     * jwt 토큰을 관리하기 위해서 refresh token을 저장하는 함수
+     * @param email Member/TempOauthMember의 email
+     * @param refreshToken jwt refresh token
+     * @param expiration refresh token의 만료 시간(단위: ms)
+     */
+    @Transactional
+    public void saveRefreshToken(String email, String refreshToken, Date expiration) {
+        // 1. email에 등록된 refresh token이 존재하는지 확인
+        String refreshTokenId = findRefreshTokenIdByEmail(email);
+        if (refreshTokenId != null) {
+            // 1-1. refresh token이 존재하는 경우 삭제
+            refreshTokenRepository.deleteById(refreshTokenId);
+        }
+
+        // 2. 새로운 refresh token 생성
+        Long remainExpiration = expiration.getTime() - new Date().getTime();
+        RefreshToken redisRefreshToken = RefreshToken.of(email, refreshToken, remainExpiration);
+        refreshTokenRepository.save(redisRefreshToken);
+    }
+    
+    /**
+     * email로 RefreshToken의 id를 조회하는 함수
+     * @param email 찾으려는 refresh token의 email
+     * @return refresh token의 id (존재하지 않는 경우: null)
+     */
+    private String findRefreshTokenIdByEmail(String email) {
+        RefreshTokenEmailDTO dto = refreshTokenRepository.findByEmail(email);
+        return dto.getId();
+    }
+}
