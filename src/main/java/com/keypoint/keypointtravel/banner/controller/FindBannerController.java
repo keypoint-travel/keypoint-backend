@@ -11,6 +11,8 @@ import com.keypoint.keypointtravel.banner.service.FindBannerService;
 import com.keypoint.keypointtravel.banner.service.TourismApiService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -70,7 +72,9 @@ public class FindBannerController {
 
         TourismListUseCase arounds = tourismApiService.findArounds(
             longitude, latitude, serviceKey);
-
+        if (arounds.getResponse().getBody().getItems().getItem().isEmpty()){
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_TOURISM);
+        }
         return APIResponseEntity.<RecommendationResponse>builder()
             .message("추천 배너 조회")
             .data(RecommendationResponse.from(arounds.getResponse().getBody().getItems().getItem()))
