@@ -1,5 +1,11 @@
 package com.keypoint.keypointtravel.member.service;
 
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -8,35 +14,20 @@ import com.keypoint.keypointtravel.member.dto.response.MemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberService {
-
+public class CreateMemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * email로 Member를 조회하는 함수
-     *
-     * @param email
-     * @return
-     */
-    public Member findMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
-            .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
-    }
-
-    /**
      * Member 생성하는 함수 (일반 회원가입)
      *
-     * @param useCase
+     * @param useCase 회원 가입 데이터
      * @return
      */
     @Transactional
@@ -63,16 +54,21 @@ public class MemberService {
         }
     }
 
-    public String encodePassword(String password) {
+    /**
+     * 비밀번호를 PasswordEncoder로 암호화
+     * @param password 암호화할 비밀번호
+     * @return
+     */
+    private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
 
     /**
      * (일반 회원가입 경우) 계정 유효성 검사
      *
-     * @param email
+     * @param email 이메일
      */
-    public void validateEmailForSignUp(String email) {
+    private void validateEmailForSignUp(String email) {
         Optional<Member> memberOptional = memberRepository.findByEmail(email);
         if (memberOptional.isPresent()) {
             Member existMember = memberOptional.get();
