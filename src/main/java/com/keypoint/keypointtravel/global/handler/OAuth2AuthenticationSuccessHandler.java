@@ -1,17 +1,20 @@
 package com.keypoint.keypointtravel.global.handler;
 
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
-import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -36,7 +39,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         HttpServletResponse response,
         Authentication authentication
     ) {
-        TokenInfoDTO tokenInfoDTO = tokenProvider.createToken(authentication);
+        TokenInfoResponse tokenInfoDTO = tokenProvider.createToken(authentication);
         String jsonResponse = "{\"accessToken\": \"" + tokenInfoDTO.getAccessToken() + "\"}";
 
         try {
