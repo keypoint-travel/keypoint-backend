@@ -15,8 +15,9 @@ public interface TourismApiService {
     /**
      * 한국관광공사 API를 이용하여 관광지 리스트를 조회하는 함수
      *
-     * @Param
-     * @Return
+     * @Param 특정 관광지 리스트를 조회하기 위한 분류 값
+     *
+     * @Return 조회한 관광지 목록
      */
     @GetMapping(FIND_TOURISM_LIST + COMMON_OPTION)
     TourismListUseCase findTourismList(
@@ -32,7 +33,8 @@ public interface TourismApiService {
      * 한국관광공사 API를 이용하여 특정 관광지를 조회하는 함수
      *
      * @Param contentId, serviceKey
-     * @Return
+     *
+     * @Return 조회한 관광지 정보
      */
     @GetMapping(FIND_TOURISM + COMMON_OPTION)
     TourismUseCase findTourism(
@@ -43,13 +45,21 @@ public interface TourismApiService {
      * 한국관광공사 API를 이용하여 특정 관광지의 이미지 리스트를 조회하는 함수
      *
      * @Param contentId, serviceKey
-     * @Return
+     *
+     * @Return 조회한 관광지 이미지 목록
      */
     @GetMapping(FIND_IMAGE_LIST + COMMON_OPTION)
     ImageListUseCase findImageList(
         @RequestParam("contentId") String contentId,
         @RequestParam("serviceKey") String serviceKey);
 
+    /**
+     * 한국관광공사 API를 이용하여 특정 위치 주변 관광지 리스트를 조회하는 함수
+     *
+     * @Param contentId, serviceKey
+     *
+     * @Return 조회한 관광지 목록
+     */
     @GetMapping(FIND_AROUNDS + COMMON_OPTION)
     TourismListUseCase findArounds(
         @RequestParam("mapX") Double mapX,

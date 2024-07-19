@@ -15,7 +15,7 @@ public class DeleteBannerService {
     /**
      * Banner 삭제하는 함수(isExposed를 false로) (공통 배너 삭제)
      *
-     * @Param useCase
+     * @Param bannerId를 담은 useCase
      */
     @Transactional
     public void deleteBanner(DeleteUseCase deleteUseCase) {

@@ -16,7 +16,7 @@ public class CreateBannerService {
     /**
      * Banner 생성하는 함수 (공통 배너 생성)
      *
-     * @Param useCase
+     * @Param 배너 생성 정보 useCase
      */
     @Transactional
     public void saveBanner(SaveUseCase useCase) {

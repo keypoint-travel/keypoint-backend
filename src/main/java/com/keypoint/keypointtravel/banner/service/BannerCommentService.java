@@ -31,9 +31,9 @@ public class BannerCommentService {
     /**
      * BannerComment 생성하는 함수 (배너 댓글 생성)
      *
-     * @Param useCase
+     * @Param 생성하는 댓글 정보 useCase
      *
-     * @Return
+     * @Return 생성된 댓글 정보 Dto
      */
     @Transactional
     public CommentDto saveComment(CreateCommentUseCase useCase) {
@@ -52,7 +52,7 @@ public class BannerCommentService {
     /**
      * BannerComment 내용 수정하는 함수 (배너 댓글 수정)
      *
-     * @Param useCase
+     * @Param 수정하는 댓글 정보 useCase
      */
     @Transactional
     public void updateComment(UpdateCommentUseCase useCase) {
@@ -63,7 +63,7 @@ public class BannerCommentService {
     /**
      * BannerComment 삭제하는 함수(isDeleted를 true로) (배너 댓글 삭제)
      *
-     * @Param useCase
+     * @Param 삭제하는 댓글 정보 useCase
      */
     @Transactional
     public void deleteComment(DeleteCommentUseCase deleteCommentUseCase) {

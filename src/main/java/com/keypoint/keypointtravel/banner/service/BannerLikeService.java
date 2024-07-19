@@ -23,6 +23,11 @@ public class BannerLikeService {
 
     private final BannerLikeRepository bannerLikeRepository;
 
+    /**
+     * Banner 좋아요 추가 /삭제하는 함수
+     *
+     * @Param 좋아요 정보 useCase
+     */
     @Transactional
     public void changeLike(ChangeLikeUseCase useCase) {
         if (useCase.isHasILiked()) {

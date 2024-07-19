@@ -23,7 +23,7 @@ public class FindBannerService {
     /**
      * 생성한 Banner 목록을 조회하는 함수 (공통 배너 목록 조회)
      *
-     * @Return
+     * @Return 관리자가 확인할 수 있는 배너 목록 useCase
      */
     @Transactional(readOnly = true)
     public List<SummaryUseCase> findBannerList() {
@@ -35,7 +35,7 @@ public class FindBannerService {
     /**
      * Banner 썸네일 목록을 조회하는 함수 (배너 썸네일 목록 조회)
      *
-     * @Return
+     * @Return 사용자가 볼 수 있는 배너 썸네일 목록 useCase
      */
     @Transactional(readOnly = true)
     public List<ThumbnailUseCase> findThumbnailList() {
@@ -48,7 +48,9 @@ public class FindBannerService {
     /**
      * Banner 상세 정보를 조회하는 함수 (공통 배너 상세 조회)
      *
-     * @Return
+     * @Param bannerId, memberId(좋아요 여부 확인을 위한)
+     *
+     * @Return 공통 배너 상세 정보 useCase
      */
     @Transactional(readOnly = true)
     public CommonTourismUseCase findCommonBanner(BannerUseCase useCase) {
