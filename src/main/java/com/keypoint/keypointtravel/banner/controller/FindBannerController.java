@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.response.BannerListResponse;
+import com.keypoint.keypointtravel.banner.dto.response.RecommendationResponse;
 import com.keypoint.keypointtravel.banner.dto.response.commonBanner.CommonBannerResponse;
 import com.keypoint.keypointtravel.banner.dto.response.ThumbnailListResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.BannerUseCase;
@@ -13,10 +14,7 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/banners")
@@ -62,6 +60,20 @@ public class FindBannerController {
         return APIResponseEntity.<CommonBannerResponse>builder()
             .message("공통 배너 상세 조회 ")
             .data(CommonBannerResponse.of(details, arounds.getResponse().getBody().getItems(), userDetails))
+            .build();
+    }
+
+    @GetMapping("/recommendation")
+    public APIResponseEntity<RecommendationResponse> findRecommendationBanner(
+        @RequestParam("latitude") Double latitude,
+        @RequestParam("longitude") Double longitude) {
+
+        TourismListUseCase arounds = tourismApiService.findArounds(
+            longitude, latitude, serviceKey);
+
+        return APIResponseEntity.<RecommendationResponse>builder()
+            .message("추천 배너 조회")
+            .data(RecommendationResponse.from(arounds.getResponse().getBody().getItems().getItem()))
             .build();
     }
 }
