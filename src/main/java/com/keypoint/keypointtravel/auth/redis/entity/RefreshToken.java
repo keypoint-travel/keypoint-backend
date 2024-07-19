@@ -1,20 +1,19 @@
 package com.keypoint.keypointtravel.auth.redis.entity;
 
+import jakarta.persistence.Id;
 import java.util.concurrent.TimeUnit;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 
 @Getter
 @NoArgsConstructor
-@RedisHash(value = "refresh_token")
+@RedisHash(value = "refreshToken")
 public class RefreshToken {
+
     @Id
     private String id;
 
@@ -34,5 +33,5 @@ public class RefreshToken {
 
     public static RefreshToken of(String email, String refreshToken, Long expiration) {
         return new RefreshToken(email, refreshToken, expiration);
-    } 
+    }
 }

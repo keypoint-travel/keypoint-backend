@@ -1,13 +1,6 @@
 package com.keypoint.keypointtravel.auth.service;
 
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
@@ -19,15 +12,20 @@ import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final static String TOKEN_GRANT_TYPE = "Bearer";
+    private static final String TOKEN_GRANT_TYPE = "Bearer";
 
     private final JwtTokenProvider tokenProvider;
     private final ReadMemberService readMemberService;
@@ -94,7 +92,7 @@ public class AuthService {
     /**
      * JWT 토큰 생성 함수
      *
-     * @param email 토큰 생성할 Member의 email
+     * @param email    토큰 생성할 Member의 email
      * @param password 토큰 생성할 Member의 password
      * @return
      */

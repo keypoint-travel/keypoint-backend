@@ -1,27 +1,26 @@
 package com.keypoint.keypointtravel.auth.redis.service;
 
-import java.util.Date;
-
-import org.springframework.stereotype.Service;
-
 import com.keypoint.keypointtravel.auth.dto.dto.RefreshTokenEmailDTO;
 import com.keypoint.keypointtravel.auth.redis.entity.RefreshToken;
 import com.keypoint.keypointtravel.auth.redis.repository.RefreshTokenRepository;
-
-import jakarta.transaction.Transactional;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RefreshTokenService {
+
     private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * jwt 토큰을 관리하기 위해서 refresh token을 저장하는 함수
-     * @param email Member/TempOauthMember의 email
+     *
+     * @param email        Member/TempOauthMember의 email
      * @param refreshToken jwt refresh token
-     * @param expiration refresh token의 만료 시간(단위: ms)
+     * @param expiration   refresh token의 만료 시간(단위: ms)
      */
     @Transactional
     public void saveRefreshToken(String email, String refreshToken, Date expiration) {
@@ -37,9 +36,10 @@ public class RefreshTokenService {
         RefreshToken redisRefreshToken = RefreshToken.of(email, refreshToken, remainExpiration);
         refreshTokenRepository.save(redisRefreshToken);
     }
-    
+
     /**
      * email로 RefreshToken의 id를 조회하는 함수
+     *
      * @param email 찾으려는 refresh token의 email
      * @return refresh token의 id (존재하지 않는 경우: null)
      */

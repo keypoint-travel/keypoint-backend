@@ -1,22 +1,5 @@
 package com.keypoint.keypointtravel.auth.service;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -26,11 +9,26 @@ import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
+import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
-
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -113,32 +111,33 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             userNameAttributeName,
             oAuth2User.getAttributes()
         );
-        Member member = saveOrUpdate(attributes);
+        CommonMemberDTO member = saveOrUpdate(attributes);
         httpSession.setAttribute("member", SessionUser.from(member));
         return CustomUserDetails.of(member, oAuth2User.getAttributes());
     }
 
-    public Member saveOrUpdate(OAuthAttributes attributes)
+    public CommonMemberDTO saveOrUpdate(OAuthAttributes attributes)
         throws GeneralOAuth2AuthenticationException {
         OauthProviderType oauthProviderType = attributes.getOAuthProvider();
         String email = attributes.getEmail();
 
         // 1. 이메일이 등록되어 있는지 확인
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
 
         // 2. 등록되지 않은 경우: 저장 / 다른 제공사로 등록되어 있는 경우 예외 발생
         if (memberOptional.isPresent()) {
-            Member member = memberOptional.get();
+            // 2-1. 로그인 (이전에 등록되어 있는 이메일)
+            CommonMemberDTO member = memberOptional.get();
             validateOauthProvider(member, oauthProviderType);
-            memberRepository.save(member);
 
             return member;
         } else {
+            // 2-2. 회원가비 (등록되어 있지 않은 이메일)
             return addUser(attributes);
         }
     }
 
-    private void validateOauthProvider(Member member, OauthProviderType oauthProviderType)
+    private void validateOauthProvider(CommonMemberDTO member, OauthProviderType oauthProviderType)
         throws GeneralOAuth2AuthenticationException {
         if (member.getOauthProviderType() != oauthProviderType) {
             throw new GeneralOAuth2AuthenticationException(
@@ -147,9 +146,10 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    private Member addUser(OAuthAttributes attributes) {
+    private CommonMemberDTO addUser(OAuthAttributes attributes) {
         Member newMember = attributes.toEntity();
         memberRepository.save(newMember);
-        return newMember;
+
+        return memberRepository.findByEmail(newMember.getEmail()).get();
     }
 }
