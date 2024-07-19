@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
@@ -39,7 +39,7 @@ public class AuthService {
      * @param useCase
      * @return
      */
-    public TokenInfoDTO reissueToken(ReissueUseCase useCase) {
+    public TokenInfoResponse reissueToken(ReissueUseCase useCase) {
         try {
             String accessToken = useCase.getAccessToken();
             String refreshToken = useCase.getRefreshToken();
@@ -71,7 +71,7 @@ public class AuthService {
      * @return jwt 토큰 정보
      */
     @Transactional(noRollbackFor = GeneralException.class)
-    public TokenInfoDTO login(LoginUseCase useCase) {
+    public TokenInfoResponse login(LoginUseCase useCase) {
         try {
             String email = useCase.getEmail();
             String password = useCase.getPassword();
@@ -98,7 +98,7 @@ public class AuthService {
      * @param password 토큰 생성할 Member의 password
      * @return
      */
-    public TokenInfoDTO getJwtTokenInfo(String email, String password) {
+    public TokenInfoResponse getJwtTokenInfo(String email, String password) {
         // 1. Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
             email, password);

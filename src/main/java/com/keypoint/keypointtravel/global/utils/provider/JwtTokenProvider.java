@@ -16,7 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
@@ -64,7 +64,7 @@ public class JwtTokenProvider implements InitializingBean {
      * @param authentication 인증 정보가 담긴 객체
      * @return access token과 refresh token이 담긴 jwt 토큰 객체
     */
-    public TokenInfoDTO createToken(Authentication authentication) {
+    public TokenInfoResponse createToken(Authentication authentication) {
         // 1. 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
@@ -94,7 +94,7 @@ public class JwtTokenProvider implements InitializingBean {
             
         // 5. 토큰 저장
         refreshTokenService.saveRefreshToken(userDetails.getEmail(), refreshToken, refreshTokenExpiration);
-        return TokenInfoDTO.of(GRANT_TYPE, accessToken, refreshToken);
+        return TokenInfoResponse.of(GRANT_TYPE, accessToken, refreshToken);
     }
 
     /**
