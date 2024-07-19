@@ -5,13 +5,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
-import com.keypoint.keypointtravel.auth.service.AuthService;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.member.dto.request.LoginRequest;
+import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
+import com.keypoint.keypointtravel.member.dto.request.EmailVerificationRequest;
 import com.keypoint.keypointtravel.member.dto.request.SignUpRequest;
-import com.keypoint.keypointtravel.member.dto.response.MemberDTO;
-import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
+import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.service.CreateMemberService;
 
@@ -20,28 +20,40 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/member")
+@RequestMapping("/api/v1/members")
 public class MemberController {
 
     private final CreateMemberService createMemberService;
-    private final AuthService authService;
 
-    @PostMapping("sign-up")
-    public APIResponseEntity<MemberDTO> addUser(@Valid @RequestBody SignUpRequest request) {
-        SignUpUseCase useCase = SignUpUseCase.from(request);
-        MemberDTO userDTO = this.createMemberService.registerMember(useCase);
+    @PostMapping("/email/validate")
+    public APIResponseEntity<Void> sendVerificationCodeToEmail(@Valid @RequestBody EmailRequest request) {
+        EmailUseCase useCase = EmailUseCase.from(request);
+        MemberResponse result = createMemberService.sendVerificationCodeToEmail(useCase);
 
-        return APIResponseEntity.<MemberDTO>builder()
-            .data(userDTO)
+        return APIResponseEntity.<Void>builder()
+                .message("이메일 인증 번호 전송 성공")
+                .build();
+    }
+    
+    @PostMapping("/email/confirm")
+    public APIResponseEntity<MemberResponse> confirmEmail(@Valid @RequestBody EmailVerificationRequest request) {
+        EmailVerificationUseCase useCase = EmailVerificationUseCase.from(request);
+        MemberResponse result = createMemberService.registerMember(useCase);
+
+        return APIResponseEntity.<MemberResponse>builder()
+            .message("이메일 인증 성공")
+            .data(result)
             .build();
     }
 
-    @PostMapping("login")
-    public APIResponseEntity<TokenInfoDTO> login(@Valid @RequestBody LoginRequest request) {
-        LoginUseCase useCase = LoginUseCase.from(request);
-        TokenInfoDTO result = authService.login(useCase);
 
-        return APIResponseEntity.<TokenInfoDTO>builder()
+    @PostMapping
+    public APIResponseEntity<MemberResponse> addUser(@Valid @RequestBody SignUpRequest request) {
+        SignUpUseCase useCase = SignUpUseCase.from(request);
+        MemberResponse result = createMemberService.registerMember(useCase);
+
+        return APIResponseEntity.<MemberResponse>builder()
+            .message("회원 가입 성공")
             .data(result)
             .build();
     }

@@ -6,11 +6,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
-import com.keypoint.keypointtravel.member.dto.response.MemberDTO;
+import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
+import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
@@ -21,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CreateMemberService {
+    private static final int EMAIL_VERIFICATION_CODE_DIGITS = 6;
+
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -31,7 +37,7 @@ public class CreateMemberService {
      * @return
      */
     @Transactional
-    public MemberDTO registerMember(SignUpUseCase useCase) {
+    public MemberResponse registerMember(SignUpUseCase useCase) {
         try {
             String email = useCase.getEmail();
             String password = useCase.getPassword();
@@ -48,7 +54,7 @@ public class CreateMemberService {
             Member member = new Member(email, encodePassword(password), OauthProviderType.NONE);
             memberRepository.save(member);
 
-            return MemberDTO.from(member);
+            return MemberResponse.from(member);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -69,14 +75,25 @@ public class CreateMemberService {
      * @param email 이메일
      */
     private void validateEmailForSignUp(String email) {
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
         if (memberOptional.isPresent()) {
-            Member existMember = memberOptional.get();
-            if (existMember.getEmail().contains(OauthProviderType.NONE.name())) {
+            CommonMemberDTO existMember = memberOptional.get();
+            if ( existMember.getOauthProviderType() == OauthProviderType.NONE) {
                 throw new GeneralException(MemberErrorCode.DUPLICATED_EMAIL);
             } else {
                 throw new GeneralException(MemberErrorCode.REGISTERED_EMAIL_FOR_THE_OTHER);
             }
         }
+    }
+
+    /**
+     * 이메일 인증 코드 전달 함수
+     * @param useCase 이메일 정보 데이터
+     * @return
+     */
+    public boolean sendVerificationCodeToEmail(EmailUseCase useCase) {
+        String code = StringUtils.getRandomNumber(EMAIL_VERIFICATION_CODE_DIGITS);
+        boolean result = EmailUtils.sendEmail(useCase.getEmail(), EmailTemplate.EMAIL_VERIFICATION, );
+        return result;
     }
 }
