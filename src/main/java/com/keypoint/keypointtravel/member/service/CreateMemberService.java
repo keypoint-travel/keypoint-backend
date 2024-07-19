@@ -17,8 +17,10 @@ import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.redis.entity.EmailVerificationCode;
 import com.keypoint.keypointtravel.member.redis.service.EmailVerificationCodeService;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
 
@@ -95,7 +97,7 @@ public class CreateMemberService {
      * @param useCase 이메일 정보 데이터
      * @return
      */
-    public boolean sendVerificationCodeToEmail(EmailUseCase useCase) {
+    public void sendVerificationCodeToEmail(EmailUseCase useCase) {
         String email = useCase.getEmail();
 
         // 1. 인증 코드 생성
@@ -104,12 +106,31 @@ public class CreateMemberService {
         // 2. 이메일 전송
         Map<String, String> emailContent = new HashMap<>();
         emailContent.put("code", code);
-        boolean result = EmailUtils.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
+        EmailUtils.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
 
-        // 3. 이메일 전송이 성공일 경우에만 인증 코드 저장
-        if (result) {
-            emailVerificationCodeService.saveEmailVerificationCode(email, code);
+        // 3. 이메일 전송이 성공일 경우, 인증 코드 저장
+        emailVerificationCodeService.saveEmailVerificationCode(email, code);
+    }
+
+    /**
+     * 이메일 인증 확인 결과를 전달하는 함수
+     *
+     * @param useCase 이메일 인증 데이터
+     */
+    public boolean confirmEmail(EmailVerificationUseCase useCase) {
+        String email = useCase.getEmail();
+        String code = useCase.getCode();
+
+        try {
+            EmailVerificationCode emailVerificationCode = emailVerificationCodeService
+                    .findEmailVerificationCodeByEmailAndCode(email, code);
+            if (emailVerificationCode != null) {
+                emailVerificationCodeService.deleteEmailVerificationCode(emailVerificationCode);
+            }
+
+            return emailVerificationCode != null;
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
         }
-        return result;
     }
 }

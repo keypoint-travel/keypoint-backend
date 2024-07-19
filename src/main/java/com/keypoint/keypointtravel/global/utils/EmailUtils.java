@@ -32,7 +32,7 @@ public class EmailUtils {
      * @param emailContent 이메일 매핑 내용
      * @return 이메일 성공 여부
      */
-    public static boolean sendEmail(String receiver, EmailTemplate template, Map<String, String> emailContent) {
+    public static void sendEmail(String receiver, EmailTemplate template, Map<String, String> emailContent) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
         try {
@@ -50,10 +50,8 @@ public class EmailUtils {
 
             // 이메일 전송
             javaMailSender.send(mimeMessage);
-            return true;
         } catch (MessagingException e) {
             throw new GeneralException(CommonErrorCode.FAIL_TO_SEND_EMAIL);
-            return false;
         }
     }
 }

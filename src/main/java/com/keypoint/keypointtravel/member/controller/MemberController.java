@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.keypoint.keypointtravel.auth.dto.response.EmailVerificationResponse;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
 import com.keypoint.keypointtravel.member.dto.request.EmailVerificationRequest;
@@ -28,7 +29,7 @@ public class MemberController {
     @PostMapping("/email/validate")
     public APIResponseEntity<Void> sendVerificationCodeToEmail(@Valid @RequestBody EmailRequest request) {
         EmailUseCase useCase = EmailUseCase.from(request);
-        MemberResponse result = createMemberService.sendVerificationCodeToEmail(useCase);
+        createMemberService.sendVerificationCodeToEmail(useCase);
 
         return APIResponseEntity.<Void>builder()
                 .message("이메일 인증 번호 전송 성공")
@@ -36,13 +37,13 @@ public class MemberController {
     }
     
     @PostMapping("/email/confirm")
-    public APIResponseEntity<MemberResponse> confirmEmail(@Valid @RequestBody EmailVerificationRequest request) {
+    public APIResponseEntity<EmailVerificationResponse> confirmEmail(@Valid @RequestBody EmailVerificationRequest request) {
         EmailVerificationUseCase useCase = EmailVerificationUseCase.from(request);
-        MemberResponse result = createMemberService.registerMember(useCase);
+        boolean result = createMemberService.confirmEmail(useCase);
 
-        return APIResponseEntity.<MemberResponse>builder()
+        return APIResponseEntity.<EmailVerificationResponse>builder()
             .message("이메일 인증 성공")
-            .data(result)
+            .data(EmailVerificationResponse.from(result))
             .build();
     }
 
