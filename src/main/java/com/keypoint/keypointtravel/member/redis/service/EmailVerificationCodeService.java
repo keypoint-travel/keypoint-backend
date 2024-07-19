@@ -1,12 +1,10 @@
 package com.keypoint.keypointtravel.member.redis.service;
 
-import org.springframework.stereotype.Service;
-
 import com.keypoint.keypointtravel.member.redis.entity.EmailVerificationCode;
 import com.keypoint.keypointtravel.member.redis.repository.EmailVerificationCodeRepository;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,12 +15,13 @@ public class EmailVerificationCodeService {
 
     /**
      * 이메일 인증 데이터를 저장하는 함수
+     *
      * @param email
      * @param code
      */
     @Transactional
     public void saveEmailVerificationCode(String email, String code) {
-        // 1. email에 대해서 인증 데이터가 존재하는지 확인
+        // 1. email 에 대해서 인증 데이터가 존재하는지 확인
         EmailVerificationCode existedCode = findEmailVerificationCodeByEmail(email);
         if (existedCode != null) {
             // 1-1. 삭제
@@ -36,6 +35,7 @@ public class EmailVerificationCodeService {
 
     /**
      * email에 대해서 EmailVerificationCode를 조회하는 함수
+     *
      * @param email
      * @return
      */
@@ -45,20 +45,23 @@ public class EmailVerificationCodeService {
 
     /**
      * 전달받은 email, code에 대해서 EmailVerificationCode를 조회하는 함수
+     *
      * @param email
      * @param code
      * @return
      */
-    public EmailVerificationCode findEmailVerificationCodeByEmailAndCode(String email, String code) {
+    public EmailVerificationCode findEmailVerificationCodeByEmailAndCode(String email,
+        String code) {
         return emailAuthenticationNumberRepository.findByEmailAndCode(email, code).orElse(null);
     }
 
     /**
      * emailVerificationCode 삭제하는 함수
+     *
      * @param emailVerificationCode
      */
     public void deleteEmailVerificationCode(EmailVerificationCode emailVerificationCode) {
         emailAuthenticationNumberRepository.delete(emailVerificationCode);
     }
-    
+
 }

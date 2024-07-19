@@ -1,18 +1,10 @@
 package com.keypoint.keypointtravel.member.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.global.utils.EmailUtils;
+import com.keypoint.keypointtravel.global.utils.EmailService;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
@@ -23,18 +15,25 @@ import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.redis.entity.EmailVerificationCode;
 import com.keypoint.keypointtravel.member.redis.service.EmailVerificationCodeService;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CreateMemberService {
+
     private static final int EMAIL_VERIFICATION_CODE_DIGITS = 6;
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationCodeService emailVerificationCodeService;
+    private final EmailService emailService;
 
     /**
      * Member 생성하는 함수 (일반 회원가입)
@@ -68,6 +67,7 @@ public class CreateMemberService {
 
     /**
      * 비밀번호를 PasswordEncoder로 암호화
+     *
      * @param password 암호화할 비밀번호
      * @return
      */
@@ -84,7 +84,7 @@ public class CreateMemberService {
         Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
         if (memberOptional.isPresent()) {
             CommonMemberDTO existMember = memberOptional.get();
-            if ( existMember.getOauthProviderType() == OauthProviderType.NONE) {
+            if (existMember.getOauthProviderType() == OauthProviderType.NONE) {
                 throw new GeneralException(MemberErrorCode.DUPLICATED_EMAIL);
             } else {
                 throw new GeneralException(MemberErrorCode.REGISTERED_EMAIL_FOR_THE_OTHER);
@@ -94,22 +94,27 @@ public class CreateMemberService {
 
     /**
      * 이메일 인증 코드 전달 함수
+     *
      * @param useCase 이메일 정보 데이터
      * @return
      */
     public void sendVerificationCodeToEmail(EmailUseCase useCase) {
-        String email = useCase.getEmail();
+        try {
+            String email = useCase.getEmail();
 
-        // 1. 인증 코드 생성
-        String code = StringUtils.getRandomNumber(EMAIL_VERIFICATION_CODE_DIGITS);
+            // 1. 인증 코드 생성
+            String code = StringUtils.getRandomNumber(EMAIL_VERIFICATION_CODE_DIGITS);
 
-        // 2. 이메일 전송
-        Map<String, String> emailContent = new HashMap<>();
-        emailContent.put("code", code);
-        EmailUtils.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
+            // 2. 이메일 전송
+            Map<String, String> emailContent = new HashMap<>();
+            emailContent.put("code", code);
+            emailService.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
 
-        // 3. 이메일 전송이 성공일 경우, 인증 코드 저장
-        emailVerificationCodeService.saveEmailVerificationCode(email, code);
+            // 3. 이메일 전송이 성공일 경우, 인증 코드 저장
+            emailVerificationCodeService.saveEmailVerificationCode(email, code);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 
     /**
@@ -123,12 +128,13 @@ public class CreateMemberService {
 
         try {
             EmailVerificationCode emailVerificationCode = emailVerificationCodeService
-                    .findEmailVerificationCodeByEmailAndCode(email, code);
+                .findEmailVerificationCodeByEmailAndCode(email, code);
+            boolean result = emailVerificationCode != null;
             if (emailVerificationCode != null) {
                 emailVerificationCodeService.deleteEmailVerificationCode(emailVerificationCode);
             }
 
-            return emailVerificationCode != null;
+            return result;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
