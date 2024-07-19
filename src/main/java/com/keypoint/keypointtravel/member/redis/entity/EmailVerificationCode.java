@@ -23,4 +23,8 @@ public class EmailVerificationCode {
         this.email = email;
         this.code = code;
     }
+
+    public static EmailVerificationCode of(String email, String code) {
+        return new EmailVerificationCode(email, code);
+    }
 }

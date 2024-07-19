@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.member.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,7 @@ import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.redis.service.EmailVerificationCodeService;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class CreateMemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationCodeService emailVerificationCodeService;
 
     /**
      * Member 생성하는 함수 (일반 회원가입)
@@ -92,8 +96,20 @@ public class CreateMemberService {
      * @return
      */
     public boolean sendVerificationCodeToEmail(EmailUseCase useCase) {
+        String email = useCase.getEmail();
+
+        // 1. 인증 코드 생성
         String code = StringUtils.getRandomNumber(EMAIL_VERIFICATION_CODE_DIGITS);
-        boolean result = EmailUtils.sendEmail(useCase.getEmail(), EmailTemplate.EMAIL_VERIFICATION, );
+
+        // 2. 이메일 전송
+        Map<String, String> emailContent = new HashMap<>();
+        emailContent.put("code", code);
+        boolean result = EmailUtils.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
+
+        // 3. 이메일 전송이 성공일 경우에만 인증 코드 저장
+        if (result) {
+            emailVerificationCodeService.saveEmailVerificationCode(email, code);
+        }
         return result;
     }
 }

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum EmailTemplate {
-    EMAIL_VERIFICATION("01", "auth_mail", "이메일 인증");
+    EMAIL_VERIFICATION("01", "email-verification", "이메일 인증");
 
 
     private final String code;
