@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.auth.dto.response;
+package com.keypoint.keypointtravel.member.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
