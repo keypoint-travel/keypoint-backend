@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,17 +110,24 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
             .getUserInfoEndpoint().getUserNameAttributeName();
 
+        String oauthAccessToken = userRequest.getAccessToken().getTokenValue();
+        Instant oauthAccessTokenExpiry = userRequest.getAccessToken().getExpiresAt();
+
         OAuthAttributes attributes = OAuthAttributes.of(
             registrationId,
             userNameAttributeName,
             oAuth2User.getAttributes()
         );
-        CommonMemberDTO member = saveOrUpdate(attributes);
+        CommonMemberDTO member = saveOrUpdate(attributes, oauthAccessToken, oauthAccessTokenExpiry);
         httpSession.setAttribute("member", SessionUser.from(member));
         return CustomUserDetails.of(member, oAuth2User.getAttributes());
     }
 
-    public CommonMemberDTO saveOrUpdate(OAuthAttributes attributes)
+    public CommonMemberDTO saveOrUpdate(
+        OAuthAttributes attributes,
+        String oauthAccessToken,
+        Instant oauthAccessTokenExpiry
+    )
         throws GeneralOAuth2AuthenticationException {
         OauthProviderType oauthProviderType = attributes.getOAuthProvider();
         String email = attributes.getEmail();
@@ -132,6 +140,8 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             // 2-1. 로그인 (이전에 등록되어 있는 이메일)
             CommonMemberDTO member = memberOptional.get();
             validateOauthProvider(member, oauthProviderType);
+
+            // 2-2. Oauth 토큰 저장
 
             return member;
         } else {

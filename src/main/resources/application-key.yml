@@ -24,6 +24,8 @@ spring:
           apple:
             authorizationUri: https://appleid.apple.com/auth/authorize?response_mode=form_post
             tokenUri: https://appleid.apple.com/auth/token
+          google:
+            authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent
         registration:
           apple:
             clientId: keypoint.com
