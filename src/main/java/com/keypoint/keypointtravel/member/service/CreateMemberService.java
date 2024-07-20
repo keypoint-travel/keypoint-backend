@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.member.service;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.EmailService;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
@@ -10,6 +11,7 @@ import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberProfileUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.entity.MemberConsent;
@@ -152,6 +154,38 @@ public class CreateMemberService {
             }
 
             return result;
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * Member 개인 정보 생성하는 함수 (소셜 로그인)
+     *
+     * @param useCase 개인 정보 데이터
+     * @return
+     */
+    @Transactional
+    public MemberResponse registerMemberProfile(MemberProfileUseCase useCase) {
+        try {
+            // 1. Member 찾기
+            Member member = memberRepository.findById(useCase.getMemberId())
+                .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
+
+            // 2. Member 상태 변경
+            memberRepository.updateRole(member.getId(), RoleType.ROLE_CERTIFIED_USER);
+
+            // 3. MemberConsent, MemberDetail, Notification 생성
+            MemberConsent memberConsent = MemberConsent.from(member);
+            MemberDetail memberDetail = useCase.toEntity(member);
+            Notification notification = Notification.from(member);
+
+            // 4. 저장
+            memberConsentRepository.save(memberConsent);
+            memberDetailRepository.save(memberDetail);
+            notificationRepository.save(notification);
+
+            return MemberResponse.from(member);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

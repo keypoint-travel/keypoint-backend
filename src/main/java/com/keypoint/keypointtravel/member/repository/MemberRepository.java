@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.member.repository;
 
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import java.time.LocalDateTime;
@@ -22,5 +23,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     int updateRecentLoginAtByMemberId(
         @Param("id") Long id,
         @Param("recentLoginAt") LocalDateTime recentLoginAt
+    );
+
+    @Modifying
+    @Query("UPDATE Member m SET m.role = :role WHERE m.id = :id")
+    int updateRole(
+        @Param("id") Long id,
+        @Param("role") RoleType role
     );
 }
