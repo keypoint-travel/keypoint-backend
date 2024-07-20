@@ -12,9 +12,15 @@ import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.entity.MemberConsent;
+import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import com.keypoint.keypointtravel.member.redis.entity.EmailVerificationCode;
 import com.keypoint.keypointtravel.member.redis.service.EmailVerificationCodeService;
+import com.keypoint.keypointtravel.member.repository.MemberConsentRepository;
+import com.keypoint.keypointtravel.member.repository.MemberDetailRepository;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.notification.entity.Notification;
+import com.keypoint.keypointtravel.notification.repository.NotificationRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +37,9 @@ public class CreateMemberService {
     private static final int EMAIL_VERIFICATION_CODE_DIGITS = 6;
 
     private final MemberRepository memberRepository;
+    private final MemberConsentRepository memberConsentRepository;
+    private final MemberDetailRepository memberDetailRepository;
+    private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationCodeService emailVerificationCodeService;
     private final EmailService emailService;
@@ -55,9 +64,17 @@ public class CreateMemberService {
                 throw new GeneralException(MemberErrorCode.INVALID_PASSWORD);
             }
 
-            // 3. Member 생성
-            Member member = new Member(email, encodePassword(password), OauthProviderType.NONE);
+            // 3. Member, MemberConsent, MemberDetail, Notification 생성
+            Member member = Member.of(email, encodePassword(password));
+            MemberConsent memberConsent = MemberConsent.from(member);
+            MemberDetail memberDetail = useCase.toEntity(member);
+            Notification notification = Notification.from(member);
+
+            // 4. 저장
             memberRepository.save(member);
+            memberConsentRepository.save(memberConsent);
+            memberDetailRepository.save(memberDetail);
+            notificationRepository.save(notification);
 
             return MemberResponse.from(member);
         } catch (Exception ex) {

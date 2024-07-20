@@ -1,15 +1,10 @@
 package com.keypoint.keypointtravel.member.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.Comment;
-
 import com.keypoint.keypointtravel.global.converter.AES256ToStringConverter;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.notification.entity.Notification;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -21,9 +16,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -74,16 +71,33 @@ public class Member extends BaseEntity {
     public Member(String email, OauthProviderType oauthProviderType) {
         this.email = email;
         this.oauthProviderType = oauthProviderType;
-        this.isDeleted = false;
         this.role = RoleType.ROLE_CERTIFIED_USER;
+        this.isDeleted = false;
+
     }
 
-    public Member(String email, String password, OauthProviderType oauthProviderType) {
+    public Member(String email, String password) {
         this.email = email;
         this.password = password;
-        this.oauthProviderType = oauthProviderType;
-        this.isDeleted = false;
         this.role = RoleType.ROLE_CERTIFIED_USER;
+        this.oauthProviderType = OauthProviderType.NONE;
         this.lastPasswordUpdatedAt = LocalDateTime.now();
+        this.isDeleted = false;
+    }
+
+    public static Member of(String email, String password) {
+        return new Member(email, password);
+    }
+
+    public void setMemberDetail(MemberDetail memberDetail) {
+        this.memberDetail = memberDetail;
+    }
+
+    public void setMemberConsent(MemberConsent memberConsent) {
+        this.memberConsent = memberConsent;
+    }
+
+    public void setNotification(Notification notification) {
+        this.notification = notification;
     }
 }

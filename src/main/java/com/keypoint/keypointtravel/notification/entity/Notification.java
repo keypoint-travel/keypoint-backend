@@ -1,10 +1,7 @@
 package com.keypoint.keypointtravel.notification.entity;
 
-import org.hibernate.annotations.Comment;
-
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.member.entity.Member;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,12 +14,13 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
 @Table(name = "notification")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification extends BaseEntity{
+public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +38,14 @@ public class Notification extends BaseEntity{
     @Column(nullable = false)
     @Comment("마켓팅 알림 가능 여부")
     private boolean marketingNotificationEnabled;
+
+    public Notification(Member member) {
+        this.member = member;
+        this.pushNotificationEnabled = true;
+        this.marketingNotificationEnabled = true;
+    }
+
+    public static Notification from(Member member) {
+        return new Notification(member);
+    }
 }
