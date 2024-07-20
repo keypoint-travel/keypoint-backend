@@ -2,7 +2,9 @@ package com.keypoint.keypointtravel.auth.service;
 
 
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.auth.dto.useCase.LogoutUseCase;
 import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
+import com.keypoint.keypointtravel.auth.redis.service.BlacklistService;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
@@ -32,6 +34,7 @@ public class AuthService {
     private final ReadMemberService readMemberService;
     private final AuthenticationManagerBuilder managerBuilder;
     private final UpdateMemberService updateMemberService;
+    private final BlacklistService blacklistService;
 
     /**
      * JWT 토큰을 재발급하는 함수
@@ -128,5 +131,24 @@ public class AuthService {
         }
 
         return dto;
+    }
+
+    /**
+     * 로그아웃 함수
+     *
+     * @param useCase 로그아웃 데이터
+     */
+    @Transactional
+    public void logout(LogoutUseCase useCase) {
+        String accessToken = StringUtils.parseGrantTypeInToken(
+            TOKEN_GRANT_TYPE,
+            useCase.getAccessToken()
+        );
+        Long expiration = tokenProvider.getExpiration(accessToken);
+        if (expiration == null || expiration == 0L) {
+            return;
+        }
+
+        blacklistService.saveBlacklist(accessToken, expiration);
     }
 }

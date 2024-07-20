@@ -1,12 +1,21 @@
 package com.keypoint.keypointtravel.global.utils.provider;
 
 
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,18 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
-import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
-import com.keypoint.keypointtravel.global.exception.GeneralException;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
 public class JwtTokenProvider implements InitializingBean {
@@ -38,9 +35,8 @@ public class JwtTokenProvider implements InitializingBean {
     private final String jwtSecretKey;
     private final Long accessTokenValidityInMin;
     private final Long refreshTokenValidityInMin;
-    private String jwtKey;
-
     private final RefreshTokenService refreshTokenService;
+    private String jwtKey;
 
     public JwtTokenProvider(
         @Value("${key.jwt.secret-key}") String jwtSecretKey,
@@ -61,9 +57,10 @@ public class JwtTokenProvider implements InitializingBean {
 
     /**
      * JWT token 정보를 생성하는 함수
+     *
      * @param authentication 인증 정보가 담긴 객체
      * @return access token과 refresh token이 담긴 jwt 토큰 객체
-    */
+     */
     public TokenInfoResponse createToken(Authentication authentication) {
         // 1. 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
@@ -90,10 +87,11 @@ public class JwtTokenProvider implements InitializingBean {
         String refreshToken = Jwts.builder()
             .setExpiration(refreshTokenExpiration)
             .signWith(SignatureAlgorithm.HS256, jwtKey)
-                .compact();
-            
+            .compact();
+
         // 5. 토큰 저장
-        refreshTokenService.saveRefreshToken(userDetails.getEmail(), refreshToken, refreshTokenExpiration);
+        refreshTokenService.saveRefreshToken(userDetails.getEmail(), refreshToken,
+            refreshTokenExpiration);
         return TokenInfoResponse.of(GRANT_TYPE, accessToken, refreshToken);
     }
 
@@ -167,5 +165,25 @@ public class JwtTokenProvider implements InitializingBean {
         } catch (IllegalStateException e) {
             return TokenErrorCode.INVALID_TOKEN;
         }
+    }
+
+    /**
+     * 토큰 유효시간 반환하는 함수
+     *
+     * @param accessToken
+     * @return 남은 유효 시간 (ms)
+     */
+    public Long getExpiration(String accessToken) {
+        Date expiration = Jwts.parserBuilder()
+            .setSigningKey(jwtKey).build()
+            .parseClaimsJws(accessToken).getBody()
+            .getExpiration();
+
+        if (expiration == null) {
+            return 0L;
+        }
+
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 }
