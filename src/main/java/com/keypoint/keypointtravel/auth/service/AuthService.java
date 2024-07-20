@@ -12,6 +12,7 @@ import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
+import com.keypoint.keypointtravel.member.service.UpdateMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +31,7 @@ public class AuthService {
     private final JwtTokenProvider tokenProvider;
     private final ReadMemberService readMemberService;
     private final AuthenticationManagerBuilder managerBuilder;
+    private final UpdateMemberService updateMemberService;
 
     /**
      * JWT 토큰을 재발급하는 함수
@@ -68,21 +70,24 @@ public class AuthService {
      * @param useCase 로그인 정보
      * @return jwt 토큰 정보
      */
-    @Transactional(noRollbackFor = GeneralException.class)
+    @Transactional
     public TokenInfoResponse login(LoginUseCase useCase) {
         try {
             String email = useCase.getEmail();
             String password = useCase.getPassword();
 
             // 1. 이메일 유효성 검사
-            validateMemberForLogin(email);
+            CommonMemberDTO member = validateMemberForLogin(email);
 
             // 2. 비밃번호 유효성 검사
             if (!StringUtils.checkPasswordValidation(password)) {
                 throw new GeneralException(MemberErrorCode.INVALID_LOGIN_CREDENTIALS);
             }
 
-            // 3. JWT 토큰 생성
+            // 3. 최근 로그인 일자 업데이트
+            updateMemberService.updateRecentLoginAtByMemberId(member.getId());
+
+            // 4. JWT 토큰 생성
             return getJwtTokenInfo(email, password);
         } catch (Exception ex) {
             throw new GeneralException(ex);
@@ -113,13 +118,15 @@ public class AuthService {
      * 이메일 유효성 검사를 한 후, 유효성 검사에 통과한 경우, User를 반환하는 함수
      *
      * @param email 유효성 검사할 Member의 email
-     * @return
+     * @return 사용자 정보
      */
-    private void validateMemberForLogin(String email) {
+    private CommonMemberDTO validateMemberForLogin(String email) {
         CommonMemberDTO dto = readMemberService.findMemberByEmail(email);
 
         if (dto.getOauthProviderType() != OauthProviderType.NONE) {
             throw new GeneralException(MemberErrorCode.REGISTERED_EMAIL_FOR_THE_OTHER);
         }
+
+        return dto;
     }
 }

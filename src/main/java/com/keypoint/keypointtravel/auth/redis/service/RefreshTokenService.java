@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.auth.dto.dto.RefreshTokenEmailDTO;
 import com.keypoint.keypointtravel.auth.redis.entity.RefreshToken;
 import com.keypoint.keypointtravel.auth.redis.repository.RefreshTokenRepository;
 import java.util.Date;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,12 @@ public class RefreshTokenService {
      * @return refresh token의 id (존재하지 않는 경우: null)
      */
     private String findRefreshTokenIdByEmail(String email) {
-        RefreshTokenEmailDTO dto = refreshTokenRepository.findByEmail(email);
-        return dto.getId();
+        Optional<RefreshTokenEmailDTO> dtoOptional = refreshTokenRepository.findByEmail(email);
+
+        if (dtoOptional.isPresent()) {
+            return dtoOptional.get().getId();
+        } else {
+            return null;
+        }
     }
 }
