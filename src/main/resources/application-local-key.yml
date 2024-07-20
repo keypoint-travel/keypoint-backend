@@ -37,7 +37,7 @@ spring:
           google:
             client-id: 308423055794-7qq0j6f3jghc6gvpmqg84nf5036ube21.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: https://back-dev.keypointtravel.com/login/oauth2/code/google
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
             scope:
               - profile
               - email

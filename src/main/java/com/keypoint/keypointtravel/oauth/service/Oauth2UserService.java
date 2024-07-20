@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.auth.service;
+package com.keypoint.keypointtravel.oauth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +12,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationE
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -36,10 +38,11 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
     private static final String APPLE_REGISTRATION_ID = "apple";
     private static final String ID_TOKEN = "id_token";
-    private static final RoleType ROLE_USER = RoleType.ROLE_UNCERTIFIED_USER;
-
+    private static final RoleType ROLE_USER = RoleType.ROLE_CERTIFIED_USER;
     private final MemberRepository memberRepository;
     private final HttpSession httpSession;
+    @Value("${spring.security.oauth2.authorizedRedirectUri}")
+    private String redirectUri;
 
     public static Map<String, Object> decodeJwtTokenPayload(String jwtToken)
         throws JsonProcessingException {
@@ -132,7 +135,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
             return member;
         } else {
-            // 2-2. 회원가비 (등록되어 있지 않은 이메일)
+            // 2-2. 회원가입: 임시 회원으로 등록 (등록되어 있지 않은 이메일)
             return addUser(attributes);
         }
     }
@@ -151,5 +154,15 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         memberRepository.save(newMember);
 
         return memberRepository.findByEmail(newMember.getEmail()).get();
+    }
+
+    /**
+     * Oauth의 redirect url을 반환하는 함수
+     *
+     * @param request
+     * @return
+     */
+    public String getOauthRedirectURL(HttpServletRequest request) {
+        return request.getScheme() + "://" + request.getHeader("Host") + redirectUri;
     }
 }

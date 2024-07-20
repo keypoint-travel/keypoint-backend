@@ -1,28 +1,26 @@
 package com.keypoint.keypointtravel.global.handler;
 
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.utils.AuthenticationUtils;
+import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
+import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
-import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider tokenProvider;
-    @Value("${spring.security.oauth2.authorizedRedirectUri}")
-    private String redirectUri;
+    private final Oauth2UserService oauth2UserService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -30,16 +28,20 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         HttpServletResponse response,
         Authentication authentication
     ) throws IOException {
-        String targetURL = determineTargetUrl(response, authentication);
+        String redirectURL = oauth2UserService.getOauthRedirectURL(request);
+        String targetURL = determineTargetUrl(redirectURL, response, authentication);
 
         getRedirectStrategy().sendRedirect(request, response, targetURL);
     }
 
     protected String determineTargetUrl(
+        String redirectURL,
         HttpServletResponse response,
         Authentication authentication
     ) {
         TokenInfoResponse tokenInfoDTO = tokenProvider.createToken(authentication);
+        RoleType role = AuthenticationUtils.getCurrentRoleType(authentication);
+
         String jsonResponse = "{\"accessToken\": \"" + tokenInfoDTO.getAccessToken() + "\"}";
 
         try {
@@ -52,8 +54,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
 
-        return UriComponentsBuilder.fromUriString(redirectUri)
+        return UriComponentsBuilder.fromUriString(redirectURL)
+            .queryParam("isFirst", role == RoleType.ROLE_CERTIFIED_USER)
             .queryParam("success", true)
+            .queryParam("grantType", "Bearer")
             .queryParam("accessToken", tokenInfoDTO.getAccessToken())
             .queryParam("refreshToken", tokenInfoDTO.getRefreshToken())
             .build().toUriString();

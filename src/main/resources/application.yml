@@ -5,6 +5,6 @@ spring:
       maxRequestSize: 10MB
   profiles:
     group:
-      local: "local, key, mail"
+      local: "local, local-key, mail"
       dev: "dev, key, mail"
     active: local

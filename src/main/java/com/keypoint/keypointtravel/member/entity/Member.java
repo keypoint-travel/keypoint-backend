@@ -71,7 +71,7 @@ public class Member extends BaseEntity {
     public Member(String email, OauthProviderType oauthProviderType) {
         this.email = email;
         this.oauthProviderType = oauthProviderType;
-        this.role = RoleType.ROLE_CERTIFIED_USER;
+        this.role = RoleType.ROLE_UNCERTIFIED_USER;
         this.isDeleted = false;
 
     }

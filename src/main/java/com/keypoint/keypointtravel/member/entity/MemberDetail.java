@@ -1,7 +1,6 @@
 package com.keypoint.keypointtravel.member.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import com.keypoint.keypointtravel.global.enumType.member.CountryCode;
 import com.keypoint.keypointtravel.global.enumType.member.GenderType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import jakarta.persistence.Column;
@@ -47,9 +46,8 @@ public class MemberDetail extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     @Comment("국적")
-    private CountryCode country;
+    private String country;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -63,14 +61,14 @@ public class MemberDetail extends BaseEntity {
         GenderType gender,
         LocalDate birth,
         String name,
-        LanguageCode language
+        LanguageCode language,
+        String country
     ) {
         this.member = member;
         this.gender = gender;
         this.birth = birth;
         this.name = name;
         this.language = language;
-
-        this.country = CountryCode.NONE; // todo API 연동 이후 수정 필요
+        this.country = country;
     }
 }
