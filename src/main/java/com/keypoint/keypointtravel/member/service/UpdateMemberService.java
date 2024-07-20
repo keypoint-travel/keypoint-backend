@@ -1,6 +1,21 @@
 package com.keypoint.keypointtravel.member.service;
 
+import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
+import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberProfileUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.UpdatePasswordUseCase;
+import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.entity.MemberConsent;
+import com.keypoint.keypointtravel.member.entity.MemberDetail;
+import com.keypoint.keypointtravel.member.repository.MemberConsentRepository;
+import com.keypoint.keypointtravel.member.repository.MemberDetailRepository;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.notification.entity.Notification;
+import com.keypoint.keypointtravel.notification.repository.NotificationRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateMemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberConsentRepository memberConsentRepository;
+    private final MemberDetailRepository memberDetailRepository;
+    private final NotificationRepository notificationRepository;
+    private final ReadMemberService readMemberService;
 
     /**
      * 최근 로그인 날짜 정보를 업데이트하는 함수
@@ -21,5 +40,61 @@ public class UpdateMemberService {
     @Transactional
     public void updateRecentLoginAtByMemberId(Long memberId) {
         memberRepository.updateRecentLoginAtByMemberId(memberId, LocalDateTime.now());
+    }
+
+    /**
+     * Member 개인 정보 생성하는 함수 (소셜 로그인)
+     *
+     * @param useCase 개인 정보 데이터
+     * @return
+     */
+    @Transactional
+    public MemberResponse registerMemberProfile(MemberProfileUseCase useCase) {
+        try {
+            // 1. Member 찾기
+            Member member = memberRepository.findById(useCase.getMemberId())
+                .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
+
+            // 2. Member 상태 변경
+            memberRepository.updateRole(member.getId(), RoleType.ROLE_CERTIFIED_USER);
+
+            // 3. MemberConsent, MemberDetail, Notification 생성
+            MemberConsent memberConsent = MemberConsent.from(member);
+            MemberDetail memberDetail = useCase.toEntity(member);
+            Notification notification = Notification.from(member);
+
+            // 4. 저장
+            memberConsentRepository.save(memberConsent);
+            memberDetailRepository.save(memberDetail);
+            notificationRepository.save(notification);
+
+            return MemberResponse.from(member);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 회원 비밀번호를 변경하는 함수
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void updateMemberPassword(UpdatePasswordUseCase useCase) {
+        try {
+            String email = useCase.getEmail();
+            String newPassword = useCase.getNewPassword();
+
+            // 1. 소셜 로그인 등록 사용자가 아닌지 확인
+            CommonMemberDTO memberDTO = readMemberService.findMemberByEmail(email);
+            if (memberDTO.getOauthProviderType() != OauthProviderType.NONE) {
+                throw new GeneralException(MemberErrorCode.NOT_GENERAL_MEMBER);
+            }
+
+            // 2. 비밀번호 변경
+            memberRepository.updatePassword(memberDTO.getId(), newPassword);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }

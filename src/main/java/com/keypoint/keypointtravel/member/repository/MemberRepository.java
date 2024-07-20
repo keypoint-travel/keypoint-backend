@@ -31,4 +31,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         @Param("id") Long id,
         @Param("role") RoleType role
     );
+
+    @Modifying
+    @Query("UPDATE Member m SET m.password = :password WHERE m.id = :id")
+    int updatePassword(
+        @Param("id") Long id,
+        @Param("password") String password
+    );
 }
