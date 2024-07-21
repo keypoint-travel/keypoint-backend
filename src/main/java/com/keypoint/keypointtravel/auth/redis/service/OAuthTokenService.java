@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.auth.redis.service;
 
 import com.keypoint.keypointtravel.auth.redis.entity.OAuthToken;
 import com.keypoint.keypointtravel.auth.redis.repository.OAuthTokenRepository;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -22,6 +23,11 @@ public class OAuthTokenService {
      * @param client   oauth 토큰 정보가 존재하는 객체
      */
     public void saveOAuthToken(Long memberId, OAuth2AuthorizedClient client) {
+        if (client == null) {
+            LogUtils.writeInfoLog("OAuthTokenService", "OAuth2AuthorizedClient : null");
+            return;
+        }
+
         // 1. 요청한 사용자에게 토큰 데이터가 존재하는지 확인
         Optional<OAuthToken> tokenOptional = oauthTokenRepository.findByMemberId(memberId);
         if (tokenOptional.isPresent()) {

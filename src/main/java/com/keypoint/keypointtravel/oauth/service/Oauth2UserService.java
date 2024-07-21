@@ -2,7 +2,6 @@ package com.keypoint.keypointtravel.oauth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
 import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
@@ -25,8 +24,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -44,8 +41,6 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
     private static final RoleType ROLE_USER = RoleType.ROLE_CERTIFIED_USER;
     private final MemberRepository memberRepository;
     private final HttpSession httpSession;
-    private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-    private final OAuthTokenService oauthTokenService;
 
     @Value("${spring.security.oauth2.authorizedRedirectUri}")
     private String redirectUri;
@@ -125,7 +120,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         return CustomUserDetails.of(member, oAuth2User.getAttributes());
     }
 
-    public CommonMemberDTO saveOrUpdate(
+    private CommonMemberDTO saveOrUpdate(
         OAuthAttributes attributes,
         String registrationId
     )
@@ -141,10 +136,6 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             // 2-1. 로그인 (이전에 등록되어 있는 이메일)
             CommonMemberDTO member = memberOptional.get();
             validateOauthProvider(member, oauthProviderType);
-
-            // 2-2. Oauth 토큰 저장
-            OAuth2AuthorizedClient client = getOauthToken(registrationId, member.getEmail());
-            oauthTokenService.saveOAuthToken(member.getId(), client);
 
             return member;
         } else {
@@ -177,11 +168,5 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
      */
     public String getOauthRedirectURL(HttpServletRequest request) {
         return request.getScheme() + "://" + request.getHeader("Host") + redirectUri;
-    }
-
-    private OAuth2AuthorizedClient getOauthToken(String registrationId, String email) {
-        return oAuth2AuthorizedClientService.loadAuthorizedClient(
-            registrationId, email
-        );
     }
 }
