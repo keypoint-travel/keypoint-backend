@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.oauth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
 import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
@@ -16,7 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +25,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -42,6 +44,9 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
     private static final RoleType ROLE_USER = RoleType.ROLE_CERTIFIED_USER;
     private final MemberRepository memberRepository;
     private final HttpSession httpSession;
+    private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+    private final OAuthTokenService oauthTokenService;
+
     @Value("${spring.security.oauth2.authorizedRedirectUri}")
     private String redirectUri;
 
@@ -110,23 +115,19 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
             .getUserInfoEndpoint().getUserNameAttributeName();
 
-        String oauthAccessToken = userRequest.getAccessToken().getTokenValue();
-        Instant oauthAccessTokenExpiry = userRequest.getAccessToken().getExpiresAt();
-
         OAuthAttributes attributes = OAuthAttributes.of(
             registrationId,
             userNameAttributeName,
             oAuth2User.getAttributes()
         );
-        CommonMemberDTO member = saveOrUpdate(attributes, oauthAccessToken, oauthAccessTokenExpiry);
+        CommonMemberDTO member = saveOrUpdate(attributes, registrationId);
         httpSession.setAttribute("member", SessionUser.from(member));
         return CustomUserDetails.of(member, oAuth2User.getAttributes());
     }
 
     public CommonMemberDTO saveOrUpdate(
         OAuthAttributes attributes,
-        String oauthAccessToken,
-        Instant oauthAccessTokenExpiry
+        String registrationId
     )
         throws GeneralOAuth2AuthenticationException {
         OauthProviderType oauthProviderType = attributes.getOAuthProvider();
@@ -142,6 +143,8 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             validateOauthProvider(member, oauthProviderType);
 
             // 2-2. Oauth 토큰 저장
+            OAuth2AuthorizedClient client = getOauthToken(registrationId, member.getEmail());
+            oauthTokenService.saveOAuthToken(member.getId(), client);
 
             return member;
         } else {
@@ -174,5 +177,11 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
      */
     public String getOauthRedirectURL(HttpServletRequest request) {
         return request.getScheme() + "://" + request.getHeader("Host") + redirectUri;
+    }
+
+    private OAuth2AuthorizedClient getOauthToken(String registrationId, String email) {
+        return oAuth2AuthorizedClientService.loadAuthorizedClient(
+            registrationId, email
+        );
     }
 }

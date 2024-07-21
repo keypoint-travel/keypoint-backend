@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.oauth.service;
 
-public interface OauthService {
+public interface OAuthService {
 
     /**
      * 소셜 로그인 토큰 재발급
