@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.auth.redis.service;
 
-import com.keypoint.keypointtravel.auth.dto.dto.RefreshTokenEmailDTO;
+import com.keypoint.keypointtravel.auth.dto.dto.CommonRefreshTokenDTO;
 import com.keypoint.keypointtravel.auth.redis.entity.RefreshToken;
 import com.keypoint.keypointtravel.auth.redis.repository.RefreshTokenRepository;
 import java.util.Date;
@@ -26,7 +26,7 @@ public class RefreshTokenService {
     @Transactional
     public void saveRefreshToken(String email, String refreshToken, Date expiration) {
         // 1. email에 등록된 refresh token이 존재하는지 확인
-        String refreshTokenId = findRefreshTokenIdByEmail(email);
+        String refreshTokenId = findRefreshTokenByEmail(email).getId();
         if (refreshTokenId != null) {
             // 1-1. refresh token이 존재하는 경우 삭제
             refreshTokenRepository.deleteById(refreshTokenId);
@@ -44,11 +44,11 @@ public class RefreshTokenService {
      * @param email 찾으려는 refresh token의 email
      * @return refresh token의 id (존재하지 않는 경우: null)
      */
-    private String findRefreshTokenIdByEmail(String email) {
-        Optional<RefreshTokenEmailDTO> dtoOptional = refreshTokenRepository.findByEmail(email);
+    public CommonRefreshTokenDTO findRefreshTokenByEmail(String email) {
+        Optional<CommonRefreshTokenDTO> dtoOptional = refreshTokenRepository.findByEmail(email);
 
         if (dtoOptional.isPresent()) {
-            return dtoOptional.get().getId();
+            return dtoOptional.get();
         } else {
             return null;
         }

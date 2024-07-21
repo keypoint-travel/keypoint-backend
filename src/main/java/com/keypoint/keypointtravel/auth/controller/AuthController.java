@@ -1,7 +1,6 @@
 package com.keypoint.keypointtravel.auth.controller;
 
 import com.keypoint.keypointtravel.auth.dto.request.LoginRequest;
-import com.keypoint.keypointtravel.auth.dto.request.RefreshTokenRequest;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.dto.useCase.LogoutUseCase;
 import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
@@ -38,9 +37,8 @@ public class AuthController {
 
     @PostMapping("reissue")
     public APIResponseEntity<TokenInfoResponse> reissueToken(
-        @RequestHeader(value = HeaderConstants.AUTHORIZATION_HEADER) String accessToken,
-        @RequestBody RefreshTokenRequest request) {
-        ReissueUseCase useCase = ReissueUseCase.of(accessToken, request.getRefreshToken());
+        @RequestHeader(value = HeaderConstants.AUTHORIZATION_HEADER) String accessToken) {
+        ReissueUseCase useCase = ReissueUseCase.from(accessToken);
         TokenInfoResponse result = authService.reissueToken(useCase);
 
         return APIResponseEntity.<TokenInfoResponse>builder()

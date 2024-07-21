@@ -5,6 +5,8 @@ import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.dto.useCase.LogoutUseCase;
 import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.redis.service.BlacklistService;
+import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
@@ -15,6 +17,8 @@ import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
+import com.keypoint.keypointtravel.oauth.service.OAuthService;
+import com.keypoint.keypointtravel.oauth.service.OAuthServiceFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +39,8 @@ public class AuthService {
     private final AuthenticationManagerBuilder managerBuilder;
     private final UpdateMemberService updateMemberService;
     private final BlacklistService blacklistService;
+    private final OAuthServiceFactory oAuthServiceFactory;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * JWT 토큰을 재발급하는 함수
@@ -45,26 +51,47 @@ public class AuthService {
     public TokenInfoResponse reissueToken(ReissueUseCase useCase) {
         try {
             String accessToken = useCase.getAccessToken();
-            String refreshToken = useCase.getRefreshToken();
             String token = StringUtils.parseGrantTypeInToken(
                 TOKEN_GRANT_TYPE,
                 accessToken
             );
 
-            // 1. refresh token 유효성 확인
+            // 1. Access token 사용자 확인
+            Authentication authentication = tokenProvider.getAuthentication(token);
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String email = userDetails.getEmail();
+
+            // 2. refresh token 유효성 확인
+            String refreshToken = refreshTokenService.findRefreshTokenByEmail(email)
+                .getRefreshToken();
             TokenErrorCode validateResult = tokenProvider.validateToken(refreshToken);
             if (validateResult != TokenErrorCode.NONE) {
                 throw new GeneralException(HttpStatus.UNAUTHORIZED, validateResult);
             }
 
-            // 2. Access token 사용자 확인
-            Authentication authentication = tokenProvider.getAuthentication(token);
+            // 3. Oauth 사용자인 경우, Oauth 토큰 재발급
+            CommonMemberDTO memberDTO = readMemberService.findMemberByEmail(email);
+            if (memberDTO.getOauthProviderType() != OauthProviderType.NONE) {
+                reissueOAuthToken(memberDTO);
+            }
 
-            // 3. JWT 토큰 재발급
+            // 4. JWT 토큰 재발급
             return tokenProvider.createToken(authentication);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
+    }
+
+    /**
+     * OAuth 토큰을 재발급하는 함수
+     *
+     * @param memberDTO
+     */
+    private void reissueOAuthToken(CommonMemberDTO memberDTO) {
+        OAuthService oauthService = oAuthServiceFactory.getService(
+            memberDTO.getOauthProviderType());
+
+        oauthService.reissue(memberDTO.getId());
     }
 
     /**

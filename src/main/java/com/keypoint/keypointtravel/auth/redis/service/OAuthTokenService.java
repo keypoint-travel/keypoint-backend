@@ -2,9 +2,13 @@ package com.keypoint.keypointtravel.auth.redis.service;
 
 import com.keypoint.keypointtravel.auth.redis.entity.OAuthToken;
 import com.keypoint.keypointtravel.auth.redis.repository.OAuthTokenRepository;
+import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.LogUtils;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +42,22 @@ public class OAuthTokenService {
         // 2. 저장
         OAuthToken oAuthToken = OAuthToken.of(memberId, client);
         oauthTokenRepository.save(oAuthToken);
+    }
+
+    /**
+     * 토큰 재발급이 필요한지 확인하는 함수
+     *
+     * @param memberId
+     * @return
+     */
+    public boolean checkIsNeedToReissueToken(Long memberId) {
+        Optional<OAuthToken> oAuthTokenOptional = oauthTokenRepository.findByMemberId(memberId);
+        if (oAuthTokenOptional.isPresent()) {
+            OAuthToken oAuthToken = oAuthTokenOptional.get();
+            return !LocalDateTime.now().isAfter(oAuthToken.getAccessTokenExpiredAt());
+        } else {
+            throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.EXPIRED_TOKEN);
+        }
     }
 
 }
