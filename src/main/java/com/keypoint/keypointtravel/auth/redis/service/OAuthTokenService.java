@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.auth.redis.repository.OAuthTokenRepository;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.LogUtils;
+import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -45,19 +46,54 @@ public class OAuthTokenService {
     }
 
     /**
+     * OAuthToken 저장하는 함수
+     *
+     * @param memberId 토큰을 발급받은 사용자
+     */
+    public void saveOAuthToken(
+        Long memberId,
+        String accessToken,
+        LocalDateTime accessTokenExpiredAt,
+        String refreshToken,
+        Long refreshTokenExpiration
+
+    ) {
+        // 1. 요청한 사용자에게 토큰 데이터가 존재하는지 확인
+        Optional<OAuthToken> tokenOptional = oauthTokenRepository.findByMemberId(memberId);
+        if (tokenOptional.isPresent()) {
+            // 1-1. 저장된 토큰이 존재하는 경우 삭제
+            oauthTokenRepository.delete(tokenOptional.get());
+        }
+
+        // 2. 저장
+        OAuthToken oAuthToken = OAuthToken.of(
+            memberId,
+            accessToken,
+            accessTokenExpiredAt,
+            refreshToken,
+            refreshTokenExpiration
+        );
+        oauthTokenRepository.save(oAuthToken);
+    }
+
+
+    /**
      * 토큰 재발급이 필요한지 확인하는 함수
      *
      * @param memberId
      * @return
      */
-    public boolean checkIsNeedToReissueToken(Long memberId) {
+    public ReissueRefreshTokenUseCase checkIsNeedToReissueToken(Long memberId) {
         Optional<OAuthToken> oAuthTokenOptional = oauthTokenRepository.findByMemberId(memberId);
         if (oAuthTokenOptional.isPresent()) {
             OAuthToken oAuthToken = oAuthTokenOptional.get();
-            return !LocalDateTime.now().isAfter(oAuthToken.getAccessTokenExpiredAt());
+            ReissueRefreshTokenUseCase useCase = ReissueRefreshTokenUseCase.of(
+                !LocalDateTime.now().isAfter(oAuthToken.getAccessTokenExpiredAt()),
+                oAuthToken.getRefreshToken()
+            );
+            return useCase;
         } else {
             throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.EXPIRED_TOKEN);
         }
     }
-
 }

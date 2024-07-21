@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.oauth.service;
 
 import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
+import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,8 @@ public class AppleOAuthService implements OAuthService {
     @Override
     public void reissue(Long memberId) {
         // 1. 토큰 재발급이 필요한지 확인
-        if (oAuthTokenService.checkIsNeedToReissueToken(memberId)) {
+        ReissueRefreshTokenUseCase useCase = oAuthTokenService.checkIsNeedToReissueToken(memberId);
+        if (useCase.isNeedToReissue()) {
             // 2. 토큰 재발급
 
             // 3. 토큰 업데이트

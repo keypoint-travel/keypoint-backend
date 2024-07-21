@@ -60,7 +60,37 @@ public class OAuthToken {
         }
     }
 
+    public OAuthToken(
+        Long memberId,
+        String accessToken,
+        LocalDateTime accessTokenExpiredAt,
+        String refreshToken,
+        Long refreshTokenExpiration
+    ) {
+        this.memberId = memberId;
+        this.accessToken = accessToken;
+        this.accessTokenExpiredAt = accessTokenExpiredAt;
+        this.refreshToken = refreshToken;
+        this.refreshTokenExpiration = refreshTokenExpiration;
+    }
+
     public static OAuthToken of(Long memberId, OAuth2AuthorizedClient client) {
         return new OAuthToken(memberId, client);
+    }
+
+    public static OAuthToken of(
+        Long memberId,
+        String accessToken,
+        LocalDateTime accessTokenExpiredAt,
+        String refreshToken,
+        Long refreshTokenExpiration
+    ) {
+        return new OAuthToken(
+            memberId,
+            accessToken,
+            accessTokenExpiredAt,
+            refreshToken,
+            refreshTokenExpiration
+        );
     }
 }
