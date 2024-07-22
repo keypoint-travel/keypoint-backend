@@ -1,6 +1,10 @@
 package com.keypoint.keypointtravel.global.config.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.keypoint.keypointtravel.auth.redis.service.BlacklistService;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
+import com.keypoint.keypointtravel.global.dto.response.ErrorDTO;
+import com.keypoint.keypointtravel.global.enumType.error.ErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
@@ -9,9 +13,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,6 +32,7 @@ public class JwtFilter extends GenericFilterBean {
 
     private static final String TOKEN_GRANT_TYPE = "Bearer";
     private final JwtTokenProvider tokenProvider;
+    private final BlacklistService blacklistService;
 
     @Override
     public void doFilter(
@@ -33,18 +41,47 @@ public class JwtFilter extends GenericFilterBean {
         FilterChain filterChain
     ) throws IOException, ServletException, GeneralException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         String jwtAccessToken = parseBearerToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
 
-        if (StringUtils.hasText(jwtAccessToken)
-            && tokenProvider.validateToken(jwtAccessToken) == TokenErrorCode.NONE) {
-            Authentication authentication = tokenProvider.getAuthentication(jwtAccessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
-        }
+        try {
+            if (StringUtils.hasText(jwtAccessToken)) {
+                TokenErrorCode tokenError = tokenProvider.validateToken(jwtAccessToken);
 
-        filterChain.doFilter(servletRequest, servletResponse);
+                switch (tokenError) {
+                    case NONE:
+                        if (!checkIsLogout(jwtAccessToken)) {
+                            Authentication authentication = tokenProvider.getAuthentication(
+                                jwtAccessToken);
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                        } else {
+                            throw new GeneralException(TokenErrorCode.LOGGED_OUT_TOKEN);
+                        }
+                        break;
+                    case EXPIRED_TOKEN:
+                        throw new GeneralException(TokenErrorCode.EXPIRED_TOKEN);
+                    default:
+                        throw new GeneralException(TokenErrorCode.EXPIRED_TOKEN);
+                }
+            }
+            filterChain.doFilter(servletRequest, servletResponse);
+        } catch (GeneralException e) {
+            setErrorResponse(httpServletResponse, e.getErrorCode());
+        }
+    }
+
+    private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode)
+        throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+        ErrorDTO errorDTO = ErrorDTO.from(errorCode);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String errorJson = objectMapper.writeValueAsString(errorDTO);
+        response.getWriter().write(errorJson);
     }
 
     /**
@@ -62,4 +99,15 @@ public class JwtFilter extends GenericFilterBean {
 
         return null;
     }
+
+    /**
+     * 로그아웃된 토큰인지 확인하는 함수
+     *
+     * @param accessToken
+     * @return
+     */
+    private boolean checkIsLogout(String accessToken) {
+        return blacklistService.existsBlacklistByAccessToken(accessToken);
+    }
+
 }

@@ -7,10 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ReissueUseCase {
 
-  private String accessToken;
-  private String refreshToken;
+    private String accessToken;
 
-  public static ReissueUseCase of(String accessToken, String refreshToken) {
-    return new ReissueUseCase(accessToken, refreshToken);
-  }
+    public static ReissueUseCase from(String accessToken) {
+        return new ReissueUseCase(accessToken);
+    }
 }

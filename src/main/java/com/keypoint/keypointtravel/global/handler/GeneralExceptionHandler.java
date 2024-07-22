@@ -21,8 +21,8 @@ public class GeneralExceptionHandler {
         log.warn(
             String.format("http-status={%s} code={%s} msg={%s} detail={%s}",
                 exception.getStatus().value(),
-                exception.getErrorCode(),
-                exception.getErrorMsg(),
+                exception.getErrorCode().getCode(),
+                exception.getErrorCode().getMsg(),
                 exception.getDetail()
             )
         );

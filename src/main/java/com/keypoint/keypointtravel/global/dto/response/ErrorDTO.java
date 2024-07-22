@@ -17,8 +17,8 @@ public class ErrorDTO {
 
     public static APIResponseEntity<ErrorDTO> from(GeneralException ex) {
         ErrorDTO errorDTO = ErrorDTO.builder()
-            .code(ex.getErrorCode())
-            .msg(ex.getErrorMsg())
+            .code(ex.getErrorCode().getCode())
+            .msg(ex.getErrorCode().getMsg())
             .detail(ex.getDetail())
             .build();
 
@@ -26,6 +26,14 @@ public class ErrorDTO {
             .data(errorDTO)
             .build();
     }
+
+    public static ErrorDTO from(ErrorCode errorCode) {
+        return ErrorDTO.builder()
+            .code(errorCode.getCode())
+            .msg(errorCode.getMsg())
+            .build();
+    }
+
 
     public static ResponseEntity<APIResponseEntity<ErrorDTO>> of(
         HttpClientException ex,

@@ -1,7 +1,8 @@
 package com.keypoint.keypointtravel.global.utils.provider;
 
 
-import com.keypoint.keypointtravel.auth.dto.response.TokenInfoDTO;
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -34,15 +35,18 @@ public class JwtTokenProvider implements InitializingBean {
     private final String jwtSecretKey;
     private final Long accessTokenValidityInMin;
     private final Long refreshTokenValidityInMin;
+    private final RefreshTokenService refreshTokenService;
     private String jwtKey;
 
     public JwtTokenProvider(
         @Value("${key.jwt.secret-key}") String jwtSecretKey,
         @Value("${key.jwt.accesstoken-validity-in-min}") Long accessTokenValidityInMin,
-        @Value("${key.jwt.refreshtoken-validity-in-min}") Long refreshTokenValidityInMin) {
+        @Value("${key.jwt.refreshtoken-validity-in-min}") Long refreshTokenValidityInMin,
+        RefreshTokenService refreshTokenService) {
         this.jwtSecretKey = jwtSecretKey;
         this.accessTokenValidityInMin = accessTokenValidityInMin * 1000L * 60;
         this.refreshTokenValidityInMin = refreshTokenValidityInMin * 1000L * 60;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -54,16 +58,18 @@ public class JwtTokenProvider implements InitializingBean {
     /**
      * JWT token 정보를 생성하는 함수
      *
+     * @param authentication 인증 정보가 담긴 객체
      * @return access token과 refresh token이 담긴 jwt 토큰 객체
      */
-    public TokenInfoDTO createToken(Authentication authentication) {
+    public TokenInfoResponse createToken(Authentication authentication) {
         // 1. 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
 
         // 2. userID 가져오기
-        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getId();
 
         // 3. Access token 생성
         long now = (new Date()).getTime();
@@ -77,19 +83,23 @@ public class JwtTokenProvider implements InitializingBean {
             .compact();
 
         // 4. Refresh token 생성
+        Date refreshTokenExpiration = new Date(now + refreshTokenValidityInMin);
         String refreshToken = Jwts.builder()
-            .setExpiration(new Date(now + refreshTokenValidityInMin))
+            .setExpiration(refreshTokenExpiration)
             .signWith(SignatureAlgorithm.HS256, jwtKey)
             .compact();
 
-        return TokenInfoDTO.of(GRANT_TYPE, accessToken, refreshToken);
+        // 5. 토큰 저장
+        refreshTokenService.saveRefreshToken(userDetails.getEmail(), refreshToken,
+            refreshTokenExpiration);
+        return TokenInfoResponse.of(GRANT_TYPE, accessToken, refreshToken);
     }
 
     /**
-     * JWT access token을 복호화하여 토큰에 들어있는 정보를 꺼내는 함수
+     * access token을 복호화하여 토큰에 들어있는 정보를 꺼내는 함수
      *
-     * @param accessToken
-     * @return
+     * @param accessToken jwt access token
+     * @return 인증정보가 담긴 객체
      */
     public Authentication getAuthentication(String accessToken) {
         // 1. 토큰 복호화
@@ -124,9 +134,9 @@ public class JwtTokenProvider implements InitializingBean {
     }
 
     /**
-     * JWT access token 만료되었을 때, 갱신을 하기 위해 필요한 정보를 얻기 위한 Claim 반환하는 함수
+     * access token 만료되었을 때, 갱신을 하기 위해 필요한 정보를 얻기 위한 Claim 반환하는 함수
      *
-     * @param accessToken
+     * @param accessToken jwt access token
      * @return
      */
     public Claims parseClaims(String accessToken) {
@@ -141,8 +151,8 @@ public class JwtTokenProvider implements InitializingBean {
     /**
      * token의 유효성을 확인하는 함수
      *
-     * @param jwtToken
-     * @return
+     * @param jwtToken jwt 토큰
+     * @return 유효성 결과 코드
      */
     public TokenErrorCode validateToken(String jwtToken) {
         try {
@@ -155,5 +165,25 @@ public class JwtTokenProvider implements InitializingBean {
         } catch (IllegalStateException e) {
             return TokenErrorCode.INVALID_TOKEN;
         }
+    }
+
+    /**
+     * 토큰 유효시간 반환하는 함수
+     *
+     * @param accessToken
+     * @return 남은 유효 시간 (ms)
+     */
+    public Long getExpiration(String accessToken) {
+        Date expiration = Jwts.parserBuilder()
+            .setSigningKey(jwtKey).build()
+            .parseClaimsJws(accessToken).getBody()
+            .getExpiration();
+
+        if (expiration == null) {
+            return 0L;
+        }
+
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 }

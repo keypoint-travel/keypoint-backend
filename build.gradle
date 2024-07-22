@@ -63,6 +63,14 @@ dependencies {
     // aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.0'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }

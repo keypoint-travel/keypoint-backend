@@ -50,7 +50,8 @@ public class OAuthAttributes {
         }
     }
 
-    private static OAuthAttributes ofGoogle(String nameAttributeKey,
+    private static OAuthAttributes ofGoogle(
+        String nameAttributeKey,
         Map<String, Object> attributes
     ) {
         if (Boolean.FALSE.equals((attributes.get(EMAIL_VERIFIED_KEY)))) {
@@ -65,7 +66,8 @@ public class OAuthAttributes {
             .build();
     }
 
-    private static OAuthAttributes ofApple(String nameAttributeKey,
+    private static OAuthAttributes ofApple(
+        String nameAttributeKey,
         Map<String, Object> attributes
     ) {
         Map<String, Object> response = (Map<String, Object>) attributes.get(RESPONSE_KEY);

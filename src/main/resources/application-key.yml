@@ -18,12 +18,15 @@ key:
 spring:
   security:
     oauth2:
-      authorizedRedirectUri: http://localhost:3000/auth/login/result
+      authorizedRedirectUri: /sign-in
       client:
         provider:
           apple:
             authorizationUri: https://appleid.apple.com/auth/authorize?response_mode=form_post
             tokenUri: https://appleid.apple.com/auth/token
+          google:
+            authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline
+            tokenUri: https://www.googleapis.com/oauth2/v4/token
         registration:
           apple:
             clientId: keypoint.com

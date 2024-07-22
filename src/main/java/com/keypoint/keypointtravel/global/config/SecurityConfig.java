@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.global.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import com.keypoint.keypointtravel.auth.service.Oauth2UserService;
+import com.keypoint.keypointtravel.auth.redis.service.BlacklistService;
 import com.keypoint.keypointtravel.global.config.security.entryPoint.JwtAuthenticationEntryPoint;
 import com.keypoint.keypointtravel.global.config.security.filter.JwtFilter;
 import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.global.handler.JwtAccessDeniedHandler;
 import com.keypoint.keypointtravel.global.handler.OAuth2AuthenticationFailureHandler;
 import com.keypoint.keypointtravel.global.handler.OAuth2AuthenticationSuccessHandler;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
+import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,7 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler authenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler authenticationFailureHandler;
     private final Oauth2RequestEntityConverter oauth2RequestEntityConverter;
+    private final BlacklistService blacklistService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -60,7 +62,7 @@ public class SecurityConfig {
     protected SecurityFilterChain config(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .addFilterBefore(
-                new JwtFilter(jwtTokenProvider),
+                new JwtFilter(jwtTokenProvider, blacklistService),
                 UsernamePasswordAuthenticationFilter.class
             );
         http.exceptionHandling((exceptionConfig) -> exceptionConfig

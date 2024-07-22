@@ -9,43 +9,37 @@ import org.springframework.http.HttpStatus;
 public class GeneralException extends RuntimeException {
 
     private final HttpStatus status;
-    private final String errorCode;
-    private final String errorMsg;
+    private final ErrorCode errorCode;
     private final Object detail;
 
-    public GeneralException(HttpStatus status, ErrorCode errorType) {
+    public GeneralException(HttpStatus status, ErrorCode errorCode) {
         this.status = status;
-        this.errorCode = errorType.getCode();
-        this.errorMsg = errorType.getMsg();
+        this.errorCode = errorCode;
         this.detail = "";
     }
 
-    public GeneralException(HttpStatus status, ErrorCode errorType, Object detail) {
+    public GeneralException(HttpStatus status, ErrorCode errorCode, Object detail) {
         this.status = status;
-        this.errorCode = errorType.getCode();
-        this.errorMsg = errorType.getMsg();
+        this.errorCode = errorCode;
         this.detail = detail;
     }
 
-    public GeneralException(ErrorCode errorType) {
+    public GeneralException(ErrorCode errorCode) {
         this.status = HttpStatus.BAD_REQUEST;
-        this.errorCode = errorType.getCode();
-        this.errorMsg = errorType.getMsg();
+        this.errorCode = errorCode;
         this.detail = "";
     }
 
-    public GeneralException(ErrorCode errorType, Object detail) {
+    public GeneralException(ErrorCode errorCode, Object detail) {
         this.status = HttpStatus.BAD_REQUEST;
-        this.errorCode = errorType.getCode();
-        this.errorMsg = errorType.getMsg();
+        this.errorCode = errorCode;
         this.detail = detail;
     }
 
 
-    public GeneralException(ErrorCode errorType, Throwable cause) {
+    public GeneralException(ErrorCode errorCode, Throwable cause) {
         this.status = HttpStatus.BAD_REQUEST;
-        this.errorCode = errorType.getCode();
-        this.errorMsg = errorType.getMsg();
+        this.errorCode = errorCode;
         this.detail = cause.getMessage();
     }
 
@@ -54,12 +48,10 @@ public class GeneralException extends RuntimeException {
             GeneralException customException = (GeneralException) exception;
             this.status = customException.getStatus();
             this.errorCode = customException.errorCode;
-            this.errorMsg = customException.errorMsg;
             this.detail = customException.getDetail();
         } else {
             this.status = HttpStatus.BAD_REQUEST;
-            this.errorCode = CommonErrorCode.UNKNOWN.getCode();
-            this.errorMsg = "";
+            this.errorCode = CommonErrorCode.UNKNOWN;
             this.detail = exception.getMessage();
         }
     }
