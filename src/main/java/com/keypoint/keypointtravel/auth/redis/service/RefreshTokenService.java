@@ -26,9 +26,10 @@ public class RefreshTokenService {
     @Transactional
     public void saveRefreshToken(String email, String refreshToken, Date expiration) {
         // 1. email에 등록된 refresh token이 존재하는지 확인
-        String refreshTokenId = findRefreshTokenByEmail(email).getId();
-        if (refreshTokenId != null) {
+        CommonRefreshTokenDTO refreshTokenDTO = findRefreshTokenByEmail(email);
+        if (refreshTokenDTO != null) {
             // 1-1. refresh token이 존재하는 경우 삭제
+            String refreshTokenId = refreshTokenDTO.getId();
             refreshTokenRepository.deleteById(refreshTokenId);
         }
 
