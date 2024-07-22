@@ -1,11 +1,13 @@
 package com.keypoint.keypointtravel.oauth.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 
 @Getter
-public class ReissueGoogleResponse {
+public class ReissueOAuthResponse {
 
     @JsonProperty("access_token")
     private String accessToken;
@@ -20,6 +22,9 @@ public class ReissueGoogleResponse {
 
     @JsonProperty("id_token")
     private String idToken;
+
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 
     public LocalDateTime getExpiredAt() {
         return LocalDateTime.now().plusSeconds(expiresIn);

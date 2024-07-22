@@ -1,11 +1,5 @@
 package com.keypoint.keypointtravel.oauth.service;
 
-import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
-import com.keypoint.keypointtravel.global.utils.HttpUtils;
-import com.keypoint.keypointtravel.oauth.dto.request.ReissueGoogleRequest;
-import com.keypoint.keypointtravel.oauth.dto.response.ReissueGoogleResponse;
-import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,6 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
+import com.keypoint.keypointtravel.global.utils.HttpUtils;
+import com.keypoint.keypointtravel.oauth.dto.request.ReissueGoogleRequest;
+import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
+import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
@@ -51,12 +53,12 @@ public class GoogleOAuthService implements OAuthService {
                 .toUriString();
 
             // 2-2. 요청
-            ResponseEntity<ReissueGoogleResponse> response = HttpUtils.post(
+            ResponseEntity<ReissueOAuthResponse> response = HttpUtils.post(
                 requestURL,
                 headers,
                 null,
-                ReissueGoogleResponse.class);
-            ReissueGoogleResponse reissueGoogleResponse = response.getBody();
+                ReissueOAuthResponse.class);
+            ReissueOAuthResponse reissueGoogleResponse = response.getBody();
 
             // 3. 토큰 업데이트
             oAuthTokenService.saveOAuthToken(

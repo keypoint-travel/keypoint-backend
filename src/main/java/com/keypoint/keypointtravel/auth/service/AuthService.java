@@ -1,6 +1,13 @@
 package com.keypoint.keypointtravel.auth.service;
 
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.dto.useCase.LogoutUseCase;
 import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
@@ -17,15 +24,9 @@ import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
-import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.OAuthServiceFactory;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -69,29 +70,11 @@ public class AuthService {
                 throw new GeneralException(HttpStatus.UNAUTHORIZED, validateResult);
             }
 
-            // 3. Oauth 사용자인 경우, Oauth 토큰 재발급
-            CommonMemberDTO memberDTO = readMemberService.findMemberByEmail(email);
-            if (memberDTO.getOauthProviderType() != OauthProviderType.NONE) {
-                reissueOAuthToken(memberDTO);
-            }
-
-            // 4. JWT 토큰 재발급
+            // 3. JWT 토큰 재발급
             return tokenProvider.createToken(authentication);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
-    }
-
-    /**
-     * OAuth 토큰을 재발급하는 함수
-     *
-     * @param memberDTO
-     */
-    private void reissueOAuthToken(CommonMemberDTO memberDTO) {
-        OAuthService oauthService = oAuthServiceFactory.getService(
-            memberDTO.getOauthProviderType());
-
-        oauthService.reissue(memberDTO.getId());
     }
 
     /**
@@ -109,7 +92,7 @@ public class AuthService {
             // 1. 이메일 유효성 검사
             CommonMemberDTO member = validateMemberForLogin(email);
 
-            // 2. 비밃번호 유효성 검사
+            // 2. 비밀번호 유효성 검사
             if (!StringUtils.checkPasswordValidation(password)) {
                 throw new GeneralException(MemberErrorCode.INVALID_LOGIN_CREDENTIALS);
             }
