@@ -3,7 +3,7 @@ version: "3.8"
 services:
   web:
     container_name: web
-    image: lchy0413/keypoint-travel-dev
+    image: lchy0413/keypoint-travel-dev:travel-dev
     expose:
       - 8080
     ports:

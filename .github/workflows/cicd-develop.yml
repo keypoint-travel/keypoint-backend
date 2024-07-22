@@ -1,9 +1,6 @@
 name: cicd-develop
 
 on:
-  push:
-    branches:
-      - develop
   pull_request:
     branches:
       - develop
