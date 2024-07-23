@@ -7,19 +7,19 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-@Converter
+@Converter(autoApply = true)
 public class TimestampConverter implements AttributeConverter<LocalDateTime, Date> {
+
+    private static final ZoneId UTC = ZoneId.of("UTC");
 
     @Override
     public Date convertToDatabaseColumn(LocalDateTime attribute) {
-        return attribute == null ? null
-            : Date.from(attribute.atZone(ZoneId.systemDefault()).toInstant());
+        return attribute == null ? null : Date.from(attribute.atZone(UTC).toInstant());
     }
 
     @Override
     public LocalDateTime convertToEntityAttribute(Date dbData) {
         return dbData == null ? null
-            : LocalDateTime.ofInstant(Instant.ofEpochMilli(dbData.getTime()),
-                ZoneId.systemDefault());
+            : LocalDateTime.ofInstant(Instant.ofEpochMilli(dbData.getTime()), UTC);
     }
 }
