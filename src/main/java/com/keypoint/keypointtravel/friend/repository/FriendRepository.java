@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCustomRepository {
 
-    Boolean existsByFriendIdAndMemberId(Long friendId, Long memberId);
+    Boolean existsByFriendIdAndMemberIdAndIsDeletedFalse(Long friendId, Long memberId);
 
     List<Friend> findAllByMemberId(Long memberId);
 }

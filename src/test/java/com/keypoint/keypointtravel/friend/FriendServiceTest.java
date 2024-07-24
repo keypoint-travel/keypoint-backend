@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.friend.service.FriendService;
 import com.keypoint.keypointtravel.global.enumType.member.GenderType;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
@@ -18,8 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,5 +58,15 @@ public class FriendServiceTest {
         verify(friendRepository).save(friendCaptor.capture());
         Friend savedFriend = friendCaptor.getValue();
         assertThat(friendMember.getMemberDetail().getName()).isEqualTo(savedFriend.getFriendName());
+    }
+
+    @Test
+    public void deleteFriendTest() {
+        // given : 해당하는 친구 관계가 존재하지 않을 시 예외 처리
+        when(friendRepository.updateIsDeletedById(any(), any())).thenReturn(0L);
+
+        //when & then
+        assertThatThrownBy(() -> friendService.deleteFriend(1L, 2L))
+            .isInstanceOf(GeneralException.class);
     }
 }

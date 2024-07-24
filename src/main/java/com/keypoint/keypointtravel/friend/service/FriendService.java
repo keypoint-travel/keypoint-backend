@@ -27,8 +27,6 @@ public class FriendService {
      * 친구 생성 함수
      *
      * @Param 회원의 memberId, 친구 코드 or 이메일
-     *
-     * @Return 조회한 친구 목록 Dto(회원의 초대 코드, 친구 리스트(친구 아이디, 친구 이메일,))
      */
     @Transactional
     public void saveFriend(SaveUseCase saveUseCase) {
@@ -57,15 +55,35 @@ public class FriendService {
         if(findedMember.getId().equals(myId)){
             throw new GeneralException(FriendErrorCode.CANNOT_ADD_SELF);
         }
-        if(friendRepository.existsByFriendIdAndMemberId(findedMember.getId(), myId)) {
+        if(friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(findedMember.getId(), myId)) {
             throw new GeneralException(FriendErrorCode.DUPLICATED_FRIEND);
         }
     }
 
+    /**
+     * 친구 목록 조회 함수
+     *
+     * @Param 회원의 memberId
+     *
+     * @Return 조회한 친구 목록 Dto(회원의 초대 코드, 친구 리스트(친구 아이디, 친구 이름, 친구 프로필 이미지 아이디))
+     */
     @Transactional(readOnly = true)
     public FriendsResponse findFriendList(Long memberId) {
         String invitationCode = memberRepository.findInvitationCodeByMemberId(memberId);
         List<Friend> friends = friendRepository.findAllByMemberId(memberId);
         return FriendsResponse.of(invitationCode, friends);
+    }
+
+    /**
+     * 친구 삭제 함수(내 기준, 친구 기준 두 가지 siDeleted를 true로 변경)
+     *
+     * @Param 회원의 memberId, 친구의 friendId
+     */
+    @Transactional
+    public void deleteFriend(Long memberId, Long friendId) {
+        long count = friendRepository.updateIsDeletedById(memberId, friendId);
+        if (count < 2) {
+            throw new GeneralException(FriendErrorCode.NOT_EXISTED_FRIEND);
+        }
     }
 }
