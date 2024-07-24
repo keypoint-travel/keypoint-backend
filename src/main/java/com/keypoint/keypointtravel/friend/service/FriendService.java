@@ -32,22 +32,22 @@ public class FriendService {
         // 1. 친구 코드에 해당하는 회원 조회 : 없을 시 예외 처리 fetch join
         Member findedMember = friendRepository.findMemberByEmailOrInvitationCode(saveUseCase.getInvitationValue());
         validate(findedMember, saveUseCase.getMemberId());
-        // 2. 회원 아이디 가짜 객체 조회
-        Member member = memberRepository.getReferenceById(saveUseCase.getMemberId());
-        // 3. 친구 생성
-        Friend friend = Friend.builder()
+        // 2. 회원 정보 조회
+        Member member = memberRepository.findById(saveUseCase.getMemberId()).orElseThrow(
+            () -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
+        // 3. 친구 생성 및 저장(서로 생성하기에 두번 시행)
+        friendRepository.save(buildFriend(findedMember, member));
+        friendRepository.save(buildFriend(member, findedMember));
+    }
+
+    private Friend buildFriend(Member findedMember, Member member){
+        return Friend.builder()
             .friendId(findedMember.getId())
             .friendName(findedMember.getMemberDetail().getName())
             .profileImageId(findedMember.getMemberDetail().getProfileImageId())
             .member(member)
             .isDeleted(false)
             .build();
-        // 4. 친구 저장 및 예외 처리
-        try {
-            friendRepository.save(friend);
-        } catch (Exception e) {
-            throw new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER);
-        }
     }
 
     private void validate(Member findedMember, Long myId){
