@@ -76,6 +76,9 @@ public class CreateMemberService {
             memberDetailRepository.save(memberDetail);
             notificationRepository.save(notification);
 
+            //5. 초대코드 저장: 초대코드가 중복되지 않도록 문자열에 마지막에 memberId를 추가하여 저장
+            member.setInvitationCode(StringUtils.getRandomString(9) + member.getId());
+
             return MemberResponse.from(member);
         } catch (Exception ex) {
             throw new GeneralException(ex);
