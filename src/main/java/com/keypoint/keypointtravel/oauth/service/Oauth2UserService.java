@@ -9,6 +9,7 @@ import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.MemberRepository;
@@ -31,6 +32,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +64,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
     }
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
@@ -156,6 +159,9 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
     private CommonMemberDTO addUser(OAuthAttributes attributes) {
         Member newMember = attributes.toEntity();
         memberRepository.save(newMember);
+
+        // 초대코드 저장: 초대코드가 중복되지 않도록 문자열에 마지막에 memberId를 추가하여 저장
+        newMember.setInvitationCode(StringUtils.getRandomString(9) + newMember.getId());
 
         return memberRepository.findByEmail(newMember.getEmail()).get();
     }

@@ -59,6 +59,9 @@ public class Member extends BaseEntity {
     @Comment("삭제 여부")
     private boolean isDeleted;
 
+    @Column
+    private String invitationCode;
+
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
     private MemberDetail memberDetail;
 
@@ -83,10 +86,15 @@ public class Member extends BaseEntity {
         this.oauthProviderType = OauthProviderType.NONE;
         this.lastPasswordUpdatedAt = LocalDateTime.now();
         this.isDeleted = false;
+        this.invitationCode = "";
     }
 
     public static Member of(String email, String password) {
         return new Member(email, password);
+    }
+
+    public void setInvitationCode(String invitationCode) {
+        this.invitationCode = invitationCode;
     }
 
     public void setMemberDetail(MemberDetail memberDetail) {

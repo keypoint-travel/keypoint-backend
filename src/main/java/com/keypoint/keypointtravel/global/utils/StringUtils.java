@@ -13,6 +13,8 @@ public class StringUtils {
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$";
 
+    private static final String RANDOM_ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
     public static Float convertToFloat(String str) {
         return str == null ? null : Float.parseFloat(str);
     }
@@ -62,4 +64,19 @@ public class StringUtils {
         return randomNumber.toString();
     }
 
+    /**
+     * 원하는 자리 수 길이의 랜덤 숫자와 문자의 혼합된 문자열을 반환하는 함수
+     * @param chars 문자 자리 수
+     * @return 랜덤 번호(String)
+     */
+    public static String getRandomString(int chars) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Random random = new Random();
+
+        for (int i = 0; i < chars; i++) {
+            stringBuilder.append(RANDOM_ALPHANUMERIC.charAt(random.nextInt(RANDOM_ALPHANUMERIC.length())));
+        }
+        stringBuilder.append((char) (random.nextInt(26) + 'A'));
+        return stringBuilder.toString();
+    }
 }
