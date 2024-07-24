@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface FriendCustomRepository {
 
     Member findMemberByEmailOrInvitationCode(String invitationValue);
+
+    long updateIsDeletedById(Long memberId, Long friendId);
 }

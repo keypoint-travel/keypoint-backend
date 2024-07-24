@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.friend;
 
+import com.keypoint.keypointtravel.friend.entity.Friend;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.global.enumType.member.GenderType;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,5 +66,29 @@ public class FriendRepositoryTest {
             .isInstanceOf(GeneralException.class);
         assertThatThrownBy(() -> friendRepository.findMemberByEmailOrInvitationCode("block@dump.com"))
             .isInstanceOf(GeneralException.class);
+    }
+
+    @Test
+    public void updateIsDeletedById() {
+        //given : 친구 관계 생성
+        Member member1 = new Member("test@gmail.com", OauthProviderType.GOOGLE);
+        Member member2 = new Member("test@naver.com", OauthProviderType.GOOGLE);
+        member1.setInvitationCode("invitationCode1");
+        member1.setInvitationCode("invitationCode2");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        friendRepository.save(new Friend(member1.getId(), "testName1", 1L, member2, false));
+        friendRepository.save(new Friend(member2.getId(), "testName2", 1L, member1, false));
+        em.flush();
+        em.clear();
+
+        //when : 친구 관계 삭제
+        friendRepository.updateIsDeletedById(member1.getId(), member2.getId());
+
+        //then : 친구 관계 삭제 확인
+        List<Friend> friendList = friendRepository.findAll();
+        for (Friend friend : friendList) {
+            assertThat(friend.isDeleted()).isTrue();
+        }
     }
 }

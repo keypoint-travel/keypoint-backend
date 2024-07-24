@@ -35,4 +35,15 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository {
         return invitationValue.contains("@") ? member.email.eq(invitationValue) :
             member.invitationCode.eq(invitationValue);
     }
+
+    @Override
+    public long updateIsDeletedById(Long memberId, Long friendId) {
+        // 친구 관계를 삭제하는 쿼리(내 기준에서의 나, 친구 기준에서의 나)
+        BooleanExpression expression1 = friend.member.id.eq(memberId).and(friend.friendId.eq(friendId));
+        BooleanExpression expression2 = friend.member.id.eq(friendId).and(friend.friendId.eq(memberId));
+        return queryFactory.update(friend)
+            .set(friend.isDeleted, true)
+            .where(expression1.or(expression2))
+            .execute();
+    }
 }
