@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.friend.service;
 
+import com.keypoint.keypointtravel.friend.dto.FriendsResponse;
 import com.keypoint.keypointtravel.friend.dto.SaveUseCase;
 import com.keypoint.keypointtravel.friend.entity.Friend;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
@@ -11,6 +12,8 @@ import com.keypoint.keypointtravel.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,5 +60,12 @@ public class FriendService {
         if(friendRepository.existsByFriendIdAndMemberId(findedMember.getId(), myId)) {
             throw new GeneralException(FriendErrorCode.DUPLICATED_FRIEND);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public FriendsResponse findFriendList(Long memberId) {
+        String invitationCode = memberRepository.findInvitationCodeByMemberId(memberId);
+        List<Friend> friends = friendRepository.findAllByMemberId(memberId);
+        return FriendsResponse.of(invitationCode, friends);
     }
 }

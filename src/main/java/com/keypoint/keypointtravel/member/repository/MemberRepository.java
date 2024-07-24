@@ -38,4 +38,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         @Param("id") Long id,
         @Param("password") String password
     );
+
+    @Query("SELECT m.invitationCode FROM Member m WHERE m.id = :id")
+    String findInvitationCodeByMemberId(Long id);
 }
