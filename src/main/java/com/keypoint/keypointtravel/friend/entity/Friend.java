@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,7 +26,7 @@ public class Friend extends BaseEntity {
     private String friendName;
 
     @Column(nullable = false)
-    private String profileImageId;
+    private Long profileImageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -34,7 +35,8 @@ public class Friend extends BaseEntity {
     @Column
     private boolean isDeleted;
 
-    public Friend(Long friendId, String friendName, String profileImageId, Member member, boolean isDeleted) {
+    @Builder
+    public Friend(Long friendId, String friendName, Long profileImageId, Member member, boolean isDeleted) {
         this.friendId = friendId;
         this.friendName = friendName;
         this.profileImageId = profileImageId;
