@@ -3,8 +3,10 @@ package com.keypoint.keypointtravel.member.service;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
+import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,20 @@ public class ReadMemberService {
     public boolean checkIsExistedEmail(EmailUseCase useCase) {
         try {
             return memberRepository.existsByEmail(useCase.getEmail());
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * Member profile 정보를 조회하는 함수
+     *
+     * @param useCase
+     * @return
+     */
+    public MemberProfileResponse getMemberProfile(MemberIdUseCase useCase) {
+        try {
+            return null;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

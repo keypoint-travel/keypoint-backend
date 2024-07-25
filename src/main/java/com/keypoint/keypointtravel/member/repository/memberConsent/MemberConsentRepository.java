@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.member.repository;
+package com.keypoint.keypointtravel.member.repository.memberConsent;
 
 import com.keypoint.keypointtravel.member.entity.MemberConsent;
 import org.springframework.data.jpa.repository.JpaRepository;

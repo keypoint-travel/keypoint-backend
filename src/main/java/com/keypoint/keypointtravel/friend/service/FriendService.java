@@ -9,12 +9,11 @@ import com.keypoint.keypointtravel.global.enumType.error.FriendErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,8 @@ public class FriendService {
     @Transactional
     public void saveFriend(SaveUseCase saveUseCase) {
         // 1. 친구 코드에 해당하는 회원 조회 : 없을 시 예외 처리 fetch join
-        Member findedMember = friendRepository.findMemberByEmailOrInvitationCode(saveUseCase.getInvitationValue());
+        Member findedMember = friendRepository.findMemberByEmailOrInvitationCode(
+            saveUseCase.getInvitationValue());
         validate(findedMember, saveUseCase.getMemberId());
         // 2. 회원 정보 조회
         Member member = memberRepository.findById(saveUseCase.getMemberId()).orElseThrow(
@@ -42,7 +42,7 @@ public class FriendService {
         friendRepository.save(buildFriend(member, findedMember));
     }
 
-    private Friend buildFriend(Member findedMember, Member member){
+    private Friend buildFriend(Member findedMember, Member member) {
         return Friend.builder()
             .friendId(findedMember.getId())
             .member(member)
@@ -50,11 +50,12 @@ public class FriendService {
             .build();
     }
 
-    private void validate(Member findedMember, Long myId){
-        if(findedMember.getId().equals(myId)){
+    private void validate(Member findedMember, Long myId) {
+        if (findedMember.getId().equals(myId)) {
             throw new GeneralException(FriendErrorCode.CANNOT_ADD_SELF);
         }
-        if(friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(findedMember.getId(), myId)) {
+        if (friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(findedMember.getId(),
+            myId)) {
             throw new GeneralException(FriendErrorCode.DUPLICATED_FRIEND);
         }
     }
@@ -63,7 +64,6 @@ public class FriendService {
      * 친구 목록 조회 함수
      *
      * @Param 회원의 memberId
-     *
      * @Return 조회한 친구 목록 Dto(회원의 초대 코드, 친구 리스트(친구 아이디, 친구 이름, 친구 프로필 이미지 아이디))
      */
     @Transactional(readOnly = true)

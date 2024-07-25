@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.member.repository;
+package com.keypoint.keypointtravel.member.repository.member;
 
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
