@@ -51,7 +51,7 @@ public class ReadMemberService {
      */
     public MemberProfileResponse getMemberProfile(MemberIdUseCase useCase) {
         try {
-            return null;
+            return memberRepository.findMemberProfile(useCase.getMemberId());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

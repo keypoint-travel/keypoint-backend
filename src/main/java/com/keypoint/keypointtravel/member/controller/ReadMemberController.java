@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.member.controller;
 
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
-import com.keypoint.keypointtravel.member.dto.request.MemberIdRequest;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedEmailResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
@@ -11,6 +11,7 @@ import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,8 +40,8 @@ public class ReadMemberController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/profile")
     public APIResponseEntity<MemberProfileResponse> getMemberProfile(
-        @Valid @RequestBody MemberIdRequest request) {
-        MemberIdUseCase useCase = MemberIdUseCase.from(request);
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
         MemberProfileResponse result = readMemberService.getMemberProfile(useCase);
 
         return APIResponseEntity.<MemberProfileResponse>builder()
