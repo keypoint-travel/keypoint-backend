@@ -1,13 +1,19 @@
 package com.keypoint.keypointtravel.friend.repository;
 
+import com.keypoint.keypointtravel.friend.dto.FriendDto;
 import com.keypoint.keypointtravel.friend.entity.QFriend;
+import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.entity.QMember;
+import com.keypoint.keypointtravel.member.entity.QMemberDetail;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class FriendCustomRepositoryImpl implements FriendCustomRepository {
@@ -17,6 +23,10 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository {
     private final QFriend friend = QFriend.friend;
 
     private final QMember member = QMember.member;
+
+    private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
+
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     @Override
     public Member findMemberByEmailOrInvitationCode(String invitationValue) {
@@ -45,5 +55,21 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository {
             .set(friend.isDeleted, true)
             .where(expression1.or(expression2))
             .execute();
+    }
+
+    @Override
+    public List<FriendDto> findAllByMemberId(Long memberId) {
+        return queryFactory.select(Projections.constructor(FriendDto.class,
+                friend.friendId, // 친구 고유 아이디
+                memberDetail.name, // 친구 이름
+                uploadFile.path // 친구 프로필 이미지
+            ))
+            .from(friend)
+            .innerJoin(member).on(friend.friendId.eq(member.id))
+            .innerJoin(member.memberDetail, memberDetail)
+            .innerJoin(uploadFile).on(memberDetail.profileImageId.eq(uploadFile.id))
+            .where(friend.member.id.eq(memberId).and(friend.isDeleted.eq(false)))
+            .orderBy(friend.createAt.desc())
+            .fetch();
     }
 }

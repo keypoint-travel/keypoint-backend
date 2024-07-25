@@ -22,12 +22,6 @@ public class Friend extends BaseEntity {
     @Column(nullable = false)
     private Long friendId;
 
-    @Column(nullable = false)
-    private String friendName;
-
-    @Column(nullable = false)
-    private Long profileImageId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -36,10 +30,8 @@ public class Friend extends BaseEntity {
     private boolean isDeleted;
 
     @Builder
-    public Friend(Long friendId, String friendName, Long profileImageId, Member member, boolean isDeleted) {
+    public Friend(Long friendId, Member member, boolean isDeleted) {
         this.friendId = friendId;
-        this.friendName = friendName;
-        this.profileImageId = profileImageId;
         this.member = member;
         this.isDeleted = isDeleted;
     }

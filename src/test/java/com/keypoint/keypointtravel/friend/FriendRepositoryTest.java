@@ -69,7 +69,7 @@ public class FriendRepositoryTest {
     }
 
     @Test
-    public void updateIsDeletedById() {
+    public void updateIsDeletedByIdTest() {
         //given : 친구 관계 생성
         Member member1 = new Member("test@gmail.com", OauthProviderType.GOOGLE);
         Member member2 = new Member("test@naver.com", OauthProviderType.GOOGLE);
@@ -77,8 +77,8 @@ public class FriendRepositoryTest {
         member1.setInvitationCode("invitationCode2");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        friendRepository.save(new Friend(member1.getId(), "testName1", 1L, member2, false));
-        friendRepository.save(new Friend(member2.getId(), "testName2", 1L, member1, false));
+        friendRepository.save(new Friend(member1.getId(), member2, false));
+        friendRepository.save(new Friend(member2.getId(), member1, false));
         em.flush();
         em.clear();
 

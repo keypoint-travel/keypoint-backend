@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.friend.service;
 
+import com.keypoint.keypointtravel.friend.dto.FriendDto;
 import com.keypoint.keypointtravel.friend.dto.FriendsResponse;
 import com.keypoint.keypointtravel.friend.dto.SaveUseCase;
 import com.keypoint.keypointtravel.friend.entity.Friend;
@@ -44,8 +45,6 @@ public class FriendService {
     private Friend buildFriend(Member findedMember, Member member){
         return Friend.builder()
             .friendId(findedMember.getId())
-            .friendName(findedMember.getMemberDetail().getName())
-            .profileImageId(findedMember.getMemberDetail().getProfileImageId())
             .member(member)
             .isDeleted(false)
             .build();
@@ -70,7 +69,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendsResponse findFriendList(Long memberId) {
         String invitationCode = memberRepository.findInvitationCodeByMemberId(memberId);
-        List<Friend> friends = friendRepository.findAllByMemberId(memberId);
+        List<FriendDto> friends = friendRepository.findAllByMemberId(memberId);
         return FriendsResponse.of(invitationCode, friends);
     }
 
