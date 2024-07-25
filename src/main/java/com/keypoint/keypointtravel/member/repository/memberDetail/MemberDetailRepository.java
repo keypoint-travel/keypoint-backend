@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.member.repository;
+package com.keypoint.keypointtravel.member.repository.memberDetail;
 
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
