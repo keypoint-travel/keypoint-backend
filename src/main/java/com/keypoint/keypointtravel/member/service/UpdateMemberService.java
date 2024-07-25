@@ -18,6 +18,8 @@ import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.NotificationRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import main.java.com.keypoint.keypointtravel.member.dto.useCase.UpdateProfileUseCase;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,6 +113,26 @@ public class UpdateMemberService {
 
             // 2. 연결된 사용자 기기에 FCM 알림 전달
             // TODO
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 회원 프로필 데이터 변경하는 함수
+     *
+     * @param useCase 회원 프로필 데이터
+     */
+    @Transactional
+    public void updateMemberLanguage(UpdateProfileUseCase useCase) {
+        try {
+            // 1. 신규 프로필 이미지 저장
+
+            // 2. (기존 프로필 이미지가 존재한 경우) 기존 프로필 이미지 삭제
+
+            // 3. 프로필 데이터 변경
+            memberDetailRepository.updateMemberProfile(useCase.getId(), useCase.getLanguage());
+
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
