@@ -49,8 +49,34 @@ public class UpdateMemberController {
         updateMemberService.updateMemberPassword(useCase);
 
         return APIResponseEntity.<Void>builder()
-            .message("비밀번호 업데이트 성공")
-            .data(null)
-            .build();
+                .message("비밀번호 업데이트 성공")
+                .data(null)
+                .build();
+    }
+    
+    @PatchMapping("profile")
+    public APIResponseEntity<Void> updateProfile(
+        @Valid @RequestBody UpdatePasswordRequest request
+    ) {
+        UpdatePasswordUseCase useCase = UpdatePasswordUseCase.from(request);
+        updateMemberService.updateMemberPassword(useCase);
+
+        return APIResponseEntity.<Void>builder()
+                .message("사용자 프로필 정보 업데이트 성공")
+                .data(null)
+                .build();
+    }
+
+    @PatchMapping("language")
+    public APIResponseEntity<Void> updateLanguage(
+        @Valid @RequestBody UpdatePasswordRequest request
+    ) {
+        UpdatePasswordUseCase useCase = UpdatePasswordUseCase.from(request);
+        updateMemberService.updateMemberPassword(useCase);
+
+        return APIResponseEntity.<Void>builder()
+                .message("사용자 언어 설정 업데이트 성공")
+                .data(null)
+                .build();
     }
 }
