@@ -53,7 +53,7 @@ public class UpdateMemberService {
         try {
             // 1. Member 찾기
             Member member = memberRepository.findById(useCase.getMemberId())
-                .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
+                    .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
 
             // 2. Member 상태 변경
             memberRepository.updateRole(member.getId(), RoleType.ROLE_CERTIFIED_USER);
@@ -97,4 +97,23 @@ public class UpdateMemberService {
             throw new GeneralException(ex);
         }
     }
+
+    /**
+     * 회원 선택 언어를 변경하는 함수
+     *
+     * @param useCase 회원 및 변경 언어 정보 데이터
+     */
+    @Transactional
+    public void updateMemberLanguage(UpdatePasswordUseCase useCase) {
+        try {
+            // 1. 언어 변경 시도
+            memberDetailRepository.updatePassword(useCase.getId(), useCase.getLanguage());
+
+            // 2. 연결된 사용자 기기에 FCM 알림 전달
+            // TODO
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
 }

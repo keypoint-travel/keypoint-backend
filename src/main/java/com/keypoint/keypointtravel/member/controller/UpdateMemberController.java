@@ -56,6 +56,7 @@ public class UpdateMemberController {
     
     @PatchMapping("profile")
     public APIResponseEntity<Void> updateProfile(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @Valid @RequestBody UpdatePasswordRequest request
     ) {
         UpdatePasswordUseCase useCase = UpdatePasswordUseCase.from(request);
@@ -69,10 +70,11 @@ public class UpdateMemberController {
 
     @PatchMapping("language")
     public APIResponseEntity<Void> updateLanguage(
-        @Valid @RequestBody UpdatePasswordRequest request
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @Valid @RequestBody UpdateLanguageRequest request
     ) {
-        UpdatePasswordUseCase useCase = UpdatePasswordUseCase.from(request);
-        updateMemberService.updateMemberPassword(useCase);
+        UpdateLanguageUseCase useCase = UpdateLanguageUseCase.of(userDetails.getId(), request);
+        updateMemberService.updateMemberLanguage(useCase);
 
         return APIResponseEntity.<Void>builder()
                 .message("사용자 언어 설정 업데이트 성공")
