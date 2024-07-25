@@ -15,7 +15,6 @@ import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
@@ -34,6 +33,7 @@ public class ReadMemberController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/profile")
     public APIResponseEntity<IsExistedEmailResponse> getMemberProfile(
             @Valid @RequestBody EmailRequest request) {
@@ -45,6 +45,5 @@ public class ReadMemberController {
                 .data(IsExistedEmailResponse.from(result))
                 .build();
     }
-    
-    
+
 }
