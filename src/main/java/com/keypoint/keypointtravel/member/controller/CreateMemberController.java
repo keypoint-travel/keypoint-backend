@@ -10,7 +10,6 @@ import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
 import com.keypoint.keypointtravel.member.dto.request.EmailVerificationRequest;
 import com.keypoint.keypointtravel.member.dto.request.SignUpRequest;
 import com.keypoint.keypointtravel.member.dto.response.EmailVerificationResponse;
-import com.keypoint.keypointtravel.member.dto.response.IsExistedEmailResponse;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
@@ -24,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
-public class MemberController {
+public class CreateMemberController {
 
     private final ReadMemberService memberService;
     private final CreateMemberService createMemberService;
@@ -52,19 +51,6 @@ public class MemberController {
             .data(EmailVerificationResponse.from(result))
             .build();
     }
-
-    @PostMapping("/email/validate")
-    public APIResponseEntity<IsExistedEmailResponse> checkIsExistedEmail(
-        @Valid @RequestBody EmailRequest request) {
-        EmailUseCase useCase = EmailUseCase.from(request);
-        boolean result = memberService.checkIsExistedEmail(useCase);
-
-        return APIResponseEntity.<IsExistedEmailResponse>builder()
-            .message("이메일 인증 성공")
-            .data(IsExistedEmailResponse.from(result))
-            .build();
-    }
-
 
     @PostMapping
     public APIResponseEntity<MemberResponse> addMember(@Valid @RequestBody SignUpRequest request) {
