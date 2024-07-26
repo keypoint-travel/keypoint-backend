@@ -21,4 +21,11 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
             .fetchFirst();
         return member != null;
     }
+
+    @Override
+    public long deleteByBlockedMemberIdAndMemberId(Long blockedMemberId, Long memberId) {
+        return queryFactory.delete(blockedMember)
+            .where(blockedMember.blockedMemberId.eq(blockedMemberId), blockedMember.member.id.eq(memberId))
+            .execute();
+    }
 }

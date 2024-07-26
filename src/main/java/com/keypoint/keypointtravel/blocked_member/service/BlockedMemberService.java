@@ -44,4 +44,20 @@ public class BlockedMemberService {
         // 4. 차단된 회원과 친구 관계인 경우 친구 관계 삭제
         friendRepository.updateIsDeletedById(useCase.getBlockedMemberId(), useCase.getMyId());
     }
+
+    /**
+     * 회원 차단 해제 함수
+     *
+     * @Param 회원의 memberId, 차단할 회원의 memberId
+     */
+    @Transactional
+    public void unblockMember(BlockedMemberUseCase useCase) {
+        // 1. 차단 해제
+        long count = blockedMemberRepository.deleteByBlockedMemberIdAndMemberId(
+            useCase.getBlockedMemberId(), useCase.getMyId());
+        // 2. 차단된 기록이 없었을 경우
+        if(count < 1){
+            throw new GeneralException(BlockedMemberErrorCode.NOT_EXISTED_BLOCKED);
+        }
+    }
 }
