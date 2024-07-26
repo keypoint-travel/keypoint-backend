@@ -48,4 +48,36 @@ public class RepositoryTest {
         assertThat(result1).isFalse();
         assertThat(result2).isTrue();
     }
+
+    @Test
+    public void existsBlockedMemberTest() {
+        // given
+        Member member1 = new Member("email1@test.com", OauthProviderType.GOOGLE);
+        Member member2 = new Member("email2@test.com", OauthProviderType.GOOGLE);
+        Member member3 = new Member("email3@test.com", OauthProviderType.GOOGLE);
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        // member2가 member1을 차단하는 객체
+        BlockedMember blockedMember1 = new BlockedMember(member1.getId(), member2);
+        // member1이 member3을 차단하는 객체
+        BlockedMember blockedMember2 = new BlockedMember(member3.getId(), member1);
+        em.persist(blockedMember1);
+        em.persist(blockedMember2);
+        em.flush();
+        em.clear();
+
+        //when
+        // member1과 member2중 둘 중 한쪽이 차단했는지 확인
+        boolean result1 = blockedMemberRepository.existsBlockedMember(member1.getId(), member2.getId());
+        // member1과 member3중 둘 중 한쪽이 차단했는지 확인
+        boolean result2 = blockedMemberRepository.existsBlockedMember(member1.getId(), member3.getId());
+        // member2과 member3중 둘 중 한쪽이 차단했는지 확인
+        boolean result3 = blockedMemberRepository.existsBlockedMember(member2.getId(), member3.getId());
+
+        //then
+        assertThat(result1).isTrue();
+        assertThat(result2).isTrue();
+        assertThat(result3).isFalse();
+    }
 }
