@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.friend.service;
 
+import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.friend.dto.FriendDto;
 import com.keypoint.keypointtravel.friend.dto.FriendsResponse;
 import com.keypoint.keypointtravel.friend.dto.SaveUseCase;
@@ -24,6 +25,8 @@ public class FriendService {
 
     private final MemberRepository memberRepository;
 
+    private final BlockedMemberRepository blockedMemberRepository;
+
     /**
      * 친구 생성 함수
      *
@@ -31,13 +34,14 @@ public class FriendService {
      */
     @Transactional
     public void saveFriend(SaveUseCase saveUseCase) {
-        // 1. 친구 코드에 해당하는 회원 조회 : 없을 시 예외 처리 fetch join
+        // 1. 친구 코드에 해당하는 회원 조회 : 없을 시 예외 처리
         Member findedMember = friendRepository.findMemberByEmailOrInvitationCode(saveUseCase.getInvitationValue());
+        // 2. 친구 추가 가능 여부 확인 : 불가능할 시 예외 처리
         validate(findedMember, saveUseCase.getMemberId());
-        // 2. 회원 정보 조회
+        // 3. 회원 정보 조회
         Member member = memberRepository.findById(saveUseCase.getMemberId()).orElseThrow(
             () -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
-        // 3. 친구 생성 및 저장(서로 생성하기에 두번 시행)
+        // 4. 친구 생성 및 저장(서로 생성하기에 두번 시행)
         friendRepository.save(buildFriend(findedMember, member));
         friendRepository.save(buildFriend(member, findedMember));
     }
@@ -51,11 +55,17 @@ public class FriendService {
     }
 
     private void validate(Member findedMember, Long myId){
+        // 자기 자신을 친구초대할 경우
         if(findedMember.getId().equals(myId)){
             throw new GeneralException(FriendErrorCode.CANNOT_ADD_SELF);
         }
+        // 이미 친구로 등록된 경우
         if(friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(findedMember.getId(), myId)) {
             throw new GeneralException(FriendErrorCode.DUPLICATED_FRIEND);
+        }
+        // 상대가 자신을, 자신이 상대를 차단한 경우
+        if(blockedMemberRepository.existsBlockedMember(findedMember.getId(), myId)){
+            throw new GeneralException(FriendErrorCode.BLOCKED_FRIEND);
         }
     }
 
