@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.blocked_member.service;
 import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberUseCase;
 import com.keypoint.keypointtravel.blocked_member.entity.BlockedMember;
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -19,6 +20,8 @@ public class BlockedMemberService {
     private final BlockedMemberRepository blockedMemberRepository;
 
     private final MemberRepository memberRepository;
+
+    private final FriendRepository friendRepository;
 
     /**
      * 회원 차단 함수
@@ -38,5 +41,7 @@ public class BlockedMemberService {
         // 3. 차단하기
         Member member = memberRepository.getReferenceById(useCase.getMyId());
         blockedMemberRepository.save(new BlockedMember(useCase.getBlockedMemberId(), member));
+        // 4. 차단된 회원과 친구 관계인 경우 친구 관계 삭제
+        friendRepository.updateIsDeletedById(useCase.getBlockedMemberId(), useCase.getMyId());
     }
 }
