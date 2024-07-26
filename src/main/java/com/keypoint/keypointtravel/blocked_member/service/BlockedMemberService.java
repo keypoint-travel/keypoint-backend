@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.blocked_member.service;
 
+import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberDto;
 import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberUseCase;
+import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberInfo;
 import com.keypoint.keypointtravel.blocked_member.entity.BlockedMember;
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
@@ -12,6 +14,8 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +63,18 @@ public class BlockedMemberService {
         if(count < 1){
             throw new GeneralException(BlockedMemberErrorCode.NOT_EXISTED_BLOCKED);
         }
+    }
+
+    /**
+     * 차단한 회원 목록 조회 함수
+     *
+     * @Param 회원의 memberId
+     *
+     * @Return 차단한 회원의 memberId, memberName 리스트
+     */
+    @Transactional(readOnly = true)
+    public List<BlockedMemberInfo> findBlockedMemberList(Long memberId) {
+        List<BlockedMemberDto> dtoList = blockedMemberRepository.findBlockedMembers(memberId);
+        return dtoList.stream().map(BlockedMemberInfo::from).toList();
     }
 }
