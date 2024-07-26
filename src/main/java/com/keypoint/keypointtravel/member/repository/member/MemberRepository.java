@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.member.repository;
+package com.keypoint.keypointtravel.member.repository.member;
 
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberCustomRepository {
 
     Optional<CommonMemberDTO> findByEmail(String email);
 

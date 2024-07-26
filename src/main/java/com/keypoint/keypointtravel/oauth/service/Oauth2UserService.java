@@ -12,7 +12,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationE
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;

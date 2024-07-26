@@ -1,24 +1,28 @@
 package com.keypoint.keypointtravel.banner.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.keypoint.keypointtravel.banner.dto.useCase.ChangeLikeUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
 import com.keypoint.keypointtravel.banner.repository.bannerLike.BannerLikeRepository;
-import com.keypoint.keypointtravel.global.enumType.banner.*;
+import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
+import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
+import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class BannerLikeServiceTest {

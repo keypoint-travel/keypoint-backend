@@ -10,7 +10,7 @@ import com.keypoint.keypointtravel.global.enumType.error.FriendErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public class FriendService {
         friendRepository.save(buildFriend(member, findedMember));
     }
 
-    private Friend buildFriend(Member findedMember, Member member){
+    private Friend buildFriend(Member findedMember, Member member) {
         return Friend.builder()
             .friendId(findedMember.getId())
             .member(member)

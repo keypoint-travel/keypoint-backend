@@ -7,7 +7,7 @@ import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

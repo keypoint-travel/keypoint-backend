@@ -1,5 +1,8 @@
 package com.keypoint.keypointtravel.friend;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.keypoint.keypointtravel.friend.entity.Friend;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.global.enumType.member.GenderType;
@@ -8,21 +11,17 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
-import com.keypoint.keypointtravel.member.repository.MemberDetailRepository;
-import com.keypoint.keypointtravel.member.repository.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import config.QueryDslConfig;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
@@ -40,6 +39,7 @@ public class FriendRepositoryTest {
 
     @Autowired
     private TestEntityManager em;
+
     @Test
     public void findMemberByEmailOrInvitationCodeTest() {
         //given
@@ -48,7 +48,8 @@ public class FriendRepositoryTest {
         Member member = new Member(email, OauthProviderType.GOOGLE);
         member.setInvitationCode(invitationCode);
         memberRepository.save(member);
-        MemberDetail detail = new MemberDetail(member, GenderType.MAN, LocalDate.now(), "test", LanguageCode.KO, "KR");
+        MemberDetail detail = new MemberDetail(member, GenderType.MAN, LocalDate.now(), "test",
+            LanguageCode.KO, "KR");
         memberDetailRepository.save(detail);
 
         em.flush();
@@ -64,7 +65,8 @@ public class FriendRepositoryTest {
         //when & then : 이메일, 초대코드에 해당하지 않을 시 예외처리
         assertThatThrownBy(() -> friendRepository.findMemberByEmailOrInvitationCode("block"))
             .isInstanceOf(GeneralException.class);
-        assertThatThrownBy(() -> friendRepository.findMemberByEmailOrInvitationCode("block@dump.com"))
+        assertThatThrownBy(
+            () -> friendRepository.findMemberByEmailOrInvitationCode("block@dump.com"))
             .isInstanceOf(GeneralException.class);
     }
 

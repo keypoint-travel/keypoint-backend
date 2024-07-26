@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Getter
@@ -32,6 +33,26 @@ public class UploadFile extends BaseEntity {
 
     @Column(nullable = false)
     private String mimeType;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
+
+    public UploadFile(String originalFileName, String path, long size, String mimeType) {
+        this.originalFileName = originalFileName;
+        this.path = path;
+        this.size = size;
+        this.mimeType = mimeType;
+        this.isDeleted = false;
+    }
+
+    public static UploadFile of(String fileName, MultipartFile multipartFile) {
+        return new UploadFile(
+            multipartFile.getOriginalFilename(),
+            fileName,
+            multipartFile.getSize(),
+            multipartFile.getContentType()
+        );
+    }
 }
 
 
