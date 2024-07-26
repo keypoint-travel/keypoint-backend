@@ -67,7 +67,7 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository {
             .from(friend)
             .innerJoin(member).on(friend.friendId.eq(member.id))
             .innerJoin(member.memberDetail, memberDetail)
-            .innerJoin(uploadFile).on(memberDetail.profileImageId.eq(uploadFile.id))
+            .leftJoin(uploadFile).on(memberDetail.profileImageId.eq(uploadFile.id))
             .where(friend.member.id.eq(memberId).and(friend.isDeleted.eq(false)))
             .orderBy(friend.createAt.desc())
             .fetch();

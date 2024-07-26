@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.banner.service.BannerLikeService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +16,10 @@ public class BannerLikeController {
 
     private final BannerLikeService bannerLikeService;
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping
     public ResponseEntity<Void> changeLike(
-        @PathVariable Long bannerId, @RequestParam() Boolean hasILiked,
+        @PathVariable Long bannerId, @RequestParam Boolean hasILiked,
         @AuthenticationPrincipal CustomUserDetails userDetails){
 
         bannerLikeService.changeLike(new ChangeLikeUseCase(bannerId, hasILiked, userDetails.getId()));
