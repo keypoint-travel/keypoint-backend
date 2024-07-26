@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.friend.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.friend.dto.DeleteUseCase;
 import com.keypoint.keypointtravel.friend.dto.FriendDto;
 import com.keypoint.keypointtravel.friend.dto.FriendsResponse;
 import com.keypoint.keypointtravel.friend.dto.SaveUseCase;
@@ -89,8 +90,8 @@ public class FriendService {
      * @Param 회원의 memberId, 친구의 friendId
      */
     @Transactional
-    public void deleteFriend(Long memberId, Long friendId) {
-        long count = friendRepository.updateIsDeletedById(memberId, friendId);
+    public void deleteFriend(DeleteUseCase useCase) {
+        long count = friendRepository.updateIsDeletedById(useCase.getMemberId(), useCase.getFriendId());
         if (count < 2) {
             throw new GeneralException(FriendErrorCode.NOT_EXISTED_FRIEND);
         }

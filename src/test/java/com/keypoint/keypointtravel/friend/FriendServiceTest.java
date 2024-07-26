@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.friend;
 
+import com.keypoint.keypointtravel.friend.dto.DeleteUseCase;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.friend.service.FriendService;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -27,7 +28,7 @@ public class FriendServiceTest {
         when(friendRepository.updateIsDeletedById(any(), any())).thenReturn(0L);
 
         //when & then
-        assertThatThrownBy(() -> friendService.deleteFriend(1L, 2L))
+        assertThatThrownBy(() -> friendService.deleteFriend(new DeleteUseCase(1L, 2L)))
             .isInstanceOf(GeneralException.class);
     }
 }

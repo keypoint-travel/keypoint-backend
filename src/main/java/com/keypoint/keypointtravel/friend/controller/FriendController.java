@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.friend.controller;
 
+import com.keypoint.keypointtravel.friend.dto.DeleteUseCase;
 import com.keypoint.keypointtravel.friend.dto.FriendRequest;
 import com.keypoint.keypointtravel.friend.dto.FriendsResponse;
 import com.keypoint.keypointtravel.friend.dto.SaveUseCase;
@@ -48,7 +49,7 @@ public class FriendController {
         @PathVariable Long friendId,
         @AuthenticationPrincipal CustomUserDetails userDetails){
 
-        friendService.deleteFriend(userDetails.getId(), friendId);
+        friendService.deleteFriend(new DeleteUseCase(userDetails.getId(), friendId));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
