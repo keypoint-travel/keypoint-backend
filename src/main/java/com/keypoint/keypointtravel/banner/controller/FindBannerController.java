@@ -54,7 +54,7 @@ public class FindBannerController {
     public APIResponseEntity<CommonBannerResponse> findCommonBanner(
         @PathVariable("bannerId") Long bannerId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
+        // 로그인이 필수가 아니기에 사용자 인증 확인 실행 x
         CommonTourismUseCase details = findBannerService.findCommonBanner(new BannerUseCase(bannerId, userDetails));
         TourismListUseCase arounds = tourismApiService.findArounds(
             details.getCommonTourismDto().getLongitude(), details.getCommonTourismDto().getLatitude(), serviceKey);

@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class BlockedMemberController {
 
     private final BlockedMemberService blockedMemberService;
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping
     public ResponseEntity<Void> blockMember(@RequestBody BlockedMemberRequest request,
                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -29,6 +31,7 @@ public class BlockedMemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping("/unblock")
     public ResponseEntity<Void> unblockMember(@RequestBody BlockedMemberRequest request,
                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -36,6 +39,7 @@ public class BlockedMemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping
     public APIResponseEntity<BlockedMemberResponse> findBlockedMemberList(
         @AuthenticationPrincipal CustomUserDetails userDetails) {

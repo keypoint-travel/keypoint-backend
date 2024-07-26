@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class FriendController {
 
     private final FriendService friendService;
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping
     public ResponseEntity<Void> saveFriend(
         @RequestBody @Valid FriendRequest friendRequest,
@@ -29,6 +31,7 @@ public class FriendController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping
     public APIResponseEntity<FriendsResponse> findFriendList(@AuthenticationPrincipal CustomUserDetails userDetails){
 
@@ -39,6 +42,7 @@ public class FriendController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @DeleteMapping("/{friendId}")
     public ResponseEntity<Void> deleteFriend(
         @PathVariable Long friendId,
