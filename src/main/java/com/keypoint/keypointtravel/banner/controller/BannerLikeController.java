@@ -17,7 +17,7 @@ public class BannerLikeController {
 
     @PostMapping
     public ResponseEntity<Void> changeLike(
-        @PathVariable Long bannerId, @RequestParam() Boolean hasILiked,
+        @PathVariable Long bannerId, @RequestParam Boolean hasILiked,
         @AuthenticationPrincipal CustomUserDetails userDetails){
 
         bannerLikeService.changeLike(new ChangeLikeUseCase(bannerId, hasILiked, userDetails.getId()));

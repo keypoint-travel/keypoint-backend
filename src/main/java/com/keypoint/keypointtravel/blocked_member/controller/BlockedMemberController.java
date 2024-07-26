@@ -26,4 +26,11 @@ public class BlockedMemberController {
         blockedMemberService.blockMember(new BlockedMemberUseCase(request.getBlockedMemberId(), userDetails.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @PostMapping("/unblock")
+    public ResponseEntity<Void> unblockMember(@RequestBody BlockedMemberRequest request,
+                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        blockedMemberService.unblockMember(new BlockedMemberUseCase(request.getBlockedMemberId(), userDetails.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
