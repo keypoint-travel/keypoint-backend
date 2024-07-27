@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.QBanner;
 import com.keypoint.keypointtravel.banner.entity.QBannerComment;
 import com.keypoint.keypointtravel.banner.entity.QBannerLike;
+import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.querydsl.core.types.Projections;
@@ -27,6 +28,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     private final QBanner banner = QBanner.banner;
 
     private final QBannerComment bannerComment = QBannerComment.bannerComment;
+
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     @Override
     public void updateIsExposedById(Long bannerId) {
@@ -86,9 +89,11 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 bannerComment.id,
                 bannerComment.content,
                 bannerComment.member.id,
-                bannerComment.member.email,
+                bannerComment.member.memberDetail.name,
+                uploadFile.path,
                 bannerComment.createAt))
             .from(bannerComment)
+            .leftJoin(uploadFile).on(bannerComment.member.memberDetail.profileImageId.eq(uploadFile.id))
             .where(bannerComment.banner.id.eq(bannerId))
             .orderBy(bannerComment.createAt.desc())
             .fetch();
