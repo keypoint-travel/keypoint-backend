@@ -73,6 +73,10 @@ dependencies {
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // FCM
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'
 }
 
 ext {
@@ -88,7 +92,7 @@ dependencyManagement {
 def querydslDir = "$buildDir/generated/querydsl"
 
 sourceSets {
-    main.java.srcDirs += [ querydslDir ]
+    main.java.srcDirs += [querydslDir]
 }
 
 tasks.named('test') {
