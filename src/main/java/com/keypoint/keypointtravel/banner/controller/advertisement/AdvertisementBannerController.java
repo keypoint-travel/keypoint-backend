@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
 import com.keypoint.keypointtravel.banner.service.AdvertisementBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class AdvertisementBannerController {
     public ResponseEntity<Void> saveAdvertisementBanner(
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
-        @RequestPart(value = "detail") AdvertisementRequest request,
+        @RequestPart(value = "detail") @Valid AdvertisementRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         //todo: 관리자 인증 로직 추가 예정
