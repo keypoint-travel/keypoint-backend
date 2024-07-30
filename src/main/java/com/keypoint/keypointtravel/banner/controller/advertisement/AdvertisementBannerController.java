@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.banner.controller.advertisement;
 
 import com.keypoint.keypointtravel.banner.dto.request.AdvertisementRequest;
+import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerResponse;
+import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
@@ -14,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/banners/advertisement")
@@ -48,5 +52,18 @@ public class AdvertisementBannerController {
 
         advertisementBannerService.saveAdvertisementBanner(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping
+    public APIResponseEntity<AdvertisementBannerResponse> findAdvertisementBanners(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        //todo: 관리자 인증 로직 추가 예정
+        List<AdvertisementBannerUseCase> useCaseList = advertisementBannerService.findAdvertisementBanners();
+        AdvertisementBannerResponse response = new AdvertisementBannerResponse(useCaseList);
+        return APIResponseEntity.<AdvertisementBannerResponse>builder()
+            .message("광고 배너 목록 조회 성공")
+            .data(response)
+            .build();
     }
 }
