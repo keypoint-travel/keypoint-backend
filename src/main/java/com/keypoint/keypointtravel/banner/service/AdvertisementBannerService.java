@@ -56,12 +56,12 @@ public class AdvertisementBannerService {
             // 1. 썸네일 이미지 저장
             Long thumbnailImageId = uploadFileService.saveUploadFile(
                 useCase.getThumbnailImage(),
-                DirectoryConstants.ADVERTISEMENT_BANNER_DIRECTORY
+                DirectoryConstants.ADVERTISEMENT_BANNER_THUMBNAIL_DIRECTORY
             );
             // 2. 상세 이미지 저장
             Long detailImageId = uploadFileService.saveUploadFile(
                 useCase.getDetailImage(),
-                DirectoryConstants.ADVERTISEMENT_BANNER_DIRECTORY
+                DirectoryConstants.ADVERTISEMENT_BANNER_DETAIL_DIRECTORY
             );
             // 3. 광고 배너 저장
             advertisementBannerRepository.save(
