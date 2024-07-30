@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
+import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
@@ -96,5 +97,22 @@ public class AdvertisementBannerService {
         if (count < 1) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
+    }
+
+    /**
+     * 광고 배너 상세 페이지 조회 함수
+     *
+     * @Param bannerId
+     *
+     * @Return dto(id, title, content, detailImageUrl)
+     */
+    @Transactional(readOnly = true)
+    public AdvertisementDetailDto findAdvertisementBanner(Long bannerId) {
+        AdvertisementDetailDto dto = advertisementBannerRepository.findAdvertisementBannerById(bannerId);
+        // 조회된 배너가 없을 경우
+        if(dto == null){
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+        return dto;
     }
 }
