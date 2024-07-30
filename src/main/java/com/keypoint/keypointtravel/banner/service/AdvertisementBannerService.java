@@ -4,11 +4,13 @@ import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
 import com.keypoint.keypointtravel.banner.entity.AdvertisementBanner;
 import com.keypoint.keypointtravel.banner.repository.banner.AdvertisementBannerRepository;
 import com.keypoint.keypointtravel.external.aws.service.S3Service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import lombok.RequiredArgsConstructor;
@@ -80,5 +82,19 @@ public class AdvertisementBannerService {
     public List<AdvertisementBannerUseCase> findAdvertisementBanners() {
         List<AdvertisementBannerDto> dtoList = advertisementBannerRepository.findAdvertisementBanners();
         return dtoList.stream().map(AdvertisementBannerUseCase::from).toList();
+    }
+
+    /**
+     * Banner 삭제하는 함수(isExposed를 false로) (공통 배너 삭제)
+     *
+     * @Param bannerId를 담은 useCase
+     */
+    @Transactional
+    public void deleteBanner(DeleteUseCase deleteUseCase) {
+        Long count = advertisementBannerRepository.updateIsExposedById(deleteUseCase.bannerId());
+        // 삭제된 배너가 없을 경우
+        if (count < 1) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
     }
 }

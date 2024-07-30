@@ -7,4 +7,6 @@ import java.util.List;
 public interface AdvertisementCustomRepository {
 
     List<AdvertisementBannerDto> findAdvertisementBanners();
+
+    Long updateIsExposedById(Long bannerId);
 }

@@ -37,6 +37,7 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             .set(banner.isExposed, false)
             .where(banner.id.eq(bannerId))
             .execute();
+        // 삭제된 배너가 없을 경우
         if (count < 1) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
