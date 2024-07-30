@@ -29,10 +29,14 @@ public class AdvertisementBanner extends BaseEntity {
     @Column
     private Long detailImageId;
 
+    @Column
+    private boolean isExposed;
+
     public AdvertisementBanner(String title, String content, Long thumbnailImageId, Long detailImageId) {
         this.title = title;
         this.content = content;
         this.thumbnailImageId = thumbnailImageId;
         this.detailImageId = detailImageId;
+        this.isExposed = true;
     }
 }
