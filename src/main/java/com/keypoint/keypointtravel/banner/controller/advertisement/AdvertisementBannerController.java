@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerRespon
 import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
 import com.keypoint.keypointtravel.banner.service.AdvertisementBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -65,5 +66,15 @@ public class AdvertisementBannerController {
             .message("광고 배너 목록 조회 성공")
             .data(response)
             .build();
+    }
+
+    @DeleteMapping("/{bannerId}")
+    public ResponseEntity<Void> deleteBanner(
+        @PathVariable("bannerId") Long bannerId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        //todo: 관리자 인증 로직 추가 예정
+        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId));
+        return ResponseEntity.noContent().build();
     }
 }
