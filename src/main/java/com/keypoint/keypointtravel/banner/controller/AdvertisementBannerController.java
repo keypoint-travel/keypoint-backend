@@ -1,9 +1,8 @@
-package com.keypoint.keypointtravel.banner.controller.advertisement;
+package com.keypoint.keypointtravel.banner.controller;
 
+import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.request.AdvertisementRequest;
-import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerResponse;
-import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
-import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
+import com.keypoint.keypointtravel.banner.dto.response.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
@@ -56,13 +55,13 @@ public class AdvertisementBannerController {
     }
 
     @GetMapping
-    public APIResponseEntity<AdvertisementBannerResponse> findAdvertisementBanners(
+    public APIResponseEntity<AdvertisementBannerListResponse> findAdvertisementBannerList(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         //todo: 관리자 인증 로직 추가 예정
         List<AdvertisementBannerUseCase> useCaseList = advertisementBannerService.findAdvertisementBanners();
-        AdvertisementBannerResponse response = new AdvertisementBannerResponse(useCaseList);
-        return APIResponseEntity.<AdvertisementBannerResponse>builder()
+        AdvertisementBannerListResponse response = new AdvertisementBannerListResponse(useCaseList);
+        return APIResponseEntity.<AdvertisementBannerListResponse>builder()
             .message("광고 배너 목록 조회 성공")
             .data(response)
             .build();
@@ -76,5 +75,18 @@ public class AdvertisementBannerController {
         //todo: 관리자 인증 로직 추가 예정
         advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId));
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{bannerId}")
+    public APIResponseEntity<AdvertisementBannerResponse> findAdvertisementBanner(
+        @PathVariable("bannerId") Long bannerId) {
+
+        AdvertisementDetailDto dto = advertisementBannerService.findAdvertisementBanner(bannerId);
+        AdvertisementBannerResponse response = AdvertisementBannerResponse.from(dto);
+
+        return APIResponseEntity.<AdvertisementBannerResponse>builder()
+            .message("광고 배너 상세 조회")
+            .data(response)
+            .build();
     }
 }
