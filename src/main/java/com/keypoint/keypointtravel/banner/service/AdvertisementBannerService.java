@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
+import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
@@ -114,5 +115,15 @@ public class AdvertisementBannerService {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return dto;
+    }
+
+    /**
+     * 광고 배너 썸네일 목록 조회 함수
+     *
+     * @Return dto(id, thumbnailImageUrl, title)
+     */
+    @Transactional(readOnly = true)
+    public List<AdvertisementThumbnailDto> findThumbnailList() {
+        return advertisementBannerRepository.findAdvertisementThumbnailList();
     }
 }

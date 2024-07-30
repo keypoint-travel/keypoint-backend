@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.entity.QAdvertisementBanner;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
@@ -61,7 +62,20 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             ))
             .from(advertisementBanner)
             .leftJoin(uploadFile).on(advertisementBanner.detailImageId.eq(uploadFile.id))
-            .where(advertisementBanner.id.eq(bannerId))
+            .where(advertisementBanner.id.eq(bannerId).and(advertisementBanner.isExposed.isTrue()))
             .fetchOne();
+    }
+
+    @Override
+    public List<AdvertisementThumbnailDto> findAdvertisementThumbnailList() {
+        return queryFactory.select(Projections.constructor(AdvertisementThumbnailDto.class,
+                advertisementBanner.id,
+                uploadFile.path,
+                advertisementBanner.title
+            ))
+            .from(advertisementBanner)
+            .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))
+            .where(advertisementBanner.isExposed.isTrue())
+            .fetch();
     }
 }
