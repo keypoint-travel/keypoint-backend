@@ -4,11 +4,15 @@ import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
+import com.keypoint.keypointtravel.global.enumType.member.GenderType;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,6 +92,9 @@ public class BannerRepositoryTest extends RepositoryTest {
         Long bannerId = 1L;
         Banner banner = buildBanner(bannerId, true);
         Member member = buildMember("email@test.com");
+        MemberDetail detail = new MemberDetail(member, GenderType.MAN, LocalDate.now(), "test2",
+            LanguageCode.KO, "KR");
+        em.persist(detail);
         buildBannerComment(banner, member, "test");
         buildBannerComment(banner, member, "test2");
         em.flush();
