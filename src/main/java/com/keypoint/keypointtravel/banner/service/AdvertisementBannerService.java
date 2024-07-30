@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.banner.service;
 
+import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
+import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +69,16 @@ public class AdvertisementBannerService {
         } catch (Exception e) {
             throw new GeneralException(e);
         }
+    }
+
+    /**
+     * 광고 배너 목록 조회 함수
+     *
+     * @Return
+     */
+    @Transactional(readOnly = true)
+    public List<AdvertisementBannerUseCase> findAdvertisementBanners() {
+        List<AdvertisementBannerDto> dtoList = advertisementBannerRepository.findAdvertisementBanners();
+        return dtoList.stream().map(AdvertisementBannerUseCase::from).toList();
     }
 }
