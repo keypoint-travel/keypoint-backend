@@ -37,6 +37,7 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
                 select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBanner.modifyId))
             ))
             .from(advertisementBanner)
+            .where(advertisementBanner.isExposed.isTrue())
             .orderBy(advertisementBanner.createAt.desc())
             .fetch();
     }
