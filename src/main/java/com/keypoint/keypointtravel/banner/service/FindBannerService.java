@@ -5,7 +5,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.BannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.SummaryUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.ThumbnailUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,11 +38,11 @@ public class FindBannerService {
      * @Return 사용자가 볼 수 있는 배너 썸네일 목록 useCase
      */
     @Transactional(readOnly = true)
-    public List<ThumbnailUseCase> findThumbnailList() {
+    public List<CommonBannerThumbnailUseCase> findThumbnailList() {
 
         //todo: 광고 배너 조회 로직 추가 예정
         List<Banner> banners = bannerRepository.findBannerList();
-        return banners.stream().map(ThumbnailUseCase::from).toList();
+        return banners.stream().map(CommonBannerThumbnailUseCase::from).toList();
     }
 
     /**

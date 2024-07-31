@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.QBanner;
 import com.keypoint.keypointtravel.banner.entity.QBannerComment;
 import com.keypoint.keypointtravel.banner.entity.QBannerLike;
+import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.querydsl.core.types.Projections;
@@ -28,12 +29,15 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
 
     private final QBannerComment bannerComment = QBannerComment.bannerComment;
 
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
+
     @Override
     public void updateIsExposedById(Long bannerId) {
         long count = queryFactory.update(banner)
             .set(banner.isExposed, false)
             .where(banner.id.eq(bannerId))
             .execute();
+        // 삭제된 배너가 없을 경우
         if (count < 1) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
@@ -86,9 +90,11 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 bannerComment.id,
                 bannerComment.content,
                 bannerComment.member.id,
-                bannerComment.member.email,
+                bannerComment.member.memberDetail.name,
+                uploadFile.path,
                 bannerComment.createAt))
             .from(bannerComment)
+            .leftJoin(uploadFile).on(bannerComment.member.memberDetail.profileImageId.eq(uploadFile.id))
             .where(bannerComment.banner.id.eq(bannerId))
             .orderBy(bannerComment.createAt.desc())
             .fetch();

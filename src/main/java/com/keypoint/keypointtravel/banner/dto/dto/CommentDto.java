@@ -15,16 +15,18 @@ public class CommentDto {
     private Long commentId;
     private String content;
     private Long writerId;
-    private String writerEmail;
+    private String writerName;
+    private String profileImageUrl;
     private LocalDateTime createAt;
 
-    public static CommentDto from(BannerComment comment) {
+    public static CommentDto of(BannerComment comment, CommentWriterDto dto) {
         return CommentDto.builder()
-                .commentId(comment.getId())
-                .content(comment.getContent())
-                .writerId(comment.getMember().getId())
-                .writerEmail(comment.getMember().getEmail())
-                .createAt(comment.getCreateAt())
-                .build();
+            .commentId(comment.getId())
+            .content(comment.getContent())
+            .writerId(dto.getWriterId())
+            .writerName(dto.getWriterName())
+            .profileImageUrl(dto.getProfileImageUrl())
+            .createAt(comment.getCreateAt())
+            .build();
     }
 }
