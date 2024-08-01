@@ -8,8 +8,9 @@ import lombok.Getter;
 public class ReissueUseCase {
 
     private String accessToken;
+    private String refreshToken;
 
-    public static ReissueUseCase from(String accessToken) {
+    public static ReissueUseCase of(String accessToken, String refreshToken) {
         return new ReissueUseCase(accessToken);
     }
 }
