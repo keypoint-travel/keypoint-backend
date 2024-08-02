@@ -11,6 +11,6 @@ public class ReissueUseCase {
     private String refreshToken;
 
     public static ReissueUseCase of(String accessToken, String refreshToken) {
-        return new ReissueUseCase(accessToken);
+        return new ReissueUseCase(accessToken, refreshToken);
     }
 }
