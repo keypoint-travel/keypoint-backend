@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.notification.service;
 
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
-import com.keypoint.keypointtravel.notification.repository.NotificationRepository;
+import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

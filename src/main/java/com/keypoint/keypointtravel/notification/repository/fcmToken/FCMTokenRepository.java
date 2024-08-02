@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.notification.repository;
+package com.keypoint.keypointtravel.notification.repository.fcmToken;
 
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.notification.dto.dto.CommonFCMTokenDTO;
@@ -14,7 +14,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
+public interface FCMTokenRepository extends JpaRepository<FCMToken, Long>,
+    FCMTokenCustomRepository {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<CommonFCMTokenDTO> findByToken(String token);

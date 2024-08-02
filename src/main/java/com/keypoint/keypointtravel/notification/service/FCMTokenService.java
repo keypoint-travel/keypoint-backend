@@ -1,11 +1,13 @@
 package com.keypoint.keypointtravel.notification.service;
 
+import com.keypoint.keypointtravel.global.enumType.error.FCMErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.CommonFCMTokenDTO;
 import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
 import com.keypoint.keypointtravel.notification.entity.FCMToken;
-import com.keypoint.keypointtravel.notification.repository.FCMTokenRepository;
+import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,18 @@ public class FCMTokenService {
             // 1-2. 새로운 토큰으로 저장
             FCMToken fcmToken = FCMToken.of(token, member);
             fcmTokenRepository.save(fcmToken);
+        }
+    }
+
+    public void deleteFCMToken(FCMTokenUseCase useCase) {
+        try {
+            long result = fcmTokenRepository.deleteFCMTokenByTokenAndMemberId(useCase);
+
+            if (result != 1) {
+                throw new GeneralException(FCMErrorCode.NOT_REGISTERED_FCM_TOKEN);
+            }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
         }
     }
 }

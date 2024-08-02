@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.notification.repository;
+package com.keypoint.keypointtravel.notification.repository.notification;
 
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
