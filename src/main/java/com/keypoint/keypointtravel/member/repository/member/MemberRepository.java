@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.member.repository.member;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     boolean existsByEmail(String email);
 
+    @Transactional
     @Modifying
     @Query("UPDATE Member m SET m.recentLoginAt = :recentLoginAt WHERE m.id = :id")
     int updateRecentLoginAtByMemberId(
@@ -25,6 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
         @Param("recentLoginAt") LocalDateTime recentLoginAt
     );
 
+    @Transactional
     @Modifying
     @Query("UPDATE Member m SET m.role = :role WHERE m.id = :id")
     int updateRole(
@@ -32,6 +35,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
         @Param("role") RoleType role
     );
 
+    @Transactional
     @Modifying
     @Query("UPDATE Member m SET m.password = :password WHERE m.id = :id")
     int updatePassword(
