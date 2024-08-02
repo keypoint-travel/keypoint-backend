@@ -28,7 +28,7 @@ public class FCMService {
             .setTitle(dto.getTitle())
             .setBody(dto.getBody())
             .build();
-        
+
         return Message
             .builder()
             .setNotification(notification)
