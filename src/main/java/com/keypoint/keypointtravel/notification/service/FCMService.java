@@ -4,8 +4,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.notification.dto.dto.fcm.FCMSendDTO;
+import com.keypoint.keypointtravel.notification.event.PushNotificationEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FCMService {
 
     private final FirebaseMessaging firebaseMessaging;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * FCM을 보낼 객체를 생성하는 함수
@@ -44,5 +48,12 @@ public class FCMService {
     public void sendMessageTo(FCMSendDTO fcmSendDto) throws FirebaseMessagingException {
         firebaseMessaging.send(
             makeMessage(fcmSendDto));
+    }
+
+    public void testEvent() {
+        eventPublisher.publishEvent(PushNotificationEvent.of(
+            PushNotificationType.EVENT_NOTICE,
+            1L
+        ));
     }
 }
