@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfi
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.OtherMemberUseCase;
+import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,18 @@ public class ReadMemberService {
         return memberRepository.findByEmail(email)
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
     }
+
+    /**
+     * memberId로 Member 조회하는 함수
+     *
+     * @param memberId Member를 조회할 memberId
+     * @return
+     */
+    public Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+            .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
+    }
+
 
     /**
      * 등록된 이메일인지 확인하는 함수
@@ -67,7 +80,8 @@ public class ReadMemberService {
      */
     public OtherMemberProfileResponse getOtherMemberProfile(OtherMemberUseCase useCase) {
         try {
-            return memberRepository.findOtherMemberProfile(useCase.getMyId(), useCase.getOtherMemberId());
+            return memberRepository.findOtherMemberProfile(useCase.getMyId(),
+                useCase.getOtherMemberId());
             // todo: 다른 회원의 프로필 조회 시, 해당 회원이 가지고 있는 배지 정보도 함께 조회하기 구현 필요
         } catch (Exception ex) {
             throw new GeneralException(ex);

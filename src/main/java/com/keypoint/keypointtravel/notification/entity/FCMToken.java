@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.notification.entity;
 
+import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import org.hibernate.annotations.Comment;
 @Getter
 @Table(name = "fcm_token")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FCMToken {
+public class FCMToken extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +34,13 @@ public class FCMToken {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public FCMToken(String token, Member member) {
+        this.token = token;
+        this.member = member;
+    }
+
+    public static FCMToken of(String token, Member member) {
+        return new FCMToken(token, member);
+    }
 }
