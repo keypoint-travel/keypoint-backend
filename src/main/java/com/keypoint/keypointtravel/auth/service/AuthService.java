@@ -1,13 +1,6 @@
 package com.keypoint.keypointtravel.auth.service;
 
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.keypoint.keypointtravel.auth.dto.dto.CommonRefreshTokenDTO;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.dto.useCase.LogoutUseCase;
@@ -26,8 +19,13 @@ import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
 import com.keypoint.keypointtravel.oauth.service.OAuthServiceFactory;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -64,7 +62,8 @@ public class AuthService {
             String email = userDetails.getEmail();
 
             // 2. refresh token 유효성 확인
-            CommonRefreshTokenDTO refreshTokenDTO = refreshTokenService.findRefreshTokenByEmail(email);
+            CommonRefreshTokenDTO refreshTokenDTO = refreshTokenService.findRefreshTokenByEmail(
+                email);
             if (refreshTokenDTO == null) { // 토큰이 만료되어 존재하지 않는 경우
                 throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.EXPIRED_TOKEN);
             }
@@ -72,10 +71,11 @@ public class AuthService {
 
             // 2-1. 저장된 refresh_token과 요청한 refresh_token이 동일한지 확인
             // 다른 경우: 토큰이 탈취된 경우 
-            if (refreshToken.equals(useCase.getRefreshToken())) {
-                throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.INVALID_TOKEN, "저장된 refresh token과 유효하지 않습니다.");
+            if (!refreshToken.equals(useCase.getRefreshToken())) {
+                throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.INVALID_TOKEN,
+                    "저장된 refresh token과 유효하지 않습니다.");
             }
-                
+
             // 2-2. refresh token 토큰이 유효한지 확인
             TokenErrorCode validateResult = tokenProvider.validateToken(refreshToken);
             if (validateResult != TokenErrorCode.NONE) {
