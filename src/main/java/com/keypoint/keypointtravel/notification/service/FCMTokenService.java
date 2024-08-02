@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.notification.service;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.CommonFCMTokenDTO;
-import com.keypoint.keypointtravel.notification.dto.useCase.CreateFCMTokenUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
 import com.keypoint.keypointtravel.notification.entity.FCMToken;
 import com.keypoint.keypointtravel.notification.repository.FCMTokenRepository;
 import java.util.Optional;
@@ -24,7 +24,8 @@ public class FCMTokenService {
      *
      * @param useCase
      */
-    public void addFCMToken(CreateFCMTokenUseCase useCase) {
+    @Transactional
+    public void addFCMToken(FCMTokenUseCase useCase) {
         Long memberId = useCase.getMemberId();
         Member member = readMemberService.findMemberById(memberId);
         String token = useCase.getFcmToken();

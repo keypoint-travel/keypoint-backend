@@ -4,9 +4,9 @@ import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
-import com.keypoint.keypointtravel.notification.dto.request.CreateFCMTokenRequest;
+import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
 import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
-import com.keypoint.keypointtravel.notification.dto.useCase.CreateFCMTokenUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMTokenService;
 import com.keypoint.keypointtravel.notification.service.NotificationService;
@@ -52,8 +52,8 @@ public class NotificationController {
     @PostMapping("/fcm-token")
     public APIResponseEntity<Void> addFCMToken(
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @Valid @RequestBody CreateFCMTokenRequest request) {
-        CreateFCMTokenUseCase useCase = CreateFCMTokenUseCase.of(
+        @Valid @RequestBody FCMTokenRequest request) {
+        FCMTokenUseCase useCase = FCMTokenUseCase.of(
             userDetails.getId(),
             request
         );
