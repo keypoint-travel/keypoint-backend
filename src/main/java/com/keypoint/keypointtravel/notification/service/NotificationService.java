@@ -19,6 +19,7 @@ public class NotificationService {
      *
      * @param useCase 알림 변경 사항 데이터
      */
+    @Transactional
     public void updateNotification(UpdateNotificationUseCase useCase) {
         try {
             notificationRepository.updateNotification(useCase);
