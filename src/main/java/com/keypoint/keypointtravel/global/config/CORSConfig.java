@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.global.config;
 
 import java.util.Arrays;
 import java.util.Collections;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,6 +24,7 @@ public class CORSConfig {
                 "http://192.168.1.8:8000",
                 "http://192.168.1.8:9000",
                 "http://192.168.1.8:9500",
+                "http://192.168.1.10:9500",  
                 "http://10.0.2.2:9500",
                 "http://10.0.2.2:9000",
                 "http://10.0.2.2:8000",
