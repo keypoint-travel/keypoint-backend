@@ -20,7 +20,7 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.member.repository.memberConsent.MemberConsentRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.entity.Notification;
-import com.keypoint.keypointtravel.notification.repository.NotificationRepository;
+import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

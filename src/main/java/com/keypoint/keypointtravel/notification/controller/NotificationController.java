@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +62,23 @@ public class NotificationController {
 
         return APIResponseEntity.<Void>builder()
             .message("FCM 토큰 등록 성공")
+            .data(null)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @DeleteMapping("/fcm-token")
+    public APIResponseEntity<Void> deleteFCMToken(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @Valid @RequestBody FCMTokenRequest request) {
+        FCMTokenUseCase useCase = FCMTokenUseCase.of(
+            userDetails.getId(),
+            request
+        );
+        fcmTokenService.deleteFCMToken(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("FCM 토큰 삭제 성공")
             .data(null)
             .build();
     }

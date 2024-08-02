@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.notification.repository;
+package com.keypoint.keypointtravel.notification.repository.notification;
 
 import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
 import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
