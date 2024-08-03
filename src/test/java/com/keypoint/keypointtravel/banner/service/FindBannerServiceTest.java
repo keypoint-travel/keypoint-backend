@@ -56,6 +56,6 @@ public class FindBannerServiceTest {
     }
 
     private CommentDto buildCommentDto(Long commentId, Long writerId) {
-        return new CommentDto(commentId, "content", writerId, "email", LocalDateTime.now());
+        return new CommentDto(commentId, "content", writerId, "name", "image" ,LocalDateTime.now());
     }
 }

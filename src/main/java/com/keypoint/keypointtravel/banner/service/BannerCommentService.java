@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
+import com.keypoint.keypointtravel.banner.dto.dto.CommentWriterDto;
 import com.keypoint.keypointtravel.banner.dto.dto.UpdateCommentDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CreateCommentUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.DeleteCommentUseCase;
@@ -46,7 +47,9 @@ public class BannerCommentService {
         } catch (Exception e) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
-        return CommentDto.from(comment);
+        // 댓글을 작성한 작성자 정보 조회
+        CommentWriterDto dto = bannerCommentRepository.findWriterById(useCase.getWriterId());
+        return CommentDto.of(comment, dto);
     }
 
     /**

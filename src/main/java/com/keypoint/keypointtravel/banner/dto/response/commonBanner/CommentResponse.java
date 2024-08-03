@@ -12,10 +12,17 @@ public class CommentResponse {
     private Long commentId;
     private String content;
     private Long writerId;
-    private String writerEmail;
+    private String writerName;
+    private String profileImageUrl;
     private LocalDateTime createAt;
 
     public static CommentResponse from(CommentDto data) {
-        return new CommentResponse(data.getCommentId(), data.getContent(), data.getWriterId(), data.getWriterEmail(), data.getCreateAt());
+        return new CommentResponse(
+            data.getCommentId(),
+            data.getContent(),
+            data.getWriterId(),
+            data.getWriterName(),
+            data.getProfileImageUrl(),
+            data.getCreateAt());
     }
 }

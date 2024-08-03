@@ -8,16 +8,16 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ThumbnailUseCase {
+public class CommonBannerThumbnailUseCase {
 
     private Long bannerId;
-    private String thumbnailImage;
+    private String thumbnailImageUrl;
     private String title;
 
-    static public ThumbnailUseCase from(Banner banner) {
-        return ThumbnailUseCase.builder()
+    static public CommonBannerThumbnailUseCase from(Banner banner) {
+        return CommonBannerThumbnailUseCase.builder()
             .bannerId(banner.getId())
-            .thumbnailImage(banner.getThumbnailImage())
+            .thumbnailImageUrl(banner.getThumbnailImage())
             .title(banner.getThumbnailTitle())
             .build();
     }

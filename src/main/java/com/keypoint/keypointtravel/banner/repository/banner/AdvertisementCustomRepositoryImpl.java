@@ -1,0 +1,81 @@
+package com.keypoint.keypointtravel.banner.repository.banner;
+
+import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
+import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
+import com.keypoint.keypointtravel.banner.entity.QAdvertisementBanner;
+import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.member.entity.QMemberDetail;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
+import static com.querydsl.jpa.JPAExpressions.select;
+
+@RequiredArgsConstructor
+public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRepository {
+
+    private final JPAQueryFactory queryFactory;
+
+    private final QAdvertisementBanner advertisementBanner = QAdvertisementBanner.advertisementBanner;
+
+    private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
+
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
+
+    @Override
+    public List<AdvertisementBannerDto> findAdvertisementBanners() {
+        return queryFactory.select(Projections.constructor(AdvertisementBannerDto.class,
+                advertisementBanner.id,
+                advertisementBanner.title,
+                advertisementBanner.content,
+                select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.thumbnailImageId)),
+                select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.detailImageId)),
+                advertisementBanner.createAt,
+                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBanner.registerId)),
+                advertisementBanner.modifyAt,
+                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBanner.modifyId))
+            ))
+            .from(advertisementBanner)
+            .where(advertisementBanner.isExposed.isTrue())
+            .orderBy(advertisementBanner.createAt.desc())
+            .fetch();
+    }
+
+    @Override
+    public Long updateIsExposedById(Long bannerId) {
+        return queryFactory.update(advertisementBanner)
+            .set(advertisementBanner.isExposed, false)
+            .where(advertisementBanner.id.eq(bannerId))
+            .execute();
+    }
+
+    @Override
+    public AdvertisementDetailDto findAdvertisementBannerById(Long bannerId) {
+        return queryFactory.select(Projections.constructor(AdvertisementDetailDto.class,
+                advertisementBanner.id,
+                advertisementBanner.title,
+                advertisementBanner.content,
+                uploadFile.path
+            ))
+            .from(advertisementBanner)
+            .leftJoin(uploadFile).on(advertisementBanner.detailImageId.eq(uploadFile.id))
+            .where(advertisementBanner.id.eq(bannerId).and(advertisementBanner.isExposed.isTrue()))
+            .fetchOne();
+    }
+
+    @Override
+    public List<AdvertisementThumbnailDto> findAdvertisementThumbnailList() {
+        return queryFactory.select(Projections.constructor(AdvertisementThumbnailDto.class,
+                advertisementBanner.id,
+                uploadFile.path,
+                advertisementBanner.title
+            ))
+            .from(advertisementBanner)
+            .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))
+            .where(advertisementBanner.isExposed.isTrue())
+            .fetch();
+    }
+}
