@@ -17,24 +17,7 @@ public class CORSConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(
-            Arrays.asList(
-                "http://localhost:9000",
-                "http://localhost:8000",
-                "http://192.168.1.8:8000",
-                "http://192.168.1.8:9000",
-                "http://192.168.1.8:9500",
-                "http://192.168.1.10:9500",  
-                "http://10.0.2.2:9500",
-                "http://10.0.2.2:9000",
-                "http://10.0.2.2:8000",
-                "capacitor://",
-                "capacitor://localhost",
-                "https://m.keypointtravel.com",
-                "https://m.keypointtravel.com",
-                "https://m-dev.keypointtravel.com",
-                "https://appleid.apple.com")
-        );
+        config.setAllowedOriginPatterns(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(
             Arrays.asList("HEAD", "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
