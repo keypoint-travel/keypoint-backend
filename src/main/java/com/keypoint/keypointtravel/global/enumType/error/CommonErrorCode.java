@@ -12,6 +12,7 @@ public enum CommonErrorCode implements ErrorCode {
     OPEN_API_REQUEST_FAIL("003_OPEN_API_REQUEST_FAIL", "외부 API 요청에 실패하였습니다."),
     FAIL_TO_CONVERT_FILE("004_FAIL_TO_CONVERT_FILE", "파일을 변환하는데 실패하였습니다."),
     FAIL_TO_SEND_EMAIL("005_FAIL_TO_SEND_EMAIL", "이메일 전송에 실패하였습니다."),
+    FAIL_TO_FIND_LANGUAGE("006_FAIL_TO_FIND_LANGUAGE", "다국어를 찾는데 실패했습니다."),
 
     ACCESS_DENIED_ACCOUNT("301_ACCESS_DENIED_ACCOUNT", "접근 권한이 없는 요청입니다.");
     private final String code;
