@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignInvitePushNotificationEvent.CampaignInviteData;
+import com.keypoint.keypointtravel.notification.event.pushNotification.FrendInvitePushNotificationEvent.FrendInviteData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import java.util.ArrayList;
@@ -29,43 +30,99 @@ public class PushNotificationService {
      * @param languageCode 언어 코드
      * @return
      */
-    public PushNotificationDTO generateNotification(PushNotificationEvent event,
+    public PushNotificationDTO generateNotificationDTO(PushNotificationEvent event,
         LanguageCode languageCode) {
         PushNotificationType type = event.getPushNotificationType();
         Object additionalData = event.getAdditionalData();
 
         switch (type) {
             case FRIEND_INVITE -> {
-                if (additionalData instanceof CampaignInviteData) {
+                if (additionalData instanceof FrendInviteData) {
+                    FrendInviteData data = (FrendInviteData) additionalData;
+
                     // 1. FCM 내용 구성
                     String title = MessageSourceUtils.getLocalizedLanguage(
                         type.getTitleLangCode(), languageCode.getLocale());
-                    String content = MessageSourceUtils.getLocalizedLanguage(
-                        type.getContentLangCode(), languageCode.getLocale());
+                    String content = String.format("초대자: %s 캠페인 명: %s", data.getInviteeName(),
+                        data.getCampaignName());
+                    //MessageSourceUtils.getLocalizedLanguage(type.getContentLangCode(), languageCode.getLocale());
 
                     return PushNotificationDTO.of(title, content);
                 }
             }
             case CAMPAIGN_START -> {
+                if (additionalData instanceof String) {
+                    // 1. FCM 내용 구성
+                    String title = MessageSourceUtils.getLocalizedLanguage(
+                        type.getTitleLangCode(), languageCode.getLocale());
+                    String content = String.format(" 캠페인 명: %s", additionalData);
 
+                    return PushNotificationDTO.of(title, content);
+                }
             }
             case CAMPAIGN_END -> {
+                if (additionalData instanceof String) {
+                    // 1. FCM 내용 구성
+                    String title = MessageSourceUtils.getLocalizedLanguage(
+                        type.getTitleLangCode(), languageCode.getLocale());
+                    String content = String.format(" 캠페인 명: %s", additionalData);
 
+                    return PushNotificationDTO.of(title, content);
+                }
             }
             case CAMPAIGN_D_DAY -> {
+                if (additionalData instanceof String) {
+                    // 1. FCM 내용 구성
+                    String title = MessageSourceUtils.getLocalizedLanguage(
+                        type.getTitleLangCode(), languageCode.getLocale());
+                    String content = String.format(" 캠페인 명: %s", additionalData);
 
+                    return PushNotificationDTO.of(title, content);
+                }
             }
             case CAMPAIGN_INVITE -> {
+                if (additionalData instanceof String) {
+                    // 1. FCM 내용 구성
+                    String title = MessageSourceUtils.getLocalizedLanguage(
+                        type.getTitleLangCode(), languageCode.getLocale());
+                    String content = String.format(" 캠페인 명: %s", additionalData);
 
+                    return PushNotificationDTO.of(title, content);
+                }
             }
             case CAMPAIGN_REGISTRATION -> {
+                if (additionalData instanceof CampaignInviteData) {
+                    CampaignInviteData data = (CampaignInviteData) additionalData;
 
+                    // 1. FCM 내용 구성
+                    String title = MessageSourceUtils.getLocalizedLanguage(
+                        type.getTitleLangCode(), languageCode.getLocale());
+                    String content = String.format("등록한 사람: %s 캠페인 명: %s", data.getRegister(),
+                        data.getCampaignName());
+                    //MessageSourceUtils.getLocalizedLanguage(type.getContentLangCode(), languageCode.getLocale());
+
+                    return PushNotificationDTO.of(title, content);
+                }
             }
             case EVENT_NOTICE -> {
+                if (additionalData instanceof String) {
+                    // 1. FCM 내용 구성
+                    String title = MessageSourceUtils.getLocalizedLanguage(
+                        type.getTitleLangCode(), languageCode.getLocale());
+                    String content = String.format(" 캠페인 명: %s", additionalData);
 
+                    return PushNotificationDTO.of(title, content);
+                }
             }
             case PAYMENT_COMPLETION -> {
+                // 1. FCM 내용 구성
+                String title = MessageSourceUtils.getLocalizedLanguage(
+                    type.getTitleLangCode(), languageCode.getLocale());
+                String content =
+                    MessageSourceUtils.getLocalizedLanguage(type.getContentLangCode(),
+                        languageCode.getLocale());
 
+                return PushNotificationDTO.of(title, content);
             }
         }
 

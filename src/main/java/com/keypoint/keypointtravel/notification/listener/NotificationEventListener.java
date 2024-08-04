@@ -47,7 +47,7 @@ public class NotificationEventListener {
             LanguageCode languageCode = member.getMemberDetail().getLanguage();
 
             // 1. FCM 내용 구성
-            PushNotificationDTO notificationContent = pushNotificationService.generateNotification(
+            PushNotificationDTO notificationContent = pushNotificationService.generateNotificationDTO(
                 event,
                 languageCode);
             if (notificationContent == null) {
@@ -87,7 +87,6 @@ public class NotificationEventListener {
                 type,
                 member);
             pushNotificationHistoryService.savePushNotificationHistory(history);
-
         }
     }
 }

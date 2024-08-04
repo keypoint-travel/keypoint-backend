@@ -4,45 +4,45 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import java.util.List;
 import lombok.Getter;
 
-public class CampaignInvitePushNotificationEvent extends PushNotificationEvent {
+public class FrendInvitePushNotificationEvent extends PushNotificationEvent {
 
-    private String register;
+    private String inviteeName;
     private String campaignName;
 
 
-    public CampaignInvitePushNotificationEvent(
+    public FrendInvitePushNotificationEvent(
         PushNotificationType type,
         List<Long> userIds,
         String campaignName,
-        String register
+        String inviteeName
     ) {
         super(type, userIds);
         this.campaignName = campaignName;
-        this.register = register;
+        this.inviteeName = inviteeName;
     }
 
-    public static CampaignInvitePushNotificationEvent of(
+    public static FrendInvitePushNotificationEvent of(
         PushNotificationType type,
         List<Long> userIds,
         String campaignName,
-        String register
+        String inviteeName
     ) {
-        return new CampaignInvitePushNotificationEvent(type, userIds, campaignName, register);
+        return new FrendInvitePushNotificationEvent(type, userIds, campaignName, inviteeName);
     }
 
     @Override
     public Object getAdditionalData() {
-        return new CampaignInviteData(campaignName, register);
+        return new FrendInviteData(campaignName, inviteeName);
     }
 
     @Getter
-    public static class CampaignInviteData {
+    public static class FrendInviteData {
 
-        private String register;
+        private String inviteeName;
         private String campaignName;
 
-        public CampaignInviteData(String register, String campaignName) {
-            this.register = register;
+        public FrendInviteData(String inviteeName, String campaignName) {
+            this.inviteeName = inviteeName;
             this.campaignName = campaignName;
         }
     }
