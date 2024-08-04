@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.notification.dto.dto.CommonFCMTokenDTO;
 import com.keypoint.keypointtravel.notification.entity.FCMToken;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -27,4 +28,7 @@ public interface FCMTokenRepository extends JpaRepository<FCMToken, Long>,
         @Param("id") Long id,
         @Param("member") Member member
     );
+
+    @Query("SELECT f.token FROM FCMToken f WHERE f.member.id = :memberId")
+    List<String> findTokenByMemberId(@Param("memberId") Long memberId);
 }

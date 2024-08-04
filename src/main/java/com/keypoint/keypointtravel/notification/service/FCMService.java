@@ -1,12 +1,8 @@
 package com.keypoint.keypointtravel.notification.service;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
-import com.keypoint.keypointtravel.notification.dto.dto.fcm.FCMSendDTO;
-import com.keypoint.keypointtravel.notification.event.PushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignInvitePushNotificationEvent;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -17,43 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FCMService {
 
-    private final FirebaseMessaging firebaseMessaging;
     private final ApplicationEventPublisher eventPublisher;
 
-    /**
-     * FCM을 보낼 객체를 생성하는 함수
-     *
-     * @param dto
-     * @return
-     */
-    public static Message makeMessage(FCMSendDTO dto) {
-        Notification notification = Notification
-            .builder()
-            .setTitle(dto.getTitle())
-            .setBody(dto.getBody())
-            .build();
-
-        return Message
-            .builder()
-            .setNotification(notification)
-            .setToken(dto.getToken())
-            .build();
-    }
-
-    /**
-     * 푸시 메시지 처리를 수행하는 비즈니스 로직
-     *
-     * @param fcmSendDto fcm 보낼 데이터
-     */
-    public void sendMessageTo(FCMSendDTO fcmSendDto) throws FirebaseMessagingException {
-        firebaseMessaging.send(
-            makeMessage(fcmSendDto));
-    }
-
     public void testEvent() {
-        eventPublisher.publishEvent(PushNotificationEvent.of(
-            PushNotificationType.EVENT_NOTICE,
-            1L
+        eventPublisher.publishEvent(CampaignInvitePushNotificationEvent.of(
+            PushNotificationType.FRIEND_INVITE,
+            List.of(5L),
+            "캠페인명",
+            "초대자"
         ));
     }
 }

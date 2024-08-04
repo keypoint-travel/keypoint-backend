@@ -33,4 +33,7 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
 
     @Query("SELECT md.profileImageId FROM MemberDetail md WHERE md.member.id = :memberId")
     Optional<Long> findProfileImageIdByMemberId(@Param("memberId") Long memberId);
+
+    @Query("SELECT md.language FROM MemberDetail md WHERE md.member.id = :memberId")
+    LanguageCode findLanguageCodeByMemberId(@Param("memberId") Long memberId);
 }
