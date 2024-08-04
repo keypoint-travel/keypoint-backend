@@ -11,7 +11,7 @@ public abstract class PushNotificationEvent {
 
     private PushNotificationType pushNotificationType; // 푸시 알림 타입
 
-    private List<Long> userId; // 푸시 알림을 보낼 사용자 idc
-    
+    private List<Long> memberIds; // 푸시 알림을 보낼 사용자 idc
+
     public abstract Object getAdditionalData();
 }

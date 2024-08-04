@@ -18,13 +18,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "push_notification_type")
+@Table(name = "push_notification_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PushNotificationHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "push_notification_type_id")
+    @Column(name = "push_notification_history_id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -42,4 +42,26 @@ public class PushNotificationHistory extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isRead;
+
+    public PushNotificationHistory(
+        String title,
+        String content,
+        PushNotificationType type,
+        Member member
+    ) {
+        this.member = member;
+        this.title = title;
+        this.content = content;
+        this.type = type;
+        this.isRead = false;
+    }
+
+    public static PushNotificationHistory of(
+        String title,
+        String content,
+        PushNotificationType type,
+        Member member
+    ) {
+        return new PushNotificationHistory(title, content, type, member);
+    }
 }
