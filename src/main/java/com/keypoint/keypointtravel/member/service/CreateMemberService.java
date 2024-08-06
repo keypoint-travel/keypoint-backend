@@ -127,7 +127,7 @@ public class CreateMemberService {
             // 2. 이메일 전송
             Map<String, String> emailContent = new HashMap<>();
             emailContent.put("code", code);
-            EmailUtils.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
+            EmailUtils.sendSingleEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
 
             // 3. 이메일 전송이 성공일 경우, 인증 코드 저장
             emailVerificationCodeService.saveEmailVerificationCode(email, code);
