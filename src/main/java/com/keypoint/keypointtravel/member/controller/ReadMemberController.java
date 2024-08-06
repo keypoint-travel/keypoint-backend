@@ -29,13 +29,13 @@ public class ReadMemberController {
     private final ReadMemberService readMemberService;
 
     @PostMapping("/email/validate")
-    public APIResponseEntity<IsExistedResponse> checkIsExistedEmail(
+    public APIResponseEntity<IsExistedResponse> checkIsNotExistedEmail(
         @Valid @RequestBody EmailRequest request) {
         EmailUseCase useCase = EmailUseCase.from(request);
-        boolean result = readMemberService.checkIsExistedEmail(useCase);
+        boolean result = readMemberService.checkIsNotExistedEmail(useCase);
 
         return APIResponseEntity.<IsExistedResponse>builder()
-            .message("이메일 인증 성공")
+            .message("등록되지 않은 이메일 확인 성공")
             .data(IsExistedResponse.from(result))
             .build();
     }
