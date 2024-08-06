@@ -8,13 +8,19 @@ import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
 import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
+import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMTokenService;
 import com.keypoint.keypointtravel.notification.service.NotificationService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +39,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final FCMTokenService fcmTokenService;
-    private final PushNotificationHistoryService pushNotificationHistoryService;
+    private final PushNotificationHistoryService pushHistoryService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PatchMapping("")
@@ -89,15 +95,16 @@ public class NotificationController {
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/api/v1/alarms/push")
-    public APIResponseEntity<Void> findPushNotificationHistory(
+    @GetMapping("/push")
+    public APIResponseEntity<Slice<PushHistoryResponse>> findPushNotificationHistory(
+        @PageableDefault(size = 15, sort = "arrivedAt", direction = Sort.Direction.DESC) Pageable pageable,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
-        pushNotificationHistoryService.findPushNotificationHistory(useCase);
+        ReadPushHistoryUseCase useCase = ReadPushHistoryUseCase.of(userDetails.getId(), pageable);
+        Slice<PushHistoryResponse> result = pushHistoryService.findPushHistories(useCase);
 
-        return APIResponseEntity.<Void>builder()
+        return APIResponseEntity.<Slice<PushHistoryResponse>>builder()
             .message("푸시 알림 이력 조회 성공")
-            .data(null)
+            .data(result)
             .build();
     }
 
@@ -106,12 +113,12 @@ public class NotificationController {
     public APIResponseEntity<IsExistedResponse> checkIsExistedUnreadPushNotification(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
-        IsExistedResponse response = pushNotificationHistoryService.checkIsExistedUnreadPushNotification(
+        IsExistedResponse result = pushHistoryService.checkIsExistedUnreadPushNotification(
             useCase);
 
         return APIResponseEntity.<IsExistedResponse>builder()
             .message("읽지 않은 알림 존재 확인 성공")
-            .data(response)
+            .data(result)
             .build();
     }
 }

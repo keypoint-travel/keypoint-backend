@@ -3,9 +3,12 @@ package com.keypoint.keypointtravel.notification.service;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
+import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
+import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.repository.pushNotificationHistory.PushNotificationHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,14 @@ public class PushNotificationHistoryService {
      *
      * @param useCase
      */
-    public void findPushNotificationHistory(MemberIdUseCase useCase) {
+    public Slice<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
+        try {
+            return pushNotificationHistoryRepository.findPushHistories(
+                useCase.getMemberId(),
+                useCase.getPageable()
+            );
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }
