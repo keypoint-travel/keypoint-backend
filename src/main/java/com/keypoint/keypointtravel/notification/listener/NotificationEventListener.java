@@ -2,13 +2,17 @@ package com.keypoint.keypointtravel.notification.listener;
 
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
+import com.keypoint.keypointtravel.global.enumType.notification.MarketingNotificationType;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
+import com.keypoint.keypointtravel.notification.event.marketingNotification.MarketingNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
@@ -88,5 +92,19 @@ public class NotificationEventListener {
                 member);
             pushNotificationHistoryService.savePushNotificationHistory(history);
         }
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void sendMarketingNotification(MarketingNotificationEvent event) {
+        MarketingNotificationType type = event.getMarketingNotificationType();
+        EmailTemplate emailTemplate = type.getTemplate();
+
+        // TODO 나중에 이메일 템플릿에 맞게 수정 필요
+        EmailUtils.sendMultiEmail(
+            event.getMemberEmails()
+            , emailTemplate,
+            null
+        );
     }
 }
