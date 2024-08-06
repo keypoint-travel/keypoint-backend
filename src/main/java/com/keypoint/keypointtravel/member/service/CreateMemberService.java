@@ -151,6 +151,8 @@ public class CreateMemberService {
             boolean result = emailVerificationCode != null;
             if (emailVerificationCode != null) {
                 emailVerificationCodeService.deleteEmailVerificationCode(emailVerificationCode);
+            } else { // 이메일 인증 실패 에러 반환
+                throw new GeneralException(MemberErrorCode.FAIL_TO_CONFIRM_EMAIL);
             }
 
             return result;
