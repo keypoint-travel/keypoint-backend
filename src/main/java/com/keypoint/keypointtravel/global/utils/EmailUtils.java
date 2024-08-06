@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,17 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class EmailService {
+public class EmailUtils {
 
-    private final JavaMailSender javaMailSender;
-    private final SpringTemplateEngine templateEngine;
+    private static JavaMailSender javaMailSender;
+    private static SpringTemplateEngine templateEngine;
+
+
+    @Autowired
+    public EmailUtils(JavaMailSender javaMailSender, SpringTemplateEngine templateEngine) {
+        EmailUtils.javaMailSender = javaMailSender;
+        EmailUtils.templateEngine = templateEngine;
+    }
 
     /**
      * 이메일 전송 함수
@@ -30,7 +38,7 @@ public class EmailService {
      * @param emailContent 이메일 매핑 내용
      * @return 이메일 성공 여부
      */
-    public void sendEmail(String receiver, EmailTemplate template,
+    public static void sendEmail(String receiver, EmailTemplate template,
         Map<String, String> emailContent) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 

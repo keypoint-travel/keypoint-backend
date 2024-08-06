@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.global.utils.EmailService;
+import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
@@ -42,7 +42,6 @@ public class CreateMemberService {
     private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationCodeService emailVerificationCodeService;
-    private final EmailService emailService;
 
     /**
      * Member 생성하는 함수 (일반 회원가입)
@@ -128,7 +127,7 @@ public class CreateMemberService {
             // 2. 이메일 전송
             Map<String, String> emailContent = new HashMap<>();
             emailContent.put("code", code);
-            emailService.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
+            EmailUtils.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
 
             // 3. 이메일 전송이 성공일 경우, 인증 코드 저장
             emailVerificationCodeService.saveEmailVerificationCode(email, code);
