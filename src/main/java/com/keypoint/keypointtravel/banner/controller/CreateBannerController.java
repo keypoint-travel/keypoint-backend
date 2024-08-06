@@ -8,16 +8,12 @@ import com.keypoint.keypointtravel.banner.dto.response.ImageListResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.SaveUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.service.CreateBannerService;
-import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
-import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
-import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
-import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
-import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
-import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import com.keypoint.keypointtravel.banner.service.TourismApiService;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
+import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,10 +51,10 @@ public class CreateBannerController {
             bannerListRequest.getPage(),
             serviceKey,
             BannerCode.getConstant(AreaCode.class, bannerListRequest.getRegion()).getCode(),
-            BannerCode.getConstant(ContentType.class, bannerListRequest.getTourType()).getCode(),
-            BannerCode.getConstant(LargeCategory.class, bannerListRequest.getCat1()).getCode(),
-            BannerCode.getConstant(MiddleCategory.class, bannerListRequest.getCat2()).getCode(),
-            BannerCode.getConstant(SmallCategory.class, bannerListRequest.getCat3()).getCode()
+            bannerListRequest.getTourType(),
+            bannerListRequest.getCat1(),
+            bannerListRequest.getCat2(),
+            bannerListRequest.getCat3()
         );
 
         return APIResponseEntity.<ContentListResponse>builder()
