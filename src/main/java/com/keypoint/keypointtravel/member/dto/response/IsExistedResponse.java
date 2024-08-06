@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class IsExistedEmailResponse {
+public class IsExistedResponse {
 
     private Boolean isExisted;
 
-    public static IsExistedEmailResponse from(boolean isExisted) {
-        return new IsExistedEmailResponse(isExisted);
+    public static IsExistedResponse from(boolean isExisted) {
+        return new IsExistedResponse(isExisted);
     }
 }

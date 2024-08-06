@@ -4,17 +4,21 @@ import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
+import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
 import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
 import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMTokenService;
 import com.keypoint.keypointtravel.notification.service.NotificationService;
+import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +33,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final FCMTokenService fcmTokenService;
+    private final PushNotificationHistoryService pushNotificationHistoryService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PatchMapping("")
@@ -80,6 +85,33 @@ public class NotificationController {
         return APIResponseEntity.<Void>builder()
             .message("FCM 토큰 삭제 성공")
             .data(null)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/api/v1/alarms/push")
+    public APIResponseEntity<Void> findPushNotificationHistory(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
+        pushNotificationHistoryService.findPushNotificationHistory(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("푸시 알림 이력 조회 성공")
+            .data(null)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/push/unread")
+    public APIResponseEntity<IsExistedResponse> checkIsExistedUnreadPushNotification(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
+        IsExistedResponse response = pushNotificationHistoryService.checkIsExistedUnreadPushNotification(
+            useCase);
+
+        return APIResponseEntity.<IsExistedResponse>builder()
+            .message("읽지 않은 알림 존재 확인 성공")
+            .data(response)
             .build();
     }
 }

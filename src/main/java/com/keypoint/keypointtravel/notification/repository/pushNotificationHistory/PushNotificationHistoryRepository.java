@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PushNotificationHistoryRepository extends
-    JpaRepository<PushNotificationHistory, Long> {
+    JpaRepository<PushNotificationHistory, Long>, PushNotificationHistoryCustomRepository {
 
 }

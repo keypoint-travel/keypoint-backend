@@ -1,5 +1,8 @@
 package com.keypoint.keypointtravel.notification.service;
 
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.repository.pushNotificationHistory.PushNotificationHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +20,29 @@ public class PushNotificationHistoryService {
     @Transactional
     public void savePushNotificationHistory(PushNotificationHistory history) {
         pushNotificationHistoryRepository.save(history);
+    }
+
+    /**
+     * 읽지 않은 알림이 존재하는지 확인하는 함수
+     *
+     * @param useCase
+     */
+    public IsExistedResponse checkIsExistedUnreadPushNotification(MemberIdUseCase useCase) {
+        try {
+            boolean isExisted = pushNotificationHistoryRepository.existsByIsReadFalseAndMemberId(
+                useCase.getMemberId());
+
+            return IsExistedResponse.from(isExisted);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 푸시 이력 조회 함수 - 조회한 함수는 isRead:true 로 변경
+     *
+     * @param useCase
+     */
+    public void findPushNotificationHistory(MemberIdUseCase useCase) {
     }
 }

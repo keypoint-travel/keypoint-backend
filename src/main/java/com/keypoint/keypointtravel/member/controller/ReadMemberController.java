@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.member.controller;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
-import com.keypoint.keypointtravel.member.dto.response.IsExistedEmailResponse;
+import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
@@ -29,14 +29,14 @@ public class ReadMemberController {
     private final ReadMemberService readMemberService;
 
     @PostMapping("/email/validate")
-    public APIResponseEntity<IsExistedEmailResponse> checkIsExistedEmail(
+    public APIResponseEntity<IsExistedResponse> checkIsExistedEmail(
         @Valid @RequestBody EmailRequest request) {
         EmailUseCase useCase = EmailUseCase.from(request);
         boolean result = readMemberService.checkIsExistedEmail(useCase);
 
-        return APIResponseEntity.<IsExistedEmailResponse>builder()
+        return APIResponseEntity.<IsExistedResponse>builder()
             .message("이메일 인증 성공")
-            .data(IsExistedEmailResponse.from(result))
+            .data(IsExistedResponse.from(result))
             .build();
     }
 
