@@ -1,7 +1,6 @@
 package com.keypoint.keypointtravel.notice.Entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import com.keypoint.keypointtravel.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "friend")
+@Table(name = "notice")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice extends BaseEntity {
 
