@@ -1,5 +1,13 @@
 package com.keypoint.keypointtravel.oauth.service;
 
+import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
+import com.keypoint.keypointtravel.global.utils.HttpUtils;
+import com.keypoint.keypointtravel.oauth.dto.request.ReissueGoogleRequest;
+import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
+import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
+import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -8,14 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
-import com.keypoint.keypointtravel.global.utils.HttpUtils;
-import com.keypoint.keypointtravel.oauth.dto.request.ReissueGoogleRequest;
-import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
-import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,6 +32,11 @@ public class AppleOAuthService implements OAuthService {
 
     @Value("${spring.security.oauth2.client.registration.apple.clientSecret}")
     private String clientSecret;
+
+    @Override
+    public OauthLoginResponse login(OauthLoginUseCase useCase) {
+        return null;
+    }
 
     @Override
     public void reissue(Long memberId) {
