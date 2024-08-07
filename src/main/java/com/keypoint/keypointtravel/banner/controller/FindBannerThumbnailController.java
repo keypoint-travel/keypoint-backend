@@ -20,11 +20,12 @@ public class FindBannerThumbnailController {
     @GetMapping("/api/v1/banners/exposure")
     public APIResponseEntity<ThumbnailListResponse> findThumbnailList() {
 
+        ThumbnailListResponse response = new ThumbnailListResponse();
+        response.addCommonBanner(findBannerService.findThumbnailList());
+        response.addAdvertisementBanner(advertisementBannerService.findThumbnailList());
         return APIResponseEntity.<ThumbnailListResponse>builder()
             .message("노출된 배너 목록 조회")
-            .data(new ThumbnailListResponse(
-                findBannerService.findThumbnailList(),
-                advertisementBannerService.findThumbnailList()))
+            .data(response)
             .build();
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommonBannerResponse {
 
-    private Long bannerId;
+    private String contentId;
     private String thumbnailTitle;
     private String title;
     private String address1;
@@ -31,7 +31,7 @@ public class CommonBannerResponse {
 
     public static CommonBannerResponse of(CommonTourismUseCase details, Items data, CustomUserDetails userDetails) {
         return CommonBannerResponse.builder()
-            .bannerId(details.getCommonTourismDto().getId())
+            .contentId(String.valueOf(details.getCommonTourismDto().getId()))
             .thumbnailTitle(details.getCommonTourismDto().getThumbnailTitle())
             .title(details.getCommonTourismDto().getTitle())
             .address1(details.getCommonTourismDto().getAddress1())
