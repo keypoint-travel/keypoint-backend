@@ -4,7 +4,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients("com.keypoint.keypointtravel.banner.service")
+@EnableFeignClients(basePackages = {
+    "com.keypoint.keypointtravel.banner.service",
+    "com.keypoint.keypointtravel.oauth.service"
+})
 public class OpenFeignConfig {
 
 }

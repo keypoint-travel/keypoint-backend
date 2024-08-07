@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.oauth.dto.useCase;
 
 import com.keypoint.keypointtravel.oauth.dto.request.AppleLoginRequest;
-import com.keypoint.keypointtravel.oauth.dto.request.GoolgeLoginRequest;
+import com.keypoint.keypointtravel.oauth.dto.request.GoogleLoginRequest;
 import lombok.Getter;
 
 @Getter
@@ -25,7 +25,7 @@ public class OauthLoginUseCase {
     }
 
 
-    public static OauthLoginUseCase from(GoolgeLoginRequest request) {
+    public static OauthLoginUseCase from(GoogleLoginRequest request) {
         return new OauthLoginUseCase(request.getOauthAccessToken(), request.getOauthRefreshToken());
     }
 }
