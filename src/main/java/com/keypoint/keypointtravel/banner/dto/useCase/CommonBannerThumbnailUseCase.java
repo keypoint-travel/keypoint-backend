@@ -10,13 +10,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CommonBannerThumbnailUseCase {
 
-    private Long bannerId;
+    private String contentId;
     private String thumbnailImageUrl;
     private String title;
 
     static public CommonBannerThumbnailUseCase from(Banner banner) {
         return CommonBannerThumbnailUseCase.builder()
-            .bannerId(banner.getId())
+            .contentId(String.valueOf(banner.getId()))
             .thumbnailImageUrl(banner.getThumbnailImage())
             .title(banner.getThumbnailTitle())
             .build();

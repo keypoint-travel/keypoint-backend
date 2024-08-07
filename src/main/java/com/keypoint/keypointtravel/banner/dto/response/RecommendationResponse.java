@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RecommendationResponse {
 
-    private String bannerId;
+    private String contentId;
     private String title;
     private String address1;
     private String address2;
@@ -23,7 +23,7 @@ public class RecommendationResponse {
 
     public static RecommendationResponse from(List<Item> items){
         return RecommendationResponse.builder()
-            .bannerId(items.get(0).getContentid())
+            .contentId(items.get(0).getContentid())
             .title(items.get(0).getTitle())
             .address1(items.get(0).getAddr1())
             .address2(items.get(0).getAddr2())
