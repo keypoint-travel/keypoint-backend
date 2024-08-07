@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
 import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
 import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
 import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.googleUserInfoUseCase.GoogleUserInfoUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +25,8 @@ public class GoogleOAuthService implements OAuthService {
 
     private final OAuthTokenService oAuthTokenService;
 
+    private final GoogleAPIService googleAPIService;
+
     @Value("${spring.security.oauth2.client.provider.google.tokenUri}")
     private String tokenURL;
 
@@ -34,7 +37,17 @@ public class GoogleOAuthService implements OAuthService {
     private String clientSecret;
 
     @Override
+    @Transactional
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
+        // 1. 사용자 정보 요청
+        String authorizationHeader = "Bearer " + useCase.getOauthAccessToken();
+        GoogleUserInfoUseCase userInfo = googleAPIService.getUserInfo(authorizationHeader);
+        String email = userInfo.getEmail();
+
+        // 2. 사용자 정보 저장 & 토큰 저장
+
+        // 3. JWT 토큰 발급
+
         return null;
     }
 

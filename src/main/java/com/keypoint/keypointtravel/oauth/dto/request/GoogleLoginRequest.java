@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class GoolgeLoginRequest {
+public class GoogleLoginRequest {
 
     @NotNull
     private String oauthAccessToken;

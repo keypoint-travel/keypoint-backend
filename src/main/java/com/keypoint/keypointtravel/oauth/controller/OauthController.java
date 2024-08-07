@@ -1,14 +1,16 @@
-package com.keypoint.keypointtravel.oauth;
+package com.keypoint.keypointtravel.oauth.controller;
 
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.oauth.dto.request.AppleLoginRequest;
-import com.keypoint.keypointtravel.oauth.dto.request.GoolgeLoginRequest;
+import com.keypoint.keypointtravel.oauth.dto.request.GoogleLoginRequest;
 import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
 import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.OAuthServiceFactory;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +26,8 @@ public class OauthController {
 
     @PostMapping("/login/google")
     public APIResponseEntity<OauthLoginResponse> executeGoogleLogin(
-        @Valid @RequestBody GoolgeLoginRequest request
-    ) {
+        @Valid @RequestBody GoogleLoginRequest request
+    ) throws GeneralSecurityException, IOException {
         OauthLoginUseCase useCase = OauthLoginUseCase.from(request);
 
         OAuthService oAuthService = oAuthServiceFactory.getService(OauthProviderType.GOOGLE);
