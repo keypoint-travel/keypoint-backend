@@ -89,6 +89,10 @@ public class Member extends BaseEntity {
         this.invitationCode = "";
     }
 
+    public static Member of(String email, OauthProviderType oauthProviderType) {
+        return new Member(email, oauthProviderType);
+    }
+
     public static Member of(String email, String password) {
         return new Member(email, password);
     }

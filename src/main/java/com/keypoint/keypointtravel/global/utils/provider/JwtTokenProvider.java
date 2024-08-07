@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -62,14 +63,14 @@ public class JwtTokenProvider implements InitializingBean {
      * @return access token과 refresh token이 담긴 jwt 토큰 객체
      */
     public TokenInfoResponse createToken(Authentication authentication) {
-        // 1. 권한 가져오기
-        String authorities = authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.joining(","));
-
-        // 2. userID 가져오기
+        // 1. userID 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getId();
+
+        // 2. 권한 가져오기
+        String authorities = userDetails.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(","));
 
         // 3. Access token 생성
         long now = (new Date()).getTime();
@@ -185,5 +186,21 @@ public class JwtTokenProvider implements InitializingBean {
 
         Long now = new Date().getTime();
         return (expiration.getTime() - now);
+    }
+
+    /**
+     * Member 로 Authentication 생성하는 함수
+     *
+     * @param member
+     * @return
+     */
+    public Authentication createAuthenticationFromMember(CommonMemberDTO member) {
+        // 1. Authentication 객체 생성
+        CustomUserDetails userDetails = CustomUserDetails.from(member);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            userDetails, member.getRole().name()
+        );
+
+        return authenticationToken;
     }
 }
