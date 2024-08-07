@@ -40,7 +40,6 @@ public class FindBannerService {
     @Transactional(readOnly = true)
     public List<CommonBannerThumbnailUseCase> findThumbnailList() {
 
-        //todo: 광고 배너 조회 로직 추가 예정
         List<Banner> banners = bannerRepository.findBannerList();
         return banners.stream().map(CommonBannerThumbnailUseCase::from).toList();
     }

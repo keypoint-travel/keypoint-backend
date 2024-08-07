@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SummaryUseCase {
 
-    private Long bannerId;
+    private String contentId;
     private String region;
     private String tourType;
     private String cat1;
@@ -21,10 +21,11 @@ public class SummaryUseCase {
     private String thumbnailImage;
     private String title;
     private LocalDateTime modifyAt;
+    private LocalDateTime createAt;
 
     static public SummaryUseCase from(Banner banner) {
         return SummaryUseCase.builder()
-            .bannerId(banner.getId())
+            .contentId(String.valueOf(banner.getId()))
             .region(banner.getAreaCode().getDescription())
             .tourType(banner.getContentType().getDescription())
             .cat1(banner.getCat1().getDescription())
@@ -33,6 +34,7 @@ public class SummaryUseCase {
             .thumbnailImage(banner.getThumbnailImage())
             .title(banner.getThumbnailTitle())
             .modifyAt(banner.getModifyAt())
+            .createAt(banner.getCreateAt())
             .build();
     }
 }
