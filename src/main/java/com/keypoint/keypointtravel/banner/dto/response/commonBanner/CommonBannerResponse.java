@@ -22,7 +22,7 @@ public class CommonBannerResponse {
     private Double latitude;
     private Double longitude;
 
-    private List<AroundTourism> arounds;
+    private List<AroundTourism> around;
     private List<CommentResponse> comments;
     private int totalLikes;
     private boolean myLike;
@@ -38,7 +38,7 @@ public class CommonBannerResponse {
             .address2(details.getCommonTourismDto().getAddress2())
             .latitude(details.getCommonTourismDto().getLatitude())
             .longitude(details.getCommonTourismDto().getLongitude())
-            .arounds(createAroundTourismList(data, details))
+            .around(createAroundTourismList(data, details))
             .comments(createCommentsList(details))
             .totalLikes(details.getCommonTourismDto().getBannerLikesSize())
             .myLike(details.getCommonTourismDto().isLiked())

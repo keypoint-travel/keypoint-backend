@@ -25,7 +25,7 @@ public class TourismApiServiceFallback implements TourismApiService {
     }
 
     @Override
-    public TourismListUseCase findArounds(Double mapX, Double mapY, String serviceKey) {
+    public TourismListUseCase findAround(Double mapX, Double mapY, String serviceKey) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }
 }

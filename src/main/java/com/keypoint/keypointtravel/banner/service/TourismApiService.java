@@ -60,8 +60,8 @@ public interface TourismApiService {
      *
      * @Return 조회한 관광지 목록
      */
-    @GetMapping(FIND_AROUNDS + COMMON_OPTION)
-    TourismListUseCase findArounds(
+    @GetMapping(FIND_AROUND + COMMON_OPTION)
+    TourismListUseCase findAround(
         @RequestParam("mapX") Double mapX,
         @RequestParam("mapY") Double mapY,
         @RequestParam("serviceKey") String serviceKey);

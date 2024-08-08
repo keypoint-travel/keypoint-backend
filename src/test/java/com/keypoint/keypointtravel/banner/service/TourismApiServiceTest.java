@@ -85,7 +85,7 @@ public class TourismApiServiceTest {
         Double mapY = 37.3923573144;
 
         //when
-        TourismListUseCase useCase = tourismApiService.findArounds(mapX, mapY, serviceKey);
+        TourismListUseCase useCase = tourismApiService.findAround(mapX, mapY, serviceKey);
 
         //then
         assertThat(useCase.getResponse().getBody().getItems().getItem()).isNotEmpty();

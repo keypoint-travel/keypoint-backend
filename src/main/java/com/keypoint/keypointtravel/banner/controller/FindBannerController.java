@@ -46,12 +46,12 @@ public class FindBannerController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         // 로그인이 필수가 아니기에 사용자 인증 확인 실행 x
         CommonTourismUseCase details = findBannerService.findCommonBanner(new BannerUseCase(bannerId, userDetails));
-        TourismListUseCase arounds = tourismApiService.findArounds(
+        TourismListUseCase around = tourismApiService.findAround(
             details.getCommonTourismDto().getLongitude(), details.getCommonTourismDto().getLatitude(), serviceKey);
 
         return APIResponseEntity.<CommonBannerResponse>builder()
             .message("공통 배너 상세 조회 ")
-            .data(CommonBannerResponse.of(details, arounds.getResponse().getBody().getItems(), userDetails))
+            .data(CommonBannerResponse.of(details, around.getResponse().getBody().getItems(), userDetails))
             .build();
     }
 
@@ -60,14 +60,14 @@ public class FindBannerController {
         @RequestParam("latitude") Double latitude,
         @RequestParam("longitude") Double longitude) {
 
-        TourismListUseCase arounds = tourismApiService.findArounds(
+        TourismListUseCase around = tourismApiService.findAround(
             longitude, latitude, serviceKey);
-        if (arounds.getResponse().getBody().getItems().getItem().isEmpty()){
+        if (around.getResponse().getBody().getItems().getItem().isEmpty()){
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_TOURISM);
         }
         return APIResponseEntity.<RecommendationResponse>builder()
             .message("추천 배너 조회")
-            .data(RecommendationResponse.from(arounds.getResponse().getBody().getItems().getItem()))
+            .data(RecommendationResponse.from(around.getResponse().getBody().getItems().getItem()))
             .build();
     }
 }
