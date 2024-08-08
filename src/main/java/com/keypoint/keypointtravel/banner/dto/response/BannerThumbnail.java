@@ -9,7 +9,7 @@ import lombok.Getter;
 public class BannerThumbnail {
 
     private String contentId;
-    private String thumbnailImageUrl;
+    private String thumbnailImage;
     private String mainTitle;
     private String subTitle;
     private BannerType bannerType;

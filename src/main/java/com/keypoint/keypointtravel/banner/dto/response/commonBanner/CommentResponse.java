@@ -13,7 +13,7 @@ public class CommentResponse {
     private String content;
     private Long writerId;
     private String writerName;
-    private String profileImageUrl;
+    private String profileImage;
     private LocalDateTime createdAt;
 
     public static CommentResponse from(CommentDto data) {

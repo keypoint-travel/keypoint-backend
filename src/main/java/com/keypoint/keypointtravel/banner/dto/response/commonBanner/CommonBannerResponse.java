@@ -2,7 +2,6 @@ package com.keypoint.keypointtravel.banner.dto.response.commonBanner;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Items;
-import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +16,7 @@ public class CommonBannerResponse {
     private String contentId;
     private String mainTitle;
     private String subTitle;
-    private String name;
+    private String placeName;
     private String address1;
     private String address2;
     private Double latitude;
@@ -39,7 +38,7 @@ public class CommonBannerResponse {
             .contentId(String.valueOf(details.getCommonTourismDto().getId()))
             .mainTitle(details.getCommonTourismDto().getMainTitle())
             .subTitle(details.getCommonTourismDto().getSubTitle())
-            .name(details.getCommonTourismDto().getName())
+            .placeName(details.getCommonTourismDto().getName())
             .address1(details.getCommonTourismDto().getAddress1())
             .address2(details.getCommonTourismDto().getAddress2())
             .latitude(details.getCommonTourismDto().getLatitude())

@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AdvertisementBannerUseCase {
 
-    private Long bannerId;
+    private Long contentId;
     private String mainTitle;
     private String subTitle;
     private String content;
-    private String thumbnailUrl;
-    private String detailUrl;
+    private String thumbnailImage;
+    private String detailImage;
     private LocalDateTime createdAt;
     private String writerName;
     private LocalDateTime updatedAt;
