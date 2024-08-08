@@ -1,5 +1,8 @@
 package com.keypoint.keypointtravel.banner.dto.dto;
 
+import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
 import lombok.*;
 
 @Getter
@@ -16,4 +19,8 @@ public class CommonTourismDto {
     private Double longitude;
     private int bannerLikesSize;
     private boolean isLiked;
+    private String thumbnailImage;
+    private LargeCategory cat1;
+    private MiddleCategory cat2;
+    private SmallCategory cat3;
 }

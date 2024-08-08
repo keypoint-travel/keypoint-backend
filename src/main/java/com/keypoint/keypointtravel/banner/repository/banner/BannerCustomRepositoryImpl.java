@@ -63,18 +63,22 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 banner.latitude,
                 banner.longitude,
                 banner.bannerLikes.size(),
-                getBannerLikeExpression(bannerId, memberId)))
+                getBannerLikeExpression(bannerId, memberId),
+                banner.thumbnailImage,
+                banner.cat1,
+                banner.cat2,
+                banner.cat3))
             .from(banner)
             .where(banner.id.eq(bannerId))
             .fetchOne();
-        if(dto == null){
+        if (dto == null) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
-         return dto;
+        return dto;
     }
 
     private BooleanExpression getBannerLikeExpression(Long bannerId, Long memberId) {
-        if(memberId == null){
+        if (memberId == null) {
             return Expressions.FALSE;
         }
         return selectOne()

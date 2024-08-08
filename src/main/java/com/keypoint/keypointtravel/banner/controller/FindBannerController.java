@@ -51,7 +51,7 @@ public class FindBannerController {
 
         return APIResponseEntity.<CommonBannerResponse>builder()
             .message("공통 배너 상세 조회 ")
-            .data(CommonBannerResponse.of(details, around.getResponse().getBody().getItems(), userDetails))
+            .data(CommonBannerResponse.of(details, around.getResponse().getBody().getItems()))
             .build();
     }
 

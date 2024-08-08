@@ -54,7 +54,7 @@ public class FindBannerService {
     @Transactional(readOnly = true)
     public CommonTourismUseCase findCommonBanner(BannerUseCase useCase) {
         CommonTourismDto dto = bannerRepository.findBannerById(useCase.getBannerId(), useCase.getMemberId());
-        List<CommentDto> dtoList = bannerRepository.findCommentListById(useCase.getBannerId());
-        return new CommonTourismUseCase(dto, dtoList);
+//        List<CommentDto> dtoList = bannerRepository.findCommentListById(useCase.getBannerId());
+        return new CommonTourismUseCase(dto);
     }
 }

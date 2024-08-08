@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.banner.dto.response.commonBanner;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Items;
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,15 +21,19 @@ public class CommonBannerResponse {
     private String address2;
     private Double latitude;
     private Double longitude;
-
+    private String thumbnailImage;
+    private String cat1;
+    private String cat2;
+    private String cat3;
     private List<AroundTourism> around;
-    private List<CommentResponse> comments;
-    private int totalLikes;
-    private boolean myLike;
+    // todo: comments, totalLikes, myLike, memberId 추후 고려
+//    private List<CommentResponse> comments;
+//    private int totalLikes;
+//    private boolean myLike;
+//
+//    private Long memberId;
 
-    private Long memberId;
-
-    public static CommonBannerResponse of(CommonTourismUseCase details, Items data, CustomUserDetails userDetails) {
+    public static CommonBannerResponse of(CommonTourismUseCase details, Items data) {
         return CommonBannerResponse.builder()
             .contentId(String.valueOf(details.getCommonTourismDto().getId()))
             .thumbnailTitle(details.getCommonTourismDto().getThumbnailTitle())
@@ -38,11 +42,15 @@ public class CommonBannerResponse {
             .address2(details.getCommonTourismDto().getAddress2())
             .latitude(details.getCommonTourismDto().getLatitude())
             .longitude(details.getCommonTourismDto().getLongitude())
+            .thumbnailImage(details.getCommonTourismDto().getThumbnailImage())
+            .cat1(details.getCommonTourismDto().getCat1().getDescription())
+            .cat2(details.getCommonTourismDto().getCat2().getDescription())
+            .cat3(details.getCommonTourismDto().getCat3().getDescription())
             .around(createAroundTourismList(data, details))
-            .comments(createCommentsList(details))
-            .totalLikes(details.getCommonTourismDto().getBannerLikesSize())
-            .myLike(details.getCommonTourismDto().isLiked())
-            .memberId(userDetails == null ? null : userDetails.getId())
+//            .comments(createCommentsList(details))
+//            .totalLikes(details.getCommonTourismDto().getBannerLikesSize())
+//            .myLike(details.getCommonTourismDto().isLiked())
+//            .memberId(userDetails == null ? null : userDetails.getId())
             .build();
     }
 
@@ -52,7 +60,7 @@ public class CommonBannerResponse {
             .map(AroundTourism::from).toList();
     }
 
-    private static List<CommentResponse> createCommentsList(CommonTourismUseCase details) {
-        return details.getCommentDtoList().stream().map(CommentResponse::from).toList();
-    }
+//    private static List<CommentResponse> createCommentsList(CommonTourismUseCase details) {
+//        return details.getCommentDtoList().stream().map(CommentResponse::from).toList();
+//    }
 }
