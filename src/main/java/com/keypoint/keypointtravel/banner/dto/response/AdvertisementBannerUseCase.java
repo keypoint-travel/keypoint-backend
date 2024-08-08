@@ -15,10 +15,10 @@ public class AdvertisementBannerUseCase {
     private String content;
     private String thumbnailUrl;
     private String detailUrl;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
     private String writerName;
-    private LocalDateTime modifyAt;
-    private String modifierName;
+    private LocalDateTime updatedAt;
+    private String updaterName;
 
     public static AdvertisementBannerUseCase from(AdvertisementBannerDto dto) {
         return new AdvertisementBannerUseCase(
@@ -27,10 +27,10 @@ public class AdvertisementBannerUseCase {
             dto.getContent(),
             dto.getThumbnailUrl(),
             dto.getDetailUrl(),
-            dto.getCreateAt(),
+            dto.getCreatedAt(),
             dto.getWriterName(),
-            dto.getModifyAt(),
-            dto.getModifierName()
+            dto.getUpdatedAt(),
+            dto.getUpdaterName()
         );
     }
 }

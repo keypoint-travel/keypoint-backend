@@ -14,8 +14,8 @@ public class AdvertisementBannerDto {
     private String content;
     private String thumbnailUrl;
     private String detailUrl;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
     private String writerName;
-    private LocalDateTime modifyAt;
-    private String modifierName;
+    private LocalDateTime updatedAt;
+    private String updaterName;
 }

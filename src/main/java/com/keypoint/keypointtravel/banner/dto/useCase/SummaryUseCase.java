@@ -20,8 +20,8 @@ public class SummaryUseCase {
     private String cat3;
     private String thumbnailImage;
     private String title;
-    private LocalDateTime modifyAt;
-    private LocalDateTime createAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
 
     static public SummaryUseCase from(Banner banner) {
         return SummaryUseCase.builder()
@@ -33,8 +33,8 @@ public class SummaryUseCase {
             .cat3(banner.getCat3().getDescription())
             .thumbnailImage(banner.getThumbnailImage())
             .title(banner.getThumbnailTitle())
-            .modifyAt(banner.getModifyAt())
-            .createAt(banner.getCreateAt())
+            .updatedAt(banner.getModifyAt())
+            .createdAt(banner.getCreateAt())
             .build();
     }
 }
