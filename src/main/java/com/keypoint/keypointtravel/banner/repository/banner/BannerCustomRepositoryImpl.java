@@ -56,8 +56,9 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     public CommonTourismDto findBannerById(Long bannerId, Long memberId) {
         CommonTourismDto dto = queryFactory.select(Projections.constructor(CommonTourismDto.class,
                 banner.id,
-                banner.thumbnailTitle,
-                banner.title,
+                banner.mainTitle,
+                banner.subTitle,
+                banner.name,
                 banner.address1,
                 banner.address2,
                 banner.latitude,

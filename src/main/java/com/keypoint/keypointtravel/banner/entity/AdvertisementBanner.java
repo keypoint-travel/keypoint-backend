@@ -18,7 +18,10 @@ public class AdvertisementBanner extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String mainTitle;
+
+    @Column(nullable = false)
+    private String subTitle;
 
     @Column(nullable = false)
     private String content;
@@ -32,8 +35,9 @@ public class AdvertisementBanner extends BaseEntity {
     @Column
     private boolean isExposed;
 
-    public AdvertisementBanner(String title, String content, Long thumbnailImageId, Long detailImageId) {
-        this.title = title;
+    public AdvertisementBanner(String mainTitle, String subTitle, String content, Long thumbnailImageId, Long detailImageId) {
+        this.mainTitle = mainTitle;
+        this.subTitle = subTitle;
         this.content = content;
         this.thumbnailImageId = thumbnailImageId;
         this.detailImageId = detailImageId;

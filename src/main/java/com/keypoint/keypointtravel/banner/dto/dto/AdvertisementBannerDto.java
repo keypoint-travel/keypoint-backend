@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 public class AdvertisementBannerDto {
 
     private Long bannerId;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
     private String content;
     private String thumbnailUrl;
     private String detailUrl;

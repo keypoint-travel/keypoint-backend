@@ -69,7 +69,7 @@ public class AdvertisementBannerService {
             );
             // 3. 광고 배너 저장
             advertisementBannerRepository.save(
-                new AdvertisementBanner(useCase.getTitle(), useCase.getContent(), thumbnailImageId, detailImageId));
+                new AdvertisementBanner(useCase.getMainTitle(), useCase.getSubTitle(), useCase.getContent(), thumbnailImageId, detailImageId));
         } catch (Exception e) {
             throw new GeneralException(e);
         }

@@ -13,10 +13,14 @@ public class AdvertisementRequest {
     @NotEmpty(message = "제목을 입력해주세요.")
     @NotBlank(message = "제목을 입력해주세요.")
     @Size(max = 20, message = "제목의 최대길이를 초과하였습니다.")
-    private String title;
+    private String mainTitle;
+
+    @NotEmpty(message = "제목을 입력해주세요.")
+    @NotBlank(message = "제목을 입력해주세요.")
+    @Size(max = 40, message = "제목의 최대길이를 초과하였습니다.")
+    private String subTitle;
 
     @NotEmpty(message = "내용을 입력해주세요.")
     @NotBlank(message = "내용을 입력해주세요.")
-    @Size(max = 2000, message = "내용의 최대길이를 초과하였습니다.")
     private String content;
 }

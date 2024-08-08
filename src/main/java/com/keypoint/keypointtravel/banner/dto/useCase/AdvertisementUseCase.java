@@ -10,6 +10,7 @@ public class AdvertisementUseCase {
 
     private MultipartFile thumbnailImage;
     private MultipartFile detailImage;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
     private String content;
 }

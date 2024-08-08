@@ -22,7 +22,8 @@ public class ThumbnailListResponse {
             banners.add(new BannerThumbnail(
                 banner.getContentId(),
                 banner.getThumbnailImageUrl(),
-                banner.getTitle(),
+                banner.getMainTitle(),
+                banner.getSubTitle(),
                 BannerType.COMMON_BANNER)
             );
         }
@@ -33,7 +34,8 @@ public class ThumbnailListResponse {
             banners.add(new BannerThumbnail(
                 String.valueOf(banner.getBannerId()),
                 banner.getThumbnailImageUrl(),
-                banner.getTitle(),
+                banner.getMainTitle(),
+                banner.getSubTitle(),
                 BannerType.ADVERTISEMENT_BANNER)
             );
         }

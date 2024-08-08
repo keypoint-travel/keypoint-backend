@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 public class AdvertisementBannerUseCase {
 
     private Long bannerId;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
     private String content;
     private String thumbnailUrl;
     private String detailUrl;
@@ -23,7 +24,8 @@ public class AdvertisementBannerUseCase {
     public static AdvertisementBannerUseCase from(AdvertisementBannerDto dto) {
         return new AdvertisementBannerUseCase(
             dto.getBannerId(),
-            dto.getTitle(),
+            dto.getMainTitle(),
+            dto.getSubTitle(),
             dto.getContent(),
             dto.getThumbnailUrl(),
             dto.getDetailUrl(),

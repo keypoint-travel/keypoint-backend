@@ -9,5 +9,6 @@ public class AdvertisementThumbnailDto {
 
     private Long bannerId;
     private String thumbnailImageUrl;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
 }

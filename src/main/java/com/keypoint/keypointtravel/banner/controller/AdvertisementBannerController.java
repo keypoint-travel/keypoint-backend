@@ -48,7 +48,7 @@ public class AdvertisementBannerController {
 
         //todo: 관리자 인증 로직 추가 예정
         AdvertisementUseCase useCase = new AdvertisementUseCase(
-            thumbnailImage, detailImage, request.getTitle(), request.getContent());
+            thumbnailImage, detailImage, request.getMainTitle(), request.getSubTitle(), request.getContent());
 
         advertisementBannerService.saveAdvertisementBanner(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();

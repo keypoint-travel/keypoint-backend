@@ -15,8 +15,9 @@ import java.util.List;
 public class CommonBannerResponse {
 
     private String contentId;
-    private String thumbnailTitle;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
+    private String name;
     private String address1;
     private String address2;
     private Double latitude;
@@ -36,8 +37,9 @@ public class CommonBannerResponse {
     public static CommonBannerResponse of(CommonTourismUseCase details, Items data) {
         return CommonBannerResponse.builder()
             .contentId(String.valueOf(details.getCommonTourismDto().getId()))
-            .thumbnailTitle(details.getCommonTourismDto().getThumbnailTitle())
-            .title(details.getCommonTourismDto().getTitle())
+            .mainTitle(details.getCommonTourismDto().getMainTitle())
+            .subTitle(details.getCommonTourismDto().getSubTitle())
+            .name(details.getCommonTourismDto().getName())
             .address1(details.getCommonTourismDto().getAddress1())
             .address2(details.getCommonTourismDto().getAddress2())
             .latitude(details.getCommonTourismDto().getLatitude())

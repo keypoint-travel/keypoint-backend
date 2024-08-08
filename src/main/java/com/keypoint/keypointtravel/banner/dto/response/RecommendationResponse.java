@@ -18,7 +18,7 @@ import java.util.List;
 public class RecommendationResponse {
 
     private String contentId;
-    private String title;
+    private String name;
     private String address1;
     private String address2;
     private String latitude;
@@ -32,7 +32,7 @@ public class RecommendationResponse {
     public static RecommendationResponse from(List<Item> items){
         return RecommendationResponse.builder()
             .contentId(items.get(0).getContentid())
-            .title(items.get(0).getTitle())
+            .name(items.get(0).getTitle())
             .address1(items.get(0).getAddr1())
             .address2(items.get(0).getAddr2())
             .latitude(items.get(0).getMapy())

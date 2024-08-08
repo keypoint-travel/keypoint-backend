@@ -12,13 +12,15 @@ public class CommonBannerThumbnailUseCase {
 
     private String contentId;
     private String thumbnailImageUrl;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
 
     static public CommonBannerThumbnailUseCase from(Banner banner) {
         return CommonBannerThumbnailUseCase.builder()
             .contentId(String.valueOf(banner.getId()))
             .thumbnailImageUrl(banner.getThumbnailImage())
-            .title(banner.getThumbnailTitle())
+            .mainTitle(banner.getMainTitle())
+            .subTitle(banner.getSubTitle())
             .build();
     }
 }

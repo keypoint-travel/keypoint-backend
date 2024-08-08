@@ -19,7 +19,7 @@ public class Banner extends BaseEntity {
     private Long id;
 
     @Column
-    private String title;
+    private String name;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -42,7 +42,10 @@ public class Banner extends BaseEntity {
     private ContentType contentType;
 
     @Column(nullable = false)
-    private String thumbnailTitle;
+    private String mainTitle;
+
+    @Column(nullable = false)
+    private String subTitle;
 
     @Column
     private String thumbnailImage;
@@ -69,17 +72,18 @@ public class Banner extends BaseEntity {
     private List<BannerLike> bannerLikes = new ArrayList<>();
 
     @Builder
-    public Banner(Long id, String title, AreaCode areaCode, LargeCategory cat1, MiddleCategory cat2, SmallCategory cat3,
-                  ContentType contentType, String thumbnailTitle, String thumbnailImage, String address1, String address2,
+    public Banner(Long id, String name, AreaCode areaCode, LargeCategory cat1, MiddleCategory cat2, SmallCategory cat3,
+                  ContentType contentType, String mainTitle, String subTitle, String thumbnailImage, String address1, String address2,
                   Double latitude, Double longitude, boolean isExposed) {
         this.id = id;
-        this.title = title;
+        this.name = name;
         this.areaCode = areaCode;
         this.cat1 = cat1;
         this.cat2 = cat2;
         this.cat3 = cat3;
         this.contentType = contentType;
-        this.thumbnailTitle = thumbnailTitle;
+        this.mainTitle = mainTitle;
+        this.subTitle = subTitle;
         this.thumbnailImage = thumbnailImage;
         this.address1 = address1;
         this.address2 = address2;

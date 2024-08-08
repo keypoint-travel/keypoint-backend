@@ -29,7 +29,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     public List<AdvertisementBannerDto> findAdvertisementBanners() {
         return queryFactory.select(Projections.constructor(AdvertisementBannerDto.class,
                 advertisementBanner.id,
-                advertisementBanner.title,
+                advertisementBanner.mainTitle,
+                advertisementBanner.subTitle,
                 advertisementBanner.content,
                 select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.thumbnailImageId)),
                 select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.detailImageId)),
@@ -56,7 +57,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     public AdvertisementDetailDto findAdvertisementBannerById(Long bannerId) {
         return queryFactory.select(Projections.constructor(AdvertisementDetailDto.class,
                 advertisementBanner.id,
-                advertisementBanner.title,
+                advertisementBanner.mainTitle,
+                advertisementBanner.subTitle,
                 advertisementBanner.content,
                 uploadFile.path
             ))
@@ -71,7 +73,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
         return queryFactory.select(Projections.constructor(AdvertisementThumbnailDto.class,
                 advertisementBanner.id,
                 uploadFile.path,
-                advertisementBanner.title
+                advertisementBanner.mainTitle,
+                advertisementBanner.subTitle
             ))
             .from(advertisementBanner)
             .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))

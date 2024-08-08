@@ -17,13 +17,14 @@ import lombok.Getter;
 public class SaveUseCase {
 
     private Long contentId;
-    private String title;
+    private String name;
     private AreaCode areaCode;
     private LargeCategory cat1;
     private MiddleCategory cat2;
     private SmallCategory cat3;
     private ContentType contentType;
-    private String thumbnailTitle;
+    private String mainTitle;
+    private String subTitle;
     private String thumbnailImage;
     private String address1;
     private String address2;
@@ -33,13 +34,14 @@ public class SaveUseCase {
     public static SaveUseCase from(BannerRequest request){
         return SaveUseCase.builder()
             .contentId(request.getContentId())
-            .title(request.getTitle())
+            .mainTitle(request.getMainTitle())
+            .subTitle(request.getSubTitle())
             .areaCode(BannerCode.getConstant(AreaCode.class, request.getRegion()))
             .cat1(BannerCode.getConstant(LargeCategory.class, request.getCat1()))
             .cat2(BannerCode.getConstant(MiddleCategory.class, request.getCat2()))
             .cat3(BannerCode.getConstant(SmallCategory.class, request.getCat3()))
             .contentType(BannerCode.getConstant(ContentType.class, request.getTourType()))
-            .thumbnailTitle(request.getThumbnailTitle())
+            .name(request.getName())
             .thumbnailImage(request.getThumbnailImage())
             .address1(request.getAddress1())
             .address2(request.getAddress2())

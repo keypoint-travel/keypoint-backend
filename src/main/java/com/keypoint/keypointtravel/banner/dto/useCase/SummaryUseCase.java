@@ -19,7 +19,9 @@ public class SummaryUseCase {
     private String cat2;
     private String cat3;
     private String thumbnailImage;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
+    private String name;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
 
@@ -32,7 +34,9 @@ public class SummaryUseCase {
             .cat2(banner.getCat2().getDescription())
             .cat3(banner.getCat3().getDescription())
             .thumbnailImage(banner.getThumbnailImage())
-            .title(banner.getThumbnailTitle())
+            .mainTitle(banner.getMainTitle())
+            .subTitle(banner.getSubTitle())
+            .name(banner.getName())
             .updatedAt(banner.getModifyAt())
             .createdAt(banner.getCreateAt())
             .build();

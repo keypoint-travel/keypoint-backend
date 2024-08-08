@@ -27,7 +27,7 @@ public class BannerDetails {
     private String latitude;
     private String longitude;
     private String thumbnailImage;
-    private String title;
+    private String name;
 
     public static BannerDetails from(Item data) {
         return BannerDetails.builder()
@@ -42,7 +42,7 @@ public class BannerDetails {
             .latitude(data.getMapy())
             .longitude(data.getMapx())
             .thumbnailImage(data.getFirstimage())
-            .title(data.getTitle())
+            .name(data.getTitle())
             .build();
     }
 }

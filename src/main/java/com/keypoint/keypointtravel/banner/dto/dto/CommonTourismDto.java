@@ -11,8 +11,9 @@ import lombok.*;
 public class CommonTourismDto {
 
     private Long id;
-    private String thumbnailTitle;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
+    private String name;
     private String address1;
     private String address2;
     private Double latitude;
