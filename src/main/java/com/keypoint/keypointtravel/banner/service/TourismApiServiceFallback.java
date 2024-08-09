@@ -10,22 +10,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class TourismApiServiceFallback implements TourismApiService {
     @Override
-    public TourismListUseCase findTourismList(int pageNo, String serviceKey, String areaCode, String contentTypeId, String cat1, String cat2, String cat3) {
+    public TourismListUseCase findTourismList(String language, int pageNo, String serviceKey, String areaCode,
+                                              String contentTypeId, String cat1, String cat2, String cat3) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }
 
     @Override
-    public TourismUseCase findTourism(String contentId, String serviceKey) {
+    public TourismUseCase findTourism(String language, String contentId, String serviceKey) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }
 
     @Override
-    public ImageListUseCase findImageList(String contentId, String serviceKey) {
+    public ImageListUseCase findImageList(String language, String contentId, String serviceKey) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }
 
     @Override
-    public TourismListUseCase findAround(Double mapX, Double mapY, String serviceKey) {
+    public TourismListUseCase findAround(String language, Double mapX, Double mapY, String serviceKey) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }
 }

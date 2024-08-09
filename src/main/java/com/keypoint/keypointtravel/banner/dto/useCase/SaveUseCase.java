@@ -1,12 +1,13 @@
 package com.keypoint.keypointtravel.banner.dto.useCase;
 
 import com.keypoint.keypointtravel.banner.dto.request.BannerRequest;
+import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.banner.entity.BannerContent;
 import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
-import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
-import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
-import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
-import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,37 +17,80 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SaveUseCase {
 
-    private Long contentId;
-    private String name;
-    private AreaCode areaCode;
-    private LargeCategory cat1;
-    private MiddleCategory cat2;
-    private SmallCategory cat3;
-    private ContentType contentType;
+    private String contentId;
+    private LanguageCode languageCode;
     private String mainTitle;
     private String subTitle;
+    private String placeName;
+    private AreaCode areaCode;
+    private String cat1;
+    private String cat2;
+    private String cat3;
+    private String contentType;
     private String thumbnailImage;
     private String address1;
     private String address2;
     private Double latitude;
     private Double longitude;
 
-    public static SaveUseCase from(BannerRequest request){
+    public static SaveUseCase from(BannerRequest request) {
         return SaveUseCase.builder()
             .contentId(request.getContentId())
+            .languageCode(findLanguageValue(request.getLanguage()))
             .mainTitle(request.getMainTitle())
             .subTitle(request.getSubTitle())
+            .placeName(request.getPlaceName())
             .areaCode(BannerCode.getConstant(AreaCode.class, request.getRegion()))
-            .cat1(BannerCode.getConstant(LargeCategory.class, request.getCat1()))
-            .cat2(BannerCode.getConstant(MiddleCategory.class, request.getCat2()))
-            .cat3(BannerCode.getConstant(SmallCategory.class, request.getCat3()))
-            .contentType(BannerCode.getConstant(ContentType.class, request.getTourType()))
-            .name(request.getName())
+            .cat1(request.getCat1())
+            .cat2(request.getCat2())
+            .cat3(request.getCat3())
+            .contentType(request.getTourType())
             .thumbnailImage(request.getThumbnailImage())
             .address1(request.getAddress1())
             .address2(request.getAddress2())
             .latitude(request.getLatitude())
             .longitude(request.getLongitude())
+            .build();
+    }
+
+    private static LanguageCode findLanguageValue(String language) {
+        if (language.equals("kor")) {
+            return LanguageCode.KO;
+        }
+        if (language.equals("eng")) {
+            return LanguageCode.EN;
+        }
+        if (language.equals("jap")) {
+            return LanguageCode.JA;
+        }
+        throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
+    }
+
+    public Banner toEntity(boolean isDeleted) {
+        return Banner.builder()
+            .areaCode(this.areaCode)
+            .latitude(this.latitude)
+            .longitude(this.longitude)
+            .isDeleted(isDeleted)
+            .build();
+    }
+
+    public BannerContent toEntity(Banner banner, boolean isDeleted) {
+        return BannerContent.builder()
+            .languageCode(this.languageCode)
+            .banner(banner)
+            .contentId(this.contentId)
+            .mainTitle(this.mainTitle)
+            .subTitle(this.subTitle)
+            .placeName(this.placeName)
+            .thumbnailImage(this.thumbnailImage)
+            .cat1(this.cat1)
+            .cat2(this.cat2)
+            .cat3(this.cat3)
+            .contentType(this.contentType)
+            .address1(this.address1)
+            .address2(this.address2)
+            .isDeleted(isDeleted)
             .build();
     }
 }

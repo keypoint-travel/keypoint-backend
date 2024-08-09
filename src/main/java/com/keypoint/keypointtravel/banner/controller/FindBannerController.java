@@ -14,8 +14,11 @@ import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
 @RestController
 @RequestMapping("/api/v1/banners")
@@ -31,43 +34,58 @@ public class FindBannerController {
 
     @GetMapping("management")
     public APIResponseEntity<BannerListResponse> findBannerList(@AuthenticationPrincipal CustomUserDetails userDetails) {
-
         //todo: 관리자 인증 로직 추가 예정
-
         return APIResponseEntity.<BannerListResponse>builder()
             .message("생성한 공통 배너 목록 조회")
             .data(new BannerListResponse(findBannerService.findBannerList()))
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{bannerId}/common")
     public APIResponseEntity<CommonBannerResponse> findCommonBanner(
         @PathVariable("bannerId") Long bannerId,
+        @RequestParam("language") String language,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // 로그인이 필수가 아니기에 사용자 인증 확인 실행 x
-        CommonTourismUseCase details = findBannerService.findCommonBanner(new BannerUseCase(bannerId, userDetails));
-        TourismListUseCase around = tourismApiService.findAround(
+        CommonTourismUseCase details = findBannerService.findCommonBanner(new BannerUseCase(language, bannerId, userDetails));
+        TourismListUseCase around = tourismApiService.findAround(findLanguageValue(language),
             details.getCommonTourismDto().getLongitude(), details.getCommonTourismDto().getLatitude(), serviceKey);
-
         return APIResponseEntity.<CommonBannerResponse>builder()
             .message("공통 배너 상세 조회 ")
             .data(CommonBannerResponse.of(details, around.getResponse().getBody().getItems()))
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/recommendation")
     public APIResponseEntity<RecommendationResponse> findRecommendationBanner(
+        @RequestParam("language") String language,
         @RequestParam("latitude") Double latitude,
-        @RequestParam("longitude") Double longitude) {
-
+        @RequestParam("longitude") Double longitude,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         TourismListUseCase around = tourismApiService.findAround(
-            longitude, latitude, serviceKey);
-        if (around.getResponse().getBody().getItems().getItem().isEmpty()){
+            findLanguageValue(language), longitude, latitude, serviceKey);
+        if (around.getResponse().getBody().getItems().getItem().isEmpty()) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_TOURISM);
         }
         return APIResponseEntity.<RecommendationResponse>builder()
             .message("추천 배너 조회")
-            .data(RecommendationResponse.from(around.getResponse().getBody().getItems().getItem()))
+            .data(RecommendationResponse.of(
+                around.getResponse().getBody().getItems().getItem(),
+                userDetails.getUsername(), language))
             .build();
+    }
+
+    private String findLanguageValue(String language) {
+        if (language.equals("kor")) {
+            return KOREAN;
+        }
+        if (language.equals("eng")) {
+            return ENGLISH;
+        }
+        if (language.equals("jap")) {
+            return JAPANESE;
+        }
+        throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
     }
 }

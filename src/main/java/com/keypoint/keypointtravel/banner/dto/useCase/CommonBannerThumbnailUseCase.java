@@ -18,9 +18,9 @@ public class CommonBannerThumbnailUseCase {
     static public CommonBannerThumbnailUseCase from(Banner banner) {
         return CommonBannerThumbnailUseCase.builder()
             .contentId(String.valueOf(banner.getId()))
-            .thumbnailImageUrl(banner.getThumbnailImage())
-            .mainTitle(banner.getMainTitle())
-            .subTitle(banner.getSubTitle())
+            .thumbnailImageUrl(banner.toString())
+            .mainTitle(banner.toString())
+            .subTitle(banner.toString())
             .build();
     }
 }
