@@ -11,7 +11,10 @@ import com.keypoint.keypointtravel.banner.service.TourismApiService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +31,8 @@ public class FindBannerController {
     private final FindBannerService findBannerService;
 
     private final TourismApiService tourismApiService;
+
+    private final ReadMemberService readMemberService;
 
     @Value("${key.tourApi.key}")
     private String serviceKey;
@@ -46,10 +51,14 @@ public class FindBannerController {
     public APIResponseEntity<CommonBannerResponse> findCommonBanner(
         @PathVariable("bannerId") Long bannerId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // todo: 사용자 등록 언어에 따라 language 받아오도록 수정 예정
-        String language = "kor";
-        CommonTourismUseCase details = findBannerService.findCommonBanner(new BannerUseCase(language, bannerId, userDetails));
-        TourismListUseCase around = tourismApiService.findAround(findLanguageValue(language),
+        // 회원의 등록 언어를 가져옴.
+        Member member = readMemberService.findMemberById(userDetails.getId());
+        LanguageCode languageCode = member.getMemberDetail().getLanguage();
+        // DB에 저장된 공통 배너 조회
+        CommonTourismUseCase details = findBannerService.findCommonBanner(
+            new BannerUseCase(languageCode, bannerId, userDetails));
+        // 한국관광공사 api를 통해 주변 관광지 조회
+        TourismListUseCase around = tourismApiService.findAround(findLanguageValue(languageCode),
             details.getCommonTourismDto().getLongitude(), details.getCommonTourismDto().getLatitude(), serviceKey);
         return APIResponseEntity.<CommonBannerResponse>builder()
             .message("공통 배너 상세 조회 ")
@@ -63,11 +72,12 @@ public class FindBannerController {
         @RequestParam("latitude") Double latitude,
         @RequestParam("longitude") Double longitude,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        // todo: 사용자 등록 언어에 따라 language 받아오도록 수정 예정
-        String language = "kor";
+        // 회원의 등록 언어를 가져옴.
+        Member member = readMemberService.findMemberById(userDetails.getId());
+        LanguageCode languageCode = member.getMemberDetail().getLanguage();
+        // 한국관광공사 api를 통해 주변 관광지 조회
         TourismListUseCase around = tourismApiService.findAround(
-            findLanguageValue(language), longitude, latitude, serviceKey);
+            findLanguageValue(languageCode), longitude, latitude, serviceKey);
         if (around.getResponse().getBody().getItems().getItem().isEmpty()) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_TOURISM);
         }
@@ -75,18 +85,18 @@ public class FindBannerController {
             .message("추천 배너 조회")
             .data(RecommendationResponse.of(
                 around.getResponse().getBody().getItems().getItem(),
-                userDetails.getUsername(), language))
+                userDetails.getUsername(), languageCode))
             .build();
     }
 
-    private String findLanguageValue(String language) {
-        if (language.equals("kor")) {
+    private String findLanguageValue(LanguageCode language) {
+        if (language.equals(LanguageCode.KO)) {
             return KOREAN;
         }
-        if (language.equals("eng")) {
+        if (language.equals(LanguageCode.EN)) {
             return ENGLISH;
         }
-        if (language.equals("jap")) {
+        if (language.equals(LanguageCode.JA)) {
             return JAPANESE;
         }
         throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);

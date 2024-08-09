@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.banner.dto.response;
 import com.keypoint.keypointtravel.banner.dto.response.commonBanner.AroundTourism;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Item;
 import com.keypoint.keypointtravel.global.enumType.banner.*;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +28,7 @@ public class RecommendationResponse {
     private String cat3;
     private List<AroundTourism> around;
 
-    public static RecommendationResponse of(List<Item> items, String memberName, String language){
+    public static RecommendationResponse of(List<Item> items, String memberName, LanguageCode language){
         RecommendationResponse response = RecommendationResponse.builder()
             .contentId(items.get(0).getContentid())
             .memberName(memberName)
@@ -48,18 +49,18 @@ public class RecommendationResponse {
         return  response;
     }
 
-    private void buildTypeByLanguage(Item data, String language) {
-        if (language.equals("kor")) {
+    private void buildTypeByLanguage(Item data, LanguageCode language) {
+        if (language.equals(LanguageCode.KO)) {
             this.cat1 = BannerCode.getDescription(LargeCategory.class, data.getCat1());
             this.cat2 = BannerCode.getDescription(MiddleCategory.class, data.getCat2());
             this.cat3 = BannerCode.getDescription(SmallCategory.class, data.getCat3());
         }
-        if (language.equals("eng")) {
+        if (language.equals(LanguageCode.EN)) {
             this.cat1 = BannerCode.getDescription(LargeCategoryByEng.class, data.getCat1());
             this.cat2 = BannerCode.getDescription(MiddleCategoryByEng.class, data.getCat2());
             this.cat3 = BannerCode.getDescription(SmallCategoryByEng.class, data.getCat3());
         }
-        if (language.equals("jap")) {
+        if (language.equals(LanguageCode.JA)) {
             this.cat1 = BannerCode.getDescription(LargeCategoryByJap.class, data.getCat1());
             this.cat2 = BannerCode.getDescription(MiddleCategoryByJap.class, data.getCat2());
             this.cat3 = BannerCode.getDescription(SmallCategoryByJap.class, data.getCat3());
