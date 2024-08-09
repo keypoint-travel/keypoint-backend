@@ -16,4 +16,6 @@ public interface BannerCustomRepository {
     CommonTourismDto findBannerById(LanguageCode languageCode, Long bannerId, Long memberId);
 
     List<CommentDto> findCommentListById(Long bannerId);
+
+    boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode);
 }

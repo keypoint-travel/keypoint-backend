@@ -97,4 +97,16 @@ public class CreateBannerController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    // 이미 생성된 배너에 다른 언어로 추가
+    @PostMapping("/{bannerId}")
+    public ResponseEntity<Void> saveBanner(
+        @PathVariable(value = "bannerId", required = false) Long bannerId,
+        @RequestBody @Valid BannerRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        bannerService.saveBannerByOtherLanguage(SaveUseCase.from(request), bannerId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }

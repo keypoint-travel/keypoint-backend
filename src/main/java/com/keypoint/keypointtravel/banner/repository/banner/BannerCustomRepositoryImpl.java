@@ -106,4 +106,18 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             .orderBy(bannerComment.createAt.desc())
             .fetch();
     }
+
+    @Override
+    public boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode) {
+        BannerContent bannerContent = queryFactory.selectFrom(QBannerContent.bannerContent)
+            .where(QBannerContent.bannerContent.banner.id.eq(bannerId)
+                .and(QBannerContent.bannerContent.languageCode.eq(languageCode)))
+            .fetchOne();
+        if (bannerContent != null) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 }
