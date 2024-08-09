@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.banner.dto.dto;
+package com.keypoint.keypointtravel.banner.dto.useCase;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class AdvertisementBannerDto {
+public class AdvertisementContent {
 
-    private Long bannerId;
-    private String thumbnailUrl;
-    private String detailUrl;
     private String mainTitle;
     private String subTitle;
     private String content;

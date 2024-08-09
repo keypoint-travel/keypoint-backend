@@ -5,19 +5,28 @@ import com.keypoint.keypointtravel.banner.dto.request.AdvertisementRequest;
 import com.keypoint.keypointtravel.banner.dto.response.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.FindAdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
 import com.keypoint.keypointtravel.banner.service.AdvertisementBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
 @RestController
 @RequestMapping("/api/v1/banners/advertisement")
@@ -26,11 +35,12 @@ public class AdvertisementBannerController {
 
     private final AdvertisementBannerService advertisementBannerService;
 
+    private final ReadMemberService readMemberService;
+
     @GetMapping("/image")
     public APIResponseEntity<ImageUrlResponse> transformToUrl(
         @RequestPart(value = "image") MultipartFile image,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         //todo: 관리자 인증 로직 추가 예정
         ImageUrlResponse response = advertisementBannerService.uploadImage(new ImageUseCase(image));
         return APIResponseEntity.<ImageUrlResponse>builder()
@@ -45,11 +55,10 @@ public class AdvertisementBannerController {
         @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
         @RequestPart(value = "detail") @Valid AdvertisementRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         //todo: 관리자 인증 로직 추가 예정
         AdvertisementUseCase useCase = new AdvertisementUseCase(
-            thumbnailImage, detailImage, request.getMainTitle(), request.getSubTitle(), request.getContent());
-
+            thumbnailImage, detailImage, findLanguageValue(request.getLanguage()), request.getMainTitle(),
+            request.getSubTitle(), request.getContent());
         advertisementBannerService.saveAdvertisementBanner(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -57,7 +66,6 @@ public class AdvertisementBannerController {
     @GetMapping
     public APIResponseEntity<AdvertisementBannerListResponse> findAdvertisementBannerList(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         //todo: 관리자 인증 로직 추가 예정
         List<AdvertisementBannerUseCase> useCaseList = advertisementBannerService.findAdvertisementBanners();
         AdvertisementBannerListResponse response = new AdvertisementBannerListResponse(useCaseList);
@@ -71,22 +79,40 @@ public class AdvertisementBannerController {
     public ResponseEntity<Void> deleteBanner(
         @PathVariable("bannerId") Long bannerId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         //todo: 관리자 인증 로직 추가 예정
         advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId));
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{bannerId}")
     public APIResponseEntity<AdvertisementBannerResponse> findAdvertisementBanner(
-        @PathVariable("bannerId") Long bannerId) {
-
-        AdvertisementDetailDto dto = advertisementBannerService.findAdvertisementBanner(bannerId);
+        @PathVariable("bannerId") Long bannerId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 회원의 등록 언어를 가져옴.
+        Member member = readMemberService.findMemberById(userDetails.getId());
+        LanguageCode languageCode = member.getMemberDetail().getLanguage();
+        // DB에 저장된 광고 배너 조회
+        AdvertisementDetailDto dto = advertisementBannerService.findAdvertisementBanner(
+            new FindAdvertisementUseCase(languageCode, bannerId));
         AdvertisementBannerResponse response = AdvertisementBannerResponse.from(dto);
 
         return APIResponseEntity.<AdvertisementBannerResponse>builder()
             .message("광고 배너 상세 조회")
             .data(response)
             .build();
+    }
+
+    private static LanguageCode findLanguageValue(String language) {
+        if (language.equals("kor")) {
+            return LanguageCode.KO;
+        }
+        if (language.equals("eng")) {
+            return LanguageCode.EN;
+        }
+        if (language.equals("jap")) {
+            return LanguageCode.JA;
+        }
+        throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
     }
 }

@@ -72,7 +72,9 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 bannerContent.cat3))
             .from(banner)
             .innerJoin(banner.bannerContents, bannerContent)
-            .where(banner.id.eq(bannerId).and(bannerContent.languageCode.eq(languageCode)))
+            .where(banner.id.eq(bannerId)
+                .and(bannerContent.languageCode.eq(languageCode))
+                .and(bannerContent.isDeleted.isFalse()))
             .fetchOne();
         if (dto == null) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);

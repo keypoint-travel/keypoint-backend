@@ -4,7 +4,9 @@ import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.entity.QAdvertisementBanner;
+import com.keypoint.keypointtravel.banner.entity.QAdvertisementBannerContent;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,48 +25,54 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
 
     private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
 
+    private final QAdvertisementBannerContent advertisementBannerContent = QAdvertisementBannerContent.advertisementBannerContent;
+
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     @Override
     public List<AdvertisementBannerDto> findAdvertisementBanners() {
         return queryFactory.select(Projections.constructor(AdvertisementBannerDto.class,
                 advertisementBanner.id,
-                advertisementBanner.mainTitle,
-                advertisementBanner.subTitle,
-                advertisementBanner.content,
                 select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.thumbnailImageId)),
                 select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.detailImageId)),
-                advertisementBanner.createAt,
-                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBanner.registerId)),
-                advertisementBanner.modifyAt,
-                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBanner.modifyId))
+                advertisementBannerContent.mainTitle,
+                advertisementBannerContent.subTitle,
+                advertisementBannerContent.content,
+                advertisementBannerContent.createAt,
+                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.registerId)),
+                advertisementBannerContent.modifyAt,
+                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.modifyId))
             ))
             .from(advertisementBanner)
-            .where(advertisementBanner.isExposed.isTrue())
-            .orderBy(advertisementBanner.createAt.desc())
+            .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
+            .where(advertisementBanner.isDeleted.isFalse())
+            .orderBy(advertisementBanner.modifyAt.desc())
             .fetch();
     }
 
     @Override
     public Long updateIsExposedById(Long bannerId) {
         return queryFactory.update(advertisementBanner)
-            .set(advertisementBanner.isExposed, false)
+            .set(advertisementBanner.isDeleted, true)
             .where(advertisementBanner.id.eq(bannerId))
             .execute();
     }
 
     @Override
-    public AdvertisementDetailDto findAdvertisementBannerById(Long bannerId) {
+    public AdvertisementDetailDto findAdvertisementBannerById(Long bannerId, LanguageCode languageCode) {
         return queryFactory.select(Projections.constructor(AdvertisementDetailDto.class,
                 advertisementBanner.id,
-                advertisementBanner.mainTitle,
-                advertisementBanner.subTitle,
-                advertisementBanner.content,
+                advertisementBannerContent.mainTitle,
+                advertisementBannerContent.subTitle,
+                advertisementBannerContent.content,
                 uploadFile.path
             ))
             .from(advertisementBanner)
+            .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .leftJoin(uploadFile).on(advertisementBanner.detailImageId.eq(uploadFile.id))
-            .where(advertisementBanner.id.eq(bannerId).and(advertisementBanner.isExposed.isTrue()))
+            .where(advertisementBanner.id.eq(bannerId)
+                .and(advertisementBannerContent.languageCode.eq(languageCode))
+                .and(advertisementBannerContent.isDeleted.isFalse()))
             .fetchOne();
     }
 
@@ -73,12 +81,13 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
         return queryFactory.select(Projections.constructor(AdvertisementThumbnailDto.class,
                 advertisementBanner.id,
                 uploadFile.path,
-                advertisementBanner.mainTitle,
-                advertisementBanner.subTitle
+                advertisementBannerContent.mainTitle,
+                advertisementBannerContent.subTitle
             ))
             .from(advertisementBanner)
+            .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))
-            .where(advertisementBanner.isExposed.isTrue())
+            .where(advertisementBanner.isDeleted.isFalse())
             .fetch();
     }
 }

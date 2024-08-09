@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.banner.dto.request;
 
-import com.google.firebase.database.annotations.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class BannerRequest {
     @NotBlank(message = "이미지 URL을 입력해주세요.")
     private String thumbnailImage;
 
-    @NotNull(value = "Language cannot be null")
+    @NotNull(message = "Language cannot be null.")
     private String language;
     private String placeName;
     private String address1;

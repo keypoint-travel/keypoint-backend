@@ -4,11 +4,10 @@ import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
-import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
-import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.*;
 import com.keypoint.keypointtravel.banner.entity.AdvertisementBanner;
+import com.keypoint.keypointtravel.banner.entity.AdvertisementBannerContent;
+import com.keypoint.keypointtravel.banner.repository.banner.AdvertisementBannerContentRepository;
 import com.keypoint.keypointtravel.banner.repository.banner.AdvertisementBannerRepository;
 import com.keypoint.keypointtravel.external.aws.service.S3Service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
@@ -31,6 +30,8 @@ public class AdvertisementBannerService {
     private final UploadFileService uploadFileService;
 
     private final AdvertisementBannerRepository advertisementBannerRepository;
+
+    private final AdvertisementBannerContentRepository advertisementBannerContentRepository;
 
     /**
      * 이미지 파일을 url로 변환하는 함수(광고 배너 생성 시 마크다운 언어로 이미지를 넣을 수 있도록 하기 위함)
@@ -68,11 +69,26 @@ public class AdvertisementBannerService {
                 DirectoryConstants.ADVERTISEMENT_BANNER_DETAIL_DIRECTORY
             );
             // 3. 광고 배너 저장
-            advertisementBannerRepository.save(
-                new AdvertisementBanner(useCase.getMainTitle(), useCase.getSubTitle(), useCase.getContent(), thumbnailImageId, detailImageId));
+            saveBanner(useCase, thumbnailImageId, detailImageId);
         } catch (Exception e) {
             throw new GeneralException(e);
         }
+    }
+
+    private void saveBanner(AdvertisementUseCase useCase, Long thumbnailImageId, Long detailImageId) {
+        // 배너 생성
+        AdvertisementBanner banner = new AdvertisementBanner(thumbnailImageId, detailImageId);
+        // 배너 내용 생성
+        AdvertisementBannerContent bannerContent = AdvertisementBannerContent.builder()
+            .languageCode(useCase.getLanguage())
+            .advertisementBanner(banner)
+            .mainTitle(useCase.getMainTitle())
+            .subTitle(useCase.getSubTitle())
+            .content(useCase.getContent())
+            .build();
+        // 배너 저장
+        advertisementBannerRepository.save(banner);
+        advertisementBannerContentRepository.save(bannerContent);
     }
 
     /**
@@ -83,7 +99,8 @@ public class AdvertisementBannerService {
     @Transactional(readOnly = true)
     public List<AdvertisementBannerUseCase> findAdvertisementBanners() {
         List<AdvertisementBannerDto> dtoList = advertisementBannerRepository.findAdvertisementBanners();
-        return dtoList.stream().map(AdvertisementBannerUseCase::from).toList();
+        List<AdvertisementBanner> banners = advertisementBannerRepository.findAll();
+        return null;
     }
 
     /**
@@ -103,13 +120,14 @@ public class AdvertisementBannerService {
     /**
      * 광고 배너 상세 페이지 조회 함수
      *
-     * @Param bannerId
+     * @Param bannerId, languageCose를 담은 useCase
      *
      * @Return dto(id, title, content, detailImageUrl)
      */
     @Transactional(readOnly = true)
-    public AdvertisementDetailDto findAdvertisementBanner(Long bannerId) {
-        AdvertisementDetailDto dto = advertisementBannerRepository.findAdvertisementBannerById(bannerId);
+    public AdvertisementDetailDto findAdvertisementBanner(FindAdvertisementUseCase useCase) {
+        AdvertisementDetailDto dto = advertisementBannerRepository.
+            findAdvertisementBannerById(useCase.getBannerId(), useCase.getLanguageCode());
         // 조회된 배너가 없을 경우
         if(dto == null){
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
