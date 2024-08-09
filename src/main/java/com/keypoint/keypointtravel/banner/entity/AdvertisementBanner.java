@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "advertisement_banner")
@@ -14,17 +17,8 @@ public class AdvertisementBanner extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "banner_id")
+    @Column(name = "advertisement_banner_id")
     private Long id;
-
-    @Column(nullable = false)
-    private String mainTitle;
-
-    @Column(nullable = false)
-    private String subTitle;
-
-    @Column(nullable = false)
-    private String content;
 
     @Column
     private Long thumbnailImageId;
@@ -33,14 +27,14 @@ public class AdvertisementBanner extends BaseEntity {
     private Long detailImageId;
 
     @Column
-    private boolean isExposed;
+    private boolean isDeleted;
 
-    public AdvertisementBanner(String mainTitle, String subTitle, String content, Long thumbnailImageId, Long detailImageId) {
-        this.mainTitle = mainTitle;
-        this.subTitle = subTitle;
-        this.content = content;
+    @OneToMany(mappedBy = "advertisementBanner", orphanRemoval = true)
+    private List<AdvertisementBannerContent> bannerContents = new ArrayList<>();
+
+    public AdvertisementBanner(Long thumbnailImageId, Long detailImageId) {
         this.thumbnailImageId = thumbnailImageId;
         this.detailImageId = detailImageId;
-        this.isExposed = true;
+        this.isDeleted = false;
     }
 }
