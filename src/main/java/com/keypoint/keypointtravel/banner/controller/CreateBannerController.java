@@ -73,6 +73,9 @@ public class CreateBannerController {
     }
 
     private String findLanguageValue(String language) {
+        if(language == null){
+            throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
+        }
         if (language.equals("kor")) {
             return KOREAN;
         }
@@ -89,9 +92,7 @@ public class CreateBannerController {
     public ResponseEntity<Void> saveBanner(
         @RequestBody @Valid BannerRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         //todo: 관리자 인증 로직 추가 예정
-
         bannerService.saveBanner(SaveUseCase.from(request));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
