@@ -85,7 +85,7 @@ public class FindBannerController {
             .message("추천 배너 조회")
             .data(RecommendationResponse.of(
                 around.getResponse().getBody().getItems().getItem(),
-                userDetails.getUsername(), languageCode))
+                member.getMemberDetail().getName(), languageCode))
             .build();
     }
 
