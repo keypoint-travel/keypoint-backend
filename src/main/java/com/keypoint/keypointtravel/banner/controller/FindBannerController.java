@@ -45,8 +45,9 @@ public class FindBannerController {
     @GetMapping("/{bannerId}/common")
     public APIResponseEntity<CommonBannerResponse> findCommonBanner(
         @PathVariable("bannerId") Long bannerId,
-        @RequestParam("language") String language,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // todo: 사용자 등록 언어에 따라 language 받아오도록 수정 예정
+        String language = "kor";
         CommonTourismUseCase details = findBannerService.findCommonBanner(new BannerUseCase(language, bannerId, userDetails));
         TourismListUseCase around = tourismApiService.findAround(findLanguageValue(language),
             details.getCommonTourismDto().getLongitude(), details.getCommonTourismDto().getLatitude(), serviceKey);
@@ -59,10 +60,12 @@ public class FindBannerController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/recommendation")
     public APIResponseEntity<RecommendationResponse> findRecommendationBanner(
-        @RequestParam("language") String language,
         @RequestParam("latitude") Double latitude,
         @RequestParam("longitude") Double longitude,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // todo: 사용자 등록 언어에 따라 language 받아오도록 수정 예정
+        String language = "kor";
         TourismListUseCase around = tourismApiService.findAround(
             findLanguageValue(language), longitude, latitude, serviceKey);
         if (around.getResponse().getBody().getItems().getItem().isEmpty()) {
