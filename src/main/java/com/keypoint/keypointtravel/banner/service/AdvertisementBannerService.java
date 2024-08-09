@@ -53,7 +53,7 @@ public class AdvertisementBannerService {
     /**
      * 광고 배너를 생성하는 함수
      *
-     * @Param 썸네일 이미지 파일, 상세 이미지 파일, 제목, 내용 useCase
+     * @Param 썸네일 이미지 파일, 상세 이미지 파일, 제목, 내용, 언어 useCase
      */
     @Transactional
     public void saveAdvertisementBanner(AdvertisementUseCase useCase) {
@@ -92,6 +92,35 @@ public class AdvertisementBannerService {
     }
 
     /**
+     * 이미 생성된 배너에 다른 언어로 생성하는 함수 (광고 배너 생성)
+     *
+     * @Param 제목, 내용, 언어, 배너 id useCase
+     */
+    @Transactional
+    public void saveBannerByOtherLanguage(PlusAdvertisementUseCase useCase) {
+        //이미 bannerId에 해당하는 배너에 저장할 언어로 배너 내용이 있는지 확인
+        if (advertisementBannerRepository.isExistBannerContentByLanguageCode(useCase.getBannerId(), useCase.getLanguage())) {
+            throw new GeneralException(BannerErrorCode.EXISTS_BANNER_CONTENT);
+        }
+        try {
+            // 배너 조회
+            AdvertisementBanner banner = advertisementBannerRepository.getReferenceById(useCase.getBannerId());
+            // 배너 내용 생성
+            AdvertisementBannerContent bannerContent = AdvertisementBannerContent.builder()
+                .languageCode(useCase.getLanguage())
+                .advertisementBanner(banner)
+                .mainTitle(useCase.getMainTitle())
+                .subTitle(useCase.getSubTitle())
+                .content(useCase.getContent())
+                .build();
+            // 배너 내용 저장
+            advertisementBannerContentRepository.save(bannerContent);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    /**
      * 광고 배너 목록 조회 함수
      *
      * @Return
@@ -121,7 +150,6 @@ public class AdvertisementBannerService {
      * 광고 배너 상세 페이지 조회 함수
      *
      * @Param bannerId, languageCose를 담은 useCase
-     *
      * @Return dto(id, title, content, detailImageUrl)
      */
     @Transactional(readOnly = true)
@@ -129,7 +157,7 @@ public class AdvertisementBannerService {
         AdvertisementDetailDto dto = advertisementBannerRepository.
             findAdvertisementBannerById(useCase.getBannerId(), useCase.getLanguageCode());
         // 조회된 배너가 없을 경우
-        if(dto == null){
+        if (dto == null) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return dto;

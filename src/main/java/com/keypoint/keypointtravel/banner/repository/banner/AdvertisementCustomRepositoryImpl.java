@@ -3,8 +3,7 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
-import com.keypoint.keypointtravel.banner.entity.QAdvertisementBanner;
-import com.keypoint.keypointtravel.banner.entity.QAdvertisementBannerContent;
+import com.keypoint.keypointtravel.banner.entity.*;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
@@ -89,5 +88,18 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))
             .where(advertisementBanner.isDeleted.isFalse())
             .fetch();
+    }
+
+    @Override
+    public boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode) {
+        AdvertisementBannerContent bannerContent = queryFactory.selectFrom(advertisementBannerContent)
+            .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
+                .and(advertisementBannerContent.languageCode.eq(languageCode)))
+            .fetchOne();
+        if (bannerContent != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

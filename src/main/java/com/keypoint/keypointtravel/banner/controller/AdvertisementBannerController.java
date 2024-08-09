@@ -3,10 +3,7 @@ package com.keypoint.keypointtravel.banner.controller;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.request.AdvertisementRequest;
 import com.keypoint.keypointtravel.banner.dto.response.*;
-import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.FindAdvertisementUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.ImageUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.*;
 import com.keypoint.keypointtravel.banner.service.AdvertisementBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
@@ -25,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
 @RestController
 @RequestMapping("/api/v1/banners/advertisement")
@@ -60,6 +55,19 @@ public class AdvertisementBannerController {
             thumbnailImage, detailImage, findLanguageValue(request.getLanguage()), request.getMainTitle(),
             request.getSubTitle(), request.getContent());
         advertisementBannerService.saveAdvertisementBanner(useCase);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // 이미 생성된 배너에 다른 언어로 추가
+    @PostMapping("/{bannerId}")
+    public ResponseEntity<Void> saveAdvertisementBanner(
+        @PathVariable(value = "bannerId", required = false) Long bannerId,
+        @RequestBody @Valid AdvertisementRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        PlusAdvertisementUseCase useCase = new PlusAdvertisementUseCase(bannerId, request.getMainTitle(),
+            request.getSubTitle(), request.getContent(), findLanguageValue(request.getLanguage()));
+        advertisementBannerService.saveBannerByOtherLanguage(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
