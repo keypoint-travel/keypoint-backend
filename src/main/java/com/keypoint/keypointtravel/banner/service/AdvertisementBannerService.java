@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -130,25 +131,26 @@ public class AdvertisementBannerService {
     @Transactional(readOnly = true)
     public List<AdvertisementBannerUseCase> findAdvertisementBanners() {
         List<AdvertisementBannerDto> dtoList = advertisementBannerRepository.findAdvertisementBanners();
-        HashMap<String, AdvertisementBannerUseCase> useCaseMap = new HashMap<>();
+        // 배너 목록을 contentId를 key로 하는 useCase 배열로 저장
+        List<AdvertisementBannerUseCase> useCases = conversionToUseCase(dtoList);
+        Collections.reverse(useCases);
+        // 배너 내용을 최신순으로 정렬
+        useCases.forEach(AdvertisementBannerUseCase::sortContents);
+        return useCases;
+    }
 
+    private List<AdvertisementBannerUseCase> conversionToUseCase(List<AdvertisementBannerDto> dtoList) {
+        HashMap<String, AdvertisementBannerUseCase> useCaseMap = new HashMap<>();
         // 배너 목록을 contentId를 key로 하는 배열로 저장
         for (AdvertisementBannerDto dto : dtoList) {
             String contentId = String.valueOf(dto.getBannerId());
             AdvertisementBannerUseCase useCase = useCaseMap.get(contentId);
             if (useCase == null) {
-                useCase = new AdvertisementBannerUseCase(
-                    contentId,
-                    dto.getThumbnailUrl(),
-                    dto.getDetailUrl(),
-                    new ArrayList<>()
-                );
+                useCase = new AdvertisementBannerUseCase(contentId, dto.getThumbnailUrl(), dto.getDetailUrl(), new ArrayList<>());
                 useCaseMap.put(contentId, useCase);
             }
-            useCase.getContents().add(new AdvertisementContent(dto.getMainTitle(), dto.getSubTitle(), dto.getContent(),
-                dto.getCreatedAt(), dto.getWriterName(), dto.getUpdatedAt(), dto.getUpdaterName()));
+            useCase.getContents().add(AdvertisementContent.from(dto));
         }
-
         return new ArrayList<>(useCaseMap.values());
     }
 

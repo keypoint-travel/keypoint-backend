@@ -16,4 +16,8 @@ public class AdvertisementBannerUseCase {
     private String thumbnailImage;
     private String detailImage;
     private List<AdvertisementContent> contents;
+
+    public void sortContents() {
+        contents.sort((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()));
+    }
 }
