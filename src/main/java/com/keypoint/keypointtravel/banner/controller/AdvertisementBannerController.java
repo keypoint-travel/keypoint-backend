@@ -129,13 +129,13 @@ public class AdvertisementBannerController {
     }
 
     private static LanguageCode findLanguageValue(String language) {
-        if (language.equals("kor")) {
+        if (language.equals("ko")) {
             return LanguageCode.KO;
         }
-        if (language.equals("eng")) {
+        if (language.equals("en")) {
             return LanguageCode.EN;
         }
-        if (language.equals("jap")) {
+        if (language.equals("ja")) {
             return LanguageCode.JA;
         }
         throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);

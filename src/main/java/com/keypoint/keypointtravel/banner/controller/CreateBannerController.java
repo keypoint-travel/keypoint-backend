@@ -76,13 +76,13 @@ public class CreateBannerController {
         if(language == null){
             throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
         }
-        if (language.equals("kor")) {
+        if (language.equals("ko")) {
             return KOREAN;
         }
-        if (language.equals("eng")) {
+        if (language.equals("en")) {
             return ENGLISH;
         }
-        if (language.equals("jap")) {
+        if (language.equals("ja")) {
             return JAPANESE;
         }
         throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);

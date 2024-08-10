@@ -40,19 +40,19 @@ public class BannerDetails {
     }
 
     private void buildTypeByLanguage(Item data, String language) {
-        if (language.equals("kor")) {
+        if (language.equals("ko")) {
             this.tourType = BannerCode.getDescription(ContentType.class, data.getContenttypeid());
             this.cat1 = BannerCode.getDescription(LargeCategory.class, data.getCat1());
             this.cat2 = BannerCode.getDescription(MiddleCategory.class, data.getCat2());
             this.cat3 = BannerCode.getDescription(SmallCategory.class, data.getCat3());
         }
-        if (language.equals("eng")) {
+        if (language.equals("en")) {
             this.tourType = BannerCode.getDescription(ContentTypeByEng.class, data.getContenttypeid());
             this.cat1 = BannerCode.getDescription(LargeCategoryByEng.class, data.getCat1());
             this.cat2 = BannerCode.getDescription(MiddleCategoryByEng.class, data.getCat2());
             this.cat3 = BannerCode.getDescription(SmallCategoryByEng.class, data.getCat3());
         }
-        if (language.equals("jap")) {
+        if (language.equals("ja")) {
             this.tourType = BannerCode.getDescription(ContentTypeByJap.class, data.getContenttypeid());
             this.cat1 = BannerCode.getDescription(LargeCategoryByJap.class, data.getCat1());
             this.cat2 = BannerCode.getDescription(MiddleCategoryByJap.class, data.getCat2());
