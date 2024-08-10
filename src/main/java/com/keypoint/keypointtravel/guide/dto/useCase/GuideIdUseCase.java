@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.guide.controller;
+package com.keypoint.keypointtravel.guide.dto.useCase;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
