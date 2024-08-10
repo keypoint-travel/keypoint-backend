@@ -10,7 +10,9 @@ import java.util.List;
 
 public interface BannerCustomRepository {
 
-    void updateIsExposedById(Long bannerId);
+    void updateIsDeletedById(Long bannerId);
+
+    void updateContentIsDeletedById(Long bannerId);
 
     List<Banner> findBannerList();
 

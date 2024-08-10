@@ -38,7 +38,7 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
 
     @Override
-    public void updateIsExposedById(Long bannerId) {
+    public void updateIsDeletedById(Long bannerId) {
         long count = queryFactory.update(banner)
             .set(banner.isDeleted, true)
             .where(banner.id.eq(bannerId))
@@ -47,6 +47,14 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
         if (count < 1) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
+    }
+
+    @Override
+    public void updateContentIsDeletedById(Long bannerId) {
+        long count = queryFactory.update(bannerContent)
+            .set(bannerContent.isDeleted, true)
+            .where(bannerContent.banner.id.eq(bannerId))
+            .execute();
     }
 
     @Override

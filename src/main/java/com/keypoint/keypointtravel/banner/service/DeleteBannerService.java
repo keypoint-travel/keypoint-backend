@@ -19,6 +19,7 @@ public class DeleteBannerService {
      */
     @Transactional
     public void deleteBanner(DeleteUseCase deleteUseCase) {
-        bannerRepository.updateIsExposedById(deleteUseCase.bannerId());
+        bannerRepository.updateIsDeletedById(deleteUseCase.bannerId());
+        bannerRepository.updateContentIsDeletedById(deleteUseCase.bannerId());
     }
 }
