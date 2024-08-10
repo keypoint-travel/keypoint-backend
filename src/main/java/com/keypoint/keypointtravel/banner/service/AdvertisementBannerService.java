@@ -191,7 +191,7 @@ public class AdvertisementBannerService {
      * @Return dto(id, thumbnailImageUrl, title)
      */
     @Transactional(readOnly = true)
-    public List<AdvertisementThumbnailDto> findThumbnailList() {
-        return advertisementBannerRepository.findAdvertisementThumbnailList();
+    public List<AdvertisementThumbnailDto> findThumbnailList(Long memberId) {
+        return advertisementBannerRepository.findAdvertisementThumbnailList(memberId);
     }
 }

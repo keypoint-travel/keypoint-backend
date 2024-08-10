@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
-import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,11 +17,11 @@ public class ThumbnailListResponse {
 
     private List<BannerThumbnail> banners = new ArrayList<>();
 
-    public void addCommonBanner(List<CommonBannerThumbnailUseCase> commonBanners) {
-        for (CommonBannerThumbnailUseCase banner : commonBanners) {
+    public void addCommonBanner(List<CommonBannerThumbnailDto> commonBanners) {
+        for (CommonBannerThumbnailDto banner : commonBanners) {
             banners.add(new BannerThumbnail(
-                banner.getContentId(),
-                banner.getThumbnailImageUrl(),
+                String.valueOf(banner.getContentId()),
+                banner.getThumbnailImage(),
                 banner.getMainTitle(),
                 banner.getSubTitle(),
                 BannerType.COMMON_BANNER)

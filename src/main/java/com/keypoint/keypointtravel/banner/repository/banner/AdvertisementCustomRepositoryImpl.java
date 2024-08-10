@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -76,7 +77,7 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     }
 
     @Override
-    public List<AdvertisementThumbnailDto> findAdvertisementThumbnailList() {
+    public List<AdvertisementThumbnailDto> findAdvertisementThumbnailList(Long memberId) {
         return queryFactory.select(Projections.constructor(AdvertisementThumbnailDto.class,
                 advertisementBanner.id,
                 uploadFile.path,
@@ -86,8 +87,16 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             .from(advertisementBanner)
             .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))
-            .where(advertisementBanner.isDeleted.isFalse())
+            .where(advertisementBanner.isDeleted.isFalse()
+                .and(advertisementBannerContent.languageCode.eq(getMemberLanguage(memberId))))
+            .orderBy(advertisementBannerContent.modifyAt.desc())
             .fetch();
+    }
+
+    private JPQLQuery<LanguageCode> getMemberLanguage(Long memberId){
+        return select(memberDetail.language)
+            .from(memberDetail)
+            .where(memberDetail.member.id.eq(memberId));
     }
 
     @Override

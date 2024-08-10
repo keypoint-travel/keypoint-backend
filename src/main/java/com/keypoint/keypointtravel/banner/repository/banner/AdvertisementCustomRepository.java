@@ -15,7 +15,7 @@ public interface AdvertisementCustomRepository {
 
     AdvertisementDetailDto findAdvertisementBannerById(Long bannerId, LanguageCode languageCode);
 
-    List<AdvertisementThumbnailDto> findAdvertisementThumbnailList();
+    List<AdvertisementThumbnailDto> findAdvertisementThumbnailList(Long memberId);
 
     boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode);
 }

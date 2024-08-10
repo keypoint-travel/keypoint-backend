@@ -3,19 +3,23 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.banner.entity.*;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import static com.querydsl.jpa.JPAExpressions.select;
 import static com.querydsl.jpa.JPAExpressions.selectOne;
 
 @RequiredArgsConstructor
@@ -30,6 +34,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     private final QBannerContent bannerContent = QBannerContent.bannerContent;
+
+    private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
 
     @Override
     public void updateIsExposedById(Long bannerId) {
@@ -51,6 +57,26 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             .where(banner.isDeleted.isFalse())
             .orderBy(banner.modifyAt.desc())
             .fetch();
+    }
+
+    @Override
+    public List<CommonBannerThumbnailDto> findThumbnailList(Long memberId) {
+        return queryFactory.select(Projections.constructor(CommonBannerThumbnailDto.class,
+                banner.id,
+                bannerContent.thumbnailImage,
+                bannerContent.mainTitle,
+                bannerContent.subTitle))
+            .from(banner)
+            .innerJoin(banner.bannerContents, bannerContent)
+            .where(bannerContent.isDeleted.isFalse().and(bannerContent.languageCode.eq(getMemberLanguage(memberId))))
+            .orderBy(bannerContent.modifyAt.desc())
+            .fetch();
+    }
+
+    private JPQLQuery<LanguageCode> getMemberLanguage(Long memberId){
+        return select(memberDetail.language)
+            .from(memberDetail)
+            .where(memberDetail.member.id.eq(memberId));
     }
 
     @Override
