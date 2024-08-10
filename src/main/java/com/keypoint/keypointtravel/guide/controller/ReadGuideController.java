@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
