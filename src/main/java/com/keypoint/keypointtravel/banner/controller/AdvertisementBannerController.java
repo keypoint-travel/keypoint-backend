@@ -86,9 +86,10 @@ public class AdvertisementBannerController {
     @DeleteMapping("/{bannerId}")
     public ResponseEntity<Void> deleteBanner(
         @PathVariable("bannerId") Long bannerId,
+        @RequestParam(value = "language", required = false) String language,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId));
+        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, language));
         return ResponseEntity.noContent().build();
     }
 

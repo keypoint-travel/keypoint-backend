@@ -12,7 +12,9 @@ public interface BannerCustomRepository {
 
     void updateIsDeletedById(Long bannerId);
 
-    void updateContentIsDeletedById(Long bannerId);
+    void updateContentIsDeletedById(Long bannerId, LanguageCode languageCode);
+
+    boolean existsBannerContentByBannerId(Long bannerId);
 
     List<Banner> findBannerList();
 

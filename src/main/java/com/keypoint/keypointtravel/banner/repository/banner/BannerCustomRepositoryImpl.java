@@ -50,11 +50,25 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     }
 
     @Override
-    public void updateContentIsDeletedById(Long bannerId) {
-        long count = queryFactory.update(bannerContent)
+    public void updateContentIsDeletedById(Long bannerId, LanguageCode languageCode) {
+        BooleanExpression languageCondition = languageCode == null ? Expressions.TRUE : bannerContent.languageCode.eq(languageCode);
+        queryFactory.update(bannerContent)
             .set(bannerContent.isDeleted, true)
-            .where(bannerContent.banner.id.eq(bannerId))
+            .where(bannerContent.banner.id.eq(bannerId)
+                .and(languageCondition))
             .execute();
+    }
+
+    @Override
+    public boolean existsBannerContentByBannerId(Long bannerId) {
+        List<BannerContent> contents = queryFactory.selectFrom(bannerContent)
+            .where(bannerContent.banner.id.eq(bannerId).and(bannerContent.isDeleted.isFalse()))
+            .fetch();
+        System.out.println(contents.size() + " contents.size()");
+        if (contents.size() > 0){
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -81,7 +95,7 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             .fetch();
     }
 
-    private JPQLQuery<LanguageCode> getMemberLanguage(Long memberId){
+    private JPQLQuery<LanguageCode> getMemberLanguage(Long memberId) {
         return select(memberDetail.language)
             .from(memberDetail)
             .where(memberDetail.member.id.eq(memberId));

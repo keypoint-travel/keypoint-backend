@@ -161,7 +161,7 @@ public class AdvertisementBannerService {
      */
     @Transactional
     public void deleteBanner(DeleteUseCase deleteUseCase) {
-        Long count = advertisementBannerRepository.updateIsExposedById(deleteUseCase.bannerId());
+        Long count = advertisementBannerRepository.updateIsExposedById(deleteUseCase.getBannerId());
         // 삭제된 배너가 없을 경우
         if (count < 1) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);

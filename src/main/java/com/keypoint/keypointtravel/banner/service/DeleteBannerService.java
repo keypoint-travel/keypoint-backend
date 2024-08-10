@@ -19,7 +19,17 @@ public class DeleteBannerService {
      */
     @Transactional
     public void deleteBanner(DeleteUseCase deleteUseCase) {
-        bannerRepository.updateIsDeletedById(deleteUseCase.bannerId());
-        bannerRepository.updateContentIsDeletedById(deleteUseCase.bannerId());
+        // 언어 코드가 없을 경우, 해당 배너 및 모든 언어 코드에 해당하는 배너 내용 삭제
+        if (deleteUseCase.getLanguageCode() == null) {
+            bannerRepository.updateIsDeletedById(deleteUseCase.getBannerId());
+            bannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(), deleteUseCase.getLanguageCode());
+            return;
+        }
+        // 언어 코드가 있을 경우, 해당 언어 코드에 해당하는 배너 내용 삭제
+        bannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(), deleteUseCase.getLanguageCode());
+        // 해당 배너의 모든 언어 코드에 해당하는 배너 내용이 없을 경우, 배너 삭제
+        if (!bannerRepository.existsBannerContentByBannerId(deleteUseCase.getBannerId())) {
+            bannerRepository.updateIsDeletedById(deleteUseCase.getBannerId());
+        }
     }
 }
