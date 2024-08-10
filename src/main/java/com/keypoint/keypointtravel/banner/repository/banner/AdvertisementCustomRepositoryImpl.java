@@ -45,7 +45,6 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             .from(advertisementBanner)
             .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .where(advertisementBanner.isDeleted.isFalse())
-            .orderBy(advertisementBanner.modifyAt.desc())
             .fetch();
     }
 

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -128,8 +130,26 @@ public class AdvertisementBannerService {
     @Transactional(readOnly = true)
     public List<AdvertisementBannerUseCase> findAdvertisementBanners() {
         List<AdvertisementBannerDto> dtoList = advertisementBannerRepository.findAdvertisementBanners();
-        List<AdvertisementBanner> banners = advertisementBannerRepository.findAll();
-        return null;
+        HashMap<String, AdvertisementBannerUseCase> useCaseMap = new HashMap<>();
+
+        // 배너 목록을 contentId를 key로 하는 배열로 저장
+        for (AdvertisementBannerDto dto : dtoList) {
+            String contentId = String.valueOf(dto.getBannerId());
+            AdvertisementBannerUseCase useCase = useCaseMap.get(contentId);
+            if (useCase == null) {
+                useCase = new AdvertisementBannerUseCase(
+                    contentId,
+                    dto.getThumbnailUrl(),
+                    dto.getDetailUrl(),
+                    new ArrayList<>()
+                );
+                useCaseMap.put(contentId, useCase);
+            }
+            useCase.getContents().add(new AdvertisementContent(dto.getMainTitle(), dto.getSubTitle(), dto.getContent(),
+                dto.getCreatedAt(), dto.getWriterName(), dto.getUpdatedAt(), dto.getUpdaterName()));
+        }
+
+        return new ArrayList<>(useCaseMap.values());
     }
 
     /**
