@@ -1,11 +1,9 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
-import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
-import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementContent;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementContent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter

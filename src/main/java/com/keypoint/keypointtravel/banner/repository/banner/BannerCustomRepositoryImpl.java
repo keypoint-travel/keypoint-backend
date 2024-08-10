@@ -4,6 +4,7 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditBannerUseCase;
 import com.keypoint.keypointtravel.banner.entity.*;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
@@ -168,5 +169,20 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             return false;
         }
 
+    }
+
+    @Override
+    public void updateBannerContentById(EditBannerUseCase useCase) {
+        long count = queryFactory.update(bannerContent)
+            .set(bannerContent.mainTitle, useCase.getMainTitle())
+            .set(bannerContent.subTitle, useCase.getSubTitle())
+            .set(bannerContent.thumbnailImage, useCase.getThumbnailImage())
+            .where(bannerContent.banner.id.eq(useCase.getBannerId())
+                .and(bannerContent.languageCode.eq(useCase.getLanguage()))
+                .and(bannerContent.isDeleted.isFalse()))
+            .execute();
+        if (count < 1) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
     }
 }

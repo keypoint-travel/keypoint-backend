@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.banner.dto.useCase;
+package com.keypoint.keypointtravel.banner.dto.useCase.advertisement;
 
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import lombok.AllArgsConstructor;

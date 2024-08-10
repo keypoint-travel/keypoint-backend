@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
-import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerType;
 import lombok.AllArgsConstructor;

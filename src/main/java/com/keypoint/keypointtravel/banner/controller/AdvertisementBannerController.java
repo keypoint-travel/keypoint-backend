@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.request.AdvertisementRequest;
 import com.keypoint.keypointtravel.banner.dto.response.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.*;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.service.AdvertisementBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
