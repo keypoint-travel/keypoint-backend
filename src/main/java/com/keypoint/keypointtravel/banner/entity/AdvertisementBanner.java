@@ -37,4 +37,9 @@ public class AdvertisementBanner extends BaseEntity {
         this.detailImageId = detailImageId;
         this.isDeleted = false;
     }
+
+    public void updateBanner(Long thumbnailImageId, Long detailImageId){
+        this.thumbnailImageId = thumbnailImageId;
+        this.detailImageId = detailImageId;
+    }
 }

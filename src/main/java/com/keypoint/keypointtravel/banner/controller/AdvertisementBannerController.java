@@ -113,6 +113,21 @@ public class AdvertisementBannerController {
             .build();
     }
 
+    @PatchMapping("/{bannerId}")
+    public ResponseEntity<Void> editAdvertisementBanner(
+        @PathVariable("bannerId") Long bannerId,
+        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
+        @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
+        @RequestPart(value = "detail") @Valid AdvertisementRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        AdvertisementUseCase useCase = new AdvertisementUseCase(
+            thumbnailImage, detailImage, findLanguageValue(request.getLanguage()), request.getMainTitle(),
+            request.getSubTitle(), request.getContent());
+        advertisementBannerService.editAdvertisementBanner(bannerId, useCase);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     private static LanguageCode findLanguageValue(String language) {
         if (language.equals("kor")) {
             return LanguageCode.KO;

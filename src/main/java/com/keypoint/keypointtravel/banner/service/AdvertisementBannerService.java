@@ -204,4 +204,38 @@ public class AdvertisementBannerService {
     public List<AdvertisementThumbnailDto> findThumbnailList(Long memberId) {
         return advertisementBannerRepository.findAdvertisementThumbnailList(memberId);
     }
+
+    /**
+     * 광고 배너 수정 함수
+     *
+     * @Param bannerId, language, 수정 내용을 담은 useCase
+     */
+    @Transactional
+    public void editAdvertisementBanner(Long bannerId, AdvertisementUseCase useCase) {
+        // bannerId, language로 배너(fetchJoin) 및 배너 내용 조회
+        AdvertisementBannerContent bannerContent = advertisementBannerRepository
+            .findAdvertisementBanner(bannerId, useCase.getLanguage());
+        Long prevThumbnailImageId = bannerContent.getAdvertisementBanner().getThumbnailImageId();
+        Long prevDetailImageId = bannerContent.getAdvertisementBanner().getDetailImageId();
+        try {
+            // 1. 썸네일 이미지 저장
+            Long thumbnailImageId = uploadFileService.saveUploadFile(
+                useCase.getThumbnailImage(),
+                DirectoryConstants.ADVERTISEMENT_BANNER_THUMBNAIL_DIRECTORY
+            );
+            // 2. 상세 이미지 저장
+            Long detailImageId = uploadFileService.saveUploadFile(
+                useCase.getDetailImage(),
+                DirectoryConstants.ADVERTISEMENT_BANNER_DETAIL_DIRECTORY
+            );
+            // 3. 광고 배너 수정
+            bannerContent.updateBannerContent(useCase.getMainTitle(), useCase.getSubTitle(), useCase.getContent(),
+                thumbnailImageId, detailImageId);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+        // 새로 저장 후 이전 이미지 삭제
+        uploadFileService.deleteUploadFile(prevThumbnailImageId);
+        uploadFileService.deleteUploadFile(prevDetailImageId);
+    }
 }

@@ -46,4 +46,12 @@ public class AdvertisementBannerContent extends LanguageEntity {
     public AdvertisementBannerContent() {
         super(LanguageCode.KO);
     }
+
+    public void updateBannerContent(String mainTitle, String subTitle, String content,
+                                    Long thumbnailImageId, Long detailImageId) {
+        this.mainTitle = mainTitle;
+        this.subTitle = subTitle;
+        this.content = content;
+        this.getAdvertisementBanner().updateBanner(thumbnailImageId, detailImageId);
+    }
 }
