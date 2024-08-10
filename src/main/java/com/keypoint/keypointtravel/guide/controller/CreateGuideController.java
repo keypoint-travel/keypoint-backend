@@ -1,14 +1,20 @@
 package com.keypoint.keypointtravel.guide.controller;
 
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.guide.dto.request.CreateGuideRequest;
+import com.keypoint.keypointtravel.guide.dto.request.CreateGuideTranslationRequest;
+import com.keypoint.keypointtravel.guide.dto.useCase.CreateGuideTranslationUseCase;
+import com.keypoint.keypointtravel.guide.dto.useCase.CreateGuideUseCase;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,19 +22,23 @@ import lombok.RequiredArgsConstructor;
 public class CreateGuideController {
     
     @PostMapping("")
-    public APIResponseEntity<?> addGuide() {
-
-        return APIResponseEntity.<?>builder()
+    public APIResponseEntity<Void> addGuide(
+        @Valid @RequestPart(value = "guide") CreateGuideRequest request,
+        @RequestPart(required = false) MultipartFile thumbnailImage
+    ) {
+        CreateGuideUseCase useCase = CreateGuideUseCase.of(request, thumbnailImage);
+        return APIResponseEntity.<Void>builder()
                 .message("이용 가이드 생성 성공")
                 .build();
     }
     
     @GetMapping("{guideId}/translations")
-    public APIResponseEntity<?> addGuideTranslation(
-        @RequestParam(value = "guideId") Long guideId
+    public APIResponseEntity<Void> addGuideTranslation(
+        @RequestParam(value = "guideId") Long guideId,
+        @Valid @RequestBody CreateGuideTranslationRequest request
         ) {
-
-        return APIResponseEntity.<?>builder()
+        CreateGuideTranslationUseCase useCase = CreateGuideTranslationUseCase.of(guideId, request);
+        return APIResponseEntity.<Void>builder()
             .message("이용 가이드 생성 성공")
             .build();
     }
