@@ -50,7 +50,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             ))
             .from(advertisementBanner)
             .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
-            .where(advertisementBanner.isDeleted.isFalse())
+            .where(advertisementBanner.isDeleted.isFalse()
+                .and(advertisementBannerContent.isDeleted.isFalse()))
             .fetch();
     }
 
@@ -118,7 +119,7 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             .from(advertisementBanner)
             .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .leftJoin(uploadFile).on(advertisementBanner.thumbnailImageId.eq(uploadFile.id))
-            .where(advertisementBanner.isDeleted.isFalse()
+            .where(advertisementBannerContent.isDeleted.isFalse()
                 .and(advertisementBannerContent.languageCode.eq(getMemberLanguage(memberId))))
             .orderBy(advertisementBannerContent.modifyAt.desc())
             .fetch();
@@ -134,6 +135,7 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     public boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode) {
         AdvertisementBannerContent bannerContent = queryFactory.selectFrom(advertisementBannerContent)
             .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
+                .and(advertisementBannerContent.isDeleted.isFalse())
                 .and(advertisementBannerContent.languageCode.eq(languageCode)))
             .fetchOne();
         if (bannerContent != null) {

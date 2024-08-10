@@ -17,6 +17,7 @@ public class CommonBannerSummaryUseCase {
     public static CommonBannerSummaryUseCase from(Banner banner) {
         return new CommonBannerSummaryUseCase(
             banner.getId(), banner.getBannerContents().stream()
+            .filter(bannerContent -> !bannerContent.isDeleted())
             .map(bannerContent -> SummaryUseCase.of(bannerContent, banner.getAreaCode())).toList());
     }
 }
