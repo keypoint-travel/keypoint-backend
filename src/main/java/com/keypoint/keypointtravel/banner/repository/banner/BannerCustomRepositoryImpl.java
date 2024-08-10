@@ -64,7 +64,6 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
         List<BannerContent> contents = queryFactory.selectFrom(bannerContent)
             .where(bannerContent.banner.id.eq(bannerId).and(bannerContent.isDeleted.isFalse()))
             .fetch();
-        System.out.println(contents.size() + " contents.size()");
         if (contents.size() > 0){
             return true;
         }

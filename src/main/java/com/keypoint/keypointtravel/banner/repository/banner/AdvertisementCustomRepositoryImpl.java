@@ -5,9 +5,13 @@ import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.entity.*;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -51,11 +55,38 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     }
 
     @Override
-    public Long updateIsExposedById(Long bannerId) {
-        return queryFactory.update(advertisementBanner)
+    public void updateIsDeletedById(Long bannerId) {
+        long count = queryFactory.update(advertisementBanner)
             .set(advertisementBanner.isDeleted, true)
             .where(advertisementBanner.id.eq(bannerId))
             .execute();
+        // 삭제된 배너가 없을 경우
+        if (count < 1) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+    }
+
+    @Override
+    public void updateContentIsDeletedById(Long bannerId, LanguageCode languageCode) {
+        BooleanExpression languageCondition = languageCode == null ?
+            Expressions.TRUE : advertisementBannerContent.languageCode.eq(languageCode);
+        queryFactory.update(advertisementBannerContent)
+            .set(advertisementBannerContent.isDeleted, true)
+            .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
+                .and(languageCondition))
+            .execute();
+    }
+
+    @Override
+    public boolean existsBannerContentByBannerId(Long bannerId) {
+        List<AdvertisementBannerContent> contents = queryFactory.selectFrom(advertisementBannerContent)
+            .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
+                .and(advertisementBannerContent.isDeleted.isFalse()))
+            .fetch();
+        if (contents.size() > 0){
+            return true;
+        }
+        return false;
     }
 
     @Override

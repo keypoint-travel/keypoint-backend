@@ -155,16 +155,23 @@ public class AdvertisementBannerService {
     }
 
     /**
-     * Banner 삭제하는 함수(isExposed를 false로) (공통 배너 삭제)
+     * Banner 삭제하는 함수(isDeleted를 false로) (공통 배너 삭제)
      *
-     * @Param bannerId를 담은 useCase
+     * @Param bannerId, language 를 담은 useCase
      */
     @Transactional
     public void deleteBanner(DeleteUseCase deleteUseCase) {
-        Long count = advertisementBannerRepository.updateIsExposedById(deleteUseCase.getBannerId());
-        // 삭제된 배너가 없을 경우
-        if (count < 1) {
-            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        // 언어 코드가 없을 경우, 해당 배너 및 모든 언어 코드에 해당하는 배너 내용 삭제
+        if (deleteUseCase.getLanguageCode() == null) {
+            advertisementBannerRepository.updateIsDeletedById(deleteUseCase.getBannerId());
+            advertisementBannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(), deleteUseCase.getLanguageCode());
+            return;
+        }
+        // 언어 코드가 있을 경우, 해당 언어 코드에 해당하는 배너 내용 삭제
+        advertisementBannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(), deleteUseCase.getLanguageCode());
+        // 해당 배너의 모든 언어 코드에 해당하는 배너 내용이 없을 경우, 배너 삭제
+        if (!advertisementBannerRepository.existsBannerContentByBannerId(deleteUseCase.getBannerId())) {
+            advertisementBannerRepository.updateIsDeletedById(deleteUseCase.getBannerId());
         }
     }
 

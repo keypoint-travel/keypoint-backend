@@ -11,7 +11,11 @@ public interface AdvertisementCustomRepository {
 
     List<AdvertisementBannerDto> findAdvertisementBanners();
 
-    Long updateIsExposedById(Long bannerId);
+    void updateIsDeletedById(Long bannerId);
+
+    void updateContentIsDeletedById(Long bannerId, LanguageCode languageCode);
+
+    boolean existsBannerContentByBannerId(Long bannerId);
 
     AdvertisementDetailDto findAdvertisementBannerById(Long bannerId, LanguageCode languageCode);
 
