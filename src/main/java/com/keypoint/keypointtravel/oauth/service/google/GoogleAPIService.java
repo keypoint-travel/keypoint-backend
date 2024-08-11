@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.oauth.service;
+package com.keypoint.keypointtravel.oauth.service.google;
 
 import com.keypoint.keypointtravel.global.constants.GoogleAPIConstants;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
