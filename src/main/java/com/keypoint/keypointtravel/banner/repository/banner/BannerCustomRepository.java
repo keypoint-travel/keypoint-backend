@@ -2,17 +2,30 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditBannerUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 
 import java.util.List;
 
 public interface BannerCustomRepository {
 
-    void updateIsExposedById(Long bannerId);
+    void updateIsDeletedById(Long bannerId);
+
+    void updateContentIsDeletedById(Long bannerId, LanguageCode languageCode);
+
+    boolean existsBannerContentByBannerId(Long bannerId);
 
     List<Banner> findBannerList();
 
-    CommonTourismDto findBannerById(Long bannerId, Long memberId);
+    List<CommonBannerThumbnailDto> findThumbnailList(Long memberId);
+
+    CommonTourismDto findBannerById(LanguageCode languageCode, Long bannerId, Long memberId);
 
     List<CommentDto> findCommentListById(Long bannerId);
+
+    boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode);
+
+    void updateBannerContentById(EditBannerUseCase useCase);
 }

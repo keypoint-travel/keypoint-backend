@@ -13,8 +13,8 @@ public class CommentResponse {
     private String content;
     private Long writerId;
     private String writerName;
-    private String profileImageUrl;
-    private LocalDateTime createAt;
+    private String profileImage;
+    private LocalDateTime createdAt;
 
     public static CommentResponse from(CommentDto data) {
         return new CommentResponse(
@@ -23,6 +23,6 @@ public class CommentResponse {
             data.getWriterId(),
             data.getWriterName(),
             data.getProfileImageUrl(),
-            data.getCreateAt());
+            data.getCreatedAt());
     }
 }

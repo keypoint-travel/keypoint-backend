@@ -1,12 +1,7 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Item;
-import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
-import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
-import com.keypoint.keypointtravel.global.enumType.banner.ContentType;
-import com.keypoint.keypointtravel.global.enumType.banner.LargeCategory;
-import com.keypoint.keypointtravel.global.enumType.banner.MiddleCategory;
-import com.keypoint.keypointtravel.global.enumType.banner.SmallCategory;
+import com.keypoint.keypointtravel.global.enumType.banner.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,22 +22,41 @@ public class BannerDetails {
     private String latitude;
     private String longitude;
     private String thumbnailImage;
-    private String title;
+    private String placeName;
 
-    public static BannerDetails from(Item data) {
-        return BannerDetails.builder()
+    public static BannerDetails from(Item data, String language) {
+        BannerDetails bannerDetails = BannerDetails.builder()
             .contentId(data.getContentid())
             .region(BannerCode.getDescription(AreaCode.class, data.getAreacode()))
-            .tourType(BannerCode.getDescription(ContentType.class, data.getContenttypeid()))
-            .cat1(BannerCode.getDescription(LargeCategory.class, data.getCat1()))
-            .cat2(BannerCode.getDescription(MiddleCategory.class, data.getCat2()))
-            .cat3(BannerCode.getDescription(SmallCategory.class, data.getCat3()))
             .address1(data.getAddr1())
             .address2(data.getAddr2())
             .latitude(data.getMapy())
             .longitude(data.getMapx())
             .thumbnailImage(data.getFirstimage())
-            .title(data.getTitle())
+            .placeName(data.getTitle())
             .build();
+        bannerDetails.buildTypeByLanguage(data, language);
+        return bannerDetails;
+    }
+
+    private void buildTypeByLanguage(Item data, String language) {
+        if (language.equals("ko")) {
+            this.tourType = BannerCode.getDescription(ContentType.class, data.getContenttypeid());
+            this.cat1 = BannerCode.getDescription(LargeCategory.class, data.getCat1());
+            this.cat2 = BannerCode.getDescription(MiddleCategory.class, data.getCat2());
+            this.cat3 = BannerCode.getDescription(SmallCategory.class, data.getCat3());
+        }
+        if (language.equals("en")) {
+            this.tourType = BannerCode.getDescription(ContentTypeByEng.class, data.getContenttypeid());
+            this.cat1 = BannerCode.getDescription(LargeCategoryByEng.class, data.getCat1());
+            this.cat2 = BannerCode.getDescription(MiddleCategoryByEng.class, data.getCat2());
+            this.cat3 = BannerCode.getDescription(SmallCategoryByEng.class, data.getCat3());
+        }
+        if (language.equals("ja")) {
+            this.tourType = BannerCode.getDescription(ContentTypeByJap.class, data.getContenttypeid());
+            this.cat1 = BannerCode.getDescription(LargeCategoryByJap.class, data.getCat1());
+            this.cat2 = BannerCode.getDescription(MiddleCategoryByJap.class, data.getCat2());
+            this.cat3 = BannerCode.getDescription(SmallCategoryByJap.class, data.getCat3());
+        }
     }
 }

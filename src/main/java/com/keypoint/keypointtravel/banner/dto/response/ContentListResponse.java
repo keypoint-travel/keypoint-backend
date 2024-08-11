@@ -26,9 +26,9 @@ public class ContentListResponse {
     private boolean empty;
     private int pageNumber;
 
-    public static ContentListResponse from(Body data) {
+    public static ContentListResponse from(Body data, String language) {
         return ContentListResponse.builder()
-            .contents(data.getItems().getItem().stream().map(BannerDetails::from).toList())
+            .contents(data.getItems().getItem().stream().map(item -> BannerDetails.from(item, language)).toList())
             .last(data.getPageNo() == getTotalPage(data.getTotalCount()))
             .totalPages(getTotalPage(data.getTotalCount()))
             .totalElements(data.getTotalCount())
