@@ -47,4 +47,20 @@ public class UploadFileService {
     public void deleteUploadFile(Long uploadFileId) {
         uploadFileRepository.updateIsDeletedTrue(uploadFileId);
     }
+
+    /**
+     * UploadFile 업데이트 하는 함수
+     *
+     * @param uploadFileId  업데이트할 id
+     * @param file          변경할 파일
+     * @param directoryName 새로 저장하는 폴더명
+     */
+    public void updateUploadFile(Long uploadFileId, MultipartFile file, String directoryName)
+        throws IOException {
+        // 1. s3 파일 업로드
+        String fileName = s3Service.uploadFileInS3(file, directoryName);
+
+        // 2. UploadFile 저장
+        uploadFileRepository.updateUploadFile(uploadFileId, fileName, file);
+    }
 }
