@@ -10,11 +10,5 @@ import org.springframework.context.annotation.Bean;
 @TestConfiguration
 public class QueryDslConfig {
 
-    @PersistenceContext
-    private EntityManager em;
 
-    @Bean
-    public JPAQueryFactory jpaQueryFactory() {
-        return new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
-    }
 }
