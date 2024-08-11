@@ -4,9 +4,12 @@ import com.keypoint.keypointtravel.global.entity.LanguageEntity;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,14 +36,20 @@ public class GuideTranslation extends LanguageEntity {
     @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "guide_id")
+    private Guide guide;
+
     @Builder
     public GuideTranslation(
+        Guide guide,
         String title,
         String subTitle,
         String content,
         LanguageCode languageCode
     ) {
         super(languageCode);
+        this.guide = guide;
         this.title = title;
         this.content = content;
         this.subTitle = subTitle;

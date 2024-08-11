@@ -5,7 +5,6 @@ import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideGuideUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideTranslationUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,14 +20,14 @@ public class DeleteGuideController {
     ) {
         DeleteGuideGuideUseCase useCase = DeleteGuideGuideUseCase.from(ids);
         return APIResponseEntity.<Void>builder()
-                .message("이용 가이드 삭제 성공")
-                .build();
+            .message("이용 가이드 삭제 성공")
+            .build();
     }
-    
-    @GetMapping("{guideId}")
+
+    @DeleteMapping("/{guideId}")
     public APIResponseEntity<Void> deleteGuideTranslation(
         @RequestParam(value = "guide-translation-id") Long[] ids
-        ) {
+    ) {
         DeleteGuideTranslationUseCase useCase = DeleteGuideTranslationUseCase.from(ids);
         return APIResponseEntity.<Void>builder()
             .message("이용 가이드 삭제 성공")

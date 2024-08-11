@@ -35,8 +35,9 @@ public class CreateGuideUseCase {
         return new Guide(thumbnailId, this.order);
     }
 
-    public GuideTranslation toGuideTranslationEntity() {
+    public GuideTranslation toGuideTranslationEntity(Guide guide) {
         return GuideTranslation.builder()
+            .guide(guide)
             .title(this.title)
             .subTitle(this.subTitle)
             .content(this.content)
