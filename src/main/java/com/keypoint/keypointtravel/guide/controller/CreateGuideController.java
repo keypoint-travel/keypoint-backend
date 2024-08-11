@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.guide.dto.request.CreateGuideRequest;
 import com.keypoint.keypointtravel.guide.dto.request.CreateGuideTranslationRequest;
 import com.keypoint.keypointtravel.guide.dto.useCase.CreateGuideTranslationUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.CreateGuideUseCase;
+import com.keypoint.keypointtravel.guide.service.CreateGuideService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/guides")
 public class CreateGuideController {
+
+    private final CreateGuideService createGuideService;
     
     @PostMapping("")
     public APIResponseEntity<Void> addGuide(
@@ -27,6 +30,8 @@ public class CreateGuideController {
         @RequestPart(required = false) MultipartFile thumbnailImage
     ) {
         CreateGuideUseCase useCase = CreateGuideUseCase.of(request, thumbnailImage);
+        createGuideService.addGuide(useCase);
+
         return APIResponseEntity.<Void>builder()
                 .message("이용 가이드 생성 성공")
                 .build();
@@ -38,6 +43,8 @@ public class CreateGuideController {
         @Valid @RequestBody CreateGuideTranslationRequest request
         ) {
         CreateGuideTranslationUseCase useCase = CreateGuideTranslationUseCase.of(guideId, request);
+        createGuideService.addGuideTranslation(useCase);
+
         return APIResponseEntity.<Void>builder()
             .message("이용 가이드 생성 성공")
             .build();
