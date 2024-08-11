@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.member.service;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
+import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
@@ -88,6 +89,20 @@ public class ReadMemberService {
             return memberRepository.findOtherMemberProfile(useCase.getMyId(),
                 useCase.getOtherMemberId());
             // todo: 다른 회원의 프로필 조회 시, 해당 회원이 가지고 있는 배지 정보도 함께 조회하기 구현 필요
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 사용자 설정 정보를 조회하는 정보
+     *
+     * @param useCase 사용자 아이디 데이터
+     * @return
+     */
+    public MemberSettingResponse getMemberSetting(MemberIdUseCase useCase) {
+        try {
+            return memberRepository.findSettingByMemberId(useCase.getMemberId());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
