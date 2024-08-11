@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
+import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
@@ -64,6 +65,20 @@ public class ReadMemberController {
 
         return APIResponseEntity.<OtherMemberProfileResponse>builder()
             .message("다른 회원 프로필 정보 조회 성공")
+            .data(result)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/settings")
+    public APIResponseEntity<MemberSettingResponse> getMemberSetting(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
+        MemberSettingResponse result = readMemberService.getMemberSetting(useCase);
+
+        return APIResponseEntity.<MemberSettingResponse>builder()
+            .message("사용자 프로필 정보 조회 성공")
             .data(result)
             .build();
     }
