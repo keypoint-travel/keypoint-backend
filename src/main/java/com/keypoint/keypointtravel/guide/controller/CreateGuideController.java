@@ -8,11 +8,10 @@ import com.keypoint.keypointtravel.guide.dto.useCase.CreateGuideUseCase;
 import com.keypoint.keypointtravel.guide.service.CreateGuideService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,9 +36,9 @@ public class CreateGuideController {
             .build();
     }
 
-    @GetMapping("{guideId}/translations")
+    @PostMapping("/{guideId}/translations")
     public APIResponseEntity<Void> addGuideTranslation(
-        @RequestParam(value = "guideId") Long guideId,
+        @PathVariable(value = "guideId") Long guideId,
         @Valid @RequestBody CreateGuideTranslationRequest request
     ) {
         CreateGuideTranslationUseCase useCase = CreateGuideTranslationUseCase.of(guideId, request);

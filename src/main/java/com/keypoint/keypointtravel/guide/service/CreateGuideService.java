@@ -44,9 +44,9 @@ public class CreateGuideService {
 
             // 3. 이용 가이드 저장 (Guide & GuideTranslation)
             Guide guide = useCase.toGuideEntity(thumbnailId);
-            GuideTranslation guideTranslation = useCase.toGuideTranslationEntity();
-
             guideRepository.save(guide);
+
+            GuideTranslation guideTranslation = useCase.toGuideTranslationEntity(guide);
             guideTranslationRepository.save(guideTranslation);
         } catch (Exception ex) {
             throw new GeneralException(ex);
@@ -61,7 +61,20 @@ public class CreateGuideService {
     @Transactional
     public void addGuideTranslation(CreateGuideTranslationUseCase useCase) {
         try {
+            // 1. 유효성 확인
+            // 1-1. guideId 존재 확인
+            Guide guide = readGuideService.findGuideByGuideId(useCase.getGuideId());
+            // 1-2. 이미 존재하는 언어 버전인지 확인
+            if (guideTranslationRepository.existsByGuideAndLanguage(
+                useCase.getGuideId(),
+                useCase.getLanguageCode())
+            ) {
+                throw new GeneralException(GuideErrorCode.DUPLICATED_GUIDE_TRANSLATION_LANGUAGE);
+            }
 
+            // 2. 이용 가이드 번역물 생성
+            GuideTranslation guideTranslation = useCase.toEntity(guide);
+            guideTranslationRepository.save(guideTranslation);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
