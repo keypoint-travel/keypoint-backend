@@ -23,8 +23,8 @@ public class UpdateGuideController {
     @PutMapping("/{guideId}")
     public APIResponseEntity<Void> updateGuide(
         @PathVariable(value = "guideId") Long guideId,
-        @Valid @RequestPart UpdateGuideRequest request,
-        @RequestPart(required = false) MultipartFile thumbnailImage
+        @Valid @RequestPart(value = "guide") UpdateGuideRequest request,
+        @RequestPart(required = false, value = "thumbnailImage") MultipartFile thumbnailImage
     ) {
         UpdateGuideUseCase useCase = UpdateGuideUseCase.of(guideId, request, thumbnailImage);
         updateGuideService.updateGuide(useCase);

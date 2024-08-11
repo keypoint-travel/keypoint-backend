@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideTran
 import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideUseCase;
 import com.keypoint.keypointtravel.guide.entity.QGuide;
 import com.keypoint.keypointtravel.guide.entity.QGuideTranslation;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,10 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
 
         // 이용 가이드 번역물 업데이트
         for (UpdateGuideTranslationUseCase translation : useCase.getTranslations()) {
+            BooleanBuilder builder = new BooleanBuilder();
+            builder.and(guideTranslation.id.eq(translation.getGuideTranslationId()))
+                .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
+
             queryFactory.update(guideTranslation)
                 .set(guideTranslation.title, translation.getTitle())
                 .set(guideTranslation.subTitle, translation.getSubTitle())
@@ -40,7 +45,7 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
 
                 .set(guideTranslation.modifyAt, LocalDateTime.now())
                 .set(guideTranslation.modifyId, currentAuditor)
-                .where(guideTranslation.id.eq(translation.getGuideTranslationId()))
+                .where(builder)
                 .execute();
         }
     }
