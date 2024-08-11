@@ -23,25 +23,25 @@ import org.springframework.web.multipart.MultipartFile;
 public class CreateGuideController {
 
     private final CreateGuideService createGuideService;
-    
+
     @PostMapping("")
     public APIResponseEntity<Void> addGuide(
         @Valid @RequestPart(value = "guide") CreateGuideRequest request,
-        @RequestPart(required = false) MultipartFile thumbnailImage
+        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage
     ) {
         CreateGuideUseCase useCase = CreateGuideUseCase.of(request, thumbnailImage);
         createGuideService.addGuide(useCase);
 
         return APIResponseEntity.<Void>builder()
-                .message("이용 가이드 생성 성공")
-                .build();
+            .message("이용 가이드 생성 성공")
+            .build();
     }
-    
+
     @GetMapping("{guideId}/translations")
     public APIResponseEntity<Void> addGuideTranslation(
         @RequestParam(value = "guideId") Long guideId,
         @Valid @RequestBody CreateGuideTranslationRequest request
-        ) {
+    ) {
         CreateGuideTranslationUseCase useCase = CreateGuideTranslationUseCase.of(guideId, request);
         createGuideService.addGuideTranslation(useCase);
 

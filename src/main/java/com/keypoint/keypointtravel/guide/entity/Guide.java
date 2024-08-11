@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "guide")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Guide extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "guide_id")
@@ -24,9 +25,18 @@ public class Guide extends BaseEntity {
     @Column(nullable = false)
     private Long thumbnailImageId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name = "order_number")
     private int order;
 
     @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted;
+
+    public Guide(
+        Long thumbnailImageId,
+        int order
+    ) {
+        this.thumbnailImageId = thumbnailImageId;
+        this.order = order;
+        this.isDeleted = false;
+    }
 }
