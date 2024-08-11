@@ -25,4 +25,12 @@ public class MemberCampaign extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    private boolean isLeader;
+
+    public MemberCampaign(Campaign campaign, Member member, boolean isLeader) {
+        this.campaign = campaign;
+        this.member = member;
+        this.isLeader = isLeader;
+    }
 }
