@@ -10,7 +10,6 @@ import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.OAuthServiceFactory;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,7 @@ public class OauthController {
     @PostMapping("/login/google")
     public APIResponseEntity<OauthLoginResponse> executeGoogleLogin(
         @Valid @RequestBody GoogleLoginRequest request
-    ) throws GeneralSecurityException, IOException {
+    ) throws IOException {
         OauthLoginUseCase useCase = OauthLoginUseCase.from(request);
 
         OAuthService oAuthService = oAuthServiceFactory.getService(OauthProviderType.GOOGLE);
@@ -41,7 +40,7 @@ public class OauthController {
 
     @PostMapping("/login/apple")
     public APIResponseEntity<OauthLoginResponse> executeAppleLogin(
-        @Valid @RequestBody AppleLoginRequest request) {
+        @Valid @RequestBody AppleLoginRequest request) throws IOException {
         OauthLoginUseCase useCase = OauthLoginUseCase.from(request);
 
         OAuthService oAuthService = oAuthServiceFactory.getService(OauthProviderType.APPLE);

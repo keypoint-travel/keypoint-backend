@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.oauth.service;
+package com.keypoint.keypointtravel.oauth.service.google;
 
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
