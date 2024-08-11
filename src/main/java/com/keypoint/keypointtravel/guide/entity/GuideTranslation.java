@@ -2,7 +2,6 @@ package com.keypoint.keypointtravel.guide.entity;
 
 import com.keypoint.keypointtravel.global.entity.LanguageEntity;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +28,7 @@ public class GuideTranslation extends LanguageEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted;
 
     public GuideTranslation(        

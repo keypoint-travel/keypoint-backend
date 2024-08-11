@@ -1,7 +1,6 @@
 package com.keypoint.keypointtravel.guide.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,9 +24,9 @@ public class Guide extends BaseEntity {
     @Column(nullable = false)
     private Long thumbnailImageId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private int order;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted;
 }
