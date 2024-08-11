@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AdvertisementBannerListResponse {
 
-    List<AdvertisementBannerUseCase> banners;
+    private List<AdvertisementBannerUseCase> banners;
 }

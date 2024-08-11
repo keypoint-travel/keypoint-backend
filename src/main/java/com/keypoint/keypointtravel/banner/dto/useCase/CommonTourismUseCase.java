@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class CommonTourismUseCase {
     private CommonTourismDto commonTourismDto;
-    private List<CommentDto> commentDtoList;
+//    private List<CommentDto> commentDtoList;
 }

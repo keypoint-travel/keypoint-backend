@@ -1,15 +1,31 @@
 package com.keypoint.keypointtravel.banner.dto.useCase;
 
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import lombok.Getter;
 
-import java.util.Objects;
+@Getter
+public class DeleteUseCase {
 
-public record DeleteUseCase(Long bannerId) {
+    private Long bannerId;
+    private LanguageCode languageCode;
 
-    public DeleteUseCase {
-        if (Objects.isNull(bannerId)) {
-            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+    public DeleteUseCase(Long bannerId, String language) {
+        this.bannerId = bannerId;
+        this.languageCode = language == null ? null : findLanguageValue(language);
+    }
+
+    private static LanguageCode findLanguageValue(String language) {
+        if (language.equals("ko")) {
+            return LanguageCode.KO;
         }
+        if (language.equals("en")) {
+            return LanguageCode.EN;
+        }
+        if (language.equals("ja")) {
+            return LanguageCode.JA;
+        }
+        throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
     }
 }

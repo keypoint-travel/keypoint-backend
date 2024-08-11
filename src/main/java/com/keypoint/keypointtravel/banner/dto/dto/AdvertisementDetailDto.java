@@ -8,7 +8,8 @@ import lombok.Getter;
 public class AdvertisementDetailDto {
 
     private Long bannerId;
-    private String title;
+    private String mainTitle;
+    private String subTitle;
     private String content;
     private String detailImageUrl;
 }

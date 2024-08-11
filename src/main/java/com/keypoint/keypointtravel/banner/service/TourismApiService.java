@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismLis
 import com.keypoint.keypointtravel.banner.dto.useCase.tourUseCase.TourismUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
@@ -19,8 +20,9 @@ public interface TourismApiService {
      *
      * @Return 조회한 관광지 목록
      */
-    @GetMapping(FIND_TOURISM_LIST + COMMON_OPTION)
+    @GetMapping("/{language}" + FIND_TOURISM_LIST + COMMON_OPTION)
     TourismListUseCase findTourismList(
+        @PathVariable("language") String language,
         @RequestParam("pageNo") int pageNo,
         @RequestParam("serviceKey") String serviceKey,
         @RequestParam("areaCode") String areaCode,
@@ -36,8 +38,9 @@ public interface TourismApiService {
      *
      * @Return 조회한 관광지 정보
      */
-    @GetMapping(FIND_TOURISM + COMMON_OPTION)
+    @GetMapping("/{language}" + FIND_TOURISM + COMMON_OPTION)
     TourismUseCase findTourism(
+        @PathVariable("language") String language,
         @RequestParam("contentId") String contentId,
         @RequestParam("serviceKey") String serviceKey);
 
@@ -48,8 +51,9 @@ public interface TourismApiService {
      *
      * @Return 조회한 관광지 이미지 목록
      */
-    @GetMapping(FIND_IMAGE_LIST + COMMON_OPTION)
+    @GetMapping("/{language}" + FIND_IMAGE_LIST + COMMON_OPTION)
     ImageListUseCase findImageList(
+        @PathVariable("language") String language,
         @RequestParam("contentId") String contentId,
         @RequestParam("serviceKey") String serviceKey);
 
@@ -60,8 +64,9 @@ public interface TourismApiService {
      *
      * @Return 조회한 관광지 목록
      */
-    @GetMapping(FIND_AROUNDS + COMMON_OPTION)
-    TourismListUseCase findArounds(
+    @GetMapping("/{language}" + FIND_AROUND + COMMON_OPTION)
+    TourismListUseCase findAround(
+        @PathVariable("language") String language,
         @RequestParam("mapX") Double mapX,
         @RequestParam("mapY") Double mapY,
         @RequestParam("serviceKey") String serviceKey);
