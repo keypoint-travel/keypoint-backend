@@ -8,17 +8,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
 @Getter
 @Table(name = "guide_translation")
 public class GuideTranslation extends LanguageEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "guide_translation_id")
     private Long id;
-    
+
     @Column(nullable = false)
     private String title;
 
@@ -31,11 +33,12 @@ public class GuideTranslation extends LanguageEntity {
     @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted;
 
-    public GuideTranslation(        
-            String title,
-            String subTitle,
-            String content,
-            LanguageCode languageCode
+    @Builder
+    public GuideTranslation(
+        String title,
+        String subTitle,
+        String content,
+        LanguageCode languageCode
     ) {
         super(languageCode);
         this.title = title;

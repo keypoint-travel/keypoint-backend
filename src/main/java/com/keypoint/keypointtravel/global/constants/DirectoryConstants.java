@@ -9,4 +9,6 @@ public class DirectoryConstants {
     public static String ADVERTISEMENT_BANNER_THUMBNAIL_DIRECTORY = "advertisement/banner/thumbnail";
 
     public static String ADVERTISEMENT_BANNER_DETAIL_DIRECTORY = "advertisement/banner/detail";
+
+    public static String GUIDE_THUMBNAIL_DIRECTORY = "guide/thumbnail";
 }
