@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.oauth.dto.useCase.googleUserInfoUseCase;
+package com.keypoint.keypointtravel.oauth.dto.useCase;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.oauth.service;
 
 import com.keypoint.keypointtravel.global.constants.GoogleAPIConstants;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
-import com.keypoint.keypointtravel.oauth.dto.useCase.googleUserInfoUseCase.GoogleUserInfoUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.GoogleUserInfoUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

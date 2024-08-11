@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.oauth.service;
 
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.oauth.dto.useCase.googleUserInfoUseCase.GoogleUserInfoUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.GoogleUserInfoUseCase;
 import org.springframework.stereotype.Component;
 
 @Component
