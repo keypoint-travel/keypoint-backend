@@ -10,4 +10,8 @@ public class LogUtils {
     public static void writeInfoLog(String header, String message) {
         log.info(String.format("[%s] %s", header, message));
     }
+
+    public static void writeErrorLog(String header, String message) {
+        log.error(String.format("[%s] %s", header, message));
+    }
 }
