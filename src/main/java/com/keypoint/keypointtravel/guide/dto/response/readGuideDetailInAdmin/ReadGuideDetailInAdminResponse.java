@@ -1,13 +1,15 @@
 package com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
+@Getter
+@NoArgsConstructor
 public class ReadGuideDetailInAdminResponse {
 
-  private Long guideId;
-  private String thumbnailImageUrl;
-  private int order;
-  private List<ReadGuideTranslationInAdminResponse> translations;
+    private Long guideId;
+    private String thumbnailImageUrl;
+    private int order;
+    private List<ReadGuideTranslationInAdminResponse> translations;
 }
