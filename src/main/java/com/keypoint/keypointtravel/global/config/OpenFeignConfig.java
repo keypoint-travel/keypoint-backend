@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableFeignClients(basePackages = {
     "com.keypoint.keypointtravel.banner.service",
-    "com.keypoint.keypointtravel.oauth.service"
+    "com.keypoint.keypointtravel.oauth.service",
+    "com.keypoint.keypointtravel.currency.service"
 })
 public class OpenFeignConfig {
 
