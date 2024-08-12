@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.guide.repository;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideTranslationInAdminResponse;
 import com.keypoint.keypointtravel.guide.entity.QGuide;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository {
@@ -51,6 +54,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
             .leftJoin(translation).on(builder)
             .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
             .where(guide.isDeleted.eq(false))
+            .orderBy(guide.order.asc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -103,5 +107,42 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
             );
 
         return data == null ? null : data.get(0);
+    }
+
+    @Override
+    public Slice<ReadGuideResponse> findGuides(LanguageCode languageCode, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder
+            .and(translation.guide.id.eq(guide.id))
+            .and(translation.languageCode.eq(languageCode))
+            .and(translation.isDeleted.eq(false));
+
+        List<ReadGuideResponse> data = queryFactory
+            .select(
+                Projections.fields(
+                    ReadGuideResponse.class,
+                    translation.id.as("guideTranslationIds"),
+                    translation.title,
+                    translation.subTitle,
+                    uploadFile.path.as("thumbnailImageUrl"),
+                    guide.order
+                )
+            )
+            .from(guide)
+            .leftJoin(translation).on(builder)
+            .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
+            .where(guide.isDeleted.eq(false))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1)
+            .orderBy(guide.order.asc())
+            .fetch();
+
+        boolean hasNext = false;
+        if (data.size() > pageable.getPageSize()) {
+            hasNext = true;
+            data.remove(pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(data, pageable, hasNext);
     }
 }
