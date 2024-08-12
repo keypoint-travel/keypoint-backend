@@ -1,15 +1,15 @@
 package com.keypoint.keypointtravel.guide.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class ReadGuideDetailResponse {
 
-  private Long guideTranslationIds;
-  private String title;
-  private String subTitle;
-  private String thumbnailImageUrl;
-  private String content;
+    private Long guideTranslationIds;
+    private String title;
+    private String subTitle;
+    private String thumbnailImageUrl;
+    private String content;
 }
