@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.guide.service;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
 import com.keypoint.keypointtravel.guide.entity.Guide;
 import com.keypoint.keypointtravel.guide.repository.GuideRepository;
@@ -38,9 +40,29 @@ public class ReadGuideService {
             .orElseThrow(() -> new GeneralException(GuideErrorCode.NOT_EXISTED_GUIDE));
     }
 
+    /**
+     * 전체 이용 가이드 리스트 조회 (기본값: 영어)
+     *
+     * @param useCase
+     * @return
+     */
     public Page<ReadGuideInAdminResponse> findGuidesInAdmin(ReadGuideInAdminUseCase useCase) {
         try {
             return guideRepository.findGuidesInAdmin(useCase.getPageable());
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 이용 가이드 상세 조회 함수
+     *
+     * @param useCase
+     * @return
+     */
+    public ReadGuideDetailInAdminResponse findGuideDetailInAdmin(GuideIdUseCase useCase) {
+        try {
+            return guideRepository.findGuideDetailInAdmin(useCase.getGuideId());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

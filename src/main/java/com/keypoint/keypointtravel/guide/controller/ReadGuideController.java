@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,14 +67,15 @@ public class ReadGuideController {
             .build();
     }
 
-    @GetMapping("/management{guideId}")
+    @GetMapping("/management/{guideId}")
     public APIResponseEntity<ReadGuideDetailInAdminResponse> findGuideDetailInAdmin(
-        @RequestParam(value = "guideId") Long guideId
+        @PathVariable(value = "guideId") Long guideId
     ) {
         GuideIdUseCase useCase = GuideIdUseCase.from(guideId);
-        //ReadGuideDetailInAdminResponse result =
+        ReadGuideDetailInAdminResponse result = readGuideService.findGuideDetailInAdmin(useCase);
         return APIResponseEntity.<ReadGuideDetailInAdminResponse>builder()
             .message("이용가이드 단일 조회 성공")
+            .data(result)
             .build();
     }
 }

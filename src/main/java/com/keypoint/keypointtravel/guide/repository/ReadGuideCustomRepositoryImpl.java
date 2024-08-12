@@ -3,9 +3,12 @@ package com.keypoint.keypointtravel.guide.repository;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideTranslationInAdminResponse;
 import com.keypoint.keypointtravel.guide.entity.QGuide;
 import com.keypoint.keypointtravel.guide.entity.QGuideTranslation;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -61,5 +64,44 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
             .fetchOne();
 
         return new PageImpl<>(data, pageable, count);
+    }
+
+    @Override
+    public ReadGuideDetailInAdminResponse findGuideDetailInAdmin(Long guideId) {
+        BooleanBuilder guideBuilder = new BooleanBuilder();
+        guideBuilder.and(guide.id.eq(guideId))
+            .and(guide.isDeleted.eq(false));
+
+        BooleanBuilder translationBuilder = new BooleanBuilder();
+        translationBuilder
+            .and(translation.guide.id.eq(guide.id))
+            .and(translation.isDeleted.eq(false));
+
+        List<ReadGuideDetailInAdminResponse> data = queryFactory
+            .selectFrom(guide)
+            .leftJoin(translation).on(translationBuilder)
+            .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
+            .where(guideBuilder)
+            .transform(GroupBy.groupBy(guide.id)
+                .list(
+                    Projections.fields(
+                        ReadGuideDetailInAdminResponse.class,
+                        guide.id.as("guideId"),
+                        uploadFile.path.as("thumbnailImageUrl"),
+                        guide.order,
+                        GroupBy.list(
+                            Projections.fields(
+                                ReadGuideTranslationInAdminResponse.class,
+                                translation.id.as("guideTranslationId"),
+                                translation.title,
+                                translation.subTitle,
+                                translation.content
+                            )
+                        ).as("translations")
+                    )
+                )
+            );
+
+        return data == null ? null : data.get(0);
     }
 }
