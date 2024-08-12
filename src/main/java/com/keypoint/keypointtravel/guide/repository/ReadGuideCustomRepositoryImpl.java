@@ -39,12 +39,12 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
 
         List<ReadGuideInAdminResponse> data = queryFactory
             .select(
-                Projections.fields(
+                Projections.constructor(
                     ReadGuideInAdminResponse.class,
-                    guide.id.as("guideId"),
+                    guide.id,
                     translation.title,
                     translation.subTitle,
-                    uploadFile.path.as("thumbnailImageUrl"),
+                    uploadFile.path,
                     translation.content,
                     guide.order,
                     translation.modifyAt
@@ -129,7 +129,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
                 )
             )
             .from(guide)
-            .leftJoin(translation).on(builder)
+            .innerJoin(translation).on(builder)
             .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
             .where(guide.isDeleted.eq(false))
             .offset(pageable.getOffset())
