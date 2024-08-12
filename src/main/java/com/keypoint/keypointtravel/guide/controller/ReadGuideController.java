@@ -10,12 +10,13 @@ import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
 import com.keypoint.keypointtravel.guide.service.ReadGuideService;
-import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberIdAndPageableUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,12 +35,17 @@ public class ReadGuideController {
 
     @GetMapping("")
     public APIResponseEntity<Slice<ReadGuideResponse>> findGuides(
-        @AuthenticationPrincipal CustomUserDetails userDetails
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PageableDefault(size = 15, sort = "order", direction = Direction.ASC) Pageable pageable
     ) {
-        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
-        //Slice<ReadGuideResponse> result =
+        MemberIdAndPageableUseCase useCase = MemberIdAndPageableUseCase.of(
+            userDetails.getId(),
+            pageable
+        );
+        Slice<ReadGuideResponse> result = readGuideService.findGuides(useCase);
         return APIResponseEntity.<Slice<ReadGuideResponse>>builder()
             .message("이용가이드 리스트 조회 성공")
+            .data(result)
             .build();
     }
 
@@ -57,7 +63,7 @@ public class ReadGuideController {
 
     @GetMapping("/management")
     public APIResponseEntity<Page<ReadGuideInAdminResponse>> findGuidesInAdmin(
-        @PageableDefault(size = 15, sort = "guideId", direction = Sort.Direction.DESC) Pageable pageable
+        @PageableDefault(size = 15, sort = "order", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         ReadGuideInAdminUseCase useCase = ReadGuideInAdminUseCase.from(pageable);
         Page<ReadGuideInAdminResponse> result = readGuideService.findGuidesInAdmin(useCase);
