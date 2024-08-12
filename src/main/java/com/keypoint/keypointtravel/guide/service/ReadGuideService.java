@@ -3,11 +3,13 @@ package com.keypoint.keypointtravel.guide.service;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
+import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
 import com.keypoint.keypointtravel.guide.entity.Guide;
 import com.keypoint.keypointtravel.guide.repository.GuideRepository;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdAndPageableUseCase;
@@ -85,6 +87,20 @@ public class ReadGuideService {
             LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
                 useCase.getMemberId());
             return guideRepository.findGuides(languageCode, useCase.getPageable());
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 이용 가이드 번역물 조회
+     *
+     * @param useCase
+     * @return
+     */
+    public ReadGuideDetailResponse findGuideDetail(ReadGuideTranslationIdUseCase useCase) {
+        try {
+            return guideRepository.findGuideDetail(useCase.getGuideTranslationIds());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

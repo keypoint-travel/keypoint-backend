@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.guide.repository;
 
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
@@ -144,5 +145,30 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
         }
 
         return new SliceImpl<>(data, pageable, hasNext);
+    }
+
+    @Override
+    public ReadGuideDetailResponse findGuideDetail(
+        Long guideTranslationIds
+    ) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(translation.id.eq(guideTranslationIds))
+            .and(translation.isDeleted.eq(false));
+
+        return queryFactory
+            .select(
+                Projections.fields(
+                    ReadGuideDetailResponse.class,
+                    translation.id.as("guideTranslationIds"),
+                    translation.title,
+                    translation.subTitle,
+                    uploadFile.path.as("thumbnailImageUrl"),
+                    translation.content
+                )
+            )
+            .from(translation)
+            .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
+            .where(builder)
+            .fetchFirst();
     }
 }

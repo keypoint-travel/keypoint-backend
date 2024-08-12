@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ReadGuideTranslationIdUseCase {
 
-  private Long guideTranslationIds;
+    private Long guideTranslationIds;
 
-  public static ReadGuideTranslationIdUseCase from(Long guideTranslationIds) {
-    return new ReadGuideTranslationIdUseCase(guideTranslationIds);
-  }
+    public static ReadGuideTranslationIdUseCase from(Long guideTranslationIds) {
+        return new ReadGuideTranslationIdUseCase(guideTranslationIds);
+    }
 }
