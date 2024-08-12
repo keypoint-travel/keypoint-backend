@@ -17,7 +17,7 @@ public class CommentDto {
     private Long writerId;
     private String writerName;
     private String profileImageUrl;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     public static CommentDto of(BannerComment comment, CommentWriterDto dto) {
         return CommentDto.builder()
@@ -26,7 +26,7 @@ public class CommentDto {
             .writerId(dto.getWriterId())
             .writerName(dto.getWriterName())
             .profileImageUrl(dto.getProfileImageUrl())
-            .createAt(comment.getCreateAt())
+            .createdAt(comment.getCreateAt())
             .build();
     }
 }

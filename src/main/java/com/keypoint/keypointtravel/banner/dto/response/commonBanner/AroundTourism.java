@@ -10,7 +10,7 @@ public class AroundTourism {
 
     private String contentId;
     private String image;
-    private String title;
+    private String placeName;
 
     public static AroundTourism from(Item data) {
         return new AroundTourism(data.getContentid(), data.getFirstimage(), data.getTitle());

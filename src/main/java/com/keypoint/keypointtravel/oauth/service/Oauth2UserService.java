@@ -132,6 +132,11 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         String email = attributes.getEmail();
 
         // 1. 이메일이 등록되어 있는지 확인
+        return registerMember(email, oauthProviderType);
+    }
+
+    public CommonMemberDTO registerMember(String email, OauthProviderType oauthProviderType) {
+        // 1. 이메일이 등록되어 있는지 확인
         Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
 
         // 2. 등록되지 않은 경우: 저장 / 다른 제공사로 등록되어 있는 경우 예외 발생
@@ -143,7 +148,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             return member;
         } else {
             // 2-2. 회원가입: 임시 회원으로 등록 (등록되어 있지 않은 이메일)
-            return addUser(attributes);
+            return addUser(email, oauthProviderType);
         }
     }
 
@@ -156,8 +161,8 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    private CommonMemberDTO addUser(OAuthAttributes attributes) {
-        Member newMember = attributes.toEntity();
+    private CommonMemberDTO addUser(String email, OauthProviderType oauthProviderType) {
+        Member newMember = new Member(email, oauthProviderType);
         memberRepository.save(newMember);
 
         // 초대코드 저장: 초대코드가 중복되지 않도록 문자열에 마지막에 memberId를 추가하여 저장

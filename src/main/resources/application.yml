@@ -7,4 +7,4 @@ spring:
     group:
       local: "local, local-key, mail"
       dev: "dev, key, mail"
-    active: dev
+    active: local

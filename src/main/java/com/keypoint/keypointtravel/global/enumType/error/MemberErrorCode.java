@@ -17,7 +17,8 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_GENERAL_MEMBER("008_NOT_GENERAL_MEMBER", "일반 회원이 아닌 소셜 로그인으로 등록된 회원입니다."),
     NOT_EXISTED_EMAIL_OR_INVITATION_CODE("009_NOT_EXISTED_EMAIL_OR_INVITATION_CODE",
         "이메일 혹은 초대코드가 잘못되었습니다."),
-    FAIL_TO_CONFIRM_EMAIL("010_FAIL_TO_CONFIRM_EMAIL", "이메일 인증에 실패하였습니다.");
+    FAIL_TO_CONFIRM_EMAIL("010_FAIL_TO_CONFIRM_EMAIL", "이메일 인증에 실패하였습니다."),
+    FAIL_TO_OAUTH_LOGIN("011_FAIL_TO_OAUTH_LOGIN", "소셜 로그인을 실패하였습니다.");
 
     private final String code;
     private final String msg;

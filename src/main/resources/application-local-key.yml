@@ -15,6 +15,8 @@ key:
     refreshtoken-validity-in-min: 600
   tourApi:
     key: VqOVEqFvT2RkIyzj2jxy5SwBAQmfSbpulCzRcS%2FcKZJ1Ir8OW9rYB4bNCkIy1nJ7xApQ9tOm8mpVi%2B6N2EKgCA%3D%3D
+  exchange-rate:
+    key: 30Qd7bHX48NBAUKS0JozEHuhrDTJNQXq
 spring:
   security:
     oauth2:
