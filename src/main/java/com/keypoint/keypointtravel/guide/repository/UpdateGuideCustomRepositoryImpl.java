@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.guide.repository;
 
+import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideGuideUseCase;
+import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideTranslationUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideTranslationUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideUseCase;
 import com.keypoint.keypointtravel.guide.entity.QGuide;
@@ -48,5 +50,45 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
                 .where(builder)
                 .execute();
         }
+    }
+
+    @Override
+    public void deleteGuides(DeleteGuideGuideUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        // 이용 가이드 삭제
+        queryFactory.update(guide)
+            .set(guide.isDeleted, true)
+            .set(guide.modifyAt, LocalDateTime.now())
+            .set(guide.modifyId, currentAuditor)
+
+            .where(guide.id.in(useCase.getGuideIds()))
+            .execute();
+
+        // 이용 가이드 번역물 삭제
+        queryFactory.update(guideTranslation)
+            .set(guideTranslation.isDeleted, true)
+            .set(guideTranslation.modifyAt, LocalDateTime.now())
+            .set(guideTranslation.modifyId, currentAuditor)
+
+            .where(guideTranslation.guide.id.in(useCase.getGuideIds()))
+            .execute();
+    }
+
+    @Override
+    public void deleteGuideTranslations(DeleteGuideTranslationUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(guideTranslation.id.in(useCase.getGuideTranslationIds()))
+            .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
+
+        queryFactory.update(guideTranslation)
+            .set(guideTranslation.isDeleted, true)
+            .set(guideTranslation.modifyAt, LocalDateTime.now())
+            .set(guideTranslation.modifyId, currentAuditor)
+
+            .where(builder)
+            .execute();
     }
 }

@@ -7,9 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DeleteGuideTranslationUseCase {
 
-  private Long[] guideTranslationIds;
+    private Long guideId;
+    private Long[] guideTranslationIds;
 
-  public static DeleteGuideTranslationUseCase from(Long[] ids) {
-    return new DeleteGuideTranslationUseCase(ids);
-  }
+
+    public static DeleteGuideTranslationUseCase of(Long guideId, Long[] ids) {
+        return new DeleteGuideTranslationUseCase(guideId, ids);
+    }
 }
