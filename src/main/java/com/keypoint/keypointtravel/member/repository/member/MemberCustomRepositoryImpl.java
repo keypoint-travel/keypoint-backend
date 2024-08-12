@@ -1,7 +1,10 @@
 package com.keypoint.keypointtravel.member.repository.member;
 
+import static com.querydsl.jpa.JPAExpressions.selectOne;
+
 import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
@@ -11,8 +14,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-
-import static com.querydsl.jpa.JPAExpressions.selectOne;
 
 @RequiredArgsConstructor
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
@@ -59,6 +60,21 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .from(member)
             .leftJoin(uploadFile).on(uploadFile.id.eq(member.memberDetail.profileImageId))
             .where(member.id.eq(otherMemberId))
+            .fetchOne();
+    }
+
+    @Override
+    public MemberSettingResponse findSettingByMemberId(Long memberId) {
+        return queryFactory
+            .select(
+                Projections.fields(
+                    MemberSettingResponse.class,
+                    member.memberDetail.language,
+                    member.notification.pushNotificationEnabled
+                )
+            )
+            .from(member)
+            .where(member.id.eq(memberId))
             .fetchOne();
     }
 

@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.global.converter;
 
+import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
 import io.jsonwebtoken.Jwts;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,6 @@ import org.springframework.util.MultiValueMap;
 public class Oauth2RequestEntityConverter implements
     Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
 
-    private static final String APPLE_URL = "https://appleid.apple.com";
     private static String appleClientId;
     private static String appleTeamId;
     private static String appleKeyId;
@@ -93,7 +93,7 @@ public class Oauth2RequestEntityConverter implements
             .setIssuer(appleTeamId)
             .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
             .setExpiration(expirationDate) // 만료 시간
-            .setAudience(APPLE_URL)
+            .setAudience(AppleAPIConstants.COMMON_URI)
             .setSubject(appleClientId)
             .signWith(getPrivateKey())
             .compact();
