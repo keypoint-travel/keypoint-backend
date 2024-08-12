@@ -40,7 +40,7 @@ public class PushNotificationHistory extends BaseEntity {
     @Column(nullable = false)
     private PushNotificationType type;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_read")
     private boolean isRead;
 
     public PushNotificationHistory(
