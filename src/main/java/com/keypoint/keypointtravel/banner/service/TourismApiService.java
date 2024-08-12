@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
-@FeignClient(name = "koreanTourismApi", url = COMMON_URI, fallback = TourismApiServiceFallback.class)
+@FeignClient(name = "tourismApi", url = COMMON_URI, fallback = TourismApiServiceFallback.class)
 public interface TourismApiService {
 
     /**
