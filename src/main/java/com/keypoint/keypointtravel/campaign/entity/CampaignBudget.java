@@ -23,6 +23,7 @@ public class CampaignBudget {
     private Campaign campaign;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CurrencyType currency;
 
     @Column(nullable = false)

@@ -50,16 +50,16 @@ public class CreateCampaignService {
      */
     @Transactional
     public void createCampaign(CreateUseCase useCase) {
-            // 1. 커버 사진 upload File 저장
-            Long coverImageId = saveUploadFile(useCase.getCoverImage());
-            // 2. 켐페인 저장
-            Campaign campaign = saveCampaign(useCase, coverImageId);
-            // 3. 켐페인 예산 저장
-            saveCampaignBudgets(campaign, useCase);
-            // 4. 회원 캠페인 저장
-            saveMemberCampaigns(campaign, useCase);
-            // 5. 여행지 저장
-            saveTravelLocations(campaign, useCase);
+        // 1. 커버 사진 upload File 저장
+        Long coverImageId = saveUploadFile(useCase.getCoverImage());
+        // 2. 켐페인 저장
+        Campaign campaign = saveCampaign(useCase, coverImageId);
+        // 3. 켐페인 예산 저장
+        saveCampaignBudgets(campaign, useCase);
+        // 4. 회원 캠페인 저장
+        saveMemberCampaigns(campaign, useCase);
+        // 5. 여행지 저장
+        saveTravelLocations(campaign, useCase);
     }
 
     private Long saveUploadFile(MultipartFile coverImage) {
@@ -72,7 +72,7 @@ public class CreateCampaignService {
         }
     }
 
-    private Campaign saveCampaign(CreateUseCase useCase, Long coverImageId){
+    private Campaign saveCampaign(CreateUseCase useCase, Long coverImageId) {
         Campaign campaign = Campaign.builder()
             .title(useCase.getTitle())
             .status(Status.IN_PROGRESS)
@@ -85,22 +85,24 @@ public class CreateCampaignService {
         return campaign;
     }
 
-    private void saveCampaignBudgets(Campaign campaign, CreateUseCase useCase){
+    private void saveCampaignBudgets(Campaign campaign, CreateUseCase useCase) {
         List<CampaignBudget> campaignBudgets = useCase.getBudgets().stream()
             .map(budget -> CampaignBudget.builder()
                 .campaign(campaign)
                 .category(budget.getCategory())
                 .amount(budget.getAmount())
-                .currency(budget.getCurrencyType())
+                .currency(budget.getCurrency())
                 .build()).toList();
-        // todo: bulk insert 로 수정 예정
         campaignBudgetRepository.saveAll(campaignBudgets);
     }
 
-    private void saveMemberCampaigns(Campaign campaign, CreateUseCase useCase){
+    private void saveMemberCampaigns(Campaign campaign, CreateUseCase useCase) {
         List<MemberCampaign> memberCampaigns = new ArrayList<>();
         // 함께 참여하는 회원들 저장
         for (MemberInfo memberInfo : useCase.getMembers()) {
+            if (memberInfo.getMemberId().equals(useCase.getMemberId())) {
+                continue;
+            }
             Member member = memberRepository.getReferenceById(memberInfo.getMemberId());
             memberCampaigns.add(new MemberCampaign(campaign, member, false));
         }
@@ -108,7 +110,6 @@ public class CreateCampaignService {
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
         memberCampaigns.add(new MemberCampaign(campaign, member, true));
         try {
-            // todo: bulk insert 로 수정 예정
             memberCampaignRepository.saveAll(memberCampaigns);
         } catch (Exception e) {
             throw new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER);
@@ -117,10 +118,9 @@ public class CreateCampaignService {
 
     private void saveTravelLocations(Campaign campaign, CreateUseCase useCase) {
         List<TravelLocation> travelLocations = useCase.getTravels().stream()
-            // todo: placeId는 국가/도시 id로 반영 예정, 현재는 임시로 1L 지정
+            // todo: placeId는 국가/도시 구현 후 수정 예정, 현재는 임시로 1L 지정,
             .map(travel -> new TravelLocation(campaign, 1L, travel.getSequence()))
             .toList();
-        // todo: bulk insert 로 수정 예정
         travelLocationRepository.saveAll(travelLocations);
     }
 }
