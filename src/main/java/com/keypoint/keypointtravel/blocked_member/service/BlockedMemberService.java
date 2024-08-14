@@ -46,7 +46,7 @@ public class BlockedMemberService {
         Member member = memberRepository.getReferenceById(useCase.getMyId());
         blockedMemberRepository.save(new BlockedMember(useCase.getBlockedMemberId(), member));
         // 4. 차단된 회원과 친구 관계인 경우 친구 관계 삭제
-        friendRepository.updateIsDeletedById(useCase.getBlockedMemberId(), useCase.getMyId());
+        friendRepository.updateIsDeletedById(useCase.getBlockedMemberId(), useCase.getMyId(), true);
     }
 
     /**
@@ -63,6 +63,8 @@ public class BlockedMemberService {
         if(count < 1){
             throw new GeneralException(BlockedMemberErrorCode.NOT_EXISTED_BLOCKED);
         }
+        // 3. 차단된 회원과 친구 관계인 경우 친구 관계 복구
+        friendRepository.updateIsDeletedById(useCase.getBlockedMemberId(), useCase.getMyId(), false);
     }
 
     /**
