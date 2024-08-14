@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.place.service.country;
+package com.keypoint.keypointtravel.place.service;
 
 import com.keypoint.keypointtravel.global.utils.ExcelUtils;
 import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CountryService {
 
-    private final CountryAPIService countryAPIService;
+    private final CountriesnowService countriesnowService;
 
     /**
      * 전체 국가 리스트 (외교부_국가·지역별 표준코드 데이터) 에서 필요한 데이터를 채워서 저장하는 함수
@@ -123,7 +123,7 @@ public class CountryService {
      */
     private List<CountryExcelUseCase> fillLocation(List<CountryExcelUseCase> excelCountries) {
         // 1. 국가 좌표 반환 API 호춫
-        CountryDetailUseCase countryDetails = countryAPIService.getCountryDetails();
+        CountryDetailUseCase countryDetails = countriesnowService.getCountryDetails();
 
         // 2. List<CountryExcelUseCase> 에 경도, 위도 추가
         for (CountryExcelUseCase excelCountry : excelCountries) {
