@@ -1,10 +1,14 @@
 package com.keypoint.keypointtravel.place.service;
 
+import com.keypoint.keypointtravel.global.utils.ExcelUtils;
+import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
+import com.keypoint.keypointtravel.place.dto.useCase.countryDetailUseCase.CountryDetailContentUseCase;
+import com.keypoint.keypointtravel.place.dto.useCase.countryDetailUseCase.CountryDetailUseCase;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -12,32 +16,40 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.keypoint.keypointtravel.global.utils.ExcelUtils;
-import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
-
-import lombok.RequiredArgsConstructor;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CountryService {
-    
+
+    private final CountryAPIService countryAPIService;
+
+    /**
+     * 전체 국가 리스트 (외교부_국가·지역별 표준코드 데이터) 에서 필요한 데이터를 채워서 저장하는 함수
+     *
+     * @throws IOException
+     */
     public void generateCountryData() throws IOException {
         // 1. 전체 국가 엑셀 파일 Load
-        Workbook workbookCountries = ExcelUtils.readExcel("null");
+        Workbook workbookCountries = ExcelUtils.readExcel("static/excel/base-countries.xlsx");
 
         // 2. Object로 생성
-        List<CountryExcelUseCase> countries = createCountryExcelUseCase(workbookCountries);
+        List<CountryExcelUseCase> basecCuntries = createCountryExcelUseCase(workbookCountries);
 
         // 3. 좌표, 경도 추가
+        List<CountryExcelUseCase> countries = fillLocation(basecCuntries);
 
         // 4. 좌표, 경도 추가 데이터 Excel로 저장
-        createExcelFile(countries);
-
-        // 5. Country & Place 저장
+        createExcelFile(countries, System.getProperty("user.dir") + "/countries-final.xlsx");
     }
 
-    private List<CountryExcelUseCase> createCountryExcelUseCase(Workbook workbook) throws IOException {
+    /**
+     * 국가 Excel 데이터를 Object로 변환하는 함수
+     *
+     * @param workbook
+     * @return
+     * @throws IOException
+     */
+    private List<CountryExcelUseCase> createCountryExcelUseCase(Workbook workbook) {
         List<CountryExcelUseCase> useCase = new ArrayList<>();
         Sheet sheet = workbook.getSheetAt(0);
         for (Row row : sheet) {
@@ -46,27 +58,39 @@ public class CountryService {
             }
 
             useCase.add(
-                    CountryExcelUseCase.of(
-                            row.getCell(0).getStringCellValue(),
-                            row.getCell(1).getStringCellValue(),
-                            row.getCell(2).getStringCellValue(),
-                            row.getCell(3).getStringCellValue()));
+                CountryExcelUseCase.of(
+                    row.getCell(0).getStringCellValue(),
+                    row.getCell(1).getStringCellValue(),
+                    row.getCell(2).getStringCellValue(),
+                    row.getCell(3).getStringCellValue()));
         }
 
         return useCase;
     }
-    
-public byte[] createExcelFile(List<CountryExcelUseCase> useCases) throws IOException {
-        try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
-            Sheet sheet = workbook.createSheet("MyObjects");
+    /**
+     * 엑셀 생성 함수 (공유 목적)
+     *
+     * @param useCases
+     * @return
+     * @throws IOException
+     */
+    private void createExcelFile(List<CountryExcelUseCase> useCases, String filePath)
+        throws IOException {
+        // 1. 엑셀 데이터 생성
+        try (Workbook workbook = new XSSFWorkbook();
+            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("countries");
 
             // 헤더 행 생성
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Field1");
-            headerRow.createCell(1).setCellValue("Field2");
-            headerRow.createCell(2).setCellValue("Field3");
+            headerRow.createCell(0).setCellValue("iso2");
+            headerRow.createCell(1).setCellValue("EN");
+            headerRow.createCell(2).setCellValue("KO");
+            headerRow.createCell(3).setCellValue("JP");
+            headerRow.createCell(4).setCellValue("longitude");
+            headerRow.createCell(5).setCellValue("latitude");
 
             // 데이터 행 생성
             int rowNum = 1;
@@ -74,12 +98,46 @@ public byte[] createExcelFile(List<CountryExcelUseCase> useCases) throws IOExcep
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(useCase.getCountryCode());
                 row.createCell(1).setCellValue(useCase.getName_EN());
-                row.createCell(2).setCellValue(useCase.getName_JP());
-                row.createCell(3).setCellValue(useCase.getName_KO());
+                row.createCell(2).setCellValue(useCase.getName_KO());
+                row.createCell(3).setCellValue(useCase.getName_JP());
+
+                Double longitude = useCase.getLongitude();
+                Double latitude = useCase.getLatitude();
+
+                row.createCell(4).setCellValue(longitude != null ? longitude : 0.0);
+                row.createCell(5).setCellValue(latitude != null ? latitude : 0.0);
             }
 
             workbook.write(out);
-            return out.toByteArray();
+
+            // 2. 엑셀 저장
+            ExcelUtils.saveExcel(filePath, out.toByteArray());
         }
+    }
+
+    /**
+     * 국가 API 를 이용해서 국가의 경도, 위도 좌표를 채우는 함수
+     *
+     * @param excelCountries
+     * @return
+     */
+    private List<CountryExcelUseCase> fillLocation(List<CountryExcelUseCase> excelCountries) {
+        // 1. 국가 좌표 반환 API 호춫
+        CountryDetailUseCase countryDetails = countryAPIService.getCountryDetails();
+
+        // 2. List<CountryExcelUseCase> 에 경도, 위도 추가
+        for (CountryExcelUseCase excelCountry : excelCountries) {
+            for (CountryDetailContentUseCase detailCountry : countryDetails.getData()) {
+                if (excelCountry.getCountryCode().equalsIgnoreCase(detailCountry.getIso2())) {
+                    excelCountry.setLocation(
+                        detailCountry.getLongitude(),
+                        detailCountry.getLatitude()
+                    );
+                    break;
+                }
+            }
+        }
+
+        return excelCountries;
     }
 }
