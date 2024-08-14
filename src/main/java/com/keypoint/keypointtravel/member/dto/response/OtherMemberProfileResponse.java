@@ -8,7 +8,7 @@ import lombok.Getter;
 public class OtherMemberProfileResponse {
 
     private Long memberId;
-    private String profileImageUrl;
+    private String profileImage;
     private String memberName;
     private boolean isBlocked;
 //    List<BadgeInfo> badges;    todo: 배지 기능 구현 후 이어서 구현 필요

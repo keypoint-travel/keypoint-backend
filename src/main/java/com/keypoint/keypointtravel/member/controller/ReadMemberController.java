@@ -55,11 +55,11 @@ public class ReadMemberController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/profile/{memberId}")
     public APIResponseEntity<OtherMemberProfileResponse> getOtherMemberProfile(
         @PathVariable Long memberId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // 로그인 하지 않은 경우 Authorization 값을 null로 받아 userDetails를 null로 설정(차단 여부 확인을 위해 로그인 여부 확인 필요)
         OtherMemberUseCase useCase = new OtherMemberUseCase(memberId, userDetails);
         OtherMemberProfileResponse result = readMemberService.getOtherMemberProfile(useCase);
 
