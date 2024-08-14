@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.place.service;
+package com.keypoint.keypointtravel.place.service.country;
 
 import com.keypoint.keypointtravel.global.utils.ExcelUtils;
 import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
@@ -141,3 +141,4 @@ public class CountryService {
         return excelCountries;
     }
 }
+
