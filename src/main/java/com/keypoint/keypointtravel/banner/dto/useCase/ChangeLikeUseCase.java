@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ChangeLikeUseCase {
 
-    private Long bannerId;
+    private Long id;
     private boolean hasILiked;
     private Long memberId;
 }

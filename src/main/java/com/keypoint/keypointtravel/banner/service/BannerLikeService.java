@@ -31,10 +31,10 @@ public class BannerLikeService {
     @Transactional
     public void changeLike(ChangeLikeUseCase useCase) {
         if (useCase.isHasILiked()) {
-            bannerLikeRepository.deleteLike(useCase.getBannerId(), useCase.getMemberId());
+            bannerLikeRepository.deleteLike(useCase.getId(), useCase.getMemberId());
             return;
         }
-        saveLike(useCase.getBannerId(), useCase.getMemberId());
+        saveLike(useCase.getId(), useCase.getMemberId());
     }
 
     private void saveLike(Long bannerId, Long memberId) {
