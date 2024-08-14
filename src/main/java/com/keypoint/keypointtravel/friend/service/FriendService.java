@@ -91,7 +91,7 @@ public class FriendService {
      */
     @Transactional
     public void deleteFriend(DeleteUseCase useCase) {
-        long count = friendRepository.updateIsDeletedById(useCase.getMemberId(), useCase.getFriendId());
+        long count = friendRepository.updateIsDeletedById(useCase.getMemberId(), useCase.getFriendId(), true);
         if (count < 2) {
             throw new GeneralException(FriendErrorCode.NOT_EXISTED_FRIEND);
         }

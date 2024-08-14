@@ -9,5 +9,5 @@ public class FriendDto {
 
     private Long friendId;
     private String friendName;
-    private String profileImageUrl;
+    private String profileImage;
 }

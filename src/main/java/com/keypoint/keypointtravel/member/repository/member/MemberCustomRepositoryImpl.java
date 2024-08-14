@@ -79,11 +79,6 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
-        // 로그인 하지 않았을 경우
-        if (myId == null) {
-            return Expressions.FALSE;
-        }
-        // 로그인 하였을 경우 : 차단 회원 엔티티에서 차단 여부 확인
         return selectOne()
             .from(QBlockedMember.blockedMember)
             .where(blockedMember.member.id.eq(myId)
