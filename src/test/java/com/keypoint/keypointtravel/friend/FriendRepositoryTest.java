@@ -87,7 +87,7 @@ public class FriendRepositoryTest {
         em.clear();
 
         //when : 친구 관계 삭제
-        friendRepository.updateIsDeletedById(member1.getId(), member2.getId());
+        friendRepository.updateIsDeletedById(member1.getId(), member2.getId(), true);
 
         //then : 친구 관계 삭제 확인
         List<Friend> friendList = friendRepository.findAll();
