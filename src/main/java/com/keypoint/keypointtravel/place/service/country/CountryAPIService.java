@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.place.service;
+package com.keypoint.keypointtravel.place.service.country;
 
 import com.keypoint.keypointtravel.place.dto.useCase.countryDetailUseCase.CountryDetailUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
