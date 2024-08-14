@@ -9,7 +9,7 @@ public interface FriendCustomRepository {
 
     Member findMemberByEmailOrInvitationCode(String invitationValue);
 
-    long updateIsDeletedById(Long memberId, Long friendId);
+    long updateIsDeletedById(Long memberId, Long friendId, boolean isDeleted);
 
     List<FriendDto> findAllByMemberId(Long memberId);
 }
