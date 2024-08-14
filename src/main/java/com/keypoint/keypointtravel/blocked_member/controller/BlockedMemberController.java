@@ -6,6 +6,8 @@ import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberInfo;
 import com.keypoint.keypointtravel.blocked_member.service.BlockedMemberService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,9 @@ public class BlockedMemberController {
     @PostMapping("/{blockedMemberId}")
     public ResponseEntity<Void> blockMember(@PathVariable Long blockedMemberId,
                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (blockedMemberId.equals(userDetails.getId())) {
+            throw new GeneralException(BlockedMemberErrorCode.CANNOT_BLOCK_SELF);
+        }
         blockedMemberService.blockMember(new BlockedMemberUseCase(blockedMemberId, userDetails.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
