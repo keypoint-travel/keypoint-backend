@@ -4,6 +4,8 @@ import com.keypoint.keypointtravel.global.utils.ExcelUtils;
 import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
 import com.keypoint.keypointtravel.place.dto.useCase.countryDetailUseCase.CountryDetailContentUseCase;
 import com.keypoint.keypointtravel.place.dto.useCase.countryDetailUseCase.CountryDetailUseCase;
+import com.keypoint.keypointtravel.place.entity.Country;
+import com.keypoint.keypointtravel.place.repository.CountryRepository;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CountryService {
 
     private final CountriesnowService countriesnowService;
+    private final CountryRepository countryRepository;
 
     /**
      * 전체 국가 리스트 (외교부_국가·지역별 표준코드 데이터) 에서 필요한 데이터를 채워서 저장하는 함수
@@ -62,7 +65,10 @@ public class CountryService {
                     row.getCell(0).getStringCellValue(),
                     row.getCell(1).getStringCellValue(),
                     row.getCell(2).getStringCellValue(),
-                    row.getCell(3).getStringCellValue()));
+                    row.getCell(3).getStringCellValue(),
+                    null,
+                    null
+                ));
         }
 
         return useCase;
@@ -139,6 +145,20 @@ public class CountryService {
         }
 
         return excelCountries;
+    }
+
+    /**
+     * Country 저장하는 함수
+     *
+     * @param useCase
+     * @return
+     */
+    @Transactional
+    public Country addCountry(CountryExcelUseCase useCase) {
+        Country country = useCase.toCountryEntity();
+        countryRepository.save(country);
+
+        return country;
     }
 }
 

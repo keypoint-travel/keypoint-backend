@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.place.controller;
 
+import com.keypoint.keypointtravel.place.service.CityService;
 import com.keypoint.keypointtravel.place.service.CountryService;
 import com.keypoint.keypointtravel.place.service.PlaceService;
 import java.io.IOException;
@@ -17,10 +18,11 @@ public class PlaceController {
 
     private final PlaceService placeService;
     private final CountryService countryService;
+    private final CityService cityService;
 
     @PostMapping("")
     public ResponseEntity<?> testEvent() throws IOException {
-        countryService.generateCountryData();
+        cityService.generateCityData();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
