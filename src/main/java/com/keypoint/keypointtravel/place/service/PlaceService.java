@@ -1,10 +1,14 @@
 package com.keypoint.keypointtravel.place.service;
 
+import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.place.dto.response.PlaceResponse;
 import com.keypoint.keypointtravel.place.dto.useCase.CityExcelUseCase;
 import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
+import com.keypoint.keypointtravel.place.dto.useCase.PlaceSearchUseCase;
 import com.keypoint.keypointtravel.place.entity.Country;
 import com.keypoint.keypointtravel.place.entity.Place;
 import com.keypoint.keypointtravel.place.repository.PlaceRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,5 +52,19 @@ public class PlaceService {
      */
     public long countAllPlaces() {
         return placeRepository.count();
+    }
+
+    /**
+     * 검색어에 대해서 장소를 조회하는 함수 - 만약 검색어가 존재하지 않은 경우, 전체 조회
+     *
+     * @param useCase
+     * @return
+     */
+    public List<PlaceResponse> getPlacesBySearchWord(PlaceSearchUseCase useCase) {
+        try {
+            return null;
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }
