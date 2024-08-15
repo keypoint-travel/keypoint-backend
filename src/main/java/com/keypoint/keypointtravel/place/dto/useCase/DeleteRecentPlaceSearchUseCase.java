@@ -8,9 +8,9 @@ import lombok.Getter;
 public class DeleteRecentPlaceSearchUseCase {
 
     private Long memberId;
-    private Long placeSearchHistoryId;
+    private String placeSearchHistoryId;
 
-    public static DeleteRecentPlaceSearchUseCase of(Long id, Long placeSearchHistoryId) {
+    public static DeleteRecentPlaceSearchUseCase of(Long id, String placeSearchHistoryId) {
         return new DeleteRecentPlaceSearchUseCase(id, placeSearchHistoryId);
     }
 }
