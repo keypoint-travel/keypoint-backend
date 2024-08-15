@@ -8,9 +8,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CountryExcelUseCase {
+public class CityExcelUseCase {
 
-    private String countryCode;
+    private String iso2;
 
     private String name_EN;
 
@@ -22,16 +22,16 @@ public class CountryExcelUseCase {
 
     private Double latitude;
 
-    public static CountryExcelUseCase of(
-        String countryCode,
+    public static CityExcelUseCase of(
+        String iso2,
         String name_EN,
         String name_KO,
         String name_JP,
         Double longitude,
         Double latitude
     ) {
-        return new CountryExcelUseCase(
-            countryCode,
+        return new CityExcelUseCase(
+            iso2,
             name_EN,
             name_KO,
             name_JP,
@@ -40,26 +40,16 @@ public class CountryExcelUseCase {
         );
     }
 
-    public void setLocation(Double longitude, Double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
-    public Country toCountryEntity() {
-        return Country.builder()
-            .countryEN(this.name_EN)
-            .countryKO(this.name_KO)
-            .countryJP(this.name_JP)
-            .iso2(countryCode)
-            .build();
-    }
-
-    public Place toPlaceEntity(Country country) {
+    public Place toEntity(Country country) {
         return Place.builder()
             .country(country)
+            .cityEN(this.name_EN)
+            .cityKO(this.name_KO)
+            .cityJP(this.name_JP)
             .longitude(this.longitude)
             .latitude(this.latitude)
-            .placeType(PlaceType.COUNTRY)
+            .placeType(PlaceType.CITY)
             .build();
     }
+
 }

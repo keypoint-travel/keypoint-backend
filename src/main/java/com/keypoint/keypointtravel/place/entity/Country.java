@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -32,6 +33,19 @@ public class Country {
     private String countryJP;
 
     @Comment("국가 코드")
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String iso2;
+
+    @Builder
+    public Country(
+        String countryEN,
+        String countryKO,
+        String countryJP,
+        String iso2
+    ) {
+        this.countryEN = countryEN;
+        this.countryKO = countryKO;
+        this.countryJP = countryJP;
+        this.iso2 = iso2;
+    }
 }

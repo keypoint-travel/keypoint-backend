@@ -10,9 +10,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -28,28 +29,47 @@ public class Place {
     @Column(name = "place_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @Column(nullable = false, name = "city_en")
+    @Column(name = "city_en")
     private String cityEN;
 
-    @Column(nullable = false, name = "city_ko")
+    @Column(name = "city_ko")
     private String cityKO;
 
-    @Column(nullable = false, name = "city_jp")
+    @Column(name = "city_jp")
     private String cityJP;
 
     @Comment("경도")
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Double longitude;
 
     @Comment("위도")
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Double latitude;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PlaceType placeType;
+
+    @Builder
+    public Place(
+        Country country,
+        String cityEN,
+        String cityKO,
+        String cityJP,
+        Double longitude,
+        Double latitude,
+        PlaceType placeType
+    ) {
+        this.country = country;
+        this.cityEN = cityEN;
+        this.cityKO = cityKO;
+        this.cityJP = cityJP;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.placeType = placeType;
+    }
 }
