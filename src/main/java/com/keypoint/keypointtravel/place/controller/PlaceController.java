@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.place.dto.useCase.PlaceSearchUseCase;
 import com.keypoint.keypointtravel.place.service.PlaceService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class PlaceController {
 
     private final PlaceService placeService;
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("")
     public APIResponseEntity<List<PlaceResponse>> getPlaces(
         @AuthenticationPrincipal CustomUserDetails userDetails,

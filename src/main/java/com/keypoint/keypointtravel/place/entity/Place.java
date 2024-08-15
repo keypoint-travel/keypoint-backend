@@ -39,8 +39,8 @@ public class Place {
     @Column(name = "city_ko")
     private String cityKO;
 
-    @Column(name = "city_jp")
-    private String cityJP;
+    @Column(name = "city_ja")
+    private String cityJA;
 
     @Comment("경도")
     //@Column(nullable = false)
@@ -59,7 +59,7 @@ public class Place {
         Country country,
         String cityEN,
         String cityKO,
-        String cityJP,
+        String cityJA,
         Double longitude,
         Double latitude,
         PlaceType placeType
@@ -67,7 +67,7 @@ public class Place {
         this.country = country;
         this.cityEN = cityEN;
         this.cityKO = cityKO;
-        this.cityJP = cityJP;
+        this.cityJA = cityJA;
         this.longitude = longitude;
         this.latitude = latitude;
         this.placeType = placeType;

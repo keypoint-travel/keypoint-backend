@@ -29,8 +29,8 @@ public class Country {
     @Column(nullable = false, name = "country_ko")
     private String countryKO;
 
-    @Column(nullable = false, name = "country_jp")
-    private String countryJP;
+    @Column(nullable = false, name = "country_ja")
+    private String countryJA;
 
     @Comment("국가 코드")
     @Column(nullable = false, unique = true)
@@ -40,12 +40,12 @@ public class Country {
     public Country(
         String countryEN,
         String countryKO,
-        String countryJP,
+        String countryJA,
         String iso2
     ) {
         this.countryEN = countryEN;
         this.countryKO = countryKO;
-        this.countryJP = countryJP;
+        this.countryJA = countryJA;
         this.iso2 = iso2;
     }
 }
