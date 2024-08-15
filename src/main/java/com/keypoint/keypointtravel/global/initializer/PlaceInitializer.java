@@ -81,26 +81,16 @@ public class PlaceInitializer {
             if (row.getRowNum() == 0) {
                 continue;
             }
-
-            try {
-                CityExcelUseCase city = CityExcelUseCase.of(
-                    row.getCell(0).getStringCellValue(),
-                    row.getCell(1).getStringCellValue(),
-                    row.getCell(2).getStringCellValue(),
-                    row.getCell(3).getStringCellValue(),
-                    row.getCell(4) == null ? null : row.getCell(4).getNumericCellValue(),
-                    row.getCell(5) == null ? null : row.getCell(5).getNumericCellValue()
-                );
-
-                map.get(city.getIso2()).add(city);
-
-            } catch (Exception ex) {
-                LogUtils.writeErrorLog("generateDummyPlaceData", "Fail to generate places");
-            }
-
-
+            CityExcelUseCase city = CityExcelUseCase.of(
+                row.getCell(0).getStringCellValue(),
+                row.getCell(1).getStringCellValue(),
+                row.getCell(2).getStringCellValue(),
+                row.getCell(3).getStringCellValue(),
+                row.getCell(4) == null ? null : row.getCell(4).getNumericCellValue(),
+                row.getCell(5) == null ? null : row.getCell(5).getNumericCellValue()
+            );
+            map.get(city.getIso2()).add(city);
         }
-
         return map;
     }
 
