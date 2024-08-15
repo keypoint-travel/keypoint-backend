@@ -1,6 +1,9 @@
 package com.keypoint.keypointtravel.place.redis.entity;
 
+import com.keypoint.keypointtravel.global.converter.TimestampConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
@@ -15,9 +18,25 @@ public class RecentPlaceSearch {
     private String id;
 
     @Indexed
-    private Long countryId;
+    private Long memberId;
 
     @Indexed
     private String searchWord;
+
+    @Convert(converter = TimestampConverter.class)
+    private LocalDateTime modifyAt;
+
+    public RecentPlaceSearch(Long memberId, String searchWord) {
+        this.memberId = memberId;
+        this.searchWord = searchWord;
+    }
+
+    public static RecentPlaceSearch of(Long memberId, String searchWord) {
+        return new RecentPlaceSearch(memberId, searchWord);
+    }
+
+    public void setModifyAt() {
+        this.modifyAt = LocalDateTime.now();
+    }
 
 }
