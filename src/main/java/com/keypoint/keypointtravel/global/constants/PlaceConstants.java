@@ -30,4 +30,6 @@ public class PlaceConstants {
         "VN",
         "ZA"
     );
+
+    public static int MAX_PLACE_SEARCH_WORD_CNT = 5;
 }
