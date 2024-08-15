@@ -49,7 +49,7 @@ public class RecentPlaceSearchController {
     @DeleteMapping("/search-history")
     public APIResponseEntity<Void> getPlaces(
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @RequestParam(value = "placeSearchWordId") Long placeSearchWordId
+        @RequestParam(value = "place-search-word-id") String placeSearchWordId
     ) {
         DeleteRecentPlaceSearchUseCase useCase = DeleteRecentPlaceSearchUseCase.of(
             userDetails.getId(),

@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReadPlaceSearchHistoryResponse {
 
-    private Long placeSearchHistoryId;
+    private String placeSearchHistoryId;
     private String searchWord;
 }

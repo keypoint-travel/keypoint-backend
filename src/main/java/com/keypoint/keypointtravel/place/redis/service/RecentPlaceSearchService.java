@@ -57,9 +57,10 @@ public class RecentPlaceSearchService {
      *
      * @param useCase
      */
+    @Transactional
     public void deleteSearchWord(DeleteRecentPlaceSearchUseCase useCase) {
         try {
-
+            recentPlaceSearchRepository.deleteById(useCase.getPlaceSearchHistoryId());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
