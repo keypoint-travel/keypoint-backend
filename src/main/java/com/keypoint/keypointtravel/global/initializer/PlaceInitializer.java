@@ -57,7 +57,7 @@ public class PlaceInitializer {
                 placeService.addPlaceForCountry(newCountry, country);
 
                 // 2-2. 도시 추가
-                String iso2 = country.getCountryCode();
+                String iso2 = country.getIso2();
                 if (PlaceConstants.MAYOR_COUNTRIES.contains(iso2)) {
                     for (CityExcelUseCase city : cities.get(iso2)) {
                         placeService.addPlaceForCity(newCountry, city);
@@ -82,16 +82,23 @@ public class PlaceInitializer {
                 continue;
             }
 
-            CityExcelUseCase city = CityExcelUseCase.of(
-                row.getCell(0).getStringCellValue(),
-                row.getCell(1).getStringCellValue(),
-                row.getCell(2).getStringCellValue(),
-                row.getCell(3).getStringCellValue(),
-                row.getCell(4) == null ? null : row.getCell(4).getNumericCellValue(),
-                row.getCell(5) == null ? null : row.getCell(5).getNumericCellValue()
-            );
+            try {
+                CityExcelUseCase city = CityExcelUseCase.of(
+                    row.getCell(0).getStringCellValue(),
+                    row.getCell(1).getStringCellValue(),
+                    row.getCell(2).getStringCellValue(),
+                    row.getCell(3).getStringCellValue(),
+                    row.getCell(4) == null ? null : row.getCell(4).getNumericCellValue(),
+                    row.getCell(5) == null ? null : row.getCell(5).getNumericCellValue()
+                );
 
-            map.get(city.getIso2()).add(city);
+                map.get(city.getIso2()).add(city);
+
+            } catch (Exception ex) {
+                LogUtils.writeErrorLog("generateDummyPlaceData", "Fail to generate places");
+            }
+
+
         }
 
         return map;

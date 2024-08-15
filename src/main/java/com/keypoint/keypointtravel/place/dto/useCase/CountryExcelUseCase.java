@@ -10,31 +10,31 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CountryExcelUseCase {
 
-    private String countryCode;
+    private String iso2;
 
-    private String name_EN;
+    private String nameEN;
 
-    private String name_KO;
+    private String nameKO;
 
-    private String name_JP;
+    private String nameJA;
 
     private Double longitude;
 
     private Double latitude;
 
     public static CountryExcelUseCase of(
-        String countryCode,
-        String name_EN,
-        String name_KO,
-        String name_JP,
+        String iso2,
+        String nameEN,
+        String nameKO,
+        String nameJA,
         Double longitude,
         Double latitude
     ) {
         return new CountryExcelUseCase(
-            countryCode,
-            name_EN,
-            name_KO,
-            name_JP,
+            iso2,
+            nameEN,
+            nameKO,
+            nameJA,
             longitude,
             latitude
         );
@@ -47,10 +47,10 @@ public class CountryExcelUseCase {
 
     public Country toCountryEntity() {
         return Country.builder()
-            .countryEN(this.name_EN)
-            .countryKO(this.name_KO)
-            .countryJP(this.name_JP)
-            .iso2(countryCode)
+            .countryEN(this.nameEN)
+            .countryKO(this.nameKO)
+            .countryJA(this.nameJA)
+            .iso2(iso2)
             .build();
     }
 

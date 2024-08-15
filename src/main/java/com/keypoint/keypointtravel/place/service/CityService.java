@@ -76,7 +76,7 @@ public class CityService {
             headerRow.createCell(0).setCellValue("iso2");
             headerRow.createCell(1).setCellValue("EN");
             headerRow.createCell(2).setCellValue("KO");
-            headerRow.createCell(3).setCellValue("JP");
+            headerRow.createCell(3).setCellValue("JA");
             headerRow.createCell(4).setCellValue("longitude");
             headerRow.createCell(5).setCellValue("latitude");
 

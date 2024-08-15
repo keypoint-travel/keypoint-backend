@@ -12,11 +12,11 @@ public class CityExcelUseCase {
 
     private String iso2;
 
-    private String name_EN;
+    private String nameEN;
 
-    private String name_KO;
+    private String nameKO;
 
-    private String name_JP;
+    private String nameJA;
 
     private Double longitude;
 
@@ -24,17 +24,17 @@ public class CityExcelUseCase {
 
     public static CityExcelUseCase of(
         String iso2,
-        String name_EN,
-        String name_KO,
-        String name_JP,
+        String nameEN,
+        String nameKO,
+        String nameJA,
         Double longitude,
         Double latitude
     ) {
         return new CityExcelUseCase(
             iso2,
-            name_EN,
-            name_KO,
-            name_JP,
+            nameEN,
+            nameKO,
+            nameJA,
             longitude,
             latitude
         );
@@ -43,9 +43,9 @@ public class CityExcelUseCase {
     public Place toEntity(Country country) {
         return Place.builder()
             .country(country)
-            .cityEN(this.name_EN)
-            .cityKO(this.name_KO)
-            .cityJP(this.name_JP)
+            .cityEN(this.nameEN)
+            .cityKO(this.nameKO)
+            .cityJA(this.nameJA)
             .longitude(this.longitude)
             .latitude(this.latitude)
             .placeType(PlaceType.CITY)

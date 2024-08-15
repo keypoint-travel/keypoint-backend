@@ -94,7 +94,7 @@ public class CountryService {
             headerRow.createCell(0).setCellValue("iso2");
             headerRow.createCell(1).setCellValue("EN");
             headerRow.createCell(2).setCellValue("KO");
-            headerRow.createCell(3).setCellValue("JP");
+            headerRow.createCell(3).setCellValue("JA");
             headerRow.createCell(4).setCellValue("longitude");
             headerRow.createCell(5).setCellValue("latitude");
 
@@ -102,10 +102,10 @@ public class CountryService {
             int rowNum = 1;
             for (CountryExcelUseCase useCase : useCases) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(useCase.getCountryCode());
-                row.createCell(1).setCellValue(useCase.getName_EN());
-                row.createCell(2).setCellValue(useCase.getName_KO());
-                row.createCell(3).setCellValue(useCase.getName_JP());
+                row.createCell(0).setCellValue(useCase.getIso2());
+                row.createCell(1).setCellValue(useCase.getNameEN());
+                row.createCell(2).setCellValue(useCase.getNameKO());
+                row.createCell(3).setCellValue(useCase.getNameJA());
 
                 Double longitude = useCase.getLongitude();
                 Double latitude = useCase.getLatitude();
@@ -134,7 +134,7 @@ public class CountryService {
         // 2. List<CountryExcelUseCase> 에 경도, 위도 추가
         for (CountryExcelUseCase excelCountry : excelCountries) {
             for (CountryDetailContentUseCase detailCountry : countryDetails.getData()) {
-                if (excelCountry.getCountryCode().equalsIgnoreCase(detailCountry.getIso2())) {
+                if (excelCountry.getIso2().equalsIgnoreCase(detailCountry.getIso2())) {
                     excelCountry.setLocation(
                         detailCountry.getLongitude(),
                         detailCountry.getLatitude()

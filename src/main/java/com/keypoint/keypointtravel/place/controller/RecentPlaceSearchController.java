@@ -12,6 +12,7 @@ import com.keypoint.keypointtravel.place.redis.service.RecentPlaceSearchService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ public class RecentPlaceSearchController {
 
     private final RecentPlaceSearchService recentPlaceSearchService;
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping("/search-history")
     public APIResponseEntity<PlaceResponse> getPlaces(
         @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -43,6 +45,7 @@ public class RecentPlaceSearchController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @DeleteMapping("/search-history")
     public APIResponseEntity<Void> getPlaces(
         @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -58,6 +61,7 @@ public class RecentPlaceSearchController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/search-history")
     public APIResponseEntity<List<ReadPlaceSearchHistoryResponse>> getPlaceHistoryWords(
         @AuthenticationPrincipal CustomUserDetails userDetails

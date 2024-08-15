@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.place.service;
 
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.place.dto.response.PlaceResponse;
 import com.keypoint.keypointtravel.place.dto.useCase.CityExcelUseCase;
 import com.keypoint.keypointtravel.place.dto.useCase.CountryExcelUseCase;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
+    private final MemberDetailRepository memberDetailRepository;
 
     /**
      * Country 타입으로 Place 생성
@@ -62,7 +65,10 @@ public class PlaceService {
      */
     public List<PlaceResponse> getPlacesBySearchWord(PlaceSearchUseCase useCase) {
         try {
-            return null;
+            LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
+                useCase.getMemberId());
+            return placeRepository.getPlacesBySearchWord(languageCode, useCase.getMemberId(),
+                useCase.getSearchWord());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
