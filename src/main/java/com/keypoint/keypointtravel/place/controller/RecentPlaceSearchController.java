@@ -5,7 +5,7 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.place.dto.request.CreateRecentPlaceSearchRequest;
 import com.keypoint.keypointtravel.place.dto.response.PlaceResponse;
-import com.keypoint.keypointtravel.place.dto.response.ReadPlaceSearchHistoryResponse;
+import com.keypoint.keypointtravel.place.dto.response.ReadRecentPlaceSearchResponse;
 import com.keypoint.keypointtravel.place.dto.useCase.DeleteRecentPlaceSearchUseCase;
 import com.keypoint.keypointtravel.place.dto.useCase.PlaceSearchUseCase;
 import com.keypoint.keypointtravel.place.redis.service.RecentPlaceSearchService;
@@ -63,15 +63,15 @@ public class RecentPlaceSearchController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/search-history")
-    public APIResponseEntity<List<ReadPlaceSearchHistoryResponse>> getPlaceHistoryWords(
+    public APIResponseEntity<List<ReadRecentPlaceSearchResponse>> getPlaceHistoryWords(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
-        List<ReadPlaceSearchHistoryResponse> result = recentPlaceSearchService.getPlaceHistoryWords(
+        List<ReadRecentPlaceSearchResponse> result = recentPlaceSearchService.getPlaceHistoryWords(
             useCase
         );
 
-        return APIResponseEntity.<List<ReadPlaceSearchHistoryResponse>>builder()
+        return APIResponseEntity.<List<ReadRecentPlaceSearchResponse>>builder()
             .message("장소 검색 기록 조회 성공")
             .data(result)
             .build();

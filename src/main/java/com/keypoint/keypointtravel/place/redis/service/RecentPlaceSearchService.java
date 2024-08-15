@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.place.redis.service;
 import com.keypoint.keypointtravel.global.constants.PlaceConstants;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
-import com.keypoint.keypointtravel.place.dto.response.ReadPlaceSearchHistoryResponse;
+import com.keypoint.keypointtravel.place.dto.response.ReadRecentPlaceSearchResponse;
 import com.keypoint.keypointtravel.place.dto.useCase.DeleteRecentPlaceSearchUseCase;
 import com.keypoint.keypointtravel.place.dto.useCase.PlaceSearchUseCase;
 import com.keypoint.keypointtravel.place.redis.entity.RecentPlaceSearch;
@@ -72,9 +72,14 @@ public class RecentPlaceSearchService {
      * @param useCase
      * @return
      */
-    public List<ReadPlaceSearchHistoryResponse> getPlaceHistoryWords(MemberIdUseCase useCase) {
+    public List<ReadRecentPlaceSearchResponse> getPlaceHistoryWords(MemberIdUseCase useCase) {
         try {
-            return null;
+            List<RecentPlaceSearch> recentPlaceSearches = recentPlaceSearchRepository.findByMemberId(
+                useCase.getMemberId()
+            );
+            return recentPlaceSearches.stream()
+                .map(x -> ReadRecentPlaceSearchResponse.of(x.getId(), x.getSearchWord()))
+                .toList();
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
