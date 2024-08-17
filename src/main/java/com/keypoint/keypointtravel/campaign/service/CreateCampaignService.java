@@ -118,8 +118,7 @@ public class CreateCampaignService {
 
     private void saveTravelLocations(Campaign campaign, CreateUseCase useCase) {
         List<TravelLocation> travelLocations = useCase.getTravels().stream()
-            // todo: placeId는 국가/도시 구현 후 수정 예정, 현재는 임시로 1L 지정,
-            .map(travel -> new TravelLocation(campaign, 1L, travel.getSequence()))
+            .map(travel -> new TravelLocation(campaign, travel.getPlaceId(), travel.getSequence()))
             .toList();
         travelLocationRepository.saveAll(travelLocations);
     }

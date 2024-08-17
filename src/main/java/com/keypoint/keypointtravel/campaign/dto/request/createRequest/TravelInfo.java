@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class TravelInfo {
 
     private Long sequence;
-    private String name;
+    private Long placeId;
 }
