@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.campaign.service;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +59,7 @@ public class InviteCampaignService {
      *
      * @Param email, memberId(요청을 보낸 사용자), campaignId useCase
      */
+    @Async
     @Transactional
     public void sendEmail(InviteByEmailUseCase useCase) {
         // 캠페인 코드를 포함한 이메일 전송
