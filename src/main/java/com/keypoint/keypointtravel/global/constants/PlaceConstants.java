@@ -17,18 +17,10 @@ public class PlaceConstants {
         "TR",
         "MX",
         "DE",
-        "TH",
-        "GB",
         "JP",
-        "GR",
-        "MY",
-        "ID",
         "PT",
         "AU",
-        "CA",
-        "SA",
-        "VN",
-        "ZA"
+        "CA"
     );
 
     public static int MAX_PLACE_SEARCH_WORD_CNT = 5;
