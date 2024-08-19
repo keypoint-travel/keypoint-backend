@@ -34,7 +34,7 @@ public class CreateUseCase {
             memberId,
             request.getTravels(),
             request.getBudgets(),
-            request.getMembers()
+            request.getFriends()
         );
     }
 }

@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.CreateRequest;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailsUseCase;
 import com.keypoint.keypointtravel.campaign.service.CreateCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -29,9 +30,12 @@ public class CreateCampaignController {
         @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
         @RequestPart(value = "detail") @Valid CreateRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        createCampaignService.createCampaign(CreateUseCase.of(coverImage, request, userDetails.getId()));
-
+        // 캠페인 생성
+        Long campaignId = createCampaignService.createCampaign(
+            CreateUseCase.of(coverImage, request, userDetails.getId()));
+        // 이메일로 초대
+        createCampaignService.sendEmail(
+            InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -12,4 +12,6 @@ public interface CustomBlockedMemberRepository {
     long deleteByBlockedMemberIdAndMemberId(Long blockedMemberId, Long memberId);
 
     List<BlockedMemberDto> findBlockedMembers(Long memberId);
+
+    boolean existsBlockedMembers(List<Long> memberIds);
 }
