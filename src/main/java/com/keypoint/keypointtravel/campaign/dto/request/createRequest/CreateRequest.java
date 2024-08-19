@@ -24,14 +24,17 @@ public class CreateRequest {
     private Date endDate;
     List<TravelInfo> travels;
     List<BudgetInfo> budgets;
-    List<MemberInfo> members;
+    List<MemberInfo> friends;
+    List<EmailInfo> emails;
 
-    public CreateRequest(String title, Date startDate, Date endDate, List<TravelInfo> travels, List<BudgetInfo> budgets, List<MemberInfo> members) {
+    public CreateRequest(String title, Date startDate, Date endDate, List<TravelInfo> travels,
+        List<BudgetInfo> budgets, List<MemberInfo> friends, List<EmailInfo> emails) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
         this.travels = Optional.ofNullable(travels).orElseGet(ArrayList::new);
         this.budgets = Optional.ofNullable(budgets).orElseGet(ArrayList::new);
-        this.members = Optional.ofNullable(members).orElseGet(ArrayList::new);
+        this.friends = Optional.ofNullable(friends).orElseGet(ArrayList::new);
+        this.emails = Optional.ofNullable(emails).orElseGet(ArrayList::new);
     }
 }

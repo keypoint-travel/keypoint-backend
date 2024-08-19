@@ -31,7 +31,9 @@ public class InviteCampaignController {
             request.getEmail(),
             userDetails.getId(),
             request.getCampaignId());
+        // 초대 가능한지 확인
         inviteCampaignService.validateInvitation(useCase);
+        // 이메일로 초대
         inviteCampaignService.sendEmail(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
