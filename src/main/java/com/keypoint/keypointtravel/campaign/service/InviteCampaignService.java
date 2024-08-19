@@ -62,7 +62,7 @@ public class InviteCampaignService {
     @Async
     @Transactional
     public void sendEmail(InviteByEmailUseCase useCase) {
-        // 캠페인 코드를 포함한 이메일 전송
+        // 캠페인 코드 및 로고 이미지를 포함한 이메일 전송
         SendInvitationEmailDto dto = campaignRepository.findSendInvitationEmailInfo(
             useCase.getCampaignId());
         Map<String, String> emailContent = new HashMap<>();
@@ -74,6 +74,8 @@ public class InviteCampaignService {
         EmailUtils.sendSingleEmailWithImages(
             useCase.getEmail(), EmailTemplate.INVITE_CAMPAIGN, emailContent, images);
 
-        // 캠페인 이메일 초대 기록 Redis 에 저장(3일의 만료기간 설정)
+        // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
+        emailInvitationHistoryRepository.save(
+            new EmailInvitationHistory(useCase.getMemberId(), useCase.getEmail(), 1L));
     }
 }
