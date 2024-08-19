@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -93,6 +94,48 @@ public class EmailUtils {
             // 템플릿을 처리하여 이메일 본문 생성
             String emailBody = templateEngine.process(template.getTemplate(), context);
             msgHelper.setText(emailBody, true);
+
+            // 이메일 전송
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new GeneralException(CommonErrorCode.FAIL_TO_SEND_EMAIL);
+        }
+    }
+
+    /**
+     * 이메일 단일 전송 함수
+     *
+     * @param receiver     받는 사람
+     * @param template     이메일 template
+     * @param emailContent 이메일 매핑 내용
+     * @return 이메일 성공 여부
+     */
+    public static void sendSingleEmailWithImages(
+        String receiver,
+        EmailTemplate template,
+        Map<String, String> emailContent,
+        List<String> imagePaths
+    ) {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper msgHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            msgHelper.setTo(receiver);
+            msgHelper.setSubject(template.getSubject());
+
+            // 템플릿에 매핑된 값을 설정
+            Context context = new Context();
+            emailContent.forEach(context::setVariable);
+
+            // 템플릿을 처리하여 이메일 본문 생성
+            String emailBody = templateEngine.process(template.getTemplate(), context);
+            msgHelper.setText(emailBody, true);
+
+            // 이미지 리스트를 반복하고 각 이미지에 대해 addInline 메소드를 호출
+            for (int i = 0; i < imagePaths.size(); i++) {
+                String imagePath = imagePaths.get(i);
+                String contentId = "image" + (i + 1);
+                msgHelper.addInline(contentId, new ClassPathResource(imagePath));
+            }
 
             // 이메일 전송
             javaMailSender.send(mimeMessage);
