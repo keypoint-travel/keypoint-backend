@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.campaign.service;
 
+import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
@@ -12,6 +13,7 @@ import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.TravelLocationRepository;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
+import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
@@ -41,6 +43,8 @@ public class CreateCampaignService {
 
     private final TravelLocationRepository travelLocationRepository;
 
+    private final BlockedMemberRepository blockedMemberRepository;
+
     private final UploadFileService uploadFileService;
 
     /**
@@ -50,6 +54,9 @@ public class CreateCampaignService {
      */
     @Transactional
     public void createCampaign(CreateUseCase useCase) {
+        // 0. 서로 차단한 회원이 있는지 검증
+        useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
+        validateBlockedMembers(useCase.getMembers());
         // 1. 커버 사진 upload File 저장
         Long coverImageId = saveUploadFile(useCase.getCoverImage());
         // 2. 켐페인 저장
@@ -60,6 +67,16 @@ public class CreateCampaignService {
         saveMemberCampaigns(campaign, useCase);
         // 5. 여행지 저장
         saveTravelLocations(campaign, useCase);
+        // todo : 알림 기능 추가 예정
+    }
+
+    private void validateBlockedMembers(List<MemberInfo> members) {
+        List<Long> memberIds = members.stream()
+            .map(MemberInfo::getMemberId)
+            .toList();
+        if(blockedMemberRepository.existsBlockedMembers(memberIds)){
+            throw new GeneralException(BlockedMemberErrorCode.EXISTS_BLOCKED_MEMBER);
+        }
     }
 
     private Long saveUploadFile(MultipartFile coverImage) {

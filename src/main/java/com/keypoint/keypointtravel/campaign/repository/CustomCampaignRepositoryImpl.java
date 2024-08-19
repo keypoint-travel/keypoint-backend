@@ -27,7 +27,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
 
     @Override
     public boolean existsByCampaignLeaderTrue(Long memberId, Long campaignId) {
-
+        // 캠페인 리더가 맞는지, 캠페인이 존재하는지 확인
         MemberCampaign result = queryFactory.selectFrom(memberCampaign)
             .where(memberCampaign.member.id.eq(memberId)
                 .and(memberCampaign.campaign.id.eq(campaignId))
@@ -38,7 +38,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
 
     @Override
     public boolean existsBlockedMemberInCampaign(Long memberId, Long campaignId) {
-        // campaignId에 해당하는 memberCampaign의 memberId 가 blockedMember에서 fk, blockedMemberId가 emberId인 경우가 존재하면ㄱㄱ
+        // campaignId에 해당하는 캠페인에 참여 하는 인원들 중 memberId에 해당하는 사용자를 차단 여부 확인
         MemberCampaign result = queryFactory.selectFrom(memberCampaign)
             .innerJoin(blockedMember).on(memberCampaign.member.id.eq(blockedMember.member.id))
             .where(blockedMember.blockedMemberId.eq(memberId)
@@ -49,6 +49,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
 
     @Override
     public SendInvitationEmailDto findSendInvitationEmailInfo(Long campaignId) {
+        // 캠페인 이메일 초대에 필요한 캠페인 리더의 이름, 캠페인 제목, 초대 코드 조회
         SendInvitationEmailDto dto = queryFactory.select(
                 Projections.constructor(SendInvitationEmailDto.class,
                     memberDetail.name,
