@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.campaign.dto.useCase;
 
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.BudgetInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.CreateRequest;
-import com.keypoint.keypointtravel.campaign.dto.request.createRequest.MemberInfo;
+import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.TravelInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.campaign.dto.request.createRequest;
+package com.keypoint.keypointtravel.campaign.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
