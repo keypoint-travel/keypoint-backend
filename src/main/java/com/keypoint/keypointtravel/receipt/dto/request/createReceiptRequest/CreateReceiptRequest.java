@@ -1,15 +1,13 @@
 package com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.google.firebase.database.annotations.NotNull;
 import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -31,7 +29,7 @@ public class CreateReceiptRequest {
     private LocalDateTime paidAt;
 
     @Min(1)
-    private long totalAccount;
+    private float totalAccount;
 
     @NotNull
     private List<CreatePaymentItemRequest> paymentItems;
