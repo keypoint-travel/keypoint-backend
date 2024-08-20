@@ -34,8 +34,10 @@ public class CreateCampaignController {
         Long campaignId = createCampaignService.createCampaign(
             CreateUseCase.of(coverImage, request, userDetails.getId()));
         // 이메일로 초대
-        createCampaignService.sendEmail(
-            InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId));
+        if (!request.getEmails().isEmpty()) {
+            createCampaignService.sendEmail(
+                InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId));
+        }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
