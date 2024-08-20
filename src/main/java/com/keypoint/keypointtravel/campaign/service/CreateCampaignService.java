@@ -177,7 +177,7 @@ public class CreateCampaignService {
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
         List<EmailInvitationHistory> histories = new ArrayList<>();
         for (String email : useCase.getEmails()) {
-            histories.add(new EmailInvitationHistory(useCase.getMemberId(), email,
+            histories.add(new EmailInvitationHistory(useCase.getCampaignId(), email,
                 useCase.getCampaignId()));
         }
         emailInvitationHistoryRepository.saveAll(histories);

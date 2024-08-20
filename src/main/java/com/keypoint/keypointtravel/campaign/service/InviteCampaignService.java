@@ -86,7 +86,7 @@ public class InviteCampaignService {
 
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
         emailInvitationHistoryRepository.save(
-            new EmailInvitationHistory(useCase.getMemberId(), useCase.getEmail(), 1L));
+            new EmailInvitationHistory(useCase.getCampaignId(), useCase.getEmail(), 1L));
     }
 
     /**
