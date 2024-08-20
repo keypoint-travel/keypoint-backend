@@ -30,7 +30,7 @@ public class PaymentItem extends BaseEntity{
     private Receipt receipt;
 
     @Column(nullable = false)
-    private String title;
+    private String itemName;
 
     @Column(nullable = false)
     private long quantity;
