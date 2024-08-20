@@ -51,7 +51,7 @@ public class Receipt extends BaseEntity {
 
     private String memo;
 
-    private LocalDateTime payAt;
+    private LocalDateTime paidAt;
 
     private Long receiptImageId;
 
