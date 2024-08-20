@@ -17,15 +17,15 @@ public class EmailInvitationHistory {
     private String id;
 
     @Indexed
-    private Long campaignLeaderId;
+    private Long campaignId;
 
     private String email;
 
     @TimeToLive(unit = TimeUnit.DAYS)
     private Long expiration;
 
-    public EmailInvitationHistory(Long campaignLeaderId, String email, Long expiration) {
-        this.campaignLeaderId = campaignLeaderId;
+    public EmailInvitationHistory(Long campaignId, String email, Long expiration) {
+        this.campaignId = campaignId;
         this.email = email;
         this.expiration = expiration;
     }
