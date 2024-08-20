@@ -1,7 +1,9 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.request.InviteByEmailRequest;
+import com.keypoint.keypointtravel.campaign.dto.request.InviteFriendRequest;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.service.InviteCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -35,6 +37,20 @@ public class InviteCampaignController {
         inviteCampaignService.validateInvitation(useCase);
         // 이메일로 초대
         inviteCampaignService.sendEmail(useCase);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @PostMapping("/friend")
+    public ResponseEntity<Void> inviteFriends(
+        @RequestBody @Valid InviteFriendRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        inviteCampaignService.inviteFriends(
+            InviteFriendUseCase.of(
+                request.getCampaignId(),
+                userDetails.getId(),
+                request.getFriends()
+            ));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
