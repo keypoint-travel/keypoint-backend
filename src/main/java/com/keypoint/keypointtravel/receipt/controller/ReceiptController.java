@@ -9,5 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/receipts")
 public class ReceiptController {
+    // OCR 결과 요청 API
     
+    // 영수증 등록 API (수기 등록, OCR 등록)
 }
