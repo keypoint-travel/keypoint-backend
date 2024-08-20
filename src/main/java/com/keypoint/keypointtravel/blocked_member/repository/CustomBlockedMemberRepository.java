@@ -14,4 +14,6 @@ public interface CustomBlockedMemberRepository {
     List<BlockedMemberDto> findBlockedMembers(Long memberId);
 
     boolean existsBlockedMembers(List<Long> memberIds);
+
+    boolean existsBlockedMembers(List<Long> memberIds, List<Long> targetIds);
 }
