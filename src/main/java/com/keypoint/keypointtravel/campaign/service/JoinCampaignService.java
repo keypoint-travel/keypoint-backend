@@ -13,7 +13,9 @@ import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,10 @@ public class JoinCampaignService {
      */
     @Transactional
     public void joinByEmail(JoinByEmailUseCase useCase) {
+        // 이미 캠페인 가입이 된 상태일 시 예외 처리
+        if (memberCampaignRepository.existsByCampaignIdAndMemberId(useCase.getCampaignId(), useCase.getMemberId())) {
+            throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
+        }
         // redis 캠페인 초대 이메일 목록에 저장되어 있는지(만료되지 않았는지 확인)
         List<EmailInvitationHistory> histories =
             emailInvitationHistoryRepository.findByCampaignId(useCase.getCampaignId());
@@ -55,11 +61,11 @@ public class JoinCampaignService {
         memberCampaignRepository.save(new MemberCampaign(campaign, member, false));
 
         // 캠페인 리더와 친구관계 구축
-        friendRepository.save(buildFriend(leader.getMember(), member));
-        friendRepository.save(buildFriend(member, leader.getMember()));
+        if (!friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(leader.getMember().getId(), member.getId())) {
+            friendRepository.save(buildFriend(leader.getMember(), member));
+            friendRepository.save(buildFriend(member, leader.getMember()));
+        }
         // todo: redis 에서 삭제 로직
-        // todo: 이미 가입되어 있는지,
-        // todo: 이미 친구 인지
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
     }
 
