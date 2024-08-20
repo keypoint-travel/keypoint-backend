@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.campaign.service;
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.campaign.dto.dto.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
-import com.keypoint.keypointtravel.campaign.dto.request.createRequest.MemberInfo;
+import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailsUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
