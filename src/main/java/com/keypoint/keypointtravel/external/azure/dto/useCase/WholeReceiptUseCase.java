@@ -1,6 +1,7 @@
-package com.keypoint.keypointtravel.api.dto.response;
+package com.keypoint.keypointtravel.external.azure.dto.useCase;
 
 import com.azure.ai.formrecognizer.documentanalysis.implementation.models.DocumentField;
+import com.keypoint.keypointtravel.api.dto.response.ReceiptItemUseCase;
 import com.keypoint.keypointtravel.external.azure.dto.response.OCRDocumentResponse;
 import com.keypoint.keypointtravel.global.enumType.ocr.CurrencyCode;
 import com.keypoint.keypointtravel.global.enumType.ocr.OCRFieldName;
@@ -12,7 +13,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class ReceiptDTO {
+public class WholeReceiptUseCase {
 
     private String receiptType; // 영수증 타입
     private String merchantAddress;
@@ -31,10 +32,10 @@ public class ReceiptDTO {
     private String rewardPoint; // 적립 포인트
     private String availablePoint; // 가용 포인트
 
-    private List<ReceiptItemDTO> items; // 결제 항목에 대한 세부 데이터
+    private List<ReceiptItemUseCase> items; // 결제 항목에 대한 세부 데이터
 
     @Builder
-    public ReceiptDTO(
+    public WholeReceiptUseCase(
         String receiptType,
         String merchantName,
         String merchantPhoneNumber,
@@ -46,7 +47,7 @@ public class ReceiptDTO {
         String subtotal,
         String tax,
         String tip,
-        List<ReceiptItemDTO> items
+        List<ReceiptItemUseCase> items
     ) {
         this.receiptType = receiptType;
         this.merchantName = merchantName;
@@ -62,14 +63,14 @@ public class ReceiptDTO {
         this.items = items;
     }
 
-    public static ReceiptDTO from(OCRDocumentResponse response) {
+    public static WholeReceiptUseCase from(OCRDocumentResponse response) {
         if (response == null) {
             return null;
         }
 
         Map<String, DocumentField> fieldMap = response.getFields();
 
-        return ReceiptDTO.builder()
+        return WholeReceiptUseCase.builder()
             .receiptType(response.getDocType())
             .merchantName(AzureOCRUtils.getDocumentValue(
                     OCRFieldName.MERCHANT_NAME,
@@ -119,28 +120,12 @@ public class ReceiptDTO {
             )
             .items(fieldMap.get(OCRFieldName.ITEMS.getFieldName()) == null ?
                 null :
-                ReceiptItemDTO.toDTOList(
+                ReceiptItemUseCase.toDTOList(
                     fieldMap.get(OCRFieldName.ITEMS.getFieldName())
                         .getValueArray()
                 )
             )
             .currencyCode(response.getCurrencyCode())
             .build();
-    }
-
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public void setApprovalNumber(String approvalNumber) {
-        this.approvalNumber = approvalNumber;
-    }
-
-    public void setRewardPoint(String rewardPoint) {
-        this.rewardPoint = rewardPoint;
-    }
-
-    public void setAvailablePoint(String availablePoint) {
-        this.availablePoint = availablePoint;
     }
 }

@@ -1,29 +1,29 @@
 package com.keypoint.keypointtravel.place.service;
 
-import com.keypoint.keypointtravel.global.constants.PlaceConstants;
-import com.keypoint.keypointtravel.global.utils.ExcelUtils;
-import com.keypoint.keypointtravel.place.dto.useCase.cityByCountryUseCase.CityByCountryContentUseCase;
-import com.keypoint.keypointtravel.place.dto.useCase.cityByCountryUseCase.CityByCountryUseCase;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.keypoint.keypointtravel.global.constants.PlaceConstants;
+import com.keypoint.keypointtravel.global.utils.ExcelUtils;
+import com.keypoint.keypointtravel.place.dto.useCase.cityByCountryUseCase.CityByCountryContentUseCase;
+import com.keypoint.keypointtravel.place.dto.useCase.cityByCountryUseCase.CityByCountryUseCase;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CityService {
 
     private final CountriesnowService countriesnowService;
-
 
     /**
      * 주요 국가의 도시 데이터를 저장하는 함수
