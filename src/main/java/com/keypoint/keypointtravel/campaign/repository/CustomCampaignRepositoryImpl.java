@@ -90,4 +90,12 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
                 .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
             .fetch();
     }
+
+    @Override
+    public List<MemberCampaign> findMembersByCampaignCode(Long campaignId) {
+        return queryFactory.selectFrom(memberCampaign)
+            .where(memberCampaign.campaign.id.eq(campaignId)
+                .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
+            .fetch();
+    }
 }
