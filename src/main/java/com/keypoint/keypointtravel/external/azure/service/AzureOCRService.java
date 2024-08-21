@@ -1,9 +1,11 @@
 package com.keypoint.keypointtravel.external.azure.service;
 
 import com.keypoint.keypointtravel.api.dto.useCase.ReceiptUseCase;
+import com.keypoint.keypointtravel.external.aws.service.S3Service;
 import com.keypoint.keypointtravel.external.azure.dto.response.OCRResultResponse;
 import com.keypoint.keypointtravel.external.azure.dto.useCase.OCRAnalysisUseCase;
 import com.keypoint.keypointtravel.external.azure.dto.useCase.WholeReceiptUseCase;
+import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.exception.HttpClientException;
@@ -26,10 +28,11 @@ public class AzureOCRService {
     private static final String OCR_RESULT_HEADER = "Operation-Location";
     private final AzureAPIService azureAPIService;
     private final OCRRetryableService ocrRetryableService;
+    private final S3Service s3Service;
 
     @Value("${key.azure.key1}")
     private String apiKey;
-    
+
     /**
      * 영수증 분석 결과를 반환하는 함수
      *
@@ -46,9 +49,12 @@ public class AzureOCRService {
 
             // 2. ocr 결과 가져오기
             OCRResultResponse response = ocrRetryableService.getOCRResult(ocrResultURL);
+
+            // 3. 영수증 이미지 저장 및 response 생성
+            String url = s3Service.uploadFileInS3(file, DirectoryConstants.RECEIPT_DIRECTORY);
             WholeReceiptUseCase dto = WholeReceiptUseCase.from(
                 response.getAnalyzeResult().getDocuments().get(0));
-            return ReceiptOCRResponse.from(dto);
+            return ReceiptOCRResponse.from(url, dto);
         } catch (Exception e) {
             throw new GeneralException(e);
         }
