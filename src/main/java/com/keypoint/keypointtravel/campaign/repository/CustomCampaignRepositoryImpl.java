@@ -13,6 +13,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
 
@@ -79,5 +81,21 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
         }
         return memberCampaign;
+    }
+
+    @Override
+    public List<MemberCampaign> findMembersByCampaignCode(String campaignCode) {
+        return queryFactory.selectFrom(memberCampaign)
+            .where(memberCampaign.campaign.invitation_code.eq(campaignCode)
+                .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
+            .fetch();
+    }
+
+    @Override
+    public List<MemberCampaign> findMembersByCampaignCode(Long campaignId) {
+        return queryFactory.selectFrom(memberCampaign)
+            .where(memberCampaign.campaign.id.eq(campaignId)
+                .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
+            .fetch();
     }
 }
