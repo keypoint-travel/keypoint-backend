@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.campaign.service;
 
+import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.campaign.dto.dto.EmailInvitationHistory;
+import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
@@ -33,6 +35,8 @@ public class JoinCampaignService {
     private final MemberRepository memberRepository;
 
     private final FriendRepository friendRepository;
+
+    private final BlockedMemberRepository blockedMemberRepository;
 
     /**
      * 이메일을 통한 캠페인 가입 함수
@@ -96,5 +100,33 @@ public class JoinCampaignService {
             .member(member)
             .isDeleted(false)
             .build();
+    }
+
+    /**
+     * 캠페인 코드를 통한 가입 신청 함수
+     *
+     * @Param memberId, campaignCode useCase
+     */
+    @Transactional
+    public void requestJoinByCampaignCode(JoinByCodeUseCase useCase) {
+        // 캠페인 코드에 해당하는 캠페인이 존재하지 않을 시 예외 처리
+        List<MemberCampaign> memberCampaigns = campaignRepository.findMembersByCampaignCode(useCase.getCampaignCode());
+        if (memberCampaigns.isEmpty()) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
+        List<Long> memberIds = memberCampaigns.stream()
+            .map(memberCampaign -> memberCampaign.getMember().getId())
+            .toList();
+        // 이미 캠페인 가입이 된 상태일 시 예외 처리
+        for (Long memberId : memberIds) {
+            if (memberId.equals(useCase.getMemberId())) {
+                throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
+            }
+        }
+        // 캠페인 인원들 중 차단 여부 확인
+        if (blockedMemberRepository.existsBlockedMembers(memberIds, useCase.getMemberId())) {
+            throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
+        }
+        // todo : 켐페인 장을 대상으로 알림 발송 (참여 승인 수락, 거절 알림)
     }
 }
