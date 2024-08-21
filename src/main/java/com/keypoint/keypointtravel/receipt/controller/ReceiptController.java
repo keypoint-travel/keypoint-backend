@@ -43,7 +43,6 @@ public class ReceiptController {
             .build();
     }
 
-    // 영수증 등록 API (수기 등록, OCR 등록)
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping("")
     public APIResponseEntity<Void> addReceipt(
