@@ -16,4 +16,6 @@ public interface CustomCampaignRepository {
     MemberCampaign findCampaignLeader(Long campaignId);
 
     List<MemberCampaign> findMembersByCampaignCode(String campaignCode);
+
+    List<MemberCampaign> findMembersByCampaignCode(Long campaignId);
 }
