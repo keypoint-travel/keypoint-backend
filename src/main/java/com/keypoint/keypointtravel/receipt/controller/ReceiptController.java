@@ -47,7 +47,7 @@ public class ReceiptController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping("")
     public APIResponseEntity<Void> addReceipt(
-        @RequestParam(value = "receipt-registration-type", required = false) ReceiptRegistrationType registrationType,
+        @RequestParam(value = "receipt-registration-type") ReceiptRegistrationType registrationType,
         @Valid @RequestBody CreateReceiptRequest request
     ) {
         CreateReceiptUseCase useCase = CreateReceiptUseCase.of(request, registrationType);

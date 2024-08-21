@@ -39,4 +39,6 @@ public class CreateReceiptRequest {
     private Double latitude;
 
     private String receiptImageUrl;
+
+    private String memo;
 }

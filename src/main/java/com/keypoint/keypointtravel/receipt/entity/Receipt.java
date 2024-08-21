@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -24,7 +25,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
-import org.joda.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -82,6 +82,7 @@ public class Receipt extends BaseEntity {
 
     @Builder
     public Receipt(
+        ReceiptRegistrationType receiptRegistrationType,
         Campaign campaign,
         String store,
         String storeAddress,
@@ -91,8 +92,10 @@ public class Receipt extends BaseEntity {
         LocalDateTime paidAt,
         Long receiptImageId,
         Double longitude,
-        Double latitude
+        Double latitude,
+        CurrencyType currency
     ) {
+        this.receiptRegistrationType = receiptRegistrationType;
         this.campaign = campaign;
         this.store = store;
         this.storeAddress = storeAddress;
@@ -103,5 +106,6 @@ public class Receipt extends BaseEntity {
         this.receiptImageId = receiptImageId;
         this.longitude = longitude;
         this.latitude = latitude;
+        this.currency = currency;
     }
 }
