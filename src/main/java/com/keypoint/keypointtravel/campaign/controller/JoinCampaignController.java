@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.request.JoinByCampaignCodeRequest;
+import com.keypoint.keypointtravel.campaign.dto.request.ApproveByCodeRequest;
+import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.service.JoinCampaignService;
@@ -37,6 +39,17 @@ public class JoinCampaignController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         joinCampaignService.requestJoinByCampaignCode(
             new JoinByCodeUseCase(userDetails.getId(), request.getCampaignCode()));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/participation/approval")
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    public ResponseEntity<Void> approveJoinByCampaignCode(
+        @RequestBody @Valid ApproveByCodeRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 캠페인 장만 접근 가능
+        joinCampaignService.approveJoinByCampaignCode(new ApproveByCodeUseCase(userDetails.getId(), request.isApprove(),
+            request.getMemberId(), request.getCampaignId()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
