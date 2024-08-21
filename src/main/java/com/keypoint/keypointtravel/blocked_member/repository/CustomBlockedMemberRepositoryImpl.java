@@ -70,4 +70,14 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
             .fetchFirst();
         return member != null;
     }
+
+    @Override
+    public boolean existsBlockedMembers(List<Long> memberIds, Long targetId) {
+        // memberIds 중 targetId를 차단한 경우가 있는지 확인
+        BlockedMember member = queryFactory.selectFrom(blockedMember)
+            .where(blockedMember.blockedMemberId.eq(targetId)
+                .and(blockedMember.member.id.in(memberIds)))
+            .fetchFirst();
+        return member != null;
+    }
 }
