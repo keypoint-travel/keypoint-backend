@@ -87,8 +87,6 @@ dependencies {
 
     // retry
     implementation 'org.springframework.retry:spring-retry'
-    implementation 'org.springframework.retry:spring-retry-support'
-
 }
 
 ext {
