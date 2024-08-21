@@ -12,5 +12,4 @@ public class MultiPartFileUtils {
         byte[] image = Base64.encodeBase64(file.getBytes());
         return new String(image);
     }
-
 }

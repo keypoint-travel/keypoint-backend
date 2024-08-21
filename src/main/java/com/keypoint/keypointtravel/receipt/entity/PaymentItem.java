@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +38,17 @@ public class PaymentItem extends BaseEntity {
 
     @Column(nullable = false)
     private float amount;
+
+    @Builder
+    public PaymentItem(
+        Receipt receipt,
+        String itemName,
+        long quantity,
+        float amount
+    ) {
+        this.receipt = receipt;
+        this.itemName = itemName;
+        this.quantity = quantity;
+        this.amount = amount;
+    }
 }

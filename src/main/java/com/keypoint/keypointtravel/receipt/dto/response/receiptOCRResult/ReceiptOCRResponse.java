@@ -14,14 +14,16 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ReceiptOCRResponse {
 
+    private String receiptImageUrl;
     private String store;
     private String storeAddress;
     private LocalDateTime paidAt;
     private Float totalAccount;
     private List<PaymentItemOCRResponse> paymentItems;
 
-    public static ReceiptOCRResponse from(WholeReceiptUseCase dto) {
+    public static ReceiptOCRResponse from(String receiptImageUrl, WholeReceiptUseCase dto) {
         return ReceiptOCRResponse.builder()
+            .receiptImageUrl(receiptImageUrl)
             .store(dto.getMerchantName())
             .storeAddress(dto.getMerchantAddress())
             .paidAt(ReceiptOCRResponse.getPaidAt(dto))

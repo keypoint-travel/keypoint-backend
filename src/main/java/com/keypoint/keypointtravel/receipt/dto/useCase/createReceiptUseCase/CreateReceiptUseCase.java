@@ -1,8 +1,11 @@
 package com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase;
 
+import com.keypoint.keypointtravel.campaign.entity.Campaign;
+import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreateReceiptRequest;
+import com.keypoint.keypointtravel.receipt.entity.Receipt;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,6 +24,7 @@ public class CreateReceiptUseCase {
     private ReceiptCategory receiptCategory;
     private LocalDateTime paidAt;
     private float totalAccount;
+    private String memo;
     private List<CreatePaymentItemUseCase> paymentItems;
     private Double longitude;
     private Double latitude;
@@ -38,11 +42,33 @@ public class CreateReceiptUseCase {
             .receiptCategory(request.getReceiptCategory())
             .paidAt(request.getPaidAt())
             .totalAccount(request.getTotalAccount())
+            .memo(request.getMemo())
             .paymentItems(
                 request.getPaymentItems().stream().map(CreatePaymentItemUseCase::new).toList())
             .longitude(request.getLongitude())
             .latitude(request.getLatitude())
             .receiptImageUrl(request.getReceiptImageUrl())
+            .build();
+    }
+
+    public Receipt toEntity(
+        Campaign campaign,
+        Long receiptImageId,
+        CurrencyType currency
+    ) {
+        return Receipt.builder()
+            .receiptRegistrationType(registrationType)
+            .campaign(campaign)
+            .store(this.store)
+            .storeAddress(this.storeAddress)
+            .receiptCategory(this.receiptCategory)
+            .totalAmount(this.totalAccount)
+            .memo(this.memo)
+            .paidAt(this.paidAt)
+            .receiptImageId(receiptImageId)
+            .longitude(this.longitude)
+            .latitude(this.latitude)
+            .currency(currency)
             .build();
     }
 }

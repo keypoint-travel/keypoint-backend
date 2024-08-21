@@ -28,9 +28,18 @@ public class PaymentMember extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_item_id")
-    private PaymentItem campaign;
+    private PaymentItem paymentItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public PaymentMember(PaymentItem paymentItem, Member member) {
+        this.paymentItem = paymentItem;
+        this.member = member;
+    }
+
+    public static PaymentMember of(PaymentItem paymentItem, Member member) {
+        return new PaymentMember(paymentItem, member);
+    }
 }
