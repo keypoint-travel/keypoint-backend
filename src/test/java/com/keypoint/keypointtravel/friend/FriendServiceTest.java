@@ -25,7 +25,7 @@ public class FriendServiceTest {
     @Test
     public void deleteFriendTest() {
         // given : 해당하는 친구 관계가 존재하지 않을 시 예외 처리
-        when(friendRepository.updateIsDeletedById(any(), any())).thenReturn(0L);
+        when(friendRepository.updateIsDeletedById(any(), any(), anyBoolean())).thenReturn(0L);
 
         //when & then
         assertThatThrownBy(() -> friendService.deleteFriend(new DeleteUseCase(1L, 2L)))

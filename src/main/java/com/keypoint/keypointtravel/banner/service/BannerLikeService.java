@@ -30,14 +30,20 @@ public class BannerLikeService {
      */
     @Transactional
     public void changeLike(ChangeLikeUseCase useCase) {
+        // 이미 좋아요를 눌렀을 경우 좋아요 삭제
         if (useCase.isHasILiked()) {
-            bannerLikeRepository.deleteLike(useCase.getBannerId(), useCase.getMemberId());
+            bannerLikeRepository.deleteLike(useCase.getId(), useCase.getMemberId());
             return;
         }
-        saveLike(useCase.getBannerId(), useCase.getMemberId());
+        // 좋아요 추가
+        saveLike(useCase.getId(), useCase.getMemberId());
     }
 
     private void saveLike(Long bannerId, Long memberId) {
+        // 이미 좋아요가 있는 경우 예외 처리
+        if (bannerLikeRepository.existsByBannerIdAndMemberId(bannerId, memberId)) {
+            throw new GeneralException(BannerErrorCode.Exists_LIKE);
+        }
         Banner banner = bannerRepository.getReferenceById(bannerId);
         Member member = memberRepository.getReferenceById(memberId);
         BannerLike like = new BannerLike(banner, member);

@@ -2,7 +2,11 @@ package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.SaveUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.banner.entity.BannerContent;
+import com.keypoint.keypointtravel.banner.repository.banner.BannerContentRepository;
 import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,35 +17,48 @@ public class CreateBannerService {
 
     private final BannerRepository bannerRepository;
 
+    private final BannerContentRepository bannerContentRepository;
+
     /**
-     * Banner 생성하는 함수 (공통 배너 생성)
+     * Banner 배너를 처음 생성하는 함수 (공통 배너 생성)
      *
      * @Param 배너 생성 정보 useCase
      */
     @Transactional
     public void saveBanner(SaveUseCase useCase) {
-
-        //사용자에게 노출 여부
-        boolean isExposed = true;
-
-        //배너 생성
-        Banner banner = Banner.builder()
-            .id(useCase.getContentId())
-            .title(useCase.getTitle())
-            .areaCode(useCase.getAreaCode())
-            .cat1(useCase.getCat1())
-            .cat2(useCase.getCat2())
-            .cat3(useCase.getCat3())
-            .contentType(useCase.getContentType())
-            .thumbnailTitle(useCase.getThumbnailTitle())
-            .thumbnailImage(useCase.getThumbnailImage())
-            .address1(useCase.getAddress1())
-            .address2(useCase.getAddress2())
-            .latitude(useCase.getLatitude())
-            .longitude(useCase.getLongitude())
-            .isExposed(isExposed)
-            .build();
-
+        // 삭제 여부
+        boolean isDeleted = false;
+        // 배너 생성
+        Banner banner = useCase.toEntity(isDeleted);
+        // 배너 내용 생성
+        BannerContent bannerContent = useCase.toEntity(banner, isDeleted);
+        // 배너 저장
         bannerRepository.save(banner);
+        bannerContentRepository.save(bannerContent);
+    }
+
+    /**
+     * Banner 이미 생성된 배너에 다른 언어로 생성하는 함수 (공통 배너 생성)
+     *
+     * @Param 배너 생성 정보 useCase
+     */
+    @Transactional
+    public void saveBannerByOtherLanguage(SaveUseCase useCase, Long bannerId) {
+        //이미 bannerId에 해당하는 배너에 저장할 언어로 배너 내용이 있는지 확인
+        if (bannerRepository.isExistBannerContentByLanguageCode(bannerId, useCase.getLanguageCode())) {
+            throw new GeneralException(BannerErrorCode.EXISTS_BANNER_CONTENT);
+        }
+        // 삭제 여부
+        boolean isDeleted = false;
+        // 배너 조회
+        Banner banner = bannerRepository.getReferenceById(bannerId);
+        // 배너 내용 생성
+        BannerContent bannerContent = useCase.toEntity(banner, isDeleted);
+        // 배너 내용 저장
+        try {
+            bannerContentRepository.save(bannerContent);
+        } catch (Exception e) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
     }
 }

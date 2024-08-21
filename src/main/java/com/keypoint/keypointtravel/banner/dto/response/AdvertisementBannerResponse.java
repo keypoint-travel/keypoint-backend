@@ -8,12 +8,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AdvertisementBannerResponse {
 
-    private Long bannerId;
-    private String title;
+    private Long contentId;
+    private String mainTitle;
+    private String subTitle;
     private String content;
-    private String detailImageUrl;
+    private String detailImage;
 
     public static AdvertisementBannerResponse from(AdvertisementDetailDto dto) {
-        return new AdvertisementBannerResponse(dto.getBannerId(), dto.getTitle(), dto.getContent(), dto.getDetailImageUrl());
+        return new AdvertisementBannerResponse(dto.getBannerId(), dto.getMainTitle(), dto.getSubTitle(), dto.getContent(), dto.getDetailImageUrl());
     }
 }

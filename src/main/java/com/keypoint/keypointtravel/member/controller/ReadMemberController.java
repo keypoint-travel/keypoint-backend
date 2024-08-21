@@ -3,7 +3,8 @@ package com.keypoint.keypointtravel.member.controller;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
-import com.keypoint.keypointtravel.member.dto.response.IsExistedEmailResponse;
+import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
+import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
@@ -14,7 +15,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,21 +30,22 @@ public class ReadMemberController {
     private final ReadMemberService readMemberService;
 
     @PostMapping("/email/validate")
-    public APIResponseEntity<IsExistedEmailResponse> checkIsExistedEmail(
+    public APIResponseEntity<IsExistedResponse> checkIsNotExistedEmail(
         @Valid @RequestBody EmailRequest request) {
         EmailUseCase useCase = EmailUseCase.from(request);
-        boolean result = readMemberService.checkIsExistedEmail(useCase);
+        boolean result = readMemberService.checkIsNotExistedEmail(useCase);
 
-        return APIResponseEntity.<IsExistedEmailResponse>builder()
-            .message("이메일 인증 성공")
-            .data(IsExistedEmailResponse.from(result))
+        return APIResponseEntity.<IsExistedResponse>builder()
+            .message("등록되지 않은 이메일 확인 성공")
+            .data(IsExistedResponse.from(result))
             .build();
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/profile")
     public APIResponseEntity<MemberProfileResponse> getMemberProfile(
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
         MemberProfileResponse result = readMemberService.getMemberProfile(useCase);
 
@@ -48,16 +55,30 @@ public class ReadMemberController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/profile/{memberId}")
     public APIResponseEntity<OtherMemberProfileResponse> getOtherMemberProfile(
         @PathVariable Long memberId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // 로그인 하지 않은 경우 Authorization 값을 null로 받아 userDetails를 null로 설정(차단 여부 확인을 위해 로그인 여부 확인 필요)
         OtherMemberUseCase useCase = new OtherMemberUseCase(memberId, userDetails);
         OtherMemberProfileResponse result = readMemberService.getOtherMemberProfile(useCase);
 
         return APIResponseEntity.<OtherMemberProfileResponse>builder()
             .message("다른 회원 프로필 정보 조회 성공")
+            .data(result)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/settings")
+    public APIResponseEntity<MemberSettingResponse> getMemberSetting(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
+        MemberSettingResponse result = readMemberService.getMemberSetting(useCase);
+
+        return APIResponseEntity.<MemberSettingResponse>builder()
+            .message("사용자 프로필 정보 조회 성공")
             .data(result)
             .build();
     }

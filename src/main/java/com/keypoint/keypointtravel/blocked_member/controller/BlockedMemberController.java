@@ -1,12 +1,13 @@
 package com.keypoint.keypointtravel.blocked_member.controller;
 
-import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberRequest;
 import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberResponse;
 import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberUseCase;
 import com.keypoint.keypointtravel.blocked_member.dto.BlockedMemberInfo;
 import com.keypoint.keypointtravel.blocked_member.service.BlockedMemberService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +25,21 @@ public class BlockedMemberController {
     private final BlockedMemberService blockedMemberService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @PostMapping
-    public ResponseEntity<Void> blockMember(@RequestBody BlockedMemberRequest request,
+    @PostMapping("/{blockedMemberId}")
+    public ResponseEntity<Void> blockMember(@PathVariable Long blockedMemberId,
                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        blockedMemberService.blockMember(new BlockedMemberUseCase(request.getBlockedMemberId(), userDetails.getId()));
+        if (blockedMemberId.equals(userDetails.getId())) {
+            throw new GeneralException(BlockedMemberErrorCode.CANNOT_BLOCK_SELF);
+        }
+        blockedMemberService.blockMember(new BlockedMemberUseCase(blockedMemberId, userDetails.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @PostMapping("/unblock")
-    public ResponseEntity<Void> unblockMember(@RequestBody BlockedMemberRequest request,
+    @PostMapping("/unblock/{blockedMemberId}")
+    public ResponseEntity<Void> unblockMember(@PathVariable Long blockedMemberId,
                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
-        blockedMemberService.unblockMember(new BlockedMemberUseCase(request.getBlockedMemberId(), userDetails.getId()));
+        blockedMemberService.unblockMember(new BlockedMemberUseCase(blockedMemberId, userDetails.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.oauth.service;
 
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.oauth.service.apple.AppleOAuthService;
+import com.keypoint.keypointtravel.oauth.service.google.GoogleOAuthService;
 import org.springframework.stereotype.Component;
 
 @Component

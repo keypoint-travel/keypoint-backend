@@ -1,36 +1,21 @@
 package com.keypoint.keypointtravel.banner.dto.response;
 
-import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementContent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class AdvertisementBannerUseCase {
 
-    private Long bannerId;
-    private String title;
-    private String content;
-    private String thumbnailUrl;
-    private String detailUrl;
-    private LocalDateTime createAt;
-    private String writerName;
-    private LocalDateTime modifyAt;
-    private String modifierName;
+    private String contentId;
+    private String thumbnailImage;
+    private String detailImage;
+    private List<AdvertisementContent> contents;
 
-    public static AdvertisementBannerUseCase from(AdvertisementBannerDto dto) {
-        return new AdvertisementBannerUseCase(
-            dto.getBannerId(),
-            dto.getTitle(),
-            dto.getContent(),
-            dto.getThumbnailUrl(),
-            dto.getDetailUrl(),
-            dto.getCreateAt(),
-            dto.getWriterName(),
-            dto.getModifyAt(),
-            dto.getModifierName()
-        );
+    public void sortContents() {
+        contents.sort((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()));
     }
 }

@@ -21,8 +21,10 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
     public boolean existsBlockedMember(Long blockedMemberId, Long memberId) {
         // 상대가 나를, 내가 상대를 차단한 경우가 있는지 확인
         BlockedMember member = queryFactory.selectFrom(blockedMember)
-            .where((blockedMember.blockedMemberId.eq(blockedMemberId).and(blockedMember.member.id.eq(memberId)))
-                .or(blockedMember.blockedMemberId.eq(memberId).and(blockedMember.member.id.eq(blockedMemberId))))
+            .where((blockedMember.blockedMemberId.eq(blockedMemberId)
+                .and(blockedMember.member.id.eq(memberId)))
+                .or(blockedMember.blockedMemberId.eq(memberId)
+                    .and(blockedMember.member.id.eq(blockedMemberId))))
             .fetchFirst();
         return member != null;
     }
@@ -30,7 +32,8 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
     @Override
     public long deleteByBlockedMemberIdAndMemberId(Long blockedMemberId, Long memberId) {
         return queryFactory.delete(blockedMember)
-            .where(blockedMember.blockedMemberId.eq(blockedMemberId), blockedMember.member.id.eq(memberId))
+            .where(blockedMember.blockedMemberId.eq(blockedMemberId),
+                blockedMember.member.id.eq(memberId))
             .execute();
     }
 
@@ -46,5 +49,16 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
             .where(blockedMember.member.id.eq(memberId))
             .orderBy(blockedMember.createAt.desc())
             .fetch();
+    }
+
+    @Override
+    public boolean existsBlockedMembers(List<Long> memberIds) {
+        // 회원들 중 서로가 차단한 경우가 있는지 확인
+        BlockedMember member = queryFactory.selectFrom(blockedMember)
+            .where(blockedMember.blockedMemberId.in(memberIds)
+                .and(blockedMember.member.id.in(memberIds)))
+            .fetchFirst();
+
+        return member != null;
     }
 }

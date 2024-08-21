@@ -16,6 +16,8 @@ import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRe
 import config.QueryDslConfig;
 import java.time.LocalDate;
 import java.util.List;
+
+import config.TestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -24,7 +26,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-@Import(QueryDslConfig.class)
+@Import(TestConfig.class)
 @ActiveProfiles("test")
 public class FriendRepositoryTest {
 
@@ -85,7 +87,7 @@ public class FriendRepositoryTest {
         em.clear();
 
         //when : 친구 관계 삭제
-        friendRepository.updateIsDeletedById(member1.getId(), member2.getId());
+        friendRepository.updateIsDeletedById(member1.getId(), member2.getId(), true);
 
         //then : 친구 관계 삭제 확인
         List<Friend> friendList = friendRepository.findAll();

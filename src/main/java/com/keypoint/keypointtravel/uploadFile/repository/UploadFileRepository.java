@@ -8,7 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UploadFileRepository extends JpaRepository<UploadFile, Long> {
+public interface UploadFileRepository extends JpaRepository<UploadFile, Long>,
+    UploadFileCustomRepository {
 
     @Modifying(flushAutomatically = true)
     @Query("UPDATE UploadFile up SET up.isDeleted = true WHERE up.id = :id")

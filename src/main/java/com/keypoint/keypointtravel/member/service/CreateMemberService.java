@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.global.utils.EmailService;
+import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
@@ -20,7 +20,7 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.member.repository.memberConsent.MemberConsentRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.entity.Notification;
-import com.keypoint.keypointtravel.notification.repository.NotificationRepository;
+import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +42,6 @@ public class CreateMemberService {
     private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationCodeService emailVerificationCodeService;
-    private final EmailService emailService;
 
     /**
      * Member 생성하는 함수 (일반 회원가입)
@@ -128,7 +127,7 @@ public class CreateMemberService {
             // 2. 이메일 전송
             Map<String, String> emailContent = new HashMap<>();
             emailContent.put("code", code);
-            emailService.sendEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
+            EmailUtils.sendSingleEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
 
             // 3. 이메일 전송이 성공일 경우, 인증 코드 저장
             emailVerificationCodeService.saveEmailVerificationCode(email, code);
@@ -152,6 +151,8 @@ public class CreateMemberService {
             boolean result = emailVerificationCode != null;
             if (emailVerificationCode != null) {
                 emailVerificationCodeService.deleteEmailVerificationCode(emailVerificationCode);
+            } else { // 이메일 인증 실패 에러 반환
+                throw new GeneralException(MemberErrorCode.FAIL_TO_CONFIRM_EMAIL);
             }
 
             return result;
