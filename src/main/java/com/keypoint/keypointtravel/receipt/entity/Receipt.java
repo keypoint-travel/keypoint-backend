@@ -1,17 +1,10 @@
 package com.keypoint.keypointtravel.receipt.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.annotations.Comment;
-import org.joda.time.LocalDateTime;
-
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,9 +17,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
+import org.joda.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -81,4 +79,29 @@ public class Receipt extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CurrencyType currency;
+
+    @Builder
+    public Receipt(
+        Campaign campaign,
+        String store,
+        String storeAddress,
+        ReceiptCategory receiptCategory,
+        float totalAmount,
+        String memo,
+        LocalDateTime paidAt,
+        Long receiptImageId,
+        Double longitude,
+        Double latitude
+    ) {
+        this.campaign = campaign;
+        this.store = store;
+        this.storeAddress = storeAddress;
+        this.receiptCategory = receiptCategory;
+        this.totalAmount = totalAmount;
+        this.memo = memo;
+        this.paidAt = paidAt;
+        this.receiptImageId = receiptImageId;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
 }

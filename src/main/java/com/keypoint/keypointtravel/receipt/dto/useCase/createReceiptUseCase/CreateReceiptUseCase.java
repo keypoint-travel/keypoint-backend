@@ -24,6 +24,7 @@ public class CreateReceiptUseCase {
     private List<CreatePaymentItemUseCase> paymentItems;
     private Double longitude;
     private Double latitude;
+    private String receiptImageUrl;
 
     public static CreateReceiptUseCase of(
         CreateReceiptRequest request,
@@ -41,6 +42,7 @@ public class CreateReceiptUseCase {
                 request.getPaymentItems().stream().map(CreatePaymentItemUseCase::new).toList())
             .longitude(request.getLongitude())
             .latitude(request.getLatitude())
+            .receiptImageUrl(request.getReceiptImageUrl())
             .build();
     }
 }
