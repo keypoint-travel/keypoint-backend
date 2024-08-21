@@ -86,7 +86,7 @@ dependencies {
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
 
     // retry
-    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.retry:spring-retry:2.0.8'
     implementation 'org.springframework.retry:spring-retry-support'
 
 }
