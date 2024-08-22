@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.campaign.service;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
+import com.keypoint.keypointtravel.campaign.dto.response.PaymentInfo;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
@@ -40,7 +42,7 @@ public class ReadCampaignService {
      * @Return
      */
     @Transactional
-    public void findByCategory(FindPaymentUseCase useCase) {
+    public DetailsByCategoryResponse findByCategory(FindPaymentUseCase useCase) {
         // 0. 캠페인에 소속되어 있는지 검증
         if (!memberCampaignRepository.existsByCampaignIdAndMemberId(useCase.getCampaignId(), useCase.getMemberId())) {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
@@ -69,11 +71,13 @@ public class ReadCampaignService {
         HashMap<String, Float> categoryAmount = new HashMap<>();
         paymentDtoList.forEach(paymentDto -> {
             String category = paymentDto.getCategory().getDescription();
-            categoryAmount.put(category, categoryAmount.getOrDefault(category, 0f) + paymentDto.getAmount());
+            categoryAmount.put(category, categoryAmount.getOrDefault(
+                category, 0f) + paymentDto.getAmount() * paymentDto.getQuantity());
         });
         float totalAmount = categoryAmount.values().stream().reduce(0f, Float::sum);
-        if(totalBudget.getTotalAmount() - totalAmount > 0){
-            float remainBudget = totalBudget.getTotalAmount() - totalAmount;
+        float remainBudget = 0;
+        if (totalBudget.getTotalAmount() - totalAmount > 0) {
+            remainBudget = totalBudget.getTotalAmount() - totalAmount;
             categoryAmount.put("잔여 예산", remainBudget);
             totalAmount += remainBudget;
         }
@@ -97,6 +101,19 @@ public class ReadCampaignService {
         if (maxCategory != null) {
             categoryPercentage.put(maxCategory, maxPercentage + diff);
         }
+        // 7. 결제 항목 응답값 생성
+        List<PaymentInfo> paymentInfoList = paymentDtoList.stream()
+            .map(PaymentInfo::from)
+            .toList();
+        paymentInfoList.forEach(paymentInfo -> paymentInfo.addMembers(paymentMemberDtoList));
+        // 8. 응답
+        return new DetailsByCategoryResponse(
+            totalBudget.getCurrencyType().getCode(),
+            totalAmount,
+            remainBudget,
+            categoryPercentage,
+            paymentInfoList
+        );
     }
 
     private float convertCurrency(List<Currency> currencies, float amount, CurrencyType from, CurrencyType to) {
