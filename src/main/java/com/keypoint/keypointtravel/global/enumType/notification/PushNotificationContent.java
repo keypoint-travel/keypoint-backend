@@ -1,40 +1,45 @@
 package com.keypoint.keypointtravel.global.enumType.notification;
 
+import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PushNotificationMsg {
+public enum PushNotificationContent {
     RECEIPT_REGISTER(
         PushNotificationType.RECEIPT_REGISTER,
         "pushNotification.receiptRegister_title",
         "pushNotification.receiptRegister_content"
     ),
-    FRIEND_INVITE_1(
-        PushNotificationType.FRIEND_INVITE,
-        "pushNotification.friendInvite1_title",
-        "pushNotification.friendInvite1_content"
+    CAMPAIGN_D_MINUS_7_1(
+        PushNotificationType.CAMPAIGN_D_MINUS_7,
+        "pushNotification.campaignDMinus7_1_title",
+        "pushNotification.campaignDMinus7_1_content"
     ),
-    FRIEND_INVITE_2(
-        PushNotificationType.FRIEND_INVITE,
-        "pushNotification.friendInvite2_title",
-        "pushNotification.friendInvite2_content"
+    CAMPAIGN_D_MINUS_7_2(
+        PushNotificationType.CAMPAIGN_D_MINUS_7,
+        "pushNotification.campaignDMinus7_2_title",
+        "pushNotification.campaignDMinus7_2_content"
     ),
-    FRIEND_INVITE_3(
-        PushNotificationType.FRIEND_INVITE,
-        "pushNotification.friendInvite3_title",
-        "pushNotification.friendInvite3_content"
+    CAMPAIGN_D_MINUS_7_3(
+        PushNotificationType.CAMPAIGN_D_MINUS_7,
+        "pushNotification.campaignDMinus7_3_title",
+        "pushNotification.campaignDMinus7_3_content"
     ),
-    FRIEND_INVITE_4(
-        PushNotificationType.FRIEND_INVITE,
-        "pushNotification.friendInvite4_title",
-        "pushNotification.friendInvite4_content"
+    CAMPAIGN_D_MINUS_7_4(
+        PushNotificationType.CAMPAIGN_D_MINUS_7,
+        "pushNotification.campaignDMinus7_4_title",
+        "pushNotification.campaignDMinus7_4_content"
     ),
-    FRIEND_INVITE_5(
-        PushNotificationType.FRIEND_INVITE,
-        "pushNotification.friendInvite5_title",
-        "pushNotification.friendInvite5_content"
+    CAMPAIGN_D_MINUS_7_5(
+        PushNotificationType.CAMPAIGN_D_MINUS_7,
+        "pushNotification.campaignDMinus7_5_title",
+        "pushNotification.campaignDMinus7_5_content"
     ),
     CAMPAIGN_D_DAY_1(
         PushNotificationType.CAMPAIGN_D_DAY,
@@ -130,4 +135,72 @@ public enum PushNotificationMsg {
     private final PushNotificationType type;
     private final String titleLangCode;
     private final String contentLangCode;
+
+    public static PushNotificationContent getRandomNotificationContent(PushNotificationType type) {
+        // 1. 가능한 문구 조회
+        List<PushNotificationContent> msgs = getNotificationMsgs(type);
+        if (msgs.isEmpty()) {
+            return null;
+        } else if (msgs.size() == 1) {
+            return msgs.get(0);
+        }
+
+        // 2. 가능한 문구 중 하나 반환
+        Random random = new Random();
+        int randomIndex = random.nextInt(msgs.size());
+        return msgs.get(randomIndex);
+    }
+
+    public static List<PushNotificationContent> getNotificationMsgs(PushNotificationType type) {
+        List<PushNotificationContent> notificationMsgs = new ArrayList<>();
+        for (PushNotificationContent notificationMsg : values()) {
+            if (notificationMsg.type.equals(type)) {
+                notificationMsgs.add(notificationMsg);
+            }
+        }
+
+        return notificationMsgs;
+    }
+
+    public String getTranslatedContent(String name, String campaignName, Locale locale) {
+        switch (this) {
+            case RECEIPT_REGISTER:
+            case FRIEND_ADDED:
+            case FRIEND_ACCEPTED_RECEIVER:
+            case FRIEND_ACCEPTED_SENDER:
+                return MessageSourceUtils.getLocalizedLanguageWithVariables(contentLangCode,
+                    new Object[]{name}, locale);
+            case CAMPAIGN_D_MINUS_7_1:
+            case CAMPAIGN_D_MINUS_7_2:
+            case CAMPAIGN_D_MINUS_7_3:
+            case CAMPAIGN_D_MINUS_7_4:
+            case CAMPAIGN_D_MINUS_7_5:
+            case CAMPAIGN_D_DAY_1:
+            case CAMPAIGN_D_DAY_2:
+            case CAMPAIGN_D_DAY_3:
+            case CAMPAIGN_D_DAY_4:
+            case CAMPAIGN_D_DAY_5:
+            case CAMPAIGN_NO_EXPENSE_D1:
+            case PAYMENT_COMPLETION:
+            case INQUIRY_RESPONSE_COMPLETED:
+            case CAMPAIGN_D60_PASSED_1:
+            case CAMPAIGN_D60_PASSED_2:
+                return MessageSourceUtils.getLocalizedLanguage(contentLangCode, locale);
+            case CAMPAIGN_INVITE:
+            case CAMPAIGN_ACCEPT_INVITER:
+            case CAMPAIGN_ACCEPT_INVITEE:
+            case CAMPAIGN_JOIN_REQUEST:
+                return MessageSourceUtils.getLocalizedLanguageWithVariables(
+                    contentLangCode,
+                    new Object[]{name, campaignName},
+                    locale);
+            case CAMPAIGN_END:
+                return MessageSourceUtils.getLocalizedLanguageWithVariables(
+                    contentLangCode,
+                    new Object[]{campaignName},
+                    locale);
+        }
+
+        return null;
+    }
 }
