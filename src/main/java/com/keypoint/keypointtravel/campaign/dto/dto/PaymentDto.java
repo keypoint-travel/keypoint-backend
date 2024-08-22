@@ -25,4 +25,9 @@ public class PaymentDto {
     private float amount;
 
     private CurrencyType currencyType;
+
+    public void updateBudget(float amount, CurrencyType currencyType) {
+        this.amount = amount;
+        this.currencyType = currencyType;
+    }
 }

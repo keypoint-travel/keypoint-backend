@@ -30,7 +30,7 @@ public class CampaignBudget {
     private String category;
 
     @Column(nullable = false)
-    private Long amount;
+    private float amount;
 
     @Builder
     public CampaignBudget(Campaign campaign, CurrencyType currency, String category, Long amount) {
