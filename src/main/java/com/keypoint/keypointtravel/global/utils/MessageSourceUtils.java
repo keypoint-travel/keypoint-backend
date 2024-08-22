@@ -32,4 +32,24 @@ public class MessageSourceUtils {
             throw new GeneralException(CommonErrorCode.FAIL_TO_FIND_LANGUAGE, e);
         }
     }
+
+    /**
+     * messages 에 등록에 변수를 지정해서 다국어를 가져오는 함수
+     *
+     * @param langCode 다국어 코드
+     * @param locale   Locale 객체
+     * @return 다국어 메시지
+     * @oaram variables 다국어 적용할 변수 데이터
+     */
+    public static String getLocalizedLanguageWithVariables(
+        String langCode,
+        Object[] variables,
+        Locale locale
+    ) {
+        try {
+            return messageSource.getMessage(langCode, variables, locale);
+        } catch (NoSuchMessageException e) {
+            throw new GeneralException(CommonErrorCode.FAIL_TO_FIND_LANGUAGE, e);
+        }
+    }
 }
