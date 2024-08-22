@@ -3,13 +3,20 @@ package com.keypoint.keypointtravel.notification.service;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
+import com.keypoint.keypointtravel.member.entity.MemberDetail;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
+import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
+import com.keypoint.keypointtravel.notification.dto.useCase.CommonPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.repository.pushNotificationHistory.PushNotificationHistoryRepository;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PushNotificationHistoryService {
 
     private final PushNotificationHistoryRepository pushNotificationHistoryRepository;
+    private final PushNotificationService pushNotificationService;
+    private final MemberDetailRepository memberDetailRepository;
 
 
     @Transactional
@@ -49,10 +58,43 @@ public class PushNotificationHistoryService {
      */
     public Slice<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
         try {
-            return pushNotificationHistoryRepository.findPushHistories(
+            Pageable pageable = useCase.getPageable();
+            MemberDetail memberDetail = memberDetailRepository.findByMemberId(
+                useCase.getMemberId());
+
+            // 1. 푸시 데이터 조회
+            List<CommonPushHistoryUseCase> histories = pushNotificationHistoryRepository.findPushHistories(
                 useCase.getMemberId(),
-                useCase.getPageable()
+                pageable
             );
+
+            // 3. 다국어 적용 및 response 적용 변환
+            List<PushHistoryResponse> translatedHistories = new ArrayList<>();
+            for (CommonPushHistoryUseCase history : histories) {
+
+                PushNotificationDTO notificationDTO = pushNotificationService.generateNotificationDTO(
+                    memberDetail,
+                    history.getDetailData(),
+                    history.getType()
+                );
+                translatedHistories.add(
+                    PushHistoryResponse.of(
+                        history.getHistoryId(),
+                        notificationDTO.getTitle(),
+                        notificationDTO.getBody(),
+                        history.getArrivedAt()
+                    )
+                );
+            }
+
+            // 4. Slice 적용
+            boolean hasNext = false;
+            if (translatedHistories.size() > pageable.getPageSize()) {
+                hasNext = true;
+                translatedHistories.remove(pageable.getPageSize());
+            }
+
+            return new SliceImpl<>(translatedHistories, pageable, hasNext);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
