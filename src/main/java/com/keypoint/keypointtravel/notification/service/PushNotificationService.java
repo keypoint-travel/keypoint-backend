@@ -36,6 +36,9 @@ public class PushNotificationService {
         Object additionalData = event.getAdditionalData();
 
         switch (type) {
+            case RECEIPT_REGISTER -> {
+
+            }
             case FRIEND_INVITE -> {
                 if (additionalData instanceof FrendInviteData) {
                     FrendInviteData data = (FrendInviteData) additionalData;
