@@ -93,8 +93,13 @@ public class PushNotificationService {
                         .orElse("");
 
                     // 1. FCM 내용 구성
-                    content = notificationMsg.getTranslatedContent(
+                    title = notificationMsg.getTranslatedContent(
                         data.getAcceptorName(),
+                        null,
+                        locale
+                    );
+                    content = notificationMsg.getTranslatedContent(
+                        null,
                         campaignTitle,
                         locale
                     );
@@ -129,7 +134,7 @@ public class PushNotificationService {
                     );
                 }
             }
-            case FRIEND_ADDED, FRIEND_ACCEPTED_RECEIVER, FRIEND_ACCEPTED_SENDER -> {
+            case FRIEND_ADDED, FRIEND_ACCEPTED_RECEIVER -> {
                 if (additionalData instanceof String) {
                     String data = (String) additionalData;
 
@@ -139,6 +144,20 @@ public class PushNotificationService {
                         null,
                         locale
                     );
+                }
+            }
+            case FRIEND_ACCEPTED_SENDER -> {
+                if (additionalData instanceof String) {
+                    String data = (String) additionalData;
+
+                    // 1. FCM 내용 구성
+                    title = notificationMsg.getTranslatedContent(
+                        data,
+                        null,
+                        locale
+                    );
+                    content = MessageSourceUtils.getLocalizedLanguage(
+                        notificationMsg.getContentLangCode(), locale);
                 }
             }
             // TODO 문구 미정 항목
