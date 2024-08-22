@@ -12,6 +12,11 @@ public enum PushNotificationMsg {
         "pushNotification.receiptRegister_content"
     ),
 
+    FRIEND_INVITE_1(
+        PushNotificationType.FRIEND_INVITE,
+        "pushNotification.friendInvite1_title",
+        "pushNotification.friendInvite1_content"
+    ),
     FRIEND_INVITE_2(
         PushNotificationType.FRIEND_INVITE,
         "pushNotification.friendInvite2_title",
@@ -33,9 +38,38 @@ public enum PushNotificationMsg {
         "pushNotification.friendInvite5_content"
     ),
 
-    CAMPAIGN_START("캠페인 시작 알림", "pushNotification.campaignStart", "pushNotification.campaignStart"),
+    CAMPAIGN_D_DAY_1(
+        PushNotificationType.CAMPAIGN_D_DAY,
+        "pushNotification.campaignDDay1_title",
+        "pushNotification.campaignDDay1_content"
+    ),
+    CAMPAIGN_D_DAY_2(
+        PushNotificationType.CAMPAIGN_D_DAY,
+        "pushNotification.campaignDDay2_title",
+        "pushNotification.campaignDDay2_content"
+    ),
+    CAMPAIGN_D_DAY_3(
+        PushNotificationType.CAMPAIGN_D_DAY,
+        "pushNotification.campaignDDay3_title",
+        "pushNotification.campaignDDay3_content"
+    ),
+    CAMPAIGN_D_DAY_4(
+        PushNotificationType.CAMPAIGN_D_DAY,
+        "pushNotification.campaignDDay4_title",
+        "pushNotification.campaignDDay4_content"
+    ),
+    CAMPAIGN_D_DAY_5(
+        PushNotificationType.CAMPAIGN_D_DAY,
+        "pushNotification.campaignDDay5_title",
+        "pushNotification.campaignDDay5_content"
+    ),
+
+    CAMPAIGN_START(
+        PushNotificationType.CAMPAIGN_START, "pushNotification.campaignStart",
+        "pushNotification.campaignStart"),
+
     CAMPAIGN_END("캠페인 종료 알림", "pushNotification.campaignEnd", "pushNotification.campaignEnd"),
-    CAMPAIGN_D_DAY("캠페인 D-1 알림", "pushNotification.campaignDday", "pushNotification.campaignDday"),
+
     CAMPAIGN_INVITE("캠페인 초대 알림", "pushNotification.campaignInvite",
         "pushNotification.campaignInvite"),
     CAMPAIGN_REGISTRATION("캠페인 등록 알림", "pushNotification.campaignRegistration",
