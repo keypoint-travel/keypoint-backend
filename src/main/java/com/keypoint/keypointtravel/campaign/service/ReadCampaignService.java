@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -53,7 +54,7 @@ public class ReadCampaignService {
         List<PaymentMemberDto> paymentMemberDtoList = customPaymentRepository.findMemberListByPayments(paymentItemIds);
 
         List<Currency> currencies = currencyRepository.findAll();
-        // 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
+        // 4. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
         if (useCase.getCurrencyType() != null) {
             totalBudget.updateTotalBudget(
                 convertCurrency(currencies, totalBudget.getTotalAmount(), totalBudget.getCurrencyType(), useCase.getCurrencyType()),
@@ -64,7 +65,38 @@ public class ReadCampaignService {
                 useCase.getCurrencyType()
             ));
         }
-
+        // 5. 카테고리 별 금액 계산 및 잔여 예산 계산
+        HashMap<String, Float> categoryAmount = new HashMap<>();
+        paymentDtoList.forEach(paymentDto -> {
+            String category = paymentDto.getCategory().getDescription();
+            categoryAmount.put(category, categoryAmount.getOrDefault(category, 0f) + paymentDto.getAmount());
+        });
+        float totalAmount = categoryAmount.values().stream().reduce(0f, Float::sum);
+        if(totalBudget.getTotalAmount() - totalAmount > 0){
+            float remainBudget = totalBudget.getTotalAmount() - totalAmount;
+            categoryAmount.put("잔여 예산", remainBudget);
+            totalAmount += remainBudget;
+        }
+        // 6. 카테고리 별 비율 계산
+        HashMap<String, Float> categoryPercentage = new HashMap<>();
+        // 최대 비율을 가지는 카테고리 선정
+        String maxCategory = null;
+        float maxPercentage = 0;
+        for (HashMap.Entry<String, Float> entry : categoryAmount.entrySet()) {
+            float percentage = (entry.getValue() / totalAmount) * 100;
+            percentage = Math.round(percentage);
+            categoryPercentage.put(entry.getKey(), percentage);
+            if (percentage > maxPercentage) {
+                maxPercentage = percentage;
+                maxCategory = entry.getKey();
+            }
+        }
+        float totalPercentage = categoryPercentage.values().stream().reduce(0f, Float::sum);
+        // 비율 별 소수점 반올림 후 100%를 맞추기위해 최대 비율을 가진 카테고리에 차이를 더함
+        float diff = 100 - totalPercentage;
+        if (maxCategory != null) {
+            categoryPercentage.put(maxCategory, maxPercentage + diff);
+        }
     }
 
     private float convertCurrency(List<Currency> currencies, float amount, CurrencyType from, CurrencyType to) {
