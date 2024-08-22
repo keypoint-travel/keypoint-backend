@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse
 import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.repository.pushNotificationHistory.PushNotificationHistoryRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ public class PushNotificationHistoryService {
 
 
     @Transactional
-    public void savePushNotificationHistory(PushNotificationHistory history) {
-        pushNotificationHistoryRepository.save(history);
+    public void savePushNotificationHistories(List<PushNotificationHistory> histories) {
+        pushNotificationHistoryRepository.saveAll(histories);
     }
 
     /**

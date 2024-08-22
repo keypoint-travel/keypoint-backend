@@ -4,7 +4,6 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.notification.MarketingNotificationType;
-import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
@@ -44,16 +43,18 @@ public class NotificationEventListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendFCMNotification(PushNotificationEvent event) {
-        PushNotificationType type = event.getPushNotificationType();
-
+        List<PushNotificationHistory> pushNotificationHistories = new ArrayList<>();
         for (Long memberId : event.getMemberIds()) {
             Member member = readMemberService.findMemberById(memberId);
+            String memberName = member.getMemberDetail().getName();
             LanguageCode languageCode = member.getMemberDetail().getLanguage();
 
             // 1. FCM 내용 구성
             PushNotificationDTO notificationContent = pushNotificationService.generateNotificationDTO(
+                memberName,
                 event,
-                languageCode);
+                languageCode
+            );
             if (notificationContent == null) {
                 return;
             }
@@ -84,13 +85,17 @@ public class NotificationEventListener {
             // 4. 실패한 데이터 존재 시, 토큰 삭제
             pushNotificationService.deleteFailedToken(failedHashcodes, tokenMapper);
 
+            // 5. 이력 객체 생성
+            pushNotificationHistories.add(PushNotificationHistory.of(
+                notificationContent.getPushNotificationMsg(),
+                member,
+                notificationContent.getCampaign(),
+                event
+            ));
+
             // 5. 이력 저장
-            PushNotificationHistory history = PushNotificationHistory.of(
-                notificationContent.getTitle(),
-                notificationContent.getBody(),
-                type,
-                member);
-            pushNotificationHistoryService.savePushNotificationHistory(history);
+            event.clearMemberIds();
+            pushNotificationHistoryService.savePushNotificationHistories(pushNotificationHistories);
         }
     }
 
