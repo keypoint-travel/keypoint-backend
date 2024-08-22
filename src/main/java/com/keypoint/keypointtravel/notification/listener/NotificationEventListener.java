@@ -4,7 +4,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.notification.MarketingNotificationType;
-import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -46,14 +46,14 @@ public class NotificationEventListener {
         List<PushNotificationHistory> pushNotificationHistories = new ArrayList<>();
         for (Long memberId : event.getMemberIds()) {
             Member member = readMemberService.findMemberById(memberId);
-            String memberName = member.getMemberDetail().getName();
-            LanguageCode languageCode = member.getMemberDetail().getLanguage();
 
             // 1. FCM 내용 구성
+            PushNotificationContent notificationMsg = PushNotificationContent.getRandomNotificationContent(
+                event.getPushNotificationType());
             PushNotificationDTO notificationContent = pushNotificationService.generateNotificationDTO(
-                memberName,
+                member.getMemberDetail(),
                 event,
-                languageCode
+                notificationMsg
             );
             if (notificationContent == null) {
                 return;
@@ -87,9 +87,8 @@ public class NotificationEventListener {
 
             // 5. 이력 객체 생성
             pushNotificationHistories.add(PushNotificationHistory.of(
-                notificationContent.getPushNotificationMsg(),
+                notificationContent.getPushNotificationContent(),
                 member,
-                notificationContent.getCampaign(),
                 event
             ));
         }

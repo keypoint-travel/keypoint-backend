@@ -1,18 +1,20 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
+import lombok.NoArgsConstructor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FriendPushNotificationEvent extends PushNotificationEvent {
 
-    private String friendName;
+    @JsonProperty("additionalData")
+    private FriendData additionalData;
 
     public FriendPushNotificationEvent() {
         super(null, null);
     }
-
 
     public FriendPushNotificationEvent(
         PushNotificationType type,
@@ -20,7 +22,7 @@ public class FriendPushNotificationEvent extends PushNotificationEvent {
         String friendName
     ) {
         super(type, memberIds);
-        this.friendName = friendName;
+        this.additionalData = new FriendData(friendName);
     }
 
     public static FriendPushNotificationEvent of(
@@ -32,7 +34,22 @@ public class FriendPushNotificationEvent extends PushNotificationEvent {
     }
 
     @Override
-    public String getAdditionalData() {
-        return this.friendName;
+    public FriendData getAdditionalData() {
+        return this.additionalData;
+    }
+
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class FriendData {
+
+        private String friendName;
+
+        public FriendData(String friendName) {
+            this.friendName = friendName;
+        }
+
+        public String getFriendName() {
+            return friendName;
+        }
     }
 }
