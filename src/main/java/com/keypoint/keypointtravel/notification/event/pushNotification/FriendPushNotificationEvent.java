@@ -7,6 +7,11 @@ public class FriendPushNotificationEvent extends PushNotificationEvent {
 
     private String friendName;
 
+    public FriendPushNotificationEvent() {
+        super(null, null);
+    }
+    
+
     public FriendPushNotificationEvent(
         PushNotificationType type,
         List<Long> memberIds,

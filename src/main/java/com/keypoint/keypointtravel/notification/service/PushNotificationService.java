@@ -6,9 +6,9 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent.CampaignLeaderData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaingAcceptorPushNotificationEvent.CampaignAcceptorData;
-import com.keypoint.keypointtravel.notification.event.pushNotification.CampaingApplicantPushNotificationEvent.CampaignApplicantData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import java.util.ArrayList;
