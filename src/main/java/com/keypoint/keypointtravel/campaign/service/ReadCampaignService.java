@@ -36,7 +36,7 @@ public class ReadCampaignService {
     private final CurrencyRepository currencyRepository;
 
     /**
-     * 캠페인 결제 항목을 카테고리 별 조회하는 함수
+     * 캠페인 카테고리 별 결제 내역 조회 함수
      *
      * @Param campaignId, currencyType, memberId useCase
      * @Return
