@@ -77,7 +77,7 @@ public class FCMService {
             1L
         ));
 
-        eventPublisher.publishEvent(CampaignApplicantPushNotificationEvent.of(
+        eventPublisher.publishEvent(new CampaignApplicantPushNotificationEvent(
             PushNotificationType.CAMPAIGN_JOIN_REQUEST,
             List.of(5L),
             "신청자",

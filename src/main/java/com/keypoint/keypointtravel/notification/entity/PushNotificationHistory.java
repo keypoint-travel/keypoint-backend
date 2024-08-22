@@ -1,6 +1,5 @@
 package com.keypoint.keypointtravel.notification.entity;
 
-import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.converter.PushNotificationEventToJsonConverter;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
@@ -37,10 +36,6 @@ public class PushNotificationHistory extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "campaign_id")
-    private Campaign campaign;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PushNotificationContent type;
@@ -55,11 +50,9 @@ public class PushNotificationHistory extends BaseEntity {
     public PushNotificationHistory(
         PushNotificationContent type,
         Member member,
-        Campaign campaign,
         PushNotificationEvent detailData
     ) {
         this.member = member;
-        this.campaign = campaign;
         this.type = type;
         this.isRead = false;
         this.detailData = detailData;
@@ -68,9 +61,8 @@ public class PushNotificationHistory extends BaseEntity {
     public static PushNotificationHistory of(
         PushNotificationContent type,
         Member member,
-        Campaign campaign,
         PushNotificationEvent detailData
     ) {
-        return new PushNotificationHistory(type, member, campaign, detailData);
+        return new PushNotificationHistory(type, member, detailData);
     }
 }
