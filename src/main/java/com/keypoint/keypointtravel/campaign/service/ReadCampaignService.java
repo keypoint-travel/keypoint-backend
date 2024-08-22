@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -42,7 +43,8 @@ public class ReadCampaignService {
         TotalBudgetDto totalBudget = campaignBudgetRepository.findTotalBudgetByCampaignId(useCase.getCampaignId());
         // 2. 캠페인 아이디를 통해 결제 항목 리스트 조회
         List<PaymentDto> paymentDtoList = customPaymentRepository.findPaymentList(useCase.getCampaignId());
-        // 3.  (결제 항목 id, member id, 이름) 리스트 조회
+        // 3. 결제 항목 별 참여 인원 리스트 조회
         List<Long> paymentItemIds = paymentDtoList.stream().map(PaymentDto::getPaymentItemId).toList();
+        List<PaymentMemberDto> paymentMemberDtoList = customPaymentRepository.findMemberListByPayments(paymentItemIds);
     }
 }
