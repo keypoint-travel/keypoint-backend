@@ -6,48 +6,48 @@ import java.util.List;
 import lombok.Getter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CampaignLeaderPushNotificationEvent extends PushNotificationEvent {
+public class CampaignAcceptorPushNotificationEvent extends PushNotificationEvent {
 
-    private String leaderName;
+    private String acceptorName;
     private Long campaignId;
 
-    public CampaignLeaderPushNotificationEvent() {
+    public CampaignAcceptorPushNotificationEvent() {
         super(null, null);
     }
 
-    public CampaignLeaderPushNotificationEvent(
+    public CampaignAcceptorPushNotificationEvent(
         PushNotificationType type,
         List<Long> userIds,
-        String leaderName,
+        String acceptorName,
         Long campaignId
     ) {
         super(type, userIds);
-        this.leaderName = leaderName;
+        this.acceptorName = acceptorName;
         this.campaignId = campaignId;
     }
 
-    public static CampaignLeaderPushNotificationEvent of(
+    public static CampaignAcceptorPushNotificationEvent of(
         PushNotificationType type,
         List<Long> userIds,
-        String leaderName,
+        String acceptorName,
         Long campaignId
     ) {
-        return new CampaignLeaderPushNotificationEvent(type, userIds, leaderName, campaignId);
+        return new CampaignAcceptorPushNotificationEvent(type, userIds, acceptorName, campaignId);
     }
 
     @Override
     public Object getAdditionalData() {
-        return new CampaignLeaderData(leaderName, campaignId);
+        return new CampaignAcceptorData(acceptorName, campaignId);
     }
 
     @Getter
-    public static class CampaignLeaderData {
+    public static class CampaignAcceptorData {
 
-        private String leaderName;
+        private String acceptorName;
         private Long campaignId;
 
-        public CampaignLeaderData(String leaderName, Long campaignId) {
-            this.leaderName = leaderName;
+        public CampaignAcceptorData(String leaderName, Long campaignId) {
+            this.acceptorName = leaderName;
             this.campaignId = campaignId;
         }
     }

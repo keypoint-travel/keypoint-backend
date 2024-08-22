@@ -103,31 +103,31 @@ public enum PushNotificationContent {
         "pushNotification.paymentCompleted_content"
     ),
     FRIEND_ADDED(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
+        PushNotificationType.FRIEND_ADDED,
         "pushNotification.friendAdded_title",
         "pushNotification.friendAdded_content"
     ),
     FRIEND_ACCEPTED_RECEIVER(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
+        PushNotificationType.FRIEND_ACCEPTED_RECEIVER,
         "pushNotification.friendAcceptedReceiver_title",
         "pushNotification.friendAcceptedReceiver_content"
     ),
     FRIEND_ACCEPTED_SENDER(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
+        PushNotificationType.FRIEND_ACCEPTED_SENDER,
         "pushNotification.friendAcceptedSender_title",
         "pushNotification.friendAcceptedSender_content"
     ),
     INQUIRY_RESPONSE_COMPLETED(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
+        PushNotificationType.INQUIRY_RESPONSE_COMPLETED,
         "pushNotification.inquiryResponseCompleted_title",
         "pushNotification.inquiryResponseCompleted_content"
     ),
     CAMPAIGN_D60_PASSED_1(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
+        PushNotificationType.CAMPAIGN_D60_PASSED,
         "pushNotification.campaignD60Passed1_title",
         "pushNotification.campaignD60Passed1_content"),
     CAMPAIGN_D60_PASSED_2(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
+        PushNotificationType.CAMPAIGN_D60_PASSED,
         "pushNotification.campaignD60Passed2_title",
         "pushNotification.campaignD60Passed2_content"
     );
