@@ -8,6 +8,10 @@ public class CampaignPushNotificationEvent extends PushNotificationEvent {
 
     private Campaign campaign;
 
+    public CampaignPushNotificationEvent() {
+        super(null, null);
+    }
+    
     public CampaignPushNotificationEvent(
         PushNotificationType type,
         List<Long> memberIds,
