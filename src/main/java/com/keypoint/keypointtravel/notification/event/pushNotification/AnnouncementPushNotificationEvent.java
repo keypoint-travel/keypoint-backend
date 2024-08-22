@@ -7,6 +7,10 @@ public class AnnouncementPushNotificationEvent extends PushNotificationEvent {
 
     private String announcementName;
 
+    public AnnouncementPushNotificationEvent() {
+        super(null, null);
+    }
+
     public AnnouncementPushNotificationEvent(
         PushNotificationType type,
         List<Long> memberIds,
