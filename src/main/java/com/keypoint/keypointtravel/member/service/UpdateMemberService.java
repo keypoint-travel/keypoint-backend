@@ -133,19 +133,21 @@ public class UpdateMemberService {
         try {
             Long memberId = useCase.getMemberId();
 
-            // 1. 신규 프로필 이미지 저장
-            Long profileImageId = uploadFileService.saveUploadFile(
-                useCase.getProfileImage(),
-                DirectoryConstants.MEMBER_PROFILE_DIRECTORY
-            );
-
-            // 2. (기존 프로필 이미지가 존재한 경우) 기존 프로필 이미지 삭제
+            // 1. (기존 프로필 이미지가 존재한 경우) 기존 프로필 이미지 삭제
             Optional<Long> profileImageIdOptional = memberDetailRepository.findProfileImageIdByMemberId(
                 memberId);
             if (profileImageIdOptional.isPresent()) {
                 uploadFileService.deleteUploadFile(profileImageIdOptional.get());
             }
 
+            // 2. 프로필 이미지가 존재하는 경우, 신규 프로필 이미지 저장
+            Long profileImageId = null;
+            if (useCase.getProfileImage() != null) {
+                profileImageId = uploadFileService.saveUploadFile(
+                    useCase.getProfileImage(),
+                    DirectoryConstants.MEMBER_PROFILE_DIRECTORY
+                );
+            }
             // 3. 프로필 데이터 변경
             memberDetailRepository.updateMemberProfile(memberId, useCase.getName(), profileImageId);
 

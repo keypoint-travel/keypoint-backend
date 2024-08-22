@@ -69,6 +69,7 @@ public class ReadMemberController {
             .build();
     }
 
+    @Deprecated
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/settings")
     public APIResponseEntity<MemberSettingResponse> getMemberSetting(

@@ -11,7 +11,6 @@ import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfi
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +32,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                     member.memberDetail.name,
                     member.email,
                     uploadFile.path.as("profileImageUrl"),
+                    member.memberDetail.language,
                     Projections.fields(
                         MemberAlarmResponse.class,
                         member.notification.pushNotificationEnabled,

@@ -72,7 +72,14 @@ public class ReadMemberService {
      */
     public MemberProfileResponse getMemberProfile(MemberIdUseCase useCase) {
         try {
-            return memberRepository.findMemberProfile(useCase.getMemberId());
+            MemberProfileResponse response = memberRepository.findMemberProfile(
+                useCase.getMemberId()
+            );
+            if (response == null) {
+                throw new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER);
+            }
+            
+            return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
