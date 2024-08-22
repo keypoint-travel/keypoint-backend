@@ -1,7 +1,8 @@
 package com.keypoint.keypointtravel.notification.entity;
 
+import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationMsg;
 import com.keypoint.keypointtravel.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,37 +32,39 @@ public class PushNotificationHistory extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false)
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "campaign_id")
+    private Campaign campaign;
 
     @Column(nullable = false)
-    private String content;
-
-    @Column(nullable = false)
-    private PushNotificationType type;
+    private PushNotificationMsg type;
 
     @Column(nullable = false, name = "is_read")
     private boolean isRead;
 
     public PushNotificationHistory(
-        String title,
-        String content,
-        PushNotificationType type,
-        Member member
+        PushNotificationMsg type,
+        Member member,
+        Campaign campaign
     ) {
         this.member = member;
-        this.title = title;
-        this.content = content;
+        this.campaign = campaign;
         this.type = type;
         this.isRead = false;
     }
 
     public static PushNotificationHistory of(
-        String title,
-        String content,
-        PushNotificationType type,
+        PushNotificationMsg type,
         Member member
     ) {
-        return new PushNotificationHistory(title, content, type, member);
+        return new PushNotificationHistory(type, member, null);
+    }
+
+    public static PushNotificationHistory of(
+        PushNotificationMsg type,
+        Member member,
+        Campaign campaign
+    ) {
+        return new PushNotificationHistory(type, member, campaign);
     }
 }
