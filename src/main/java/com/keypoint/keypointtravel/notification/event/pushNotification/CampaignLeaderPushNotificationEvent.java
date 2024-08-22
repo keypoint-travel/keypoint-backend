@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CampaignLeaderPushNotificationEvent extends PushNotificationEvent {
 
-    private String leaderName;
-    private Long campaignId;
+    private CampaignLeaderData additionalData;
 
     public CampaignLeaderPushNotificationEvent() {
         super(null, null);
@@ -22,8 +22,7 @@ public class CampaignLeaderPushNotificationEvent extends PushNotificationEvent {
         Long campaignId
     ) {
         super(type, userIds);
-        this.leaderName = leaderName;
-        this.campaignId = campaignId;
+        this.additionalData = new CampaignLeaderData(leaderName, campaignId);
     }
 
     public static CampaignLeaderPushNotificationEvent of(
@@ -34,13 +33,13 @@ public class CampaignLeaderPushNotificationEvent extends PushNotificationEvent {
     ) {
         return new CampaignLeaderPushNotificationEvent(type, userIds, leaderName, campaignId);
     }
-
     @Override
     public Object getAdditionalData() {
-        return new CampaignLeaderData(leaderName, campaignId);
+        return additionalData;
     }
 
     @Getter
+    @NoArgsConstructor
     public static class CampaignLeaderData {
 
         private String leaderName;
