@@ -162,6 +162,16 @@ public enum PushNotificationContent {
         return notificationMsgs;
     }
 
+    public String getTranslatedTitle(String name, String campaignName, Locale locale) {
+        switch (this) {
+            case FRIEND_ACCEPTED_SENDER:
+            case CAMPAIGN_ACCEPT_INVITER:
+                return MessageSourceUtils.getLocalizedLanguageWithVariables(contentLangCode,
+                    new Object[]{name}, locale);
+        }
+        return null;
+    }
+
     public String getTranslatedContent(String name, String campaignName, Locale locale) {
         switch (this) {
             case RECEIPT_REGISTER:
@@ -187,13 +197,13 @@ public enum PushNotificationContent {
             case CAMPAIGN_D60_PASSED_2:
                 return MessageSourceUtils.getLocalizedLanguage(contentLangCode, locale);
             case CAMPAIGN_INVITE:
-            case CAMPAIGN_ACCEPT_INVITER:
             case CAMPAIGN_ACCEPT_INVITEE:
             case CAMPAIGN_JOIN_REQUEST:
                 return MessageSourceUtils.getLocalizedLanguageWithVariables(
                     contentLangCode,
                     new Object[]{name, campaignName},
                     locale);
+            case CAMPAIGN_ACCEPT_INVITER:
             case CAMPAIGN_END:
                 return MessageSourceUtils.getLocalizedLanguageWithVariables(
                     contentLangCode,
