@@ -166,7 +166,7 @@ public enum PushNotificationContent {
         switch (this) {
             case FRIEND_ACCEPTED_SENDER:
             case CAMPAIGN_ACCEPT_INVITER:
-                return MessageSourceUtils.getLocalizedLanguageWithVariables(contentLangCode,
+                return MessageSourceUtils.getLocalizedLanguageWithVariables(titleLangCode,
                     new Object[]{name}, locale);
         }
         return null;
