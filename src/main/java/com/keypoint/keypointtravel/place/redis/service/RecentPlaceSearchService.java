@@ -42,7 +42,7 @@ public class RecentPlaceSearchService {
             recentPlaceSearchRepository.save(recentPlaceSearch);
 
             // 3. 5개가 넘는 경우, 삭제
-            List<RecentPlaceSearch> recentPlaceSearches = recentPlaceSearchRepository.findByMemberId(
+            List<RecentPlaceSearch> recentPlaceSearches = recentPlaceSearchRepository.findByMemberIdOrderByModifyAtDesc(
                 memberId);
             if (recentPlaceSearches.size() > PlaceConstants.MAX_PLACE_SEARCH_WORD_CNT) {
                 recentPlaceSearchRepository.delete(
@@ -76,12 +76,14 @@ public class RecentPlaceSearchService {
      */
     public List<ReadRecentPlaceSearchResponse> getPlaceHistoryWords(MemberIdUseCase useCase) {
         try {
-            List<RecentPlaceSearch> recentPlaceSearches = recentPlaceSearchRepository.findByMemberId(
+            List<RecentPlaceSearch> recentPlaceSearches = recentPlaceSearchRepository.findByMemberIdOrderByModifyAtDesc(
                 useCase.getMemberId()
             );
-            return recentPlaceSearches.stream()
-                .map(x -> ReadRecentPlaceSearchResponse.of(x.getId(), x.getPlaceId()))
-                .toList();
+
+            return placeRepository.getRecentSearchPlaces(
+                recentPlaceSearches,
+                useCase.getMemberId()
+            );
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
