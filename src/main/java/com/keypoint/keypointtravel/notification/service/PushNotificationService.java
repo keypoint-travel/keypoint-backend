@@ -9,8 +9,6 @@ import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent.CampaignLeaderData;
-import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignPushNotificationEvent.CampaignData;
-import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPushNotificationEvent.FriendData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import java.util.ArrayList;
@@ -92,7 +90,7 @@ public class PushNotificationService {
                         .orElse("");
 
                     // 1. FCM 내용 구성
-                    title = notificationMsg.getTranslatedTitle(
+                    title = notificationMsg.getTranslatedContent(
                         data.getAcceptorName(),
                         null,
                         locale
@@ -105,10 +103,9 @@ public class PushNotificationService {
                 }
             }
             case CAMPAIGN_END -> {
-                if (additionalData instanceof CampaignData) {
-                    CampaignData data = (CampaignData) additionalData;
-                    String campaignTitle = campaignRepository.findTitleByCampaignId(
-                            data.getCampaignId())
+                if (additionalData instanceof Long) {
+                    Long campaignId = (Long) additionalData;
+                    String campaignTitle = campaignRepository.findTitleByCampaignId(campaignId)
                         .orElse("");
 
                     // 1. FCM 내용 구성
@@ -135,24 +132,24 @@ public class PushNotificationService {
                 }
             }
             case FRIEND_ADDED, FRIEND_ACCEPTED_RECEIVER -> {
-                if (additionalData instanceof FriendData) {
-                    FriendData data = (FriendData) additionalData;
+                if (additionalData instanceof String) {
+                    String data = (String) additionalData;
 
                     // 1. FCM 내용 구성
                     content = notificationMsg.getTranslatedContent(
-                        data.getFriendName(),
+                        data,
                         null,
                         locale
                     );
                 }
             }
             case FRIEND_ACCEPTED_SENDER -> {
-                if (additionalData instanceof FriendData) {
-                    FriendData data = (FriendData) additionalData;
+                if (additionalData instanceof String) {
+                    String data = (String) additionalData;
 
                     // 1. FCM 내용 구성
-                    title = notificationMsg.getTranslatedTitle(
-                        data.getFriendName(),
+                    title = notificationMsg.getTranslatedContent(
+                        data,
                         null,
                         locale
                     );
