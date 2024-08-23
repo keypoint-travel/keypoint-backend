@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPercentageResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByDateResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -19,14 +20,14 @@ public class ReadCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/category")
-    public APIResponseEntity<DetailsByPercentageResponse> findCampaignCategoryList(
+    public APIResponseEntity<DetailsByCategoryResponse> findCampaignCategoryList(
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
-        DetailsByPercentageResponse response = readCampaignService.findByCategory(useCase);
+        DetailsByCategoryResponse response = readCampaignService.findByCategory(useCase);
         response.sortPayments();
-        return APIResponseEntity.<DetailsByPercentageResponse>builder()
+        return APIResponseEntity.<DetailsByCategoryResponse>builder()
             .message("캠페인 카테고리 별 결제 내역 조회 성공")
             .data(response)
             .build();
@@ -34,14 +35,15 @@ public class ReadCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/date")
-    public APIResponseEntity<DetailsByPercentageResponse> findCampaignDateList(
+    public APIResponseEntity<DetailsByDateResponse> findCampaignDateList(
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
-        DetailsByPercentageResponse response = readCampaignService.findByDate(useCase);
-//        response.sortPayments();
-        return APIResponseEntity.<DetailsByPercentageResponse>builder()
+        DetailsByCategoryResponse res = readCampaignService.findByDate(useCase);
+        DetailsByDateResponse response = DetailsByDateResponse.from(res);
+        response.sortPayments();
+        return APIResponseEntity.<DetailsByDateResponse>builder()
             .message("캠페인 날짜 별 결제 내역 조회 성공")
             .data(response)
             .build();

@@ -9,13 +9,13 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class DetailsByPercentageResponse {
+public class DetailsByCategoryResponse {
 
     private String currency;
     private float totalAmount;
     private float remainingBudget;
     private HashMap<String, Float> percentage;
-    private List<PaymentInfo> payments;
+    private List<CategoryPaymentInfo> payments;
 
     public void sortPayments() {
         Collections.sort(payments);

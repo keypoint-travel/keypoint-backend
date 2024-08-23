@@ -3,8 +3,8 @@ package com.keypoint.keypointtravel.campaign.service;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
-import com.keypoint.keypointtravel.campaign.dto.response.PaymentInfo;
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPercentageResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.CategoryPaymentInfo;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -45,7 +45,7 @@ public class ReadCampaignService {
      * @Return DetailsByCategoryResponse
      */
     @Transactional
-    public DetailsByPercentageResponse findByCategory(FindPaymentUseCase useCase) {
+    public DetailsByCategoryResponse findByCategory(FindPaymentUseCase useCase) {
         // 0. 캠페인에 소속되어 있는지 검증
         validateInCampaign(useCase);
         // 1. 캠페인 아이디를 통해 총 에산 조회
@@ -77,10 +77,10 @@ public class ReadCampaignService {
      * 캠페인 날짜 별 결제 내역 조회 함수
      *
      * @Param campaignId, currencyType, memberId useCase
-     * @Return
+     * @Return DetailsByCategoryResponse
      */
     @Transactional
-    public DetailsByPercentageResponse findByDate(FindPaymentUseCase useCase) {
+    public DetailsByCategoryResponse findByDate(FindPaymentUseCase useCase) {
         // 0. 캠페인에 소속되어 있는지 검증
         validateInCampaign(useCase);
         // 1. 캠페인 아이디를 통해 총 에산 조회
@@ -184,19 +184,19 @@ public class ReadCampaignService {
     }
 
     // 카테고리 별 결제 항목 응답값 생성 및 응답
-    private DetailsByPercentageResponse createResponse(TotalBudgetDto totalBudget, float totalAmount, float remainBudget,
-                                                       HashMap<String, Float> percentage, List<PaymentDto> paymentDtoList,
-                                                       List<PaymentMemberDto> paymentMemberDtoList) {
-        List<PaymentInfo> paymentInfoList = paymentDtoList.stream()
-            .map(PaymentInfo::from)
+    private DetailsByCategoryResponse createResponse(TotalBudgetDto totalBudget, float totalAmount, float remainBudget,
+                                                     HashMap<String, Float> percentage, List<PaymentDto> paymentDtoList,
+                                                     List<PaymentMemberDto> paymentMemberDtoList) {
+        List<CategoryPaymentInfo> categoryPaymentInfoList = paymentDtoList.stream()
+            .map(CategoryPaymentInfo::from)
             .collect(Collectors.toList());
-        paymentInfoList.forEach(paymentInfo -> paymentInfo.addMembers(paymentMemberDtoList));
-        return new DetailsByPercentageResponse(
+        categoryPaymentInfoList.forEach(categoryPaymentInfo -> categoryPaymentInfo.addMembers(paymentMemberDtoList));
+        return new DetailsByCategoryResponse(
             totalBudget.getCurrencyType().getCode(),
             Math.round(totalAmount * 100) / 100f,
             Math.round(remainBudget * 100) / 100f,
             percentage,
-            paymentInfoList
+            categoryPaymentInfoList
         );
     }
 
