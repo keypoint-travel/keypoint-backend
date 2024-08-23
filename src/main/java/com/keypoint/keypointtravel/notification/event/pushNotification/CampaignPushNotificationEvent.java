@@ -1,32 +1,31 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
-import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 
 public class CampaignPushNotificationEvent extends PushNotificationEvent {
 
-    private Campaign campaign;
+    private String campaignName;
 
     public CampaignPushNotificationEvent(
         PushNotificationType type,
         List<Long> memberIds,
-        Campaign campaign
+        String campaignName
     ) {
         super(type, memberIds);
-        this.campaign = campaign;
+        this.campaignName = campaignName;
     }
 
     public static CampaignPushNotificationEvent of(
         PushNotificationType type,
         List<Long> memberIds,
-        Campaign campaign
+        String campaignName
     ) {
-        return new CampaignPushNotificationEvent(type, memberIds, campaign);
+        return new CampaignPushNotificationEvent(type, memberIds, campaignName);
     }
 
     @Override
-    public Campaign getAdditionalData() {
-        return this.campaign;
+    public String getAdditionalData() {
+        return this.campaignName;
     }
 }
