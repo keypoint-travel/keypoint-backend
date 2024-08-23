@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByDateResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPriceResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -44,6 +45,20 @@ public class ReadCampaignController {
         DetailsByDateResponse response = DetailsByDateResponse.from(res);
         response.sortPayments();
         return APIResponseEntity.<DetailsByDateResponse>builder()
+            .message("캠페인 날짜 별 결제 내역 조회 성공")
+            .data(response)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/price")
+    public APIResponseEntity<DetailsByPriceResponse> findCampaignPriceList(
+        @RequestParam("currency") String currencyType,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        DetailsByPriceResponse response = readCampaignService.findByPrice(useCase);
+        return APIResponseEntity.<DetailsByPriceResponse>builder()
             .message("캠페인 날짜 별 결제 내역 조회 성공")
             .data(response)
             .build();

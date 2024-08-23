@@ -30,4 +30,8 @@ public class PaymentDto {
         this.amount = amount;
         this.currencyType = currencyType;
     }
+
+    public float getPrice() {
+        return amount * quantity;
+    }
 }

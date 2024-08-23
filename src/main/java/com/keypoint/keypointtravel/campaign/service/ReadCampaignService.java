@@ -5,6 +5,8 @@ import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.response.CategoryPaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPriceResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.PricePaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -48,7 +50,7 @@ public class ReadCampaignService {
     public DetailsByCategoryResponse findByCategory(FindPaymentUseCase useCase) {
         // 0. 캠페인에 소속되어 있는지 검증
         validateInCampaign(useCase);
-        // 1. 캠페인 아이디를 통해 총 에산 조회
+        // 1. 캠페인 아이디를 통해 총 예산 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float total = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
         TotalBudgetDto totalBudget = new TotalBudgetDto(total, campaignBudgets.get(0).getCurrency());
@@ -83,7 +85,7 @@ public class ReadCampaignService {
     public DetailsByCategoryResponse findByDate(FindPaymentUseCase useCase) {
         // 0. 캠페인에 소속되어 있는지 검증
         validateInCampaign(useCase);
-        // 1. 캠페인 아이디를 통해 총 에산 조회
+        // 1. 캠페인 아이디를 통해 총 예산 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float total = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
         TotalBudgetDto totalBudget = new TotalBudgetDto(total, campaignBudgets.get(0).getCurrency());
@@ -106,6 +108,41 @@ public class ReadCampaignService {
         HashMap<String, Float> datePercentage = calculateDatePercentage(dateAmount, totalAmount);
         // 7. 결제 항목 응답값 생성 및 응답
         return createResponse(totalBudget, totalAmount - remainBudget, remainBudget, datePercentage, paymentDtoList, paymentMemberDtoList);
+    }
+
+    /**
+     * 캠페인 금액 별 결제 내역 조회 함수
+     *
+     * @Param campaignId, currencyType, memberId useCase
+     * @Return DetailsByCategoryResponse
+     */
+    @Transactional
+    public DetailsByPriceResponse findByPrice(FindPaymentUseCase useCase) {
+        // 0. 캠페인에 소속되어 있는지 검증
+        validateInCampaign(useCase);
+        // 1. 캠페인 아이디를 통해 총 예산 조회
+        List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
+        float total = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
+        TotalBudgetDto totalBudget = new TotalBudgetDto(total, campaignBudgets.get(0).getCurrency());
+        // 2. 캠페인 아이디를 통해 결제 항목 리스트 조회
+        List<PaymentDto> paymentDtoList = customPaymentRepository.findPaymentList(useCase.getCampaignId());
+        // 3. 결제 항목 별 참여 인원 리스트 조회
+        List<Long> paymentItemIds = paymentDtoList.stream().map(PaymentDto::getPaymentItemId).toList();
+        List<PaymentMemberDto> paymentMemberDtoList = customPaymentRepository.findMemberListByPayments(paymentItemIds);
+        // 4. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
+        if (useCase.getCurrencyType() != null) {
+            List<Currency> currencies = currencyRepository.findAll();
+            updateCurrency(useCase, totalBudget, paymentDtoList, currencies);
+        }
+        // 5. 금액 별 금액 계산 및 잔여 예산 계산
+        float totalAmount = paymentDtoList.stream().reduce(0f, (acc, payment) -> acc + payment.getPrice(), Float::sum);
+        float remainBudget = 0f;
+        if (totalBudget.getTotalAmount() - totalAmount > 0) {
+            remainBudget = totalBudget.getTotalAmount() - totalAmount;
+        }
+        totalAmount += remainBudget;
+        // 6. 결제 항목 응답값 생성 및 응답
+        return createResponse(totalBudget, totalAmount - remainBudget, remainBudget, paymentDtoList, paymentMemberDtoList);
     }
 
     // 캠페인에 소속되어 있는지 검증
@@ -245,5 +282,21 @@ public class ReadCampaignService {
             datePercentage.put(maxCategory, maxPercentage + diff);
         }
         return datePercentage;
+    }
+
+    // 금액 별 결제 항목 응답값 생성 및 응답
+    private DetailsByPriceResponse createResponse(TotalBudgetDto totalBudget, float totalAmount, float remainBudget,
+                                                  List<PaymentDto> paymentDtoList,
+                                                  List<PaymentMemberDto> paymentMemberDtoList) {
+        List<PricePaymentInfo> pricePaymentInfoList = paymentDtoList.stream()
+            .map(PricePaymentInfo::from)
+            .collect(Collectors.toList());
+        pricePaymentInfoList.forEach(paymentInfo -> paymentInfo.addMembers(paymentMemberDtoList));
+        return new DetailsByPriceResponse(
+            totalBudget.getCurrencyType().getCode(),
+            Math.round(totalAmount * 100) / 100f,
+            Math.round(remainBudget * 100) / 100f,
+            pricePaymentInfoList
+        );
     }
 }
