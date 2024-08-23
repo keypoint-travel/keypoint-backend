@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.campaign.service;
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.campaign.dto.dto.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
-import com.keypoint.keypointtravel.campaign.dto.request.createRequest.MemberInfo;
+import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailsUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
@@ -177,7 +177,7 @@ public class CreateCampaignService {
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
         List<EmailInvitationHistory> histories = new ArrayList<>();
         for (String email : useCase.getEmails()) {
-            histories.add(new EmailInvitationHistory(useCase.getMemberId(), email,
+            histories.add(new EmailInvitationHistory(useCase.getCampaignId(), email,
                 useCase.getCampaignId()));
         }
         emailInvitationHistoryRepository.saveAll(histories);

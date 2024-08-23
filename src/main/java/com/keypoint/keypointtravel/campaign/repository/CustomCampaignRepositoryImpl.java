@@ -5,12 +5,15 @@ import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
+import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
@@ -60,9 +63,39 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .innerJoin(memberDetail).on(memberCampaign.member.id.eq(memberDetail.member.id))
             .where(campaign.id.eq(campaignId)
                 .and(memberCampaign.isLeader.isTrue())).fetchOne();
-        if(dto == null){
-            throw  new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        if (dto == null) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
         }
         return dto;
+    }
+
+    @Override
+    public MemberCampaign findCampaignLeader(Long campaignId) {
+        // campaignId에 해당하는 leader memberCampaign 찾기
+        MemberCampaign memberCampaign = queryFactory.selectFrom(this.memberCampaign)
+            .where(this.memberCampaign.campaign.id.eq(campaignId)
+                .and(this.memberCampaign.isLeader.isTrue())
+                .and(this.memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
+            .fetchOne();
+        if (memberCampaign == null) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
+        return memberCampaign;
+    }
+
+    @Override
+    public List<MemberCampaign> findMembersByCampaignCode(String campaignCode) {
+        return queryFactory.selectFrom(memberCampaign)
+            .where(memberCampaign.campaign.invitation_code.eq(campaignCode)
+                .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
+            .fetch();
+    }
+
+    @Override
+    public List<MemberCampaign> findMembersByCampaignCode(Long campaignId) {
+        return queryFactory.selectFrom(memberCampaign)
+            .where(memberCampaign.campaign.id.eq(campaignId)
+                .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
+            .fetch();
     }
 }

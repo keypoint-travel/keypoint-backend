@@ -1,6 +1,9 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
+import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
+
+import java.util.List;
 
 public interface CustomCampaignRepository {
 
@@ -9,4 +12,10 @@ public interface CustomCampaignRepository {
     boolean existsBlockedMemberInCampaign(Long memberId, Long campaignId);
 
     SendInvitationEmailDto findSendInvitationEmailInfo(Long campaignId);
+
+    MemberCampaign findCampaignLeader(Long campaignId);
+
+    List<MemberCampaign> findMembersByCampaignCode(String campaignCode);
+
+    List<MemberCampaign> findMembersByCampaignCode(Long campaignId);
 }

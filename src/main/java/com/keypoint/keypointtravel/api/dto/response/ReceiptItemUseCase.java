@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class ReceiptItemDTO {
+public class ReceiptItemUseCase {
 
     private Float totalPrice;
     private Float quantity; // 구매 수
@@ -20,7 +20,7 @@ public class ReceiptItemDTO {
 
 
     @Builder
-    public ReceiptItemDTO(
+    public ReceiptItemUseCase(
         String totalPrice,
         String quantity,
         String description,
@@ -34,9 +34,9 @@ public class ReceiptItemDTO {
         this.quantityUnit = quantityUnit;
     }
 
-    public static ReceiptItemDTO from(DocumentField field) {
+    public static ReceiptItemUseCase from(DocumentField field) {
         Map<String, DocumentField> fieldMap = field.getValueObject();
-        return ReceiptItemDTO.builder()
+        return ReceiptItemUseCase.builder()
             .totalPrice(
                 AzureOCRUtils.getDocumentValue(
                     OCRFieldName.TOTAL_PRICE,
@@ -64,9 +64,9 @@ public class ReceiptItemDTO {
             .build();
     }
 
-    public static List<ReceiptItemDTO> toDTOList(List<DocumentField> fieldList) {
+    public static List<ReceiptItemUseCase> toDTOList(List<DocumentField> fieldList) {
         return fieldList.stream()
-            .map(field -> ReceiptItemDTO.from(field))
+            .map(field -> ReceiptItemUseCase.from(field))
             .toList();
     }
 }

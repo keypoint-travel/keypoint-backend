@@ -58,7 +58,26 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
             .where(blockedMember.blockedMemberId.in(memberIds)
                 .and(blockedMember.member.id.in(memberIds)))
             .fetchFirst();
+        return member != null;
+    }
 
+    @Override
+    public boolean existsBlockedMembers(List<Long> memberIds, List<Long> targetIds) {
+        // memberIds 중 targetIds 를 차단한 경우가 있는지 확인
+        BlockedMember member = queryFactory.selectFrom(blockedMember)
+            .where(blockedMember.blockedMemberId.in(targetIds)
+                .and(blockedMember.member.id.in(memberIds)))
+            .fetchFirst();
+        return member != null;
+    }
+
+    @Override
+    public boolean existsBlockedMembers(List<Long> memberIds, Long targetId) {
+        // memberIds 중 targetId를 차단한 경우가 있는지 확인
+        BlockedMember member = queryFactory.selectFrom(blockedMember)
+            .where(blockedMember.blockedMemberId.eq(targetId)
+                .and(blockedMember.member.id.in(memberIds)))
+            .fetchFirst();
         return member != null;
     }
 }

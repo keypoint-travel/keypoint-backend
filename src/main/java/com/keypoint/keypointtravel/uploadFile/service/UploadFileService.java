@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.uploadFile.service;
 import com.keypoint.keypointtravel.external.aws.service.S3Service;
 import com.keypoint.keypointtravel.global.entity.UploadFile;
 import com.keypoint.keypointtravel.uploadFile.repository.UploadFileRepository;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,23 @@ public class UploadFileService {
 
         // 2. UploadFile 저장
         UploadFile uploadFile = UploadFile.of(fileName, file);
+        uploadFileRepository.save(uploadFile);
+
+        return uploadFile.getId();
+    }
+
+    /**
+     * 이미지 s3에 업로드된 이미지를 저장하는 함수
+     *
+     * @param fileName
+     * @param image
+     * @return
+     * @throws IOException
+     */
+    @Transactional
+    public Long saveUploadFile(String fileName, BufferedImage image) throws IOException {
+        // 1. UploadFile 저장
+        UploadFile uploadFile = UploadFile.of(fileName, image);
         uploadFileRepository.save(uploadFile);
 
         return uploadFile.getId();

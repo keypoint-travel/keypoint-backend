@@ -13,4 +13,6 @@ public class DirectoryConstants {
     public static String GUIDE_THUMBNAIL_DIRECTORY = "guide/thumbnail";
 
     public static String CAMPAIGN_COVER_DIRECTORY = "campaign/cover";
+
+    public static String RECEIPT_DIRECTORY = "receipt";
 }
