@@ -21,11 +21,12 @@ public class ReadCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/category")
     public APIResponseEntity<DetailsByCategoryResponse> findCampaignCategoryList(
-        @RequestParam("currency") CurrencyType currencyType,
+        @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
         DetailsByCategoryResponse response = readCampaignService.findByCategory(useCase);
+        response.sortPayments();
         return APIResponseEntity.<DetailsByCategoryResponse>builder()
             .message("캠페인 카테고리 별 결제 내역 조회 성공")
             .data(response)

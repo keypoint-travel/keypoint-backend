@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -152,7 +153,7 @@ public class ReadCampaignService {
                                                      List<PaymentMemberDto> paymentMemberDtoList) {
         List<PaymentInfo> paymentInfoList = paymentDtoList.stream()
             .map(PaymentInfo::from)
-            .toList();
+            .collect(Collectors.toList());
         paymentInfoList.forEach(paymentInfo -> paymentInfo.addMembers(paymentMemberDtoList));
         return new DetailsByCategoryResponse(
             totalBudget.getCurrencyType().getCode(),

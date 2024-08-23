@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class PaymentInfo {
+public class PaymentInfo implements Comparable<PaymentInfo> {
     private Long paymentItemId;
     private ReceiptCategory category;
     private String storeName;
@@ -41,5 +41,13 @@ public class PaymentInfo {
                 members.add(new ParticipationMemberInfo(dto.getMemberId(), dto.getMemberName()));
             }
         }
+    }
+
+    @Override
+    public int compareTo(PaymentInfo paymentInfo) {
+        if (this.category.getCode() == paymentInfo.category.getCode()) {
+            return paymentInfo.getPaidAt().compareTo(this.getPaidAt());
+        }
+        return this.category.getCode() - paymentInfo.category.getCode();
     }
 }

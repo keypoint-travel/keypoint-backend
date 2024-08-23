@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.campaign.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,4 +16,8 @@ public class DetailsByCategoryResponse {
     private float remainingBudget;
     private HashMap<String, Float> categoryPercentage;
     private List<PaymentInfo> payments;
+
+    public void sortPayments() {
+        Collections.sort(payments);
+    }
 }
