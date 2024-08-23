@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRe
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.CommonPushHistoryUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.PushHistoryIdUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.repository.pushNotificationHistory.PushNotificationHistoryRepository;
@@ -57,7 +58,7 @@ public class PushNotificationHistoryService {
      * @param useCase
      */
     public Slice<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
-//        try {
+        try {
             Pageable pageable = useCase.getPageable();
             MemberDetail memberDetail = memberDetailRepository.findByMemberId(
                 useCase.getMemberId());
@@ -96,8 +97,24 @@ public class PushNotificationHistoryService {
             }
 
             return new SliceImpl<>(translatedHistories, pageable, hasNext);
-//        } catch (Exception ex) {
-//            throw new GeneralException(ex);
-//        }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 알림 이력을 읽은 상태로 변경
+     *
+     * @param useCase
+     */
+    public void markPushHistoryAsRead(PushHistoryIdUseCase useCase) {
+        try {
+            pushNotificationHistoryRepository.updateIsReadTrueByHistoryId(
+                useCase.getHistoryId(),
+                useCase.getMemberId()
+            );
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }
