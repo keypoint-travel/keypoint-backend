@@ -21,7 +21,7 @@ public class ReadCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/category")
     public APIResponseEntity<DetailsByCategoryResponse> findCampaignCategoryList(
-        @RequestParam CurrencyType currencyType,
+        @RequestParam("currency") CurrencyType currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);

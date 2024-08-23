@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.response.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
+import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.currency.entity.Currency;
@@ -46,7 +47,9 @@ public class ReadCampaignService {
         // 0. 캠페인에 소속되어 있는지 검증
         validateInCampaign(useCase);
         // 1. 캠페인 아이디를 통해 총 에산 조회
-        TotalBudgetDto totalBudget = campaignBudgetRepository.findTotalBudgetByCampaignId(useCase.getCampaignId());
+        List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
+        float total = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
+        TotalBudgetDto totalBudget = new TotalBudgetDto(total, campaignBudgets.get(0).getCurrency());
         // 2. 캠페인 아이디를 통해 결제 항목 리스트 조회
         List<PaymentDto> paymentDtoList = customPaymentRepository.findPaymentList(useCase.getCampaignId());
         // 3. 결제 항목 별 참여 인원 리스트 조회
@@ -153,8 +156,8 @@ public class ReadCampaignService {
         paymentInfoList.forEach(paymentInfo -> paymentInfo.addMembers(paymentMemberDtoList));
         return new DetailsByCategoryResponse(
             totalBudget.getCurrencyType().getCode(),
-            totalAmount,
-            remainBudget,
+            Math.round(totalAmount * 100) / 100f,
+            Math.round(remainBudget * 100) / 100f,
             categoryPercentage,
             paymentInfoList
         );

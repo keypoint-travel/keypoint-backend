@@ -2,7 +2,6 @@ package com.keypoint.keypointtravel.campaign.dto.response;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
-import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +19,7 @@ public class PaymentInfo {
     private ReceiptCategory category;
     private String storeName;
     private LocalDateTime paidAt;
-    private List<ParticipationMemberInfo> members = new ArrayList<>();
+    private List<ParticipationMemberInfo> members;
     private float amount;
     private Long receiptId;
 
@@ -30,7 +29,8 @@ public class PaymentInfo {
             .category(dto.getCategory())
             .storeName(dto.getStore())
             .paidAt(dto.getPaidAt())
-            .amount(dto.getAmount() * dto.getQuantity())
+            .members(new ArrayList<>())
+            .amount(Math.round(dto.getAmount() * dto.getQuantity() * 100) / 100f)
             .receiptId(dto.getReceiptId())
             .build();
     }

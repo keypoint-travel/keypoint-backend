@@ -33,7 +33,7 @@ public class CampaignBudget {
     private float amount;
 
     @Builder
-    public CampaignBudget(Campaign campaign, CurrencyType currency, String category, Long amount) {
+    public CampaignBudget(Campaign campaign, CurrencyType currency, String category, float amount) {
         this.campaign = campaign;
         this.currency = currency;
         this.category = category;
