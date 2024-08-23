@@ -82,7 +82,8 @@ public class PushNotificationHistoryService {
                         history.getHistoryId(),
                         notificationDTO.getTitle(),
                         notificationDTO.getBody(),
-                        history.getArrivedAt()
+                        history.getArrivedAt(),
+                        history.isRead()
                     )
                 );
             }

@@ -11,14 +11,16 @@ public class PushHistoryResponse {
     private Long historyId;
     private String title;
     private String content;
+    private Boolean isRead;
     private LocalDateTime arrivedAt;
 
     public static PushHistoryResponse of(
         Long historyId,
         String title,
         String content,
-        LocalDateTime arrivedAt
+        LocalDateTime arrivedAt,
+        Boolean isRead
     ) {
-        return new PushHistoryResponse(historyId, title, content, arrivedAt);
+        return new PushHistoryResponse(historyId, title, content, isRead, arrivedAt);
     }
 }

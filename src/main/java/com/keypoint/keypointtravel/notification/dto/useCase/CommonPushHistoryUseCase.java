@@ -12,4 +12,5 @@ public class CommonPushHistoryUseCase {
     private PushNotificationContent type;
     private PushNotificationEvent detailData;
     private LocalDateTime arrivedAt;
+    private boolean isRead;
 }

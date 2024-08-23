@@ -5,7 +5,6 @@ import com.keypoint.keypointtravel.notification.entity.QPushNotificationHistory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
@@ -37,8 +36,6 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
 
     @Override
     public List<CommonPushHistoryUseCase> findPushHistories(Long memberId, Pageable pageable) {
-        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
-
         // 1. 푸시 이력 조회
         List<CommonPushHistoryUseCase> result = queryFactory
             .select(
@@ -47,7 +44,8 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
                     pushNotificationHistory.id.as("historyId"),
                     pushNotificationHistory.type,
                     pushNotificationHistory.detailData,
-                    pushNotificationHistory.createAt.as("arrivedAt")
+                    pushNotificationHistory.createAt.as("arrivedAt"),
+                    pushNotificationHistory.isRead
                 )
             )
             .from(pushNotificationHistory)
@@ -56,18 +54,6 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize() + 1)
             .fetch();
-
-        // 2. 조회한 이력 읽은 상태로 변경
-        List<Long> readHistoryIds = result.stream().map(CommonPushHistoryUseCase::getHistoryId)
-            .toList();
-        queryFactory.update(pushNotificationHistory)
-            .set(pushNotificationHistory.isRead, true)
-
-            .set(pushNotificationHistory.modifyAt, LocalDateTime.now())
-            .set(pushNotificationHistory.modifyId, currentAuditor)
-
-            .where(pushNotificationHistory.id.in(readHistoryIds))
-            .execute();
 
         return result;
     }
