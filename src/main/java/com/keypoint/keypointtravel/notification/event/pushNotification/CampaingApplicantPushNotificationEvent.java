@@ -5,16 +5,13 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import java.util.List;
 import lombok.Getter;
 
-public class CampaignApplicantPushNotificationEvent extends PushNotificationEvent {
+public class CampaingApplicantPushNotificationEvent extends PushNotificationEvent {
 
     private String applicantName;
     private Campaign campaign;
 
-    public CampaignApplicantPushNotificationEvent() {
-        super(null, null);
-    }
 
-    public CampaignApplicantPushNotificationEvent(
+    public CampaingApplicantPushNotificationEvent(
         PushNotificationType type,
         List<Long> userIds,
         String applicantName,
@@ -25,13 +22,13 @@ public class CampaignApplicantPushNotificationEvent extends PushNotificationEven
         this.campaign = campaign;
     }
 
-    public static CampaignApplicantPushNotificationEvent of(
+    public static CampaingApplicantPushNotificationEvent of(
         PushNotificationType type,
         List<Long> userIds,
         String applicantName,
         Campaign campaign
     ) {
-        return new CampaignApplicantPushNotificationEvent(type, userIds, applicantName, campaign);
+        return new CampaingApplicantPushNotificationEvent(type, userIds, applicantName, campaign);
     }
 
     @Override

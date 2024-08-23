@@ -92,11 +92,11 @@ public class NotificationEventListener {
                 notificationContent.getCampaign(),
                 event
             ));
-        }
 
-        // 5. 이력 저장
-        event.clearMemberIds();
-        pushNotificationHistoryService.savePushNotificationHistories(pushNotificationHistories);
+            // 5. 이력 저장
+            event.clearMemberIds();
+            pushNotificationHistoryService.savePushNotificationHistories(pushNotificationHistories);
+        }
     }
 
     @Async
