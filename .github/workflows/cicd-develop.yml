@@ -1,6 +1,8 @@
 name: cicd-develop
 
 on:
+  push:
+    - feature/fcm
   pull_request:
     branches:
       - develop
@@ -20,13 +22,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-
-      - name: Make application.properties
-        run: |
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
-        shell: bash
 
       - name: Build with Gradle
         run: |

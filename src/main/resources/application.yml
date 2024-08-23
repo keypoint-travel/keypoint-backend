@@ -6,7 +6,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
   profiles:
+    default: local
     group:
       local: "local, local-key, mail"
       dev: "dev, key, mail"
-    active: local
