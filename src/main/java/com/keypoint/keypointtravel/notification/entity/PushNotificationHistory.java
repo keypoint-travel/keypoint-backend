@@ -1,8 +1,7 @@
 package com.keypoint.keypointtravel.notification.entity;
 
-import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationMsg;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,39 +31,37 @@ public class PushNotificationHistory extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "campaign_id")
-    private Campaign campaign;
+    @Column(nullable = false)
+    private String title;
 
     @Column(nullable = false)
-    private PushNotificationMsg type;
+    private String content;
+
+    @Column(nullable = false)
+    private PushNotificationType type;
 
     @Column(nullable = false, name = "is_read")
     private boolean isRead;
 
     public PushNotificationHistory(
-        PushNotificationMsg type,
-        Member member,
-        Campaign campaign
+        String title,
+        String content,
+        PushNotificationType type,
+        Member member
     ) {
         this.member = member;
-        this.campaign = campaign;
+        this.title = title;
+        this.content = content;
         this.type = type;
         this.isRead = false;
     }
 
     public static PushNotificationHistory of(
-        PushNotificationMsg type,
+        String title,
+        String content,
+        PushNotificationType type,
         Member member
     ) {
-        return new PushNotificationHistory(type, member, null);
-    }
-
-    public static PushNotificationHistory of(
-        PushNotificationMsg type,
-        Member member,
-        Campaign campaign
-    ) {
-        return new PushNotificationHistory(type, member, campaign);
+        return new PushNotificationHistory(title, content, type, member);
     }
 }
