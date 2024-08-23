@@ -1,15 +1,14 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 import lombok.Getter;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CampaignApplicantPushNotificationEvent extends PushNotificationEvent {
 
     private String applicantName;
-    private Long campaignId;
+    private Campaign campaign;
 
     public CampaignApplicantPushNotificationEvent() {
         super(null, null);
@@ -19,36 +18,36 @@ public class CampaignApplicantPushNotificationEvent extends PushNotificationEven
         PushNotificationType type,
         List<Long> userIds,
         String applicantName,
-        Long campaignId
+        Campaign campaign
     ) {
         super(type, userIds);
         this.applicantName = applicantName;
-        this.campaignId = campaignId;
+        this.campaign = campaign;
     }
 
     public static CampaignApplicantPushNotificationEvent of(
         PushNotificationType type,
         List<Long> userIds,
         String applicantName,
-        Long campaignId
+        Campaign campaign
     ) {
-        return new CampaignApplicantPushNotificationEvent(type, userIds, applicantName, campaignId);
+        return new CampaignApplicantPushNotificationEvent(type, userIds, applicantName, campaign);
     }
 
     @Override
     public Object getAdditionalData() {
-        return new CampaignApplicantData(applicantName, campaignId);
+        return new CampaignApplicantData(applicantName, campaign);
     }
 
     @Getter
     public static class CampaignApplicantData {
 
         private String applicantName;
-        private Long campaignId;
+        private Campaign campaign;
 
-        public CampaignApplicantData(String applicantName, Long campaignId) {
+        public CampaignApplicantData(String applicantName, Campaign campaign) {
             this.applicantName = applicantName;
-            this.campaignId = campaignId;
+            this.campaign = campaign;
         }
     }
 }

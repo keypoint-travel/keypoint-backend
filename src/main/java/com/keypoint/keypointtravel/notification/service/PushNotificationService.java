@@ -1,14 +1,14 @@
 package com.keypoint.keypointtravel.notification.service;
 
-import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
+import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
-import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent.CampaignLeaderData;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaingAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PushNotificationService {
 
     private final FCMTokenRepository fcmTokenRepository;
-    private final CampaignRepository campaignRepository;
+    private final PushNotificationHistoryService pushNotificationHistoryService;
 
     /**
      * Notification 생성
@@ -73,14 +73,11 @@ public class PushNotificationService {
             case CAMPAIGN_INVITE, CAMPAIGN_ACCEPT_INVITEE -> {
                 if (additionalData instanceof CampaignLeaderData) {
                     CampaignLeaderData data = (CampaignLeaderData) additionalData;
-                    String campaignTitle = campaignRepository.findTitleByCampaignId(
-                            data.getCampaignId())
-                        .orElse("");
 
                     // 1. FCM 내용 구성
                     content = notificationMsg.getTranslatedContent(
                         data.getLeaderName(),
-                        campaignTitle,
+                        data.getCampaign().getTitle(),
                         locale
                     );
                 }
@@ -88,28 +85,23 @@ public class PushNotificationService {
             case CAMPAIGN_ACCEPT_INVITER -> {
                 if (additionalData instanceof CampaignAcceptorData) {
                     CampaignAcceptorData data = (CampaignAcceptorData) additionalData;
-                    String campaignTitle = campaignRepository.findTitleByCampaignId(
-                            data.getCampaignId())
-                        .orElse("");
 
                     // 1. FCM 내용 구성
                     content = notificationMsg.getTranslatedContent(
                         data.getAcceptorName(),
-                        campaignTitle,
+                        data.getCampaign().getTitle(),
                         locale
                     );
                 }
             }
             case CAMPAIGN_END -> {
-                if (additionalData instanceof Long) {
-                    Long campaignId = (Long) additionalData;
-                    String campaignTitle = campaignRepository.findTitleByCampaignId(campaignId)
-                        .orElse("");
+                if (additionalData instanceof Campaign) {
+                    Campaign data = (Campaign) additionalData;
 
                     // 1. FCM 내용 구성
                     content = notificationMsg.getTranslatedContent(
                         null,
-                        campaignTitle,
+                        data.getTitle(),
                         locale
                     );
                 }
@@ -117,14 +109,11 @@ public class PushNotificationService {
             case CAMPAIGN_JOIN_REQUEST -> {
                 if (additionalData instanceof CampaignApplicantData) {
                     CampaignApplicantData data = (CampaignApplicantData) additionalData;
-                    String campaignTitle = campaignRepository.findTitleByCampaignId(
-                            data.getCampaignId())
-                        .orElse("");
 
                     // 1. FCM 내용 구성
                     content = notificationMsg.getTranslatedContent(
                         data.getApplicantName(),
-                        campaignTitle,
+                        data.getCampaign().getTitle(),
                         locale
                     );
                 }

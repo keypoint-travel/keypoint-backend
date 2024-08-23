@@ -9,8 +9,6 @@ import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotif
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,7 +40,6 @@ public class PushNotificationHistory extends BaseEntity {
     private Campaign campaign;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private PushNotificationContent type;
 
     @Column(nullable = false, name = "is_read")

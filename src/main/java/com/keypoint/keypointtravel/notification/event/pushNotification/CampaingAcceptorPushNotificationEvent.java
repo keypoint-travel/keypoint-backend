@@ -5,48 +5,48 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import java.util.List;
 import lombok.Getter;
 
-public class CampaignLeaderPushNotificationEvent extends PushNotificationEvent {
+public class CampaingAcceptorPushNotificationEvent extends PushNotificationEvent {
 
-    private String leaderName;
+    private String acceptorName;
     private Campaign campaign;
 
-    public CampaignLeaderPushNotificationEvent() {
+    public CampaingAcceptorPushNotificationEvent() {
         super(null, null);
     }
 
-    public CampaignLeaderPushNotificationEvent(
+    public CampaingAcceptorPushNotificationEvent(
         PushNotificationType type,
         List<Long> userIds,
-        String leaderName,
+        String acceptorName,
         Campaign campaign
     ) {
         super(type, userIds);
-        this.leaderName = leaderName;
+        this.acceptorName = acceptorName;
         this.campaign = campaign;
     }
 
-    public static CampaignLeaderPushNotificationEvent of(
+    public static CampaingAcceptorPushNotificationEvent of(
         PushNotificationType type,
         List<Long> userIds,
-        String leaderName,
+        String acceptorName,
         Campaign campaign
     ) {
-        return new CampaignLeaderPushNotificationEvent(type, userIds, leaderName, campaign);
+        return new CampaingAcceptorPushNotificationEvent(type, userIds, acceptorName, campaign);
     }
 
     @Override
     public Object getAdditionalData() {
-        return new CampaignLeaderData(leaderName, campaign);
+        return new CampaignAcceptorData(acceptorName, campaign);
     }
 
     @Getter
-    public static class CampaignLeaderData {
+    public static class CampaignAcceptorData {
 
-        private String leaderName;
+        private String acceptorName;
         private Campaign campaign;
 
-        public CampaignLeaderData(String leaderName, Campaign campaign) {
-            this.leaderName = leaderName;
+        public CampaignAcceptorData(String leaderName, Campaign campaign) {
+            this.acceptorName = leaderName;
             this.campaign = campaign;
         }
     }

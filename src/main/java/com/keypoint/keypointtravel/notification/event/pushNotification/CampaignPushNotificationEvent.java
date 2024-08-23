@@ -1,37 +1,36 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CampaignPushNotificationEvent extends PushNotificationEvent {
 
-    private Long campaignId;
+    private Campaign campaign;
 
     public CampaignPushNotificationEvent() {
         super(null, null);
     }
-
+    
     public CampaignPushNotificationEvent(
         PushNotificationType type,
         List<Long> memberIds,
-        Long campaignId
+        Campaign campaign
     ) {
         super(type, memberIds);
-        this.campaignId = campaignId;
+        this.campaign = campaign;
     }
 
     public static CampaignPushNotificationEvent of(
         PushNotificationType type,
         List<Long> memberIds,
-        Long campaignId
+        Campaign campaign
     ) {
-        return new CampaignPushNotificationEvent(type, memberIds, campaignId);
+        return new CampaignPushNotificationEvent(type, memberIds, campaign);
     }
 
     @Override
-    public Long getAdditionalData() {
-        return this.campaignId;
+    public Campaign getAdditionalData() {
+        return this.campaign;
     }
 }
