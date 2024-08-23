@@ -57,7 +57,7 @@ public class PushNotificationHistoryService {
      * @param useCase
      */
     public Slice<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
-        try {
+//        try {
             Pageable pageable = useCase.getPageable();
             MemberDetail memberDetail = memberDetailRepository.findByMemberId(
                 useCase.getMemberId());
@@ -95,8 +95,8 @@ public class PushNotificationHistoryService {
             }
 
             return new SliceImpl<>(translatedHistories, pageable, hasNext);
-        } catch (Exception ex) {
-            throw new GeneralException(ex);
-        }
+//        } catch (Exception ex) {
+//            throw new GeneralException(ex);
+//        }
     }
 }
