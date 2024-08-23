@@ -3,9 +3,10 @@ package com.keypoint.keypointtravel.guide.service;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadNextGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
@@ -70,7 +71,9 @@ public class ReadGuideService {
      */
     public ReadGuideDetailInAdminResponse findGuideDetailInAdmin(GuideIdUseCase useCase) {
         try {
-            return guideRepository.findGuideDetailInAdmin(useCase.getGuideId());
+            ReadGuideDetailInAdminResponse response = guideRepository.findGuideDetailInAdmin(
+                useCase.getGuideId());
+            return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -100,7 +103,21 @@ public class ReadGuideService {
      */
     public ReadGuideDetailResponse findGuideDetail(ReadGuideTranslationIdUseCase useCase) {
         try {
-            return guideRepository.findGuideDetail(useCase.getGuideTranslationIds());
+            LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
+                useCase.getMemberId());
+
+            // 1. 이용 가이드 조회
+            ReadGuideDetailResponse response = guideRepository.findGuideDetail(
+                useCase.getGuideTranslationIds());
+
+            // 2. 다음 순서 이용 가이드 조회
+            ReadNextGuideResponse nextGuideResponse = guideRepository.findNextGuide(
+                response.getOrder(),
+                languageCode
+            );
+            response.setNextGuide(nextGuideResponse);
+
+            return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
