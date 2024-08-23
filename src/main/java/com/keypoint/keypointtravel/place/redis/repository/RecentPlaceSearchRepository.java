@@ -12,5 +12,5 @@ public interface RecentPlaceSearchRepository extends
 
     List<RecentPlaceSearch> findByMemberId(Long memberId);
 
-    Optional<RecentPlaceSearch> findByMemberIdAndSearchWord(Long memberId, String searchWord);
+    Optional<RecentPlaceSearch> findByMemberIdAndPlaceId(Long memberId, Long placeId);
 }

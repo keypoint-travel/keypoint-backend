@@ -5,9 +5,10 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.place.dto.response.ReadRecentPlaceSearchResponse;
 import com.keypoint.keypointtravel.place.dto.useCase.DeleteRecentPlaceSearchUseCase;
-import com.keypoint.keypointtravel.place.dto.useCase.PlaceSearchUseCase;
+import com.keypoint.keypointtravel.place.dto.useCase.PlaceIdUseCase;
 import com.keypoint.keypointtravel.place.redis.entity.RecentPlaceSearch;
 import com.keypoint.keypointtravel.place.redis.repository.RecentPlaceSearchRepository;
+import com.keypoint.keypointtravel.place.repository.PlaceRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecentPlaceSearchService {
 
     private final RecentPlaceSearchRepository recentPlaceSearchRepository;
+    private final PlaceRepository placeRepository;
 
     /**
      * 최근 장소 검색어 추가
@@ -26,15 +28,15 @@ public class RecentPlaceSearchService {
      * @param useCase
      */
     @Transactional
-    public void addSearchWord(PlaceSearchUseCase useCase) {
+    public void addSearchWord(PlaceIdUseCase useCase) {
         try {
-            String searchWord = useCase.getSearchWord();
+            Long placeId = useCase.getPlaceId();
             Long memberId = useCase.getMemberId();
 
             // 1. 이미 존재하면 날짜 업데이트, 없으면 저장
             RecentPlaceSearch recentPlaceSearch = recentPlaceSearchRepository
-                .findByMemberIdAndSearchWord(memberId, searchWord)
-                .orElse(RecentPlaceSearch.of(memberId, searchWord));
+                .findByMemberIdAndPlaceId(memberId, placeId)
+                .orElse(RecentPlaceSearch.of(memberId, placeId));
 
             recentPlaceSearch.setModifyAt();
             recentPlaceSearchRepository.save(recentPlaceSearch);
@@ -78,7 +80,7 @@ public class RecentPlaceSearchService {
                 useCase.getMemberId()
             );
             return recentPlaceSearches.stream()
-                .map(x -> ReadRecentPlaceSearchResponse.of(x.getId(), x.getSearchWord()))
+                .map(x -> ReadRecentPlaceSearchResponse.of(x.getId(), x.getPlaceId()))
                 .toList();
         } catch (Exception ex) {
             throw new GeneralException(ex);
