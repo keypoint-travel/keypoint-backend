@@ -1,10 +1,8 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FriendPushNotificationEvent extends PushNotificationEvent {
 
     private String friendName;
@@ -12,7 +10,7 @@ public class FriendPushNotificationEvent extends PushNotificationEvent {
     public FriendPushNotificationEvent() {
         super(null, null);
     }
-
+    
 
     public FriendPushNotificationEvent(
         PushNotificationType type,

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
-import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaingAcceptorPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CommonPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
@@ -52,7 +52,7 @@ public class PushNotificationEventToJsonConverter implements
                 }
                 case CAMPAIGN_ACCEPT_INVITER -> {
                     return objectMapper.readValue(dbData,
-                        CampaignAcceptorPushNotificationEvent.class);
+                        CampaingAcceptorPushNotificationEvent.class);
                 }
                 case CAMPAIGN_END -> {
                     return objectMapper.readValue(dbData, CampaignPushNotificationEvent.class);
