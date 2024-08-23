@@ -11,6 +11,7 @@ public enum PushNotificationMsg {
         "pushNotification.receiptRegister_title",
         "pushNotification.receiptRegister_content"
     ),
+
     FRIEND_INVITE_1(
         PushNotificationType.FRIEND_INVITE,
         "pushNotification.friendInvite1_title",
@@ -36,6 +37,7 @@ public enum PushNotificationMsg {
         "pushNotification.friendInvite5_title",
         "pushNotification.friendInvite5_content"
     ),
+
     CAMPAIGN_D_DAY_1(
         PushNotificationType.CAMPAIGN_D_DAY,
         "pushNotification.campaignDDay1_title",
@@ -61,71 +63,20 @@ public enum PushNotificationMsg {
         "pushNotification.campaignDDay5_title",
         "pushNotification.campaignDDay5_content"
     ),
-    CAMPAIGN_INVITE(
-        PushNotificationType.CAMPAIGN_INVITE,
-        "pushNotification.campaignInvite_title",
-        "pushNotification.campaignInvite_content"
-    ),
-    CAMPAIGN_ACCEPT_INVITER(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITER,
-        "pushNotification.campaignAcceptInviter_title",
-        "pushNotification.campaignAcceptInviter_content"
-    ),
 
-    CAMPAIGN_ACCEPT_INVITEE(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.campaignAcceptInvitee_title",
-        "pushNotification.campaignAcceptInvitee_content"
-    ),
-    CAMPAIGN_NO_EXPENSE_D1(
-        PushNotificationType.CAMPAIGN_NO_EXPENSE_D1,
-        "pushNotification.campaignNoExpenseD1_title",
-        "pushNotification.campaignNoExpenseD1_content"
-    ),
-    CAMPAIGN_END(
-        PushNotificationType.CAMPAIGN_END,
-        "pushNotification.campaignEnd_title",
-        "pushNotification.campaignEnd_content"
-    ),
-    CAMPAIGN_JOIN_REQUEST(
-        PushNotificationType.CAMPAIGN_JOIN_REQUEST,
-        "pushNotification.campaignJoinRequest_title",
-        "pushNotification.campaignJoinRequest_content"
-    ),
-    PAYMENT_COMPLETION(
-        PushNotificationType.PAYMENT_COMPLETION,
-        "pushNotification.paymentCompleted_title",
-        "pushNotification.paymentCompleted_content"
-    ),
-    FRIEND_ADDED(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.friendAdded_title",
-        "pushNotification.friendAdded_content"
-    ),
-    FRIEND_ACCEPTED_RECEIVER(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.friendAcceptedReceiver_title",
-        "pushNotification.friendAcceptedReceiver_content"
-    ),
-    FRIEND_ACCEPTED_SENDER(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.friendAcceptedSender_title",
-        "pushNotification.friendAcceptedSender_content"
-    ),
-    INQUIRY_RESPONSE_COMPLETED(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.inquiryResponseCompleted_title",
-        "pushNotification.inquiryResponseCompleted_content"
-    ),
-    CAMPAIGN_D60_PASSED_1(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.campaignD60Passed1_title",
-        "pushNotification.campaignD60Passed1_content"),
-    CAMPAIGN_D60_PASSED_2(
-        PushNotificationType.CAMPAIGN_ACCEPT_INVITEE,
-        "pushNotification.campaignD60Passed2_title",
-        "pushNotification.campaignD60Passed2_content"
-    );
+    CAMPAIGN_START(
+        PushNotificationType.CAMPAIGN_START, "pushNotification.campaignStart",
+        "pushNotification.campaignStart"),
+
+    CAMPAIGN_END("캠페인 종료 알림", "pushNotification.campaignEnd", "pushNotification.campaignEnd"),
+
+    CAMPAIGN_INVITE("캠페인 초대 알림", "pushNotification.campaignInvite",
+        "pushNotification.campaignInvite"),
+    CAMPAIGN_REGISTRATION("캠페인 등록 알림", "pushNotification.campaignRegistration",
+        "pushNotification.campaignRegistration"),
+    EVENT_NOTICE("이벤트/전체 공지 알림", "pushNotification.eventNotice", "pushNotification.eventNotice"),
+    PAYMENT_COMPLETION("결제 완료 알림", "pushNotification.paymentCompletion",
+        "pushNotification.paymentCompletion");
 
     private final PushNotificationType type;
     private final String titleLangCode;
