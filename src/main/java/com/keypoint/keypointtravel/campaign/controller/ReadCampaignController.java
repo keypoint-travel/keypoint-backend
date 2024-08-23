@@ -58,6 +58,7 @@ public class ReadCampaignController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
         DetailsByPriceResponse response = readCampaignService.findByPrice(useCase);
+        response.sortPayments();
         return APIResponseEntity.<DetailsByPriceResponse>builder()
             .message("캠페인 날짜 별 결제 내역 조회 성공")
             .data(response)

@@ -14,13 +14,13 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class PricePaymentInfo {
+public class PricePaymentInfo implements Comparable<PricePaymentInfo> {
 
     private Long paymentItemId;
+    private float amount;
     private String storeName;
     private LocalDateTime paidAt;
     private List<ParticipationMemberInfo> members;
-    private float amount;
     private Long receiptId;
 
     public static PricePaymentInfo from(PaymentDto dto) {
@@ -40,5 +40,10 @@ public class PricePaymentInfo {
                 members.add(new ParticipationMemberInfo(dto.getMemberId(), dto.getMemberName()));
             }
         }
+    }
+
+    @Override
+    public int compareTo(PricePaymentInfo info) {
+        return this.getAmount() - info.getAmount() < 0 ? 1 : -1;
     }
 }
