@@ -42,7 +42,15 @@ public class FriendService {
         // 3. 회원 정보 조회
         Member member = memberRepository.findById(saveUseCase.getMemberId()).orElseThrow(
             () -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
-        // 4. 친구 생성 및 저장(서로 생성하기에 두번 시행)
+        // 4. 과거에 친구 관계가 있었던 경우 복구
+        if (friendRepository.existsByFriendIdAndMemberIdAndIsDeletedTrue(findedMember.getId(), saveUseCase.getMemberId())) {
+            long count = friendRepository.updateIsDeletedById(saveUseCase.getMemberId(), findedMember.getId(), false);
+            if (count < 2) {
+                throw new GeneralException(FriendErrorCode.NOT_EXISTED_FRIEND);
+            }
+            return;
+        }
+        // 5. 친구 생성 및 저장(서로 생성하기에 두번 시행)
         friendRepository.save(buildFriend(findedMember, member));
         friendRepository.save(buildFriend(member, findedMember));
     }
@@ -55,17 +63,17 @@ public class FriendService {
             .build();
     }
 
-    private void validate(Member findedMember, Long myId){
+    private void validate(Member findedMember, Long myId) {
         // 자기 자신을 친구초대할 경우
-        if(findedMember.getId().equals(myId)){
+        if (findedMember.getId().equals(myId)) {
             throw new GeneralException(FriendErrorCode.CANNOT_ADD_SELF);
         }
         // 이미 친구로 등록된 경우
-        if(friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(findedMember.getId(), myId)) {
+        if (friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(findedMember.getId(), myId)) {
             throw new GeneralException(FriendErrorCode.DUPLICATED_FRIEND);
         }
         // 상대가 자신을, 자신이 상대를 차단한 경우
-        if(blockedMemberRepository.existsBlockedMember(findedMember.getId(), myId)){
+        if (blockedMemberRepository.existsBlockedMember(findedMember.getId(), myId)) {
             throw new GeneralException(FriendErrorCode.BLOCKED_FRIEND);
         }
     }
@@ -74,7 +82,6 @@ public class FriendService {
      * 친구 목록 조회 함수
      *
      * @Param 회원의 memberId
-     *
      * @Return 조회한 친구 목록 Dto(회원의 초대 코드, 친구 리스트(친구 아이디, 친구 이름, 친구 프로필 이미지 아이디))
      */
     @Transactional(readOnly = true)
