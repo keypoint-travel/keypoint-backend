@@ -36,7 +36,4 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
 
     @Query("SELECT md.language FROM MemberDetail md WHERE md.member.id = :memberId")
     LanguageCode findLanguageCodeByMemberId(@Param("memberId") Long memberId);
-
-    @Query("SELECT md FROM MemberDetail md WHERE md.member.id = :memberId")
-    MemberDetail findByMemberId(@Param("memberId") Long memberId);
 }

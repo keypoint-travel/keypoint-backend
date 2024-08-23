@@ -1,15 +1,10 @@
 package com.keypoint.keypointtravel.notification.entity;
 
-import com.keypoint.keypointtravel.global.converter.PushNotificationEventToJsonConverter;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,32 +32,36 @@ public class PushNotificationHistory extends BaseEntity {
     private Member member;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PushNotificationContent type;
+    private String title;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Column(nullable = false)
+    private PushNotificationType type;
 
     @Column(nullable = false, name = "is_read")
     private boolean isRead;
 
-    @Convert(converter = PushNotificationEventToJsonConverter.class)
-    @Column(columnDefinition = "TEXT")
-    private PushNotificationEvent detailData;
-
     public PushNotificationHistory(
-        PushNotificationContent type,
-        Member member,
-        PushNotificationEvent detailData
+        String title,
+        String content,
+        PushNotificationType type,
+        Member member
     ) {
         this.member = member;
+        this.title = title;
+        this.content = content;
         this.type = type;
         this.isRead = false;
-        this.detailData = detailData;
     }
 
     public static PushNotificationHistory of(
-        PushNotificationContent type,
-        Member member,
-        PushNotificationEvent detailData
+        String title,
+        String content,
+        PushNotificationType type,
+        Member member
     ) {
-        return new PushNotificationHistory(type, member, detailData);
+        return new PushNotificationHistory(title, content, type, member);
     }
 }
