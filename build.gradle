@@ -87,9 +87,6 @@ dependencies {
 
     // retry
     implementation 'org.springframework.retry:spring-retry'
-
-    // liquibase
-    implementation 'org.liquibase:liquibase-core'
 }
 
 ext {
