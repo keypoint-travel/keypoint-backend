@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.response.PaymentInfo;
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -45,7 +45,7 @@ public class ReadCampaignService {
      * @Return DetailsByCategoryResponse
      */
     @Transactional
-    public DetailsByCategoryResponse findByCategory(FindPaymentUseCase useCase) {
+    public DetailsByPercentageResponse findByCategory(FindPaymentUseCase useCase) {
         // 0. 캠페인에 소속되어 있는지 검증
         validateInCampaign(useCase);
         // 1. 캠페인 아이디를 통해 총 에산 조회
@@ -66,10 +66,11 @@ public class ReadCampaignService {
         HashMap<String, Float> categoryAmount = calculateCategoryAmount(paymentDtoList);
         float totalAmount = categoryAmount.values().stream().reduce(0f, Float::sum);
         float remainBudget = calculateRemainBudget(categoryAmount, totalBudget, totalAmount);
+        totalAmount += remainBudget;
         // 6. 카테고리 별 비율 계산
         HashMap<String, Float> categoryPercentage = calculateCategoryPercentage(categoryAmount, totalAmount);
         // 7. 결제 항목 응답값 생성 및 응답
-        return createResponse(totalBudget, totalAmount, remainBudget, categoryPercentage, paymentDtoList, paymentMemberDtoList);
+        return createResponse(totalBudget, totalAmount - remainBudget, remainBudget, categoryPercentage, paymentDtoList, paymentMemberDtoList);
     }
 
     /**
@@ -78,30 +79,34 @@ public class ReadCampaignService {
      * @Param campaignId, currencyType, memberId useCase
      * @Return
      */
-//    public void findByDate(FindPaymentUseCase useCase) {
-//        // 0. 캠페인에 소속되어 있는지 검증
-//        validateInCampaign(useCase);
-//        // 1. 캠페인 아이디를 통해 총 에산 조회
-//        List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
-//        float total = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
-//        TotalBudgetDto totalBudget = new TotalBudgetDto(total, campaignBudgets.get(0).getCurrency());
-//        // 2. 캠페인 아이디를 통해 결제 항목 리스트 조회
-//        List<PaymentDto> paymentDtoList = customPaymentRepository.findPaymentList(useCase.getCampaignId());
-//        // 3. 결제 항목 별 참여 인원 리스트 조회
-//        List<Long> paymentItemIds = paymentDtoList.stream().map(PaymentDto::getPaymentItemId).toList();
-//        List<PaymentMemberDto> paymentMemberDtoList = customPaymentRepository.findMemberListByPayments(paymentItemIds);
-//        // 4. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
-//        if (useCase.getCurrencyType() != null) {
-//            List<Currency> currencies = currencyRepository.findAll();
-//            updateCurrency(useCase, totalBudget, paymentDtoList, currencies);
-//        }
-//        // 5. 날짜 별 금액 계산 및 잔여 예산 계산
-//        HashMap<String, Float> categoryAmount = calculateCategoryAmount(paymentDtoList);
-//        float totalAmount = categoryAmount.values().stream().reduce(0f, Float::sum);
-//        float remainBudget = calculateRemainBudget(categoryAmount, totalBudget, totalAmount);
-//        // 6. 날짜 별 비율 계산
-//        HashMap<String, Float> categoryPercentage = calculateCategoryPercentage(categoryAmount, totalAmount);
-//    }
+    @Transactional
+    public DetailsByPercentageResponse findByDate(FindPaymentUseCase useCase) {
+        // 0. 캠페인에 소속되어 있는지 검증
+        validateInCampaign(useCase);
+        // 1. 캠페인 아이디를 통해 총 에산 조회
+        List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
+        float total = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
+        TotalBudgetDto totalBudget = new TotalBudgetDto(total, campaignBudgets.get(0).getCurrency());
+        // 2. 캠페인 아이디를 통해 결제 항목 리스트 조회
+        List<PaymentDto> paymentDtoList = customPaymentRepository.findPaymentList(useCase.getCampaignId());
+        // 3. 결제 항목 별 참여 인원 리스트 조회
+        List<Long> paymentItemIds = paymentDtoList.stream().map(PaymentDto::getPaymentItemId).toList();
+        List<PaymentMemberDto> paymentMemberDtoList = customPaymentRepository.findMemberListByPayments(paymentItemIds);
+        // 4. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
+        if (useCase.getCurrencyType() != null) {
+            List<Currency> currencies = currencyRepository.findAll();
+            updateCurrency(useCase, totalBudget, paymentDtoList, currencies);
+        }
+        // 5. 날짜 별 금액 계산 및 잔여 예산 계산
+        HashMap<String, Float> dateAmount = calculateDateAmount(paymentDtoList);
+        float totalAmount = dateAmount.values().stream().reduce(0f, Float::sum);
+        float remainBudget = calculateDateBudget(dateAmount, totalBudget, totalAmount);
+        totalAmount += remainBudget;
+        // 6. 날짜 별 비율 계산
+        HashMap<String, Float> datePercentage = calculateDatePercentage(dateAmount, totalAmount);
+        // 7. 결제 항목 응답값 생성 및 응답
+        return createResponse(totalBudget, totalAmount - remainBudget, remainBudget, datePercentage, paymentDtoList, paymentMemberDtoList);
+    }
 
     // 캠페인에 소속되어 있는지 검증
     private void validateInCampaign(FindPaymentUseCase useCase) {
@@ -179,18 +184,18 @@ public class ReadCampaignService {
     }
 
     // 카테고리 별 결제 항목 응답값 생성 및 응답
-    private DetailsByCategoryResponse createResponse(TotalBudgetDto totalBudget, float totalAmount, float remainBudget,
-                                                     HashMap<String, Float> categoryPercentage, List<PaymentDto> paymentDtoList,
-                                                     List<PaymentMemberDto> paymentMemberDtoList) {
+    private DetailsByPercentageResponse createResponse(TotalBudgetDto totalBudget, float totalAmount, float remainBudget,
+                                                       HashMap<String, Float> percentage, List<PaymentDto> paymentDtoList,
+                                                       List<PaymentMemberDto> paymentMemberDtoList) {
         List<PaymentInfo> paymentInfoList = paymentDtoList.stream()
             .map(PaymentInfo::from)
             .collect(Collectors.toList());
         paymentInfoList.forEach(paymentInfo -> paymentInfo.addMembers(paymentMemberDtoList));
-        return new DetailsByCategoryResponse(
+        return new DetailsByPercentageResponse(
             totalBudget.getCurrencyType().getCode(),
             Math.round(totalAmount * 100) / 100f,
             Math.round(remainBudget * 100) / 100f,
-            categoryPercentage,
+            percentage,
             paymentInfoList
         );
     }
@@ -209,36 +214,36 @@ public class ReadCampaignService {
     }
 
     // 날짜 별 금액 중 잔여 예산 계산
-    private float calculateDateBudget(HashMap<String, Float> categoryAmount, TotalBudgetDto totalBudget, float totalAmount) {
+    private float calculateDateBudget(HashMap<String, Float> dateAmount, TotalBudgetDto totalBudget, float totalAmount) {
         float remainBudget = 0;
         if (totalBudget.getTotalAmount() - totalAmount > 0) {
             remainBudget = totalBudget.getTotalAmount() - totalAmount;
-            categoryAmount.put("잔여 예산", remainBudget);
+            dateAmount.put("잔여 예산", remainBudget);
         }
         return remainBudget;
     }
 
     // 날짜 별 비율 계산
-    private HashMap<String, Float> calculateDatePercentage(HashMap<String, Float> categoryAmount, float totalAmount) {
-        HashMap<String, Float> categoryPercentage = new HashMap<>();
+    private HashMap<String, Float> calculateDatePercentage(HashMap<String, Float> dateAmount, float totalAmount) {
+        HashMap<String, Float> datePercentage = new HashMap<>();
         // 최대 비율을 가지는 카테고리 선정
         String maxCategory = null;
         float maxPercentage = 0;
-        for (HashMap.Entry<String, Float> entry : categoryAmount.entrySet()) {
+        for (HashMap.Entry<String, Float> entry : dateAmount.entrySet()) {
             float percentage = (entry.getValue() / totalAmount) * 100;
             percentage = Math.round(percentage);
-            categoryPercentage.put(entry.getKey(), percentage);
+            datePercentage.put(entry.getKey(), percentage);
             if (percentage > maxPercentage) {
                 maxPercentage = percentage;
                 maxCategory = entry.getKey();
             }
         }
-        float totalPercentage = categoryPercentage.values().stream().reduce(0f, Float::sum);
+        float totalPercentage = datePercentage.values().stream().reduce(0f, Float::sum);
         // 비율 별 소수점 반올림 후 100%를 맞추기위해 최대 비율을 가진 카테고리에 차이를 더함
         float diff = 100 - totalPercentage;
         if (maxCategory != null) {
-            categoryPercentage.put(maxCategory, maxPercentage + diff);
+            datePercentage.put(maxCategory, maxPercentage + diff);
         }
-        return categoryPercentage;
+        return datePercentage;
     }
 }
