@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -19,31 +19,31 @@ public class ReadCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/category")
-    public APIResponseEntity<DetailsByCategoryResponse> findCampaignCategoryList(
+    public APIResponseEntity<DetailsByPercentageResponse> findCampaignCategoryList(
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
-        DetailsByCategoryResponse response = readCampaignService.findByCategory(useCase);
+        DetailsByPercentageResponse response = readCampaignService.findByCategory(useCase);
         response.sortPayments();
-        return APIResponseEntity.<DetailsByCategoryResponse>builder()
+        return APIResponseEntity.<DetailsByPercentageResponse>builder()
             .message("캠페인 카테고리 별 결제 내역 조회 성공")
             .data(response)
             .build();
     }
 
-//    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-//    @GetMapping("/{campaignId}/category")
-//    public APIResponseEntity<DetailsByCategoryResponse> findCampaignDate(
-//        @RequestParam("currency") String currencyType,
-//        @PathVariable Long campaignId,
-//        @AuthenticationPrincipal CustomUserDetails userDetails) {
-//        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
-//        readCampaignService.findByDate(useCase);
-////        response.sortPayments();
-//        return APIResponseEntity.<DetailsByCategoryResponse>builder()
-//            .message("캠페인 카테고리 별 결제 내역 조회 성공")
-//            .data(null)
-//            .build();
-//    }
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/date")
+    public APIResponseEntity<DetailsByPercentageResponse> findCampaignDateList(
+        @RequestParam("currency") String currencyType,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        DetailsByPercentageResponse response = readCampaignService.findByDate(useCase);
+//        response.sortPayments();
+        return APIResponseEntity.<DetailsByPercentageResponse>builder()
+            .message("캠페인 날짜 별 결제 내역 조회 성공")
+            .data(response)
+            .build();
+    }
 }
