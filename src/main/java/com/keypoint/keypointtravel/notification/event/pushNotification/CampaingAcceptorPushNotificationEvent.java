@@ -10,9 +10,6 @@ public class CampaingAcceptorPushNotificationEvent extends PushNotificationEvent
     private String acceptorName;
     private Campaign campaign;
 
-    public CampaingAcceptorPushNotificationEvent() {
-        super(null, null);
-    }
 
     public CampaingAcceptorPushNotificationEvent(
         PushNotificationType type,

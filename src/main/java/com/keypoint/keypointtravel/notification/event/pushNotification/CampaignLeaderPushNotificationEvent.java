@@ -10,9 +10,6 @@ public class CampaignLeaderPushNotificationEvent extends PushNotificationEvent {
     private String leaderName;
     private Campaign campaign;
 
-    public CampaignLeaderPushNotificationEvent() {
-        super(null, null);
-    }
 
     public CampaignLeaderPushNotificationEvent(
         PushNotificationType type,
