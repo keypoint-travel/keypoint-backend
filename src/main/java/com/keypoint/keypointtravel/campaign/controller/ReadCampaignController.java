@@ -5,7 +5,6 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,4 +31,19 @@ public class ReadCampaignController {
             .data(response)
             .build();
     }
+
+//    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+//    @GetMapping("/{campaignId}/category")
+//    public APIResponseEntity<DetailsByCategoryResponse> findCampaignDate(
+//        @RequestParam("currency") String currencyType,
+//        @PathVariable Long campaignId,
+//        @AuthenticationPrincipal CustomUserDetails userDetails) {
+//        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+//        readCampaignService.findByDate(useCase);
+////        response.sortPayments();
+//        return APIResponseEntity.<DetailsByCategoryResponse>builder()
+//            .message("캠페인 카테고리 별 결제 내역 조회 성공")
+//            .data(null)
+//            .build();
+//    }
 }
