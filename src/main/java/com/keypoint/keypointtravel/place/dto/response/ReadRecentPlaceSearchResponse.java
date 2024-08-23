@@ -8,11 +8,11 @@ import lombok.Getter;
 public class ReadRecentPlaceSearchResponse {
 
     private String placeSearchHistoryId;
-    private String searchWord;
+    private Long placeId;
 
     public static ReadRecentPlaceSearchResponse of(
-        String placeSearchHistoryId, String searchWord
+        String placeSearchHistoryId, Long placeId
     ) {
-        return new ReadRecentPlaceSearchResponse(placeSearchHistoryId, searchWord);
+        return new ReadRecentPlaceSearchResponse(placeSearchHistoryId, placeId);
     }
 }
