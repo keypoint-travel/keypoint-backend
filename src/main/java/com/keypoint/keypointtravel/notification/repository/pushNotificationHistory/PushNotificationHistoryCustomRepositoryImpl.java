@@ -44,8 +44,8 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
                 Projections.fields(
                     PushHistoryResponse.class,
                     pushNotificationHistory.id.as("historyId"),
-//                    pushNotificationHistory.title,
-//                    pushNotificationHistory.content,
+                    pushNotificationHistory.title,
+                    pushNotificationHistory.content,
                     pushNotificationHistory.createAt.as("arrivedAt")
                 )
             )

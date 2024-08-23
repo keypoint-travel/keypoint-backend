@@ -1,13 +1,10 @@
 package com.keypoint.keypointtravel.notification.entity;
 
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
-import com.keypoint.keypointtravel.global.converter.PushNotificationEventToJsonConverter;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationMsg;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,34 +37,34 @@ public class PushNotificationHistory extends BaseEntity {
     private Campaign campaign;
 
     @Column(nullable = false)
-    private PushNotificationContent type;
+    private PushNotificationMsg type;
 
     @Column(nullable = false, name = "is_read")
     private boolean isRead;
 
-    @Convert(converter = PushNotificationEventToJsonConverter.class)
-    @Column(columnDefinition = "TEXT")
-    private PushNotificationEvent detailData;
-
     public PushNotificationHistory(
-        PushNotificationContent type,
+        PushNotificationMsg type,
         Member member,
-        Campaign campaign,
-        PushNotificationEvent detailData
+        Campaign campaign
     ) {
         this.member = member;
         this.campaign = campaign;
         this.type = type;
         this.isRead = false;
-        this.detailData = detailData;
     }
 
     public static PushNotificationHistory of(
-        PushNotificationContent type,
-        Member member,
-        Campaign campaign,
-        PushNotificationEvent detailData
+        PushNotificationMsg type,
+        Member member
     ) {
-        return new PushNotificationHistory(type, member, campaign, detailData);
+        return new PushNotificationHistory(type, member, null);
+    }
+
+    public static PushNotificationHistory of(
+        PushNotificationMsg type,
+        Member member,
+        Campaign campaign
+    ) {
+        return new PushNotificationHistory(type, member, campaign);
     }
 }

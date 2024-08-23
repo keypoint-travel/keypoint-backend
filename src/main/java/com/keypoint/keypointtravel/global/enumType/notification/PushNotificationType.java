@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PushNotificationType {
     RECEIPT_REGISTER("영수증 등록"),
-    CAMPAIGN_D_MINUS_7("캠페인 D-7"),
+    FRIEND_INVITE("친구 초대 알림"),
     CAMPAIGN_D_DAY("캠페인 D-1 알림"),
     CAMPAIGN_INVITE("캠페인 초대 알림"),
-    CAMPAIGN_ACCEPT_INVITER("캠페인 수락 (팀원이 수락을 했다는 것을 방장이 받는 알림.)"),
-    CAMPAIGN_ACCEPT_INVITEE("캠페인 수락 (방장이 수락했다는 것을 팀원이 받는 알림)"),
+
+    CAMPAIGN_ACCEPT_INVITER("캠페인 수락 (초대 한 사람-방장)"),
+    CAMPAIGN_ACCEPT_INVITEE("캠페인 수락 (초대 받은 사람-팀원)"),
     CAMPAIGN_NO_EXPENSE_D1("캠페인 D+1 지출 내역이 없는 경우"),
     CAMPAIGN_END("캠페인 종료 알림"),
     CAMPAIGN_JOIN_REQUEST("캠페인 참여 신청 (신청 받은 사람-방장)"),
