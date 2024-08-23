@@ -1,8 +1,6 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 import lombok.Getter;
@@ -42,29 +40,14 @@ public class CampaignAcceptorPushNotificationEvent extends PushNotificationEvent
         return new CampaignAcceptorData(acceptorName, campaignId);
     }
 
-    @JsonProperty("additionalData")
-    public void setAdditionalData(CampaignAcceptorData additionalData) {
-        this.acceptorName = additionalData.getAcceptorName();
-        this.campaignId = additionalData.getCampaignId();
-    }
-
     @Getter
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CampaignAcceptorData {
 
         private String acceptorName;
         private Long campaignId;
 
-        // 기본 생성자 추가
-        public CampaignAcceptorData() {
-        }
-
-        @JsonCreator
-        public CampaignAcceptorData(
-            @JsonProperty("acceptorName") String acceptorName,
-            @JsonProperty("campaignId") Long campaignId
-        ) {
-            this.acceptorName = acceptorName;
+        public CampaignAcceptorData(String leaderName, Long campaignId) {
+            this.acceptorName = leaderName;
             this.campaignId = campaignId;
         }
     }

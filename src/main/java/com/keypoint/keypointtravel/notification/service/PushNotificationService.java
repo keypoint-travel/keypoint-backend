@@ -3,8 +3,8 @@ package com.keypoint.keypointtravel.notification.service;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
-import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
@@ -31,17 +31,20 @@ public class PushNotificationService {
      * Notification 생성
      *
      * @param event        푸시 알림 정보가 존재하는 이벤트
+     * @param languageCode 언어 코드
      * @return
      */
     public PushNotificationDTO generateNotificationDTO(
-        MemberDetail memberDetail,
+        String memberName,
         PushNotificationEvent event,
-        PushNotificationContent notificationMsg
+        LanguageCode languageCode
     ) {
-        Locale locale = memberDetail.getLanguage().getLocale();
+        Locale locale = languageCode.getLocale();
         PushNotificationType type = event.getPushNotificationType();
         Object additionalData = event.getAdditionalData();
 
+        PushNotificationContent notificationMsg = PushNotificationContent.getRandomNotificationContent(
+            type);
         String title = MessageSourceUtils.getLocalizedLanguage(
             notificationMsg.getTitleLangCode(), locale
         );
@@ -50,7 +53,7 @@ public class PushNotificationService {
         switch (type) {
             case RECEIPT_REGISTER -> {
                 content = notificationMsg.getTranslatedContent(
-                    memberDetail.getName(),
+                    memberName,
                     null,
                     locale
                 );
