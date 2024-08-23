@@ -2,7 +2,8 @@ name: cicd-develop
 
 on:
   push:
-    - feature/fcm
+    branches:
+      - feature/fcm
   pull_request:
     branches:
       - develop
