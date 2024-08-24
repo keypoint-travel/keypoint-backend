@@ -1,10 +1,12 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
 import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
+import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -27,6 +29,8 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
     private final QBlockedMember blockedMember = QBlockedMember.blockedMember;
+
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     @Override
     public boolean existsByCampaignLeaderTrue(Long memberId, Long campaignId) {
@@ -97,5 +101,24 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .where(memberCampaign.campaign.id.eq(campaignId)
                 .and(memberCampaign.campaign.status.eq(Status.IN_PROGRESS)))
             .fetch();
+    }
+
+    @Override
+    public CampaignInfoDto findCampaignInfo(Long campaignId) {
+        CampaignInfoDto result = queryFactory.select(
+                Projections.constructor(CampaignInfoDto.class,
+                    campaign.id,
+                    uploadFile.path,
+                    campaign.title,
+                    campaign.startDate,
+                    campaign.endDate))
+            .from(campaign)
+            .leftJoin(uploadFile).on(campaign.campaignImageId.eq(uploadFile.id))
+            .where(campaign.id.eq(campaignId))
+            .fetchOne();
+        if (result == null) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
+        return result;
     }
 }

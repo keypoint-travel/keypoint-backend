@@ -1,9 +1,11 @@
 package com.keypoint.keypointtravel.receipt.repository;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.ReceiptInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
+import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentMember;
@@ -29,6 +31,8 @@ public class CustomPaymentRepository {
     private final QReceipt qReceipt = QReceipt.receipt;
 
     private final QMember qMember = QMember.member;
+
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     public List<PaymentDto> findPaymentList(Long campaignId) {
         // 캠페인 아이디를 통해 결제 항목 리스트 조회
@@ -83,6 +87,21 @@ public class CustomPaymentRepository {
             .from(qReceipt)
             .where(qReceipt.campaign.id.eq(campaignId))
             .groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", qReceipt.paidAt.stringValue(), "%y.%m.%d"))
+            .fetch();
+    }
+
+    public List<ReceiptInfoDto> findAllOrderByPaidAt(Long campaignId){
+        return queryFactory.select(
+            Projections.constructor(ReceiptInfoDto.class,
+                qReceipt.id,
+                uploadFile.path,
+                qReceipt.paidAt,
+                qReceipt.latitude,
+                qReceipt.longitude))
+            .from(qReceipt)
+            .leftJoin(uploadFile).on(qReceipt.receiptImageId.eq(uploadFile.id))
+            .where(qReceipt.campaign.id.eq(campaignId))
+            .orderBy(qReceipt.paidAt.asc())
             .fetch();
     }
 }
