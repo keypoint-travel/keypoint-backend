@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.receipt.repository;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.member.entity.QMember;
@@ -46,7 +47,7 @@ public class CustomPaymentRepository {
             .fetch();
     }
 
-    public List<PaymentMemberDto> findMemberListByPayments(List<Long> paymentItemIds){
+    public List<PaymentMemberDto> findMemberListByPayments(List<Long> paymentItemIds) {
         // 결제 항목 별 참여 인원 리스트 조회
         return queryFactory.select(
                 Projections.constructor(PaymentMemberDto.class,
@@ -56,6 +57,18 @@ public class CustomPaymentRepository {
             .from(qPaymentMember)
             .innerJoin(qPaymentMember.member, qMember)
             .where(qPaymentMember.paymentItem.id.in(paymentItemIds))
+            .fetch();
+    }
+
+    // campaignId 에 해당하는 영수중 중에 카테고리 별 그룹 화하여 비용의 합을 계산 AmountByCategoryDto
+    public List<AmountByCategoryDto> findAmountByCategory(Long campaignId) {
+        return queryFactory.select(
+                Projections.constructor(AmountByCategoryDto.class,
+                    qReceipt.receiptCategory,
+                    qReceipt.totalAmount.sum()))
+            .from(qReceipt)
+            .where(qReceipt.campaign.id.eq(campaignId))
+            .groupBy(qReceipt.receiptCategory)
             .fetch();
     }
 }
