@@ -4,9 +4,8 @@ import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
-import com.keypoint.keypointtravel.campaign.dto.response.category.CategoryPercentageResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.category.PercentageByCategory;
-import com.keypoint.keypointtravel.campaign.dto.response.date.DatePercentageResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.PercentageByCategory;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -41,7 +40,7 @@ public class FindPercentageService {
      * @Return 사용 금액, 잔여 예산, 화폐 단위, List [카테고리, 가격, 비율] CategoryPercentageResponse
      */
     @Transactional(readOnly = true)
-    public CategoryPercentageResponse findCategoryPercentage(FindPaymentUseCase useCase) {
+    public PercentageResponse findCategoryPercentage(FindPaymentUseCase useCase) {
         // 1. 캠페인 아이디를 통해 캠페인 생성 시 지정한 총 예산 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
@@ -62,7 +61,7 @@ public class FindPercentageService {
         // 5. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 6. 응답
-        return new CategoryPercentageResponse(
+        return new PercentageResponse(
             totalBudget.getCurrencyType().getCode(),
             Math.round((usedTotalAmount - remainBudget) * 100) / 100f,
             Math.round(remainBudget * 100) / 100f,
@@ -77,7 +76,7 @@ public class FindPercentageService {
      * @Return 사용 금액, 잔여 예산, 화폐 단위, List [날짜, 가격, 비율] DatePercentageResponse
      */
     @Transactional(readOnly = true)
-    public DatePercentageResponse findDatePercentage(FindPaymentUseCase useCase) {
+    public PercentageResponse findDatePercentage(FindPaymentUseCase useCase) {
         // 1. 캠페인 아이디를 통해 캠페인 생성 시 지정한 총 예산 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
@@ -98,7 +97,7 @@ public class FindPercentageService {
         // 5. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 6. 응답
-        return new DatePercentageResponse(
+        return new PercentageResponse(
             totalBudget.getCurrencyType().getCode(),
             Math.round((usedTotalAmount - remainBudget) * 100) / 100f,
             Math.round(remainBudget * 100) / 100f,

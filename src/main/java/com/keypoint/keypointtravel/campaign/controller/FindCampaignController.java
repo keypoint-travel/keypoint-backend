@@ -1,10 +1,9 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
-import com.keypoint.keypointtravel.campaign.dto.response.category.CategoryPercentageResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByDateResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPriceResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.date.DatePercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.service.FindPercentageService;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
@@ -26,13 +25,13 @@ public class FindCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/percentage/category")
-    public APIResponseEntity<CategoryPercentageResponse> findCampaignCategoryPercentages(
+    public APIResponseEntity<PercentageResponse> findCampaignCategoryPercentages(
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
-        CategoryPercentageResponse response = findPercentageService.findCategoryPercentage(useCase);
-        return APIResponseEntity.<CategoryPercentageResponse>builder()
+        PercentageResponse response = findPercentageService.findCategoryPercentage(useCase);
+        return APIResponseEntity.<PercentageResponse>builder()
             .message("캠페인 카테고리별 비율 조회 성공")
             .data(response)
             .build();
@@ -40,13 +39,14 @@ public class FindCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/percentage/date")
-    public APIResponseEntity<DatePercentageResponse> findCampaignDatePercentages(
+    public APIResponseEntity<PercentageResponse> findCampaignDatePercentages(
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
-        DatePercentageResponse response = findPercentageService.findDatePercentage(useCase);
-        return APIResponseEntity.<DatePercentageResponse>builder()
+        PercentageResponse response = findPercentageService.findDatePercentage(useCase);
+        response.sortPercentages();
+        return APIResponseEntity.<PercentageResponse>builder()
             .message("캠페인 날짜별 비율 조회 성공")
             .data(response)
             .build();
