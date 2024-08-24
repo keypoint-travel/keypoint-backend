@@ -4,7 +4,10 @@ import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByDateResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPriceResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
+import com.keypoint.keypointtravel.campaign.service.FindCampaignService;
 import com.keypoint.keypointtravel.campaign.service.FindPercentageService;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -22,6 +25,21 @@ public class FindCampaignController {
     private final ReadCampaignService readCampaignService;
 
     private final FindPercentageService findPercentageService;
+
+    private final FindCampaignService findCampaignService;
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}")
+    public APIResponseEntity<CampaignDetailsResponse> findCampaignDetails(
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FIndCampaignUseCase useCase = new FIndCampaignUseCase(campaignId, userDetails.getId());
+        CampaignDetailsResponse response = findCampaignService.findCampaignDetails(useCase);
+        return APIResponseEntity.<CampaignDetailsResponse>builder()
+            .message("캠페인 상세 페이지 상단 조회 성공")
+            .data(response)
+            .build();
+    }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/percentage/category")
