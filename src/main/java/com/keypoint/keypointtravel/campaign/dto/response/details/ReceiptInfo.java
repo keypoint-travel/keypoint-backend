@@ -9,7 +9,7 @@ public class ReceiptInfo {
 
     private Long receiptId;
     private String receiptImage;
-    private int order;
+    private int sequence;
     private double latitude;
     private double longitude;
 }

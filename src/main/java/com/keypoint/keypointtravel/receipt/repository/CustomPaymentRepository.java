@@ -100,7 +100,9 @@ public class CustomPaymentRepository {
                 qReceipt.longitude))
             .from(qReceipt)
             .leftJoin(uploadFile).on(qReceipt.receiptImageId.eq(uploadFile.id))
-            .where(qReceipt.campaign.id.eq(campaignId))
+            .where(qReceipt.campaign.id.eq(campaignId)
+                .and(qReceipt.latitude.isNotNull())
+                .and(qReceipt.longitude.isNotNull()))
             .orderBy(qReceipt.paidAt.asc())
             .fetch();
     }
