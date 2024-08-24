@@ -1,9 +1,15 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CommonPushNotificationEvent extends PushNotificationEvent {
+
+    public CommonPushNotificationEvent() {
+        super(null, null);
+    }
 
     public CommonPushNotificationEvent(
         PushNotificationType type,

@@ -2,9 +2,9 @@ package com.keypoint.keypointtravel.guide.controller;
 
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
@@ -50,9 +50,11 @@ public class ReadGuideController {
 
     @GetMapping("{guideTranslationId}")
     public APIResponseEntity<ReadGuideDetailResponse> findGuideDetail(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable(value = "guideTranslationId") Long guideTranslationIds
     ) {
-        ReadGuideTranslationIdUseCase useCase = ReadGuideTranslationIdUseCase.from(
+        ReadGuideTranslationIdUseCase useCase = ReadGuideTranslationIdUseCase.of(
+            userDetails.getId(),
             guideTranslationIds
         );
         ReadGuideDetailResponse result = readGuideService.findGuideDetail(useCase);

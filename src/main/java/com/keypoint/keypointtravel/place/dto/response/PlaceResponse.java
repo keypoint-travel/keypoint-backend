@@ -17,9 +17,13 @@ public class PlaceResponse {
     private String cityName;
     private String countryName;
     private PlaceType placeType;
+    private String alpha2code;
 
     @QueryProjection
-    public PlaceResponse(Place place, LanguageCode languageCode) {
+    public PlaceResponse(
+        Place place,
+        LanguageCode languageCode
+    ) {
         this.placeId = place.getId();
         this.placeType = place.getPlaceType();
 
@@ -41,6 +45,6 @@ public class PlaceResponse {
 
         this.displayName = placeType == PlaceType.COUNTRY ? countryName
             : String.format("%s, %s", cityName, countryName);
-
+        this.alpha2code = country.getIso2();
     }
 }

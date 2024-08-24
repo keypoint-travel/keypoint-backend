@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface RecentPlaceSearchRepository extends
     CrudRepository<RecentPlaceSearch, String> {
 
-    List<RecentPlaceSearch> findByMemberId(Long memberId);
+    List<RecentPlaceSearch> findByMemberIdOrderByModifyAtDesc(Long memberId);
 
-    Optional<RecentPlaceSearch> findByMemberIdAndSearchWord(Long memberId, String searchWord);
+    Optional<RecentPlaceSearch> findByMemberIdAndPlaceId(Long memberId, Long placeId);
 }

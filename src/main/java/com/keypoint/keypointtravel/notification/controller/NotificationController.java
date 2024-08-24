@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
 import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
 import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.PushHistoryIdUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMTokenService;
@@ -26,6 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,6 +107,19 @@ public class NotificationController {
         return APIResponseEntity.<Slice<PushHistoryResponse>>builder()
             .message("푸시 알림 이력 조회 성공")
             .data(result)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @PatchMapping("/push/{historyId}")
+    public APIResponseEntity<Void> markPushHistoryAsRead(
+        @PathVariable("historyId") Long historyId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        PushHistoryIdUseCase useCase = PushHistoryIdUseCase.of(userDetails.getId(), historyId);
+        pushHistoryService.markPushHistoryAsRead(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("푸시 알림 이력 읽은 상태로 변경 성공")
             .build();
     }
 

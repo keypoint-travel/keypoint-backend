@@ -21,18 +21,18 @@ public class RecentPlaceSearch {
     private Long memberId;
 
     @Indexed
-    private String searchWord;
+    private Long placeId;
 
     @Convert(converter = TimestampConverter.class)
     private LocalDateTime modifyAt;
 
-    public RecentPlaceSearch(Long memberId, String searchWord) {
+    public RecentPlaceSearch(Long memberId, Long placeId) {
         this.memberId = memberId;
-        this.searchWord = searchWord;
+        this.placeId = placeId;
     }
 
-    public static RecentPlaceSearch of(Long memberId, String searchWord) {
-        return new RecentPlaceSearch(memberId, searchWord);
+    public static RecentPlaceSearch of(Long memberId, Long placeId) {
+        return new RecentPlaceSearch(memberId, placeId);
     }
 
     public void setModifyAt() {

@@ -67,7 +67,7 @@ public class PlaceService {
         try {
             LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
                 useCase.getMemberId());
-            return placeRepository.getPlacesBySearchWord(languageCode, useCase.getMemberId(),
+            return placeRepository.getRecentSearchPlaces(languageCode, useCase.getMemberId(),
                 useCase.getSearchWord());
         } catch (Exception ex) {
             throw new GeneralException(ex);

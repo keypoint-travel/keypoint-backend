@@ -2,9 +2,10 @@ package com.keypoint.keypointtravel.guide.repository;
 
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadNextGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideTranslationInAdminResponse;
 import com.keypoint.keypointtravel.guide.entity.QGuide;
@@ -163,12 +164,37 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
                     translation.title,
                     translation.subTitle,
                     uploadFile.path.as("thumbnailImageUrl"),
-                    translation.content
+                    translation.content,
+                    translation.guide.order
                 )
             )
             .from(translation)
             .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
             .where(builder)
+            .fetchFirst();
+    }
+
+    @Override
+    public ReadNextGuideResponse findNextGuide(int order, LanguageCode languageCode) {
+        BooleanBuilder translationBuilder = new BooleanBuilder();
+        translationBuilder.and(translation.isDeleted.eq(false))
+            .and(translation.languageCode.eq(languageCode));
+
+        return queryFactory
+            .select(
+                Projections.fields(
+                    ReadNextGuideResponse.class,
+                    translation.id.as("guideTranslationIds"),
+                    translation.title,
+                    translation.subTitle,
+                    uploadFile.path.as("thumbnailImageUrl")
+                )
+            )
+            .from(guide)
+            .innerJoin(translation).on(translationBuilder)
+            .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
+            .where(guide.order.gt(order))
+            .orderBy(guide.order.asc())
             .fetchFirst();
     }
 }
