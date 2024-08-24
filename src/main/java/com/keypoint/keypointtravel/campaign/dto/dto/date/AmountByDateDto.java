@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.campaign.dto.dto.category;
+package com.keypoint.keypointtravel.campaign.dto.dto.date;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
@@ -7,9 +7,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AmountByCategoryDto implements AmountDto {
+public class AmountByDateDto implements AmountDto {
 
-    private ReceiptCategory category;
+    private String date;
     private float amount;
 
     public void updateBudget(float amount) {

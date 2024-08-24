@@ -3,11 +3,13 @@ package com.keypoint.keypointtravel.receipt.repository;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentMember;
 import com.keypoint.keypointtravel.receipt.entity.QReceipt;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -60,7 +62,7 @@ public class CustomPaymentRepository {
             .fetch();
     }
 
-    // campaignId 에 해당하는 영수중 중에 카테고리 별 그룹 화하여 비용의 합을 계산 AmountByCategoryDto
+    // campaignId 에 해당하는 영수중 중에 카테고리 별 그룹화하여 비용의 합을 계산 AmountByCategoryDto
     public List<AmountByCategoryDto> findAmountByCategory(Long campaignId) {
         return queryFactory.select(
                 Projections.constructor(AmountByCategoryDto.class,
@@ -69,6 +71,18 @@ public class CustomPaymentRepository {
             .from(qReceipt)
             .where(qReceipt.campaign.id.eq(campaignId))
             .groupBy(qReceipt.receiptCategory)
+            .fetch();
+    }
+
+    // campaignId 에 해당하는 영수중 중에 paid_at를 (yy.mm.dd)로 형식을 지정 후 그룹화하여 비용의 합을 계산 AmountByDateDto
+    public List<AmountByDateDto> findAmountByDate(Long campaignId) {
+        return queryFactory.select(
+                Projections.constructor(AmountByDateDto.class,
+                    Expressions.stringTemplate("DATE_FORMAT({0}, {1})", qReceipt.paidAt.stringValue(), "%y.%m.%d"),
+                    qReceipt.totalAmount.sum()))
+            .from(qReceipt)
+            .where(qReceipt.campaign.id.eq(campaignId))
+            .groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", qReceipt.paidAt.stringValue(), "%y.%m.%d"))
             .fetch();
     }
 }

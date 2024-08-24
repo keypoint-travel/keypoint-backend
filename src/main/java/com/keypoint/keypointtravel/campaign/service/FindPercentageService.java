@@ -1,9 +1,12 @@
 package com.keypoint.keypointtravel.campaign.service;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
 import com.keypoint.keypointtravel.campaign.dto.response.category.CategoryPercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.category.PercentageByCategory;
+import com.keypoint.keypointtravel.campaign.dto.response.date.DatePercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -32,7 +35,7 @@ public class FindPercentageService {
     private final CurrencyRepository currencyRepository;
 
     /**
-     * 캠페인 카테고리 별 지출 퍼센트 조회 함수
+     * 캠페인 카테고리별 지출 퍼센트 조회 함수
      *
      * @Param campaignId, currencyType, memberId useCase
      * @Return 사용 금액, 잔여 예산, 화폐 단위, List [카테고리, 가격, 비율] CategoryPercentageResponse
@@ -67,15 +70,51 @@ public class FindPercentageService {
         );
     }
 
+    /**
+     * 캠페인 날짜별 지출 퍼센트 조회 함수
+     *
+     * @Param campaignId, currencyType, memberId useCase
+     * @Return 사용 금액, 잔여 예산, 화폐 단위, List [날짜, 가격, 비율] DatePercentageResponse
+     */
+    @Transactional(readOnly = true)
+    public DatePercentageResponse findDatePercentage(FindPaymentUseCase useCase) {
+        // 1. 캠페인 아이디를 통해 캠페인 생성 시 지정한 총 예산 조회
+        List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
+        float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
+        TotalBudgetDto totalBudget = new TotalBudgetDto(campaignAmount, campaignBudgets.get(0).getCurrency());
+        // 2. 캠페인 아이디를 통해 카테고리 별 사용한 금액 조회
+        List<AmountByDateDto> dateAmounts = customPaymentRepository.findAmountByDate(useCase.getCampaignId());
+        // 3. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
+        if (useCase.getCurrencyType() != null) {
+            List<Currency> currencies = currencyRepository.findAll();
+            updateCurrency(useCase, totalBudget, dateAmounts, currencies);
+        }
+        // 4. 잔여 예산을 포함한 날짜 별 금액 종합 및 잔여 예산 계산
+        HashMap<String, Float> returnAmounts = new HashMap<>();
+        dateAmounts.forEach(amount -> returnAmounts.put(amount.getDate(), amount.getAmount()));
+        float usedTotalAmount = dateAmounts.stream().reduce(0f, (acc, amount) -> acc + amount.getAmount(), Float::sum);
+        float remainBudget = calculateRemainBudget(returnAmounts, totalBudget, usedTotalAmount);
+        usedTotalAmount += remainBudget;
+        // 5. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정
+        List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
+        // 6. 응답
+        return new DatePercentageResponse(
+            totalBudget.getCurrencyType().getCode(),
+            Math.round((usedTotalAmount - remainBudget) * 100) / 100f,
+            Math.round(remainBudget * 100) / 100f,
+            percentages
+        );
+    }
+
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
     private void updateCurrency(FindPaymentUseCase useCase, TotalBudgetDto totalBudget,
-                                List<AmountByCategoryDto> categoryAmounts, List<Currency> currencies) {
+                                List<? extends AmountDto> amounts, List<Currency> currencies) {
         CurrencyType currencyType = totalBudget.getCurrencyType();
         totalBudget.updateTotalBudget(
             convertCurrency(currencies, totalBudget.getTotalAmount(), currencyType, useCase.getCurrencyType()),
             useCase.getCurrencyType()
         );
-        for (AmountByCategoryDto amount : categoryAmounts) {
+        for (AmountDto amount : amounts) {
             amount.updateBudget(
                 convertCurrency(currencies, amount.getAmount(), currencyType, useCase.getCurrencyType())
             );
