@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.campaign.controller;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
@@ -122,5 +123,17 @@ public class FindCampaignController {
             "캠페인 금액별 결제 내역 조회 성공",
             response
         );
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/member")
+    public APIResponseEntity<TotalAmountByMemberResponse> findCampaignMemberTotalAmount(
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(campaignId);
+        return APIResponseEntity.<TotalAmountByMemberResponse>builder()
+            .message("캠페인 회원별 총 금액 조회 성공")
+            .data(response)
+            .build();
     }
 }
