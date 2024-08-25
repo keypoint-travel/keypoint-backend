@@ -1,16 +1,20 @@
 package com.keypoint.keypointtravel.badge.service;
 
+import com.keypoint.keypointtravel.badge.dto.request.BadgeIdRequest;
+import com.keypoint.keypointtravel.badge.dto.response.BadgeInAdminResponse;
 import com.keypoint.keypointtravel.badge.dto.useCase.CreateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
+import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.BadgeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,6 +116,22 @@ public class AdminBadgeService {
     public void deleteBadge(DeleteBadgeUseCase useCase) {
         try {
             badgeRepository.deleteGuides(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public BadgeInAdminResponse findBadgeById(BadgeIdRequest useCase) {
+        try {
+            return badgeRepository.findBadgeById(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public Page<BadgeInAdminResponse> findBadges(PageUseCase useCase) {
+        try {
+            return badgeRepository.findBadges(useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
