@@ -4,8 +4,11 @@ import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
+import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.currency.entity.Currency;
 import com.keypoint.keypointtravel.currency.repository.CurrencyRepository;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
@@ -28,6 +31,8 @@ public class FindPaymentService {
     private final CustomPaymentRepository customPaymentRepository;
 
     private final CurrencyRepository currencyRepository;
+
+    private final CampaignBudgetRepository campaignBudgetRepository;
 
     /**
      * 캠페인 상세 페이지 카테고리별 결제 항목 조회 함수
@@ -74,6 +79,22 @@ public class FindPaymentService {
         return createResponse(useCase, paymentDto);
     }
 
+    /**
+     * 캠페인 상세 페이지 회원별 총 결제 금액 조회 함수
+     *
+     * @Param campaignId
+     * @Return TotalAmountByMemberResponse
+     */
+    @Transactional(readOnly = true)
+    public TotalAmountByMemberResponse findTotalPaymentsByAllMember(Long campaignId) {
+        // 1. campaignId에 해당하는 회원 별 총 금액 조회
+        List<AmountByMemberDto> dtoList = customPaymentRepository.findAmountByMember(campaignId);
+        // 2. 화폐 종류 조회
+        CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(campaignId);
+        // 3. 응답
+        return TotalAmountByMemberResponse.of(currencyType, dtoList);
+    }
+
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
     private void updateCurrency(CurrencyType fromCurrency, CurrencyType toCurrency,
                                 List<? extends AmountDto> amounts, List<Currency> currencies) {
@@ -94,7 +115,7 @@ public class FindPaymentService {
         return (float) (amount * fromCurrency.getExchange_rate() / toCurrency.getExchange_rate());
     }
 
-    private Page<PaymentResponse> createResponse(FindPaymentsUseCase useCase, PaymentDto paymentDto){
+    private Page<PaymentResponse> createResponse(FindPaymentsUseCase useCase, PaymentDto paymentDto) {
         // 1. 조회된 결제 항목을 currencyType에 맞게 변환
         if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
             List<Currency> currencies = currencyRepository.findAll();

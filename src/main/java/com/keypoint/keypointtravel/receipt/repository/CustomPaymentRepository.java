@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.ReceiptInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.member.entity.QMember;
@@ -20,7 +21,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
-
+import static com.querydsl.jpa.JPAExpressions.select;
 import java.util.List;
 
 @Repository
@@ -60,6 +61,26 @@ public class CustomPaymentRepository {
             .from(receipt)
             .where(receipt.campaign.id.eq(campaignId))
             .groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", receipt.paidAt.stringValue(), "%y.%m.%d"))
+            .fetch();
+    }
+
+    // campaignId에 해당하는 회원별 총 사용 금액
+    public List<AmountByMemberDto> findAmountByMember(Long campaignId) {
+        return queryFactory.select(
+                Projections.constructor(AmountByMemberDto.class,
+                    paymentMember.member.id,
+                    paymentMember.member.memberDetail.name,
+                    uploadFile.path,
+                    paymentItem.amount.multiply(paymentItem.quantity).divide(
+                        select(paymentMember.count())
+                            .from(paymentMember)
+                            .where(paymentMember.paymentItem.id.eq(paymentItem.id))
+                    )))
+            .from(paymentItem)
+            .innerJoin(paymentMember).on(paymentItem.id.eq(paymentMember.paymentItem.id))
+            .leftJoin(uploadFile).on(paymentMember.member.memberDetail.profileImageId.eq(uploadFile.id))
+            .where(paymentItem.receipt.campaign.id.eq(campaignId))
+            .groupBy(paymentMember.member.id, paymentItem.id)
             .fetch();
     }
 
