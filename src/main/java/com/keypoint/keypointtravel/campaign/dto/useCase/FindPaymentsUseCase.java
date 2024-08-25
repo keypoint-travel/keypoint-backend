@@ -11,10 +11,10 @@ public class FindPaymentsUseCase {
     private Long campaignId;
     private Long memberId;
     private CurrencyType currencyType;
-    private Long size;
-    private Long page;
+    private int size;
+    private int page;
 
-    public FindPaymentsUseCase(Long campaignId, Long memberId, String currencyType, Long size, Long page) {
+    public FindPaymentsUseCase(Long campaignId, Long memberId, String currencyType, int size, int page) {
         this.campaignId = campaignId;
         this.memberId = memberId;
         this.size = size;
