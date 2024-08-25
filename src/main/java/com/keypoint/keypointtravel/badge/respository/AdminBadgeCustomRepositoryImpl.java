@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.badge.respository;
 
+import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.entity.QBadge;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,6 +27,21 @@ public class AdminBadgeCustomRepositoryImpl implements AdminBadgeCustomRepositor
 
             .set(badge.modifyAt, LocalDateTime.now())
             .set(badge.modifyId, currentAuditor)
+            .where(badge.id.eq(useCase.getBadgeId()))
+            .execute();
+    }
+
+    @Override
+    public void deleteGuides(DeleteBadgeUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        // 배지 삭제
+        queryFactory.update(badge)
+            .set(badge.isDeleted, true)
+            .set(badge.modifyAt, LocalDateTime.now())
+            .set(badge.modifyId, currentAuditor)
+
+            .where(badge.id.in(useCase.getBadgeIds()))
             .execute();
     }
 }

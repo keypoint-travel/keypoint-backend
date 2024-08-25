@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.badge.service;
 
 import com.keypoint.keypointtravel.badge.dto.useCase.CreateBadgeUseCase;
+import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
@@ -30,10 +31,10 @@ public class AdminBadgeService {
     public void addBadge(CreateBadgeUseCase useCase) {
         try {
             // 1. 유효성 검사
-            if (badgeRepository.existsByName(useCase.getName())) {
+            if (badgeRepository.existsByNameAndIsDeletedFalse(useCase.getName())) {
                 throw new GeneralException(BadgeErrorCode.DUPLICATED_BADGE_NAME);
             }
-            if (badgeRepository.existsByOrder(useCase.getOrder())) {
+            if (badgeRepository.existsByOrderAndIsDeletedFalse(useCase.getOrder())) {
                 throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
             }
 
@@ -58,20 +59,21 @@ public class AdminBadgeService {
      *
      * @param useCase
      */
+    @Transactional
     public void updateBadge(UpdateBadgeUseCase useCase) {
         try {
             Long badgeId = useCase.getBadgeId();
             Badge badge = findBadgeByBadgeId(badgeId);
 
             // 1. 유효성 검사
-            if (badgeRepository.existsByIdNotAndOrder(
+            if (badgeRepository.existsByIdNotAndOrderAndIsDeletedFalse(
                 badgeId,
                 useCase.getOrder()
             )) {
                 throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
             }
-            if (useCase.getName() != badge.getName() &&
-                badgeRepository.existsByName(useCase.getName())
+            if (!useCase.getName().equals(badge.getName()) &&
+                badgeRepository.existsByNameAndIsDeletedFalse(useCase.getName())
             ) {
                 throw new GeneralException(BadgeErrorCode.DUPLICATED_BADGE_NAME);
             }
@@ -97,8 +99,21 @@ public class AdminBadgeService {
     }
 
     private Badge findBadgeByBadgeId(Long badgeId) {
-        return badgeRepository.findById(badgeId).orElseThrow(
+        return badgeRepository.findByIdAndIsDeletedFalse(badgeId).orElseThrow(
             () -> new GeneralException(BadgeErrorCode.NOT_EXISTED_BADGE)
         );
+    }
+
+    /**
+     * 배지 삭제 성공
+     *
+     * @param useCase
+     */
+    public void deleteBadge(DeleteBadgeUseCase useCase) {
+        try {
+            badgeRepository.deleteGuides(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }
