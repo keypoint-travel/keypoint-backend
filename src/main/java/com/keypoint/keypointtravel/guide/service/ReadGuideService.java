@@ -35,7 +35,7 @@ public class ReadGuideService {
      * @param order
      */
     public boolean validateOrder(int order) {
-        return guideRepository.existsByOrder(order);
+        return guideRepository.existsByOrderAndIsDeletedFalse(order);
     }
 
     /**
@@ -45,7 +45,7 @@ public class ReadGuideService {
      * @return
      */
     public Guide findGuideByGuideId(Long guideId) {
-        return guideRepository.findById(guideId)
+        return guideRepository.findByIdAndIsDeletedFalse(guideId)
             .orElseThrow(() -> new GeneralException(GuideErrorCode.NOT_EXISTED_GUIDE));
     }
 

@@ -31,7 +31,7 @@ public class UpdateGuideService {
             Long guideId = useCase.getGuideId();
 
             // 1. 유효성 검사
-            if (guideRepository.existsByIdNotAndOrder(
+            if (guideRepository.existsByIdNotAndOrderAndIsDeletedFalse(
                 guideId,
                 useCase.getOrder()
             )) {
