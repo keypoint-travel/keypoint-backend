@@ -69,7 +69,7 @@ public class FindCampaignController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByCategory(useCase, category);
-        return APIResponseEntity.<PaymentResponse>toPage(
+        return APIResponseEntity.toPage(
             "캠페인 카테고리별 결제 내역 조회 성공",
             response
         );
@@ -101,7 +101,7 @@ public class FindCampaignController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, date);
-        return APIResponseEntity.<PaymentResponse>toPage(
+        return APIResponseEntity.toPage(
             "캠페인 날짜별 결제 내역 조회 성공",
             response
         );
@@ -118,7 +118,7 @@ public class FindCampaignController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, order);
-        return APIResponseEntity.<PaymentResponse>toPage(
+        return APIResponseEntity.toPage(
             "캠페인 금액별 결제 내역 조회 성공",
             response
         );

@@ -40,24 +40,8 @@ public class FindPaymentService {
         // 1. campaignId와 category에 해당하는 page, size에 맞는 결제 항목 조회
         PaymentDto paymentDto = customPaymentRepository.findPaymentsByCategory(
             useCase.getCampaignId(), category, useCase.getSize(), useCase.getPage());
-        // 2. 조회된 결제 항목을 currencyType에 맞게 변환
-        if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
-            List<Currency> currencies = currencyRepository.findAll();
-            updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
-                paymentDto.getPaymentList(), currencies);
-        }
-        // 3. 결제 항목 별 참여 인원 리스트 조회
-        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
-            useCase.getCampaignId());
-        // 4. 응답
-        List<PaymentResponse> responses = new ArrayList<>();
-        for (PaymentInfo payment : paymentDto.getPaymentList()) {
-            responses.add(PaymentResponse.of(payment, paymentMemberList));
-        }
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(
-            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
-        return new PageImpl<>(responses, pageable, paymentDto.getTotalCount());
+        // 2. 응답 값 생성 후 반환
+        return createResponse(useCase, paymentDto);
     }
 
     /**
@@ -71,24 +55,8 @@ public class FindPaymentService {
         // 1. campaignId와 date에 해당하는 page, size에 맞는 결제 항목 조회
         PaymentDto paymentDto = customPaymentRepository.findPaymentsByDate(
             useCase.getCampaignId(), date, useCase.getSize(), useCase.getPage());
-        // 2. 조회된 결제 항목을 currencyType에 맞게 변환
-        if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
-            List<Currency> currencies = currencyRepository.findAll();
-            updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
-                paymentDto.getPaymentList(), currencies);
-        }
-        // 3. 결제 항목 별 참여 인원 리스트 조회
-        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
-            useCase.getCampaignId());
-        // 4. 응답
-        List<PaymentResponse> responses = new ArrayList<>();
-        for (PaymentInfo payment : paymentDto.getPaymentList()) {
-            responses.add(PaymentResponse.of(payment, paymentMemberList));
-        }
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(
-            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
-        return new PageImpl<>(responses, pageable, paymentDto.getTotalCount());
+        // 2. 응답 값 생성 후 반환
+        return createResponse(useCase, paymentDto);
     }
 
     /**
@@ -102,24 +70,8 @@ public class FindPaymentService {
         // 1. campaignId에 해당하는 page, size에 맞는 결제 항목 조회
         PaymentDto paymentDto = customPaymentRepository.findPaymentsByPrice(
             useCase.getCampaignId(), direction, useCase.getSize(), useCase.getPage());
-        // 2. 조회된 결제 항목을 currencyType에 맞게 변환
-        if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
-            List<Currency> currencies = currencyRepository.findAll();
-            updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
-                paymentDto.getPaymentList(), currencies);
-        }
-        // 3. 결제 항목 별 참여 인원 리스트 조회
-        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
-            useCase.getCampaignId());
-        // 4. 응답
-        List<PaymentResponse> responses = new ArrayList<>();
-        for (PaymentInfo payment : paymentDto.getPaymentList()) {
-            responses.add(PaymentResponse.of(payment, paymentMemberList));
-        }
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(
-            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
-        return new PageImpl<>(responses, pageable, paymentDto.getTotalCount());
+        // 2. 응답 값 생성 후 반환
+        return createResponse(useCase, paymentDto);
     }
 
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
@@ -142,4 +94,24 @@ public class FindPaymentService {
         return (float) (amount * fromCurrency.getExchange_rate() / toCurrency.getExchange_rate());
     }
 
+    private Page<PaymentResponse> createResponse(FindPaymentsUseCase useCase, PaymentDto paymentDto){
+        // 1. 조회된 결제 항목을 currencyType에 맞게 변환
+        if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
+            List<Currency> currencies = currencyRepository.findAll();
+            updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
+                paymentDto.getPaymentList(), currencies);
+        }
+        // 2. 결제 항목 별 참여 인원 리스트 조회
+        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
+            useCase.getCampaignId());
+        // 3. 응답
+        List<PaymentResponse> responses = new ArrayList<>();
+        for (PaymentInfo payment : paymentDto.getPaymentList()) {
+            responses.add(PaymentResponse.of(payment, paymentMemberList));
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(
+            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
+        return new PageImpl<>(responses, pageable, paymentDto.getTotalCount());
+    }
 }
