@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BadgeRepository extends JpaRepository<Badge, Long>, AdminBadgeCustomRepository {
+public interface BadgeRepository extends JpaRepository<Badge, Long>,
+    AdminBadgeCustomRepository, MemberBadgeCustomRepository {
 
     boolean existsByNameAndIsDeletedFalse(String name);
 

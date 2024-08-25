@@ -83,7 +83,6 @@ public class AdminBadgeService {
             }
 
             // 2. 이미지 업데이트
-
             uploadFileService.updateUploadFile(
                 badge.getActiveImageId(),
                 useCase.getBadgeOnImage(),

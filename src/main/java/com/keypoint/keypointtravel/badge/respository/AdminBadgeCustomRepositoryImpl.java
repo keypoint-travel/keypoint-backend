@@ -110,7 +110,6 @@ public class AdminBadgeCustomRepositoryImpl implements AdminBadgeCustomRepositor
                     orderSpecifier = new OrderSpecifier<>(order, badge.order);
                     break;
             }
-
         }
 
         List<BadgeInAdminResponse> result = queryFactory
