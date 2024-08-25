@@ -15,6 +15,7 @@ import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -102,6 +103,23 @@ public class FindCampaignController {
         Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, date);
         return APIResponseEntity.<PaymentResponse>toPage(
             "캠페인 날짜별 결제 내역 조회 성공",
+            response
+        );
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/payment/price")
+    public APIResponseEntity<PageResponse<PaymentResponse>> findCampaignDatePrice(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        @RequestParam(value = "direction", defaultValue = "DESC") Direction order,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
+        Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, order);
+        return APIResponseEntity.<PaymentResponse>toPage(
+            "캠페인 금액별 결제 내역 조회 성공",
             response
         );
     }

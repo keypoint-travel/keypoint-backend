@@ -12,10 +12,13 @@ import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentMember;
 import com.keypoint.keypointtravel.receipt.entity.QReceipt;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -133,6 +136,35 @@ public class CustomPaymentRepository {
             .where(receipt.campaign.id.eq(campaignId)
                 .and(!date.equals("null") ? Expressions.stringTemplate("DATE_FORMAT({0}, {1})",
                     receipt.paidAt.stringValue(), "%y.%m.%d").eq(date) : Expressions.TRUE))
+            .fetchOne();
+        return new PaymentDto(payments, count);
+    }
+
+    public PaymentDto findPaymentsByPrice(Long campaignId, Direction direction, int size, int page) {
+        OrderSpecifier<Float> orderSpecifier =
+            new OrderSpecifier<>(direction.equals(Direction.ASC) ? Order.ASC
+                : Order.DESC, paymentItem.amount.multiply(paymentItem.quantity));
+        List<PaymentInfo> payments = queryFactory.select(
+                Projections.constructor(PaymentInfo.class,
+                    paymentItem.id,
+                    receipt.store,
+                    receipt.paidAt,
+                    paymentItem.amount,
+                    paymentItem.quantity,
+                    receipt.currency,
+                    receipt.id))
+            .from(paymentItem)
+            .innerJoin(paymentItem.receipt, receipt)
+            .where(receipt.campaign.id.eq(campaignId))
+            .orderBy(orderSpecifier)
+            .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
+            .limit((size > 0 ? size : 1))
+            .fetch();
+        // campaignId와 category에 해당하는 결제 항목의 총 합 조회
+        Long count = queryFactory.select(paymentItem.count())
+            .from(paymentItem)
+            .innerJoin(paymentItem.receipt, receipt)
+            .where(receipt.campaign.id.eq(campaignId))
             .fetchOne();
         return new PaymentDto(payments, count);
     }
