@@ -35,4 +35,17 @@ public class Badge {
 
     @Column(nullable = false, unique = true, name = "order_number")
     private int order;
+
+    public Badge(
+        Long activeImageId,
+        Long inactiveImageId,
+        String name,
+        int order
+    ) {
+        this.activeImageId = activeImageId;
+        this.inactiveImageId = inactiveImageId;
+        this.name = name;
+        this.order = order;
+        this.isDeleted = false;
+    }
 }
