@@ -106,8 +106,37 @@ public class CustomPaymentRepository {
         return new PaymentDto(payments, count);
     }
 
-    // campaignId와 category에 해당하는 회원 리스트 조회
-    public List<PaymentMemberDto> findMembersByCampaignIdAndCategory(Long campaignId, ReceiptCategory category) {
+    // campaignId와 date에 해당하는 page, size에 맞는 결제 항목 조회
+    public PaymentDto findPaymentsByDate(Long campaignId, String date, int size, int page) {
+        List<PaymentInfo> payments =  queryFactory.select(
+                Projections.constructor(PaymentInfo.class,
+                    paymentItem.id,
+                    receipt.store,
+                    receipt.paidAt,
+                    paymentItem.amount,
+                    paymentItem.quantity,
+                    receipt.currency,
+                    receipt.id))
+            .from(paymentItem)
+            .innerJoin(paymentItem.receipt, receipt)
+            .where(receipt.campaign.id.eq(campaignId)
+                .and(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", receipt.paidAt.stringValue(), "%y.%m.%d").eq(date)))
+            .orderBy(receipt.paidAt.desc())
+            .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
+            .limit((size > 0 ? size : 1))
+            .fetch();
+        // campaignId와 category에 해당하는 결제 항목의 총 합 조회
+        Long count = queryFactory.select(paymentItem.count())
+            .from(paymentItem)
+            .innerJoin(paymentItem.receipt, receipt)
+            .where(receipt.campaign.id.eq(campaignId)
+                .and(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", receipt.paidAt.stringValue(), "%y.%m.%d").eq(date)))
+            .fetchOne();
+        return new PaymentDto(payments, count);
+    }
+
+    // campaignId에 해당하는 지출 내역 및 회원 리스트 조회
+    public List<PaymentMemberDto> findPaymentMembersByCampaignId(Long campaignId) {
         return queryFactory.select(
                 Projections.constructor(PaymentMemberDto.class,
                     paymentItem.id,
@@ -116,8 +145,7 @@ public class CustomPaymentRepository {
             .from(paymentMember)
             .innerJoin(paymentMember.member, member)
             .innerJoin(paymentMember.paymentItem, paymentItem)
-            .where(paymentItem.receipt.campaign.id.eq(campaignId)
-                .and(paymentItem.receipt.receiptCategory.eq(category)))
+            .where(paymentItem.receipt.campaign.id.eq(campaignId))
             .fetch();
     }
 }

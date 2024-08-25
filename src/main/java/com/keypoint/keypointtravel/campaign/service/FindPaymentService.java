@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
-import com.keypoint.keypointtravel.campaign.dto.response.category.CategoryPaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.currency.entity.Currency;
 import com.keypoint.keypointtravel.currency.repository.CurrencyRepository;
@@ -36,11 +36,10 @@ public class FindPaymentService {
      * @Return CampaignDetailsResponse
      */
     @Transactional(readOnly = true)
-    public Page<CategoryPaymentResponse> findPaymentsByCategory(FindPaymentsUseCase useCase, ReceiptCategory category) {
+    public Page<PaymentResponse> findPaymentsByCategory(FindPaymentsUseCase useCase, ReceiptCategory category) {
         // 1. campaignId와 category에 해당하는 page, size에 맞는 결제 항목 조회
         PaymentDto paymentDto = customPaymentRepository.findPaymentsByCategory(
             useCase.getCampaignId(), category, useCase.getSize(), useCase.getPage());
-
         // 2. 조회된 결제 항목을 currencyType에 맞게 변환
         if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
             List<Currency> currencies = currencyRepository.findAll();
@@ -48,12 +47,43 @@ public class FindPaymentService {
                 paymentDto.getPaymentList(), currencies);
         }
         // 3. 결제 항목 별 참여 인원 리스트 조회
-        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findMembersByCampaignIdAndCategory(
-            useCase.getCampaignId(), category);
+        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
+            useCase.getCampaignId());
         // 4. 응답
-        List<CategoryPaymentResponse> responses = new ArrayList<>();
+        List<PaymentResponse> responses = new ArrayList<>();
         for (PaymentInfo payment : paymentDto.getPaymentList()) {
-            responses.add(CategoryPaymentResponse.of(payment, paymentMemberList));
+            responses.add(PaymentResponse.of(payment, paymentMemberList));
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(
+            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
+        return new PageImpl<>(responses, pageable, paymentDto.getTotalCount());
+    }
+
+    /**
+     * 캠페인 상세 페이지 날짜별 결제 항목 조회 함수
+     *
+     * @Param campaignId, memberId, currencyType, size, page, date useCase
+     * @Return CampaignDetailsResponse
+     */
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> findPaymentsByDate(FindPaymentsUseCase useCase, String date) {
+        // 1. campaignId와 category에 해당하는 page, size에 맞는 결제 항목 조회
+        PaymentDto paymentDto = customPaymentRepository.findPaymentsByDate(
+            useCase.getCampaignId(), date, useCase.getSize(), useCase.getPage());
+        // 2. 조회된 결제 항목을 currencyType에 맞게 변환
+        if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
+            List<Currency> currencies = currencyRepository.findAll();
+            updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
+                paymentDto.getPaymentList(), currencies);
+        }
+        // 3. 결제 항목 별 참여 인원 리스트 조회
+        List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
+            useCase.getCampaignId());
+        // 4. 응답
+        List<PaymentResponse> responses = new ArrayList<>();
+        for (PaymentInfo payment : paymentDto.getPaymentList()) {
+            responses.add(PaymentResponse.of(payment, paymentMemberList));
         }
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(

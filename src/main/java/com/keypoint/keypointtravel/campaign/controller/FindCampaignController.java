@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.category.CategoryPaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
@@ -46,7 +46,7 @@ public class FindCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/percentage/category")
     public APIResponseEntity<PercentageResponse> findCampaignCategoryPercentages(
-        @RequestParam("currency") String currencyType,
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
@@ -59,16 +59,16 @@ public class FindCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/payment/category")
-    public APIResponseEntity<PageResponse<CategoryPaymentResponse>> findCampaignCategoryPayments(
-        @RequestParam("currency") String currencyType,
+    public APIResponseEntity<PageResponse<PaymentResponse>> findCampaignCategoryPayments(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "page", defaultValue = "1") int page,
         @RequestParam("category") ReceiptCategory category,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
-        Page<CategoryPaymentResponse> response = findPaymentService.findPaymentsByCategory(useCase, category);
-        return APIResponseEntity.<CategoryPaymentResponse>toPage(
+        Page<PaymentResponse> response = findPaymentService.findPaymentsByCategory(useCase, category);
+        return APIResponseEntity.<PaymentResponse>toPage(
             "캠페인 카테고리별 결제 내역 조회 성공",
             response
         );
@@ -77,7 +77,7 @@ public class FindCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/percentage/date")
     public APIResponseEntity<PercentageResponse> findCampaignDatePercentages(
-        @RequestParam("currency") String currencyType,
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
@@ -87,5 +87,22 @@ public class FindCampaignController {
             .message("캠페인 날짜별 비율 조회 성공")
             .data(response)
             .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/payment/date")
+    public APIResponseEntity<PageResponse<PaymentResponse>> findCampaignDatePayments(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        @RequestParam("date") String date,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
+        Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, date);
+        return APIResponseEntity.<PaymentResponse>toPage(
+            "캠페인 날짜별 결제 내역 조회 성공",
+            response
+        );
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class CategoryPaymentResponse {
+public class PaymentResponse {
 
     private Long paymentItemId;
     private String storeName;
@@ -20,8 +20,8 @@ public class CategoryPaymentResponse {
     private Long receiptId;
     private List<PaymentMemberInfo> members;
 
-    public static CategoryPaymentResponse of(PaymentInfo payment, List<PaymentMemberDto> paymentMemberList) {
-        return new CategoryPaymentResponse(
+    public static PaymentResponse of(PaymentInfo payment, List<PaymentMemberDto> paymentMemberList) {
+        return new PaymentResponse(
             payment.getPaymentItemId(),
             payment.getStoreName(),
             payment.getPaidAt(),
