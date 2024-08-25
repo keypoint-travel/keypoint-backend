@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.guide.repository;
 
 import com.keypoint.keypointtravel.guide.entity.Guide;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Repository;
 public interface GuideRepository extends JpaRepository<Guide, Long>,
     ReadGuideCustomRepository, UpdateGuideCustomRepository {
 
-    boolean existsByOrder(int order);
+    boolean existsByOrderAndIsDeletedFalse(int order);
 
-    boolean existsByIdNotAndOrder(Long guide, int order);
+    boolean existsByIdNotAndOrderAndIsDeletedFalse(Long guide, int order);
+
+    Optional<Guide> findByIdAndIsDeletedFalse(Long id);
 }
