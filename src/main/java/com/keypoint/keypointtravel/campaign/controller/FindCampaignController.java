@@ -1,15 +1,11 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByCategoryResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByDateResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPriceResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.service.FindCampaignService;
 import com.keypoint.keypointtravel.campaign.service.FindPercentageService;
-import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/campaigns/details")
 @RequiredArgsConstructor
 public class FindCampaignController {
-
-    private final ReadCampaignService readCampaignService;
 
     private final FindPercentageService findPercentageService;
 
@@ -66,52 +60,6 @@ public class FindCampaignController {
         response.sortPercentages();
         return APIResponseEntity.<PercentageResponse>builder()
             .message("캠페인 날짜별 비율 조회 성공")
-            .data(response)
-            .build();
-    }
-
-    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{campaignId}/category")
-    public APIResponseEntity<DetailsByCategoryResponse> findCampaignCategoryList(
-        @RequestParam("currency") String currencyType,
-        @PathVariable Long campaignId,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
-        DetailsByCategoryResponse response = readCampaignService.findByCategory(useCase);
-        response.sortPayments();
-        return APIResponseEntity.<DetailsByCategoryResponse>builder()
-            .message("캠페인 카테고리별 결제 내역 조회 성공")
-            .data(response)
-            .build();
-    }
-
-    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{campaignId}/date")
-    public APIResponseEntity<DetailsByDateResponse> findCampaignDateList(
-        @RequestParam("currency") String currencyType,
-        @PathVariable Long campaignId,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
-        DetailsByCategoryResponse res = readCampaignService.findByDate(useCase);
-        DetailsByDateResponse response = DetailsByDateResponse.from(res);
-        response.sortPayments();
-        return APIResponseEntity.<DetailsByDateResponse>builder()
-            .message("캠페인 날짜별 결제 내역 조회 성공")
-            .data(response)
-            .build();
-    }
-
-    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{campaignId}/price")
-    public APIResponseEntity<DetailsByPriceResponse> findCampaignPriceList(
-        @RequestParam("currency") String currencyType,
-        @PathVariable Long campaignId,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
-        DetailsByPriceResponse response = readCampaignService.findByPrice(useCase);
-        response.sortPayments();
-        return APIResponseEntity.<DetailsByPriceResponse>builder()
-            .message("캠페인 날짜별 결제 내역 조회 성공")
             .data(response)
             .build();
     }
