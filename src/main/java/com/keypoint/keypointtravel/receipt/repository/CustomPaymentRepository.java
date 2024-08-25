@@ -79,7 +79,7 @@ public class CustomPaymentRepository {
 
     // campaignId와 category에 해당하는 page, size에 맞는 결제 항목 조회
     public PaymentDto findPaymentsByCategory(Long campaignId, ReceiptCategory category, int size, int page) {
-        List<PaymentInfo> payments =  queryFactory.select(
+        List<PaymentInfo> payments = queryFactory.select(
                 Projections.constructor(PaymentInfo.class,
                     paymentItem.id,
                     receipt.store,
@@ -108,7 +108,7 @@ public class CustomPaymentRepository {
 
     // campaignId와 date에 해당하는 page, size에 맞는 결제 항목 조회
     public PaymentDto findPaymentsByDate(Long campaignId, String date, int size, int page) {
-        List<PaymentInfo> payments =  queryFactory.select(
+        List<PaymentInfo> payments = queryFactory.select(
                 Projections.constructor(PaymentInfo.class,
                     paymentItem.id,
                     receipt.store,
@@ -120,7 +120,8 @@ public class CustomPaymentRepository {
             .from(paymentItem)
             .innerJoin(paymentItem.receipt, receipt)
             .where(receipt.campaign.id.eq(campaignId)
-                .and(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", receipt.paidAt.stringValue(), "%y.%m.%d").eq(date)))
+                .and(!date.equals("null") ? Expressions.stringTemplate("DATE_FORMAT({0}, {1})",
+                    receipt.paidAt.stringValue(), "%y.%m.%d").eq(date) : Expressions.TRUE))
             .orderBy(receipt.paidAt.desc())
             .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
             .limit((size > 0 ? size : 1))
@@ -130,7 +131,8 @@ public class CustomPaymentRepository {
             .from(paymentItem)
             .innerJoin(paymentItem.receipt, receipt)
             .where(receipt.campaign.id.eq(campaignId)
-                .and(Expressions.stringTemplate("DATE_FORMAT({0}, {1})", receipt.paidAt.stringValue(), "%y.%m.%d").eq(date)))
+                .and(!date.equals("null") ? Expressions.stringTemplate("DATE_FORMAT({0}, {1})",
+                    receipt.paidAt.stringValue(), "%y.%m.%d").eq(date) : Expressions.TRUE))
             .fetchOne();
         return new PaymentDto(payments, count);
     }

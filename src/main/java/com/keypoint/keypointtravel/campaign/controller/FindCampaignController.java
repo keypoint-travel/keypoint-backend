@@ -95,7 +95,7 @@ public class FindCampaignController {
         @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam("date") String date,
+        @RequestParam(value = "date", defaultValue = "null") String date,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
