@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.guide.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
-import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideUseCase;
 import com.keypoint.keypointtravel.guide.entity.Guide;
@@ -35,7 +35,7 @@ public class UpdateGuideService {
                 guideId,
                 useCase.getOrder()
             )) {
-                throw new GeneralException(GuideErrorCode.DUPLICATED_GUIDE_TRANSLATION_LANGUAGE);
+                throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
             }
 
             // 2. 썸네일 업데이트
