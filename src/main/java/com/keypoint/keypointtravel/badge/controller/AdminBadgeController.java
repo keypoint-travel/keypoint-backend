@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.badge.controller;
 
-import com.keypoint.keypointtravel.badge.dto.request.BadgeIdRequest;
 import com.keypoint.keypointtravel.badge.dto.request.CreateBadgeRequest;
 import com.keypoint.keypointtravel.badge.dto.response.BadgeInAdminResponse;
+import com.keypoint.keypointtravel.badge.dto.useCase.BadgeIdUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.CreateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
@@ -91,7 +91,7 @@ public class AdminBadgeController {
     public APIResponseEntity<BadgeInAdminResponse> findBadgeById(
         @PathVariable("badgeId") Long badgeId
     ) {
-        BadgeIdRequest useCase = BadgeIdRequest.from(
+        BadgeIdUseCase useCase = BadgeIdUseCase.from(
             badgeId
         );
         BadgeInAdminResponse result = adminBadgeService.findBadgeById(useCase);

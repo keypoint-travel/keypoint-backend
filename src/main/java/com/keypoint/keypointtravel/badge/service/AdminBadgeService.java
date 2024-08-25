@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.badge.service;
 
-import com.keypoint.keypointtravel.badge.dto.request.BadgeIdRequest;
 import com.keypoint.keypointtravel.badge.dto.response.BadgeInAdminResponse;
+import com.keypoint.keypointtravel.badge.dto.useCase.BadgeIdUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.CreateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
@@ -120,7 +120,7 @@ public class AdminBadgeService {
         }
     }
 
-    public BadgeInAdminResponse findBadgeById(BadgeIdRequest useCase) {
+    public BadgeInAdminResponse findBadgeById(BadgeIdUseCase useCase) {
         try {
             return badgeRepository.findBadgeById(useCase);
         } catch (Exception ex) {
