@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.badge.service;
 
 import com.keypoint.keypointtravel.badge.dto.useCase.CreateBadgeUseCase;
+import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
@@ -50,5 +51,54 @@ public class AdminBadgeService {
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
+    }
+
+    /**
+     * 배지 수정 함수
+     *
+     * @param useCase
+     */
+    public void updateBadge(UpdateBadgeUseCase useCase) {
+        try {
+            Long badgeId = useCase.getBadgeId();
+            Badge badge = findBadgeByBadgeId(badgeId);
+
+            // 1. 유효성 검사
+            if (badgeRepository.existsByIdNotAndOrder(
+                badgeId,
+                useCase.getOrder()
+            )) {
+                throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
+            }
+            if (useCase.getName() != badge.getName() &&
+                badgeRepository.existsByName(useCase.getName())
+            ) {
+                throw new GeneralException(BadgeErrorCode.DUPLICATED_BADGE_NAME);
+            }
+
+            // 2. 이미지 업데이트
+
+            uploadFileService.updateUploadFile(
+                badge.getActiveImageId(),
+                useCase.getBadgeOnImage(),
+                DirectoryConstants.BADGE_DIRECTORY
+            );
+            uploadFileService.updateUploadFile(
+                badge.getInactiveImageId(),
+                useCase.getBadgeOffImage(),
+                DirectoryConstants.BADGE_DIRECTORY
+            );
+
+            // 3. 데이터 업데이트
+            badgeRepository.updateBadge(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    private Badge findBadgeByBadgeId(Long badgeId) {
+        return badgeRepository.findById(badgeId).orElseThrow(
+            () -> new GeneralException(BadgeErrorCode.NOT_EXISTED_BADGE)
+        );
     }
 }

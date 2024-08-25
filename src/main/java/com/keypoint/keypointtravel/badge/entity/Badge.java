@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.badge.entity;
 
+import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "badge")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Badge {
+public class Badge extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
