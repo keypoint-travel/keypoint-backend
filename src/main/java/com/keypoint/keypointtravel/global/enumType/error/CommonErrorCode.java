@@ -14,6 +14,8 @@ public enum CommonErrorCode implements ErrorCode {
     FAIL_TO_SEND_EMAIL("005_FAIL_TO_SEND_EMAIL", "이메일 전송에 실패하였습니다."),
     FAIL_TO_FIND_LANGUAGE("006_FAIL_TO_FIND_LANGUAGE", "다국어를 찾는데 실패했습니다."),
     FAILED_TO_CONVERT_IMAGE("007_FAILED_TO_CONVERT_IMAGE", "이미지로 변환하는 것에 실패하였습니다."),
+    DUPLICATED_ORDER("008_DUPLICATED_ORDER",
+        "이미 존재하는 순서 번호 입니다. 해당 순서 번호를 가진 데이터를 수정하거나 다른 순서 번호로 등록해주세요."),
 
     ACCESS_DENIED_ACCOUNT("301_ACCESS_DENIED_ACCOUNT", "접근 권한이 없는 요청입니다.");
     private final String code;
