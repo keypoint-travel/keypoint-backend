@@ -6,7 +6,7 @@ import com.keypoint.keypointtravel.campaign.dto.response.DetailsByDateResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.DetailsByPriceResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.service.FindCampaignService;
 import com.keypoint.keypointtravel.campaign.service.FindPercentageService;
 import com.keypoint.keypointtravel.campaign.service.ReadCampaignService;
@@ -47,7 +47,7 @@ public class FindCampaignController {
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
         PercentageResponse response = findPercentageService.findCategoryPercentage(useCase);
         return APIResponseEntity.<PercentageResponse>builder()
             .message("캠페인 카테고리별 비율 조회 성공")
@@ -61,7 +61,7 @@ public class FindCampaignController {
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
         PercentageResponse response = findPercentageService.findDatePercentage(useCase);
         response.sortPercentages();
         return APIResponseEntity.<PercentageResponse>builder()
@@ -76,7 +76,7 @@ public class FindCampaignController {
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
         DetailsByCategoryResponse response = readCampaignService.findByCategory(useCase);
         response.sortPayments();
         return APIResponseEntity.<DetailsByCategoryResponse>builder()
@@ -91,7 +91,7 @@ public class FindCampaignController {
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
         DetailsByCategoryResponse res = readCampaignService.findByDate(useCase);
         DetailsByDateResponse response = DetailsByDateResponse.from(res);
         response.sortPayments();
@@ -107,7 +107,7 @@ public class FindCampaignController {
         @RequestParam("currency") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentUseCase useCase = new FindPaymentUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
         DetailsByPriceResponse response = readCampaignService.findByPrice(useCase);
         response.sortPayments();
         return APIResponseEntity.<DetailsByPriceResponse>builder()

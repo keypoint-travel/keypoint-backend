@@ -6,7 +6,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageByCategory;
-import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.currency.entity.Currency;
@@ -40,7 +40,7 @@ public class FindPercentageService {
      * @Return 사용 금액, 잔여 예산, 화폐 단위, List [카테고리, 가격, 비율] CategoryPercentageResponse
      */
     @Transactional(readOnly = true)
-    public PercentageResponse findCategoryPercentage(FindPaymentUseCase useCase) {
+    public PercentageResponse findCategoryPercentage(FindPercentangeUseCase useCase) {
         // 1. 캠페인 아이디를 통해 캠페인 생성 시 지정한 총 예산 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
@@ -76,7 +76,7 @@ public class FindPercentageService {
      * @Return 사용 금액, 잔여 예산, 화폐 단위, List [날짜, 가격, 비율] DatePercentageResponse
      */
     @Transactional(readOnly = true)
-    public PercentageResponse findDatePercentage(FindPaymentUseCase useCase) {
+    public PercentageResponse findDatePercentage(FindPercentangeUseCase useCase) {
         // 1. 캠페인 아이디를 통해 캠페인 생성 시 지정한 총 예산 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
@@ -106,7 +106,7 @@ public class FindPercentageService {
     }
 
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
-    private void updateCurrency(FindPaymentUseCase useCase, TotalBudgetDto totalBudget,
+    private void updateCurrency(FindPercentangeUseCase useCase, TotalBudgetDto totalBudget,
                                 List<? extends AmountDto> amounts, List<Currency> currencies) {
         CurrencyType currencyType = totalBudget.getCurrencyType();
         totalBudget.updateTotalBudget(
