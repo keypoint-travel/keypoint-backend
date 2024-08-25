@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.badge.respository;
 
-import com.keypoint.keypointtravel.badge.dto.request.BadgeIdRequest;
 import com.keypoint.keypointtravel.badge.dto.response.BadgeInAdminResponse;
+import com.keypoint.keypointtravel.badge.dto.useCase.BadgeIdUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
 import com.keypoint.keypointtravel.badge.entity.QBadge;
@@ -58,7 +58,7 @@ public class AdminBadgeCustomRepositoryImpl implements AdminBadgeCustomRepositor
     }
 
     @Override
-    public BadgeInAdminResponse findBadgeById(BadgeIdRequest useCase) {
+    public BadgeInAdminResponse findBadgeById(BadgeIdUseCase useCase) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(badge.id.eq(useCase.getBadgeId()))
             .and(badge.isDeleted.eq(false));

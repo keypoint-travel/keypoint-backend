@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.badge.respository;
 
-import com.keypoint.keypointtravel.badge.dto.request.BadgeIdRequest;
 import com.keypoint.keypointtravel.badge.dto.response.BadgeInAdminResponse;
+import com.keypoint.keypointtravel.badge.dto.useCase.BadgeIdUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.DeleteBadgeUseCase;
 import com.keypoint.keypointtravel.badge.dto.useCase.UpdateBadgeUseCase;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
@@ -13,7 +13,7 @@ public interface AdminBadgeCustomRepository {
 
     void deleteGuides(DeleteBadgeUseCase useCase);
 
-    BadgeInAdminResponse findBadgeById(BadgeIdRequest useCase);
+    BadgeInAdminResponse findBadgeById(BadgeIdUseCase useCase);
 
     Page<BadgeInAdminResponse> findBadges(PageUseCase useCase);
 }

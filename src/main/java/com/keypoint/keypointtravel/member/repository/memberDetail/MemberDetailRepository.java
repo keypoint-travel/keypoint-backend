@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.member.repository.memberDetail;
 
+import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import jakarta.transaction.Transactional;
@@ -29,6 +30,16 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
         @Param("memberId") Long memberId,
         @Param("name") String name,
         @Param("profileImageId") Long profileImageId
+    );
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE MemberDetail md "
+        + "SET md.representativeBadge = :representativeBadge "
+        + "WHERE md.member.id = :memberId")
+    int updateRepresentativeBadge(
+        @Param("memberId") Long memberId,
+        @Param("representativeBadge") Badge representativeBadge
     );
 
     @Query("SELECT md.profileImageId FROM MemberDetail md WHERE md.member.id = :memberId")
