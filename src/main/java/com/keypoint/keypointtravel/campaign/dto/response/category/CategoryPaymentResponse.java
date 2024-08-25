@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.campaign.dto.response.category;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.category.PaymentByCategoryDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.PaymentMemberInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class CategoryPaymentResponse {
     private Long receiptId;
     private List<PaymentMemberInfo> members;
 
-    public static CategoryPaymentResponse of(PaymentByCategoryDto payment, List<PaymentMemberDto> paymentMemberList) {
+    public static CategoryPaymentResponse of(PaymentInfo payment, List<PaymentMemberDto> paymentMemberList) {
         return new CategoryPaymentResponse(
             payment.getPaymentItemId(),
             payment.getStoreName(),

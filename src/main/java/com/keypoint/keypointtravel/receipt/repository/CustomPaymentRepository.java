@@ -1,9 +1,10 @@
 package com.keypoint.keypointtravel.receipt.repository;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.ReceiptInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.category.PaymentByCategoryDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
@@ -77,9 +78,9 @@ public class CustomPaymentRepository {
     }
 
     // campaignId와 category에 해당하는 page, size에 맞는 결제 항목 조회
-    public List<PaymentByCategoryDto> findPaymentsByCategory(Long campaignId, ReceiptCategory category, int size, int page) {
-        return queryFactory.select(
-                Projections.constructor(PaymentByCategoryDto.class,
+    public PaymentDto findPaymentsByCategory(Long campaignId, ReceiptCategory category, int size, int page) {
+        List<PaymentInfo> payments =  queryFactory.select(
+                Projections.constructor(PaymentInfo.class,
                     paymentItem.id,
                     receipt.store,
                     receipt.paidAt,
@@ -92,19 +93,17 @@ public class CustomPaymentRepository {
             .where(receipt.campaign.id.eq(campaignId)
                 .and(receipt.receiptCategory.eq(category)))
             .orderBy(receipt.paidAt.desc())
-            .offset((long) size * (page > 0 ? page - 1 : 0))
-            .limit(size)
+            .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
+            .limit((size > 0 ? size : 1))
             .fetch();
-    }
-
-    // campaignId와 category에 해당하는 결제 항목의 총 합 조회
-    public Long countPaymentByCategory(Long campaignId, ReceiptCategory category) {
-        return queryFactory.select(paymentItem.count())
+        // campaignId와 category에 해당하는 결제 항목의 총 합 조회
+        Long count = queryFactory.select(paymentItem.count())
             .from(paymentItem)
             .innerJoin(paymentItem.receipt, receipt)
             .where(receipt.campaign.id.eq(campaignId)
                 .and(receipt.receiptCategory.eq(category)))
             .fetchOne();
+        return new PaymentDto(payments, count);
     }
 
     // campaignId와 category에 해당하는 회원 리스트 조회

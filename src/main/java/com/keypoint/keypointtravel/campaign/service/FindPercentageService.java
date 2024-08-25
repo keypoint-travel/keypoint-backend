@@ -54,7 +54,7 @@ public class FindPercentageService {
         }
         // 4. 잔여 예산을 포함한 카테고리 별 금액 종합 및 잔여 예산 계산
         HashMap<String, Float> returnAmounts = new HashMap<>();
-        categoryAmounts.forEach(amount -> returnAmounts.put(amount.getCategory().getDescription(), amount.getAmount()));
+        categoryAmounts.forEach(amount -> returnAmounts.put(amount.getCategory().name(), amount.getAmount()));
         float usedTotalAmount = categoryAmounts.stream().reduce(0f, (acc, amount) -> acc + amount.getAmount(), Float::sum);
         float remainBudget = calculateRemainBudget(returnAmounts, totalBudget, usedTotalAmount);
         usedTotalAmount += remainBudget;
@@ -134,7 +134,7 @@ public class FindPercentageService {
         float remainBudget = 0;
         if (totalBudget.getTotalAmount() - totalAmount > 0) {
             remainBudget = totalBudget.getTotalAmount() - totalAmount;
-            returnAmounts.put("잔여 예산", remainBudget);
+            returnAmounts.put("REMAINING_BUDGET", remainBudget);
         }
         return remainBudget;
     }

@@ -1,6 +1,5 @@
-package com.keypoint.keypointtravel.campaign.dto.dto.category;
+package com.keypoint.keypointtravel.campaign.dto.dto;
 
-import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class PaymentByCategoryDto implements AmountDto {
+public class PaymentInfo implements AmountDto {
 
     private Long paymentItemId;
     private String storeName;

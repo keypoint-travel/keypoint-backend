@@ -1,8 +1,9 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.category.PaymentByCategoryDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.category.CategoryPaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.currency.entity.Currency;
@@ -37,25 +38,27 @@ public class FindPaymentService {
     @Transactional(readOnly = true)
     public Page<CategoryPaymentResponse> findPaymentsByCategory(FindPaymentsUseCase useCase, ReceiptCategory category) {
         // 1. campaignId와 category에 해당하는 page, size에 맞는 결제 항목 조회
-        List<PaymentByCategoryDto> paymentList = customPaymentRepository.findPaymentsByCategory(
+        PaymentDto paymentDto = customPaymentRepository.findPaymentsByCategory(
             useCase.getCampaignId(), category, useCase.getSize(), useCase.getPage());
-        Long totalCount = customPaymentRepository.countPaymentByCategory(useCase.getCampaignId(), category);
+
         // 2. 조회된 결제 항목을 currencyType에 맞게 변환
-        if (useCase.getCurrencyType() != null && !paymentList.isEmpty()) {
+        if (useCase.getCurrencyType() != null && !paymentDto.getPaymentList().isEmpty()) {
             List<Currency> currencies = currencyRepository.findAll();
-            updateCurrency(paymentList.get(0).getCurrencyType(), useCase.getCurrencyType(), paymentList, currencies);
+            updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
+                paymentDto.getPaymentList(), currencies);
         }
         // 3. 결제 항목 별 참여 인원 리스트 조회
         List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findMembersByCampaignIdAndCategory(
             useCase.getCampaignId(), category);
         // 4. 응답
         List<CategoryPaymentResponse> responses = new ArrayList<>();
-        for (PaymentByCategoryDto payment : paymentList) {
+        for (PaymentInfo payment : paymentDto.getPaymentList()) {
             responses.add(CategoryPaymentResponse.of(payment, paymentMemberList));
         }
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize(), sort);
-        return new PageImpl<>(responses, pageable, totalCount);
+        Pageable pageable = PageRequest.of(
+            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
+        return new PageImpl<>(responses, pageable, paymentDto.getTotalCount());
     }
 
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
