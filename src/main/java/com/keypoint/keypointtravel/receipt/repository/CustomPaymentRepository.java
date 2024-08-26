@@ -7,6 +7,10 @@ import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.MemberAmountByCategoryDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.TotalAmountDto;
+import com.keypoint.keypointtravel.campaign.entity.QCampaignBudget;
+import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.member.entity.QMember;
@@ -21,7 +25,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
+
 import static com.querydsl.jpa.JPAExpressions.select;
+
 import java.util.List;
 
 @Repository
@@ -39,6 +45,10 @@ public class CustomPaymentRepository {
     private final QMember member = QMember.member;
 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
+
+    private final QCampaignBudget campaignBudget = QCampaignBudget.campaignBudget;
+
+    private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
     // campaignId 에 해당하는 영수중 중에 카테고리 별 그룹화하여 비용의 합을 계산 AmountByCategoryDto
     public List<AmountByCategoryDto> findAmountByCategory(Long campaignId) {
@@ -64,8 +74,8 @@ public class CustomPaymentRepository {
             .fetch();
     }
 
-    // campaignId에 해당하는 회원별 총 사용 금액
-    public List<AmountByMemberDto> findAmountByMember(Long campaignId) {
+    // campaignId에 해당하는 모든 회원의 회원별 총 사용 금액
+    public List<AmountByMemberDto> findAmountAllMember(Long campaignId) {
         return queryFactory.select(
                 Projections.constructor(AmountByMemberDto.class,
                     paymentMember.member.id,
@@ -81,6 +91,25 @@ public class CustomPaymentRepository {
             .leftJoin(uploadFile).on(paymentMember.member.memberDetail.profileImageId.eq(uploadFile.id))
             .where(paymentItem.receipt.campaign.id.eq(campaignId))
             .groupBy(paymentMember.member.id, paymentItem.id)
+            .fetch();
+    }
+
+    // campaignId에 해당하는 회원별 총 사용 금액
+    public List<MemberAmountByCategoryDto> findAmountByMember(Long campaignId, Long memberId) {
+        return queryFactory.select(
+                Projections.constructor(MemberAmountByCategoryDto.class,
+                    receipt.receiptCategory,
+                    paymentItem.amount.multiply(paymentItem.quantity).divide(
+                        select(paymentMember.count())
+                            .from(paymentMember)
+                            .where(paymentMember.paymentItem.id.eq(paymentItem.id))
+                    )))
+            .from(receipt)
+            .innerJoin(receipt.paymentItems, paymentItem)
+            .innerJoin(paymentMember).on(paymentItem.id.eq(paymentMember.paymentItem.id))
+            .where(receipt.campaign.id.eq(campaignId)
+                .and(paymentMember.member.id.eq(memberId)))
+            .groupBy(receipt.receiptCategory, paymentItem.id)
             .fetch();
     }
 
@@ -161,6 +190,7 @@ public class CustomPaymentRepository {
         return new PaymentDto(payments, count);
     }
 
+    // campaignId에 해당하는 page, size에 맞는 금액 순 정렬 결제 항목 조회
     public PaymentDto findPaymentsByPrice(Long campaignId, Direction direction, int size, int page) {
         OrderSpecifier<Float> orderSpecifier =
             new OrderSpecifier<>(direction.equals(Direction.ASC) ? Order.ASC
@@ -202,5 +232,26 @@ public class CustomPaymentRepository {
             .innerJoin(paymentMember.paymentItem, paymentItem)
             .where(paymentItem.receipt.campaign.id.eq(campaignId))
             .fetch();
+    }
+
+    // 캠페인 내 총 예산, 총 사용 금액, 총 회원 수, 화폐 타입 조회
+    public TotalAmountDto findTotalAmountByCampaignId(Long campaignId) {
+        return queryFactory.select(
+                Projections.constructor(TotalAmountDto.class,
+                    select(campaignBudget.amount.sum())
+                        .from(campaignBudget)
+                        .where(campaignBudget.campaign.id.eq(campaignId))
+                        .groupBy(campaignBudget.campaign.id),
+                    receipt.totalAmount.sum(),
+                    select(memberCampaign.count())
+                        .from(memberCampaign)
+                        .where(memberCampaign.campaign.id.eq(campaignId))
+                        .groupBy(memberCampaign.campaign.id),
+                    receipt.currency
+                ))
+            .from(receipt)
+            .where(receipt.campaign.id.eq(campaignId))
+            .groupBy(receipt.campaign.id, receipt.currency)
+            .fetchOne();
     }
 }
