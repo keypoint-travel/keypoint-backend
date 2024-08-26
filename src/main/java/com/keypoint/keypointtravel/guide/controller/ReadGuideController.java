@@ -1,17 +1,5 @@
 package com.keypoint.keypointtravel.guide.controller;
 
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
-import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
-import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
-import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
-import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
-import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
-import com.keypoint.keypointtravel.guide.service.ReadGuideService;
-import com.keypoint.keypointtravel.member.dto.useCase.MemberIdAndPageableUseCase;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -24,6 +12,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.dto.response.PageResponse;
+import com.keypoint.keypointtravel.global.dto.response.SliceResponse;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
+import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
+import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
+import com.keypoint.keypointtravel.guide.service.ReadGuideService;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberIdAndPageableUseCase;
+
+import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -32,8 +36,8 @@ public class ReadGuideController {
 
     private final ReadGuideService readGuideService;
 
-    @GetMapping("")
-    public APIResponseEntity<Slice<ReadGuideResponse>> findGuides(
+    @GetMapping()
+    public APIResponseEntity<SliceResponse<ReadGuideResponse>> findGuides(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PageableDefault(size = 15, sort = "order", direction = Direction.ASC) Pageable pageable
     ) {
@@ -42,10 +46,11 @@ public class ReadGuideController {
             pageable
         );
         Slice<ReadGuideResponse> result = readGuideService.findGuides(useCase);
-        return APIResponseEntity.<Slice<ReadGuideResponse>>builder()
-            .message("이용가이드 리스트 조회 성공")
-            .data(result)
-            .build();
+
+        return APIResponseEntity.toSlice(
+            "이용가이드 리스트 조회 성공",
+            result
+        );
     }
 
     @GetMapping("{guideTranslationId}")
@@ -65,15 +70,16 @@ public class ReadGuideController {
     }
 
     @GetMapping("/management")
-    public APIResponseEntity<Page<ReadGuideInAdminResponse>> findGuidesInAdmin(
+    public APIResponseEntity<PageResponse<ReadGuideInAdminResponse>> findGuidesInAdmin(
         @PageableDefault(size = 15, sort = "order", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         ReadGuideInAdminUseCase useCase = ReadGuideInAdminUseCase.from(pageable);
         Page<ReadGuideInAdminResponse> result = readGuideService.findGuidesInAdmin(useCase);
-        return APIResponseEntity.<Page<ReadGuideInAdminResponse>>builder()
-            .message("이용가이드 리스트 조회 성공")
-            .data(result)
-            .build();
+
+        return APIResponseEntity.toPage(
+            "이용가이드 리스트 조회 성공",
+            result
+        );
     }
 
     @GetMapping("/management/{guideId}")
