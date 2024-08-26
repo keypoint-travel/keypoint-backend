@@ -4,8 +4,12 @@ import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.MemberAmountByCategoryDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.TotalAmountDto;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageByCategory;
+import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FindCampaignMemberUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
@@ -103,6 +107,33 @@ public class FindPercentageService {
             Math.round(remainBudget * 100) / 100f,
             percentages
         );
+    }
+
+    /**
+     * 캠페인 회원별 지출 퍼센트 조회 함수
+     *
+     * @Param campaignId, memberId useCase
+     * @Return
+     */
+    public PercentageByMemberResponse findMemberPercentage(FindCampaignMemberUseCase useCase) {
+        // 1. 총 예산, 총 사용 금액, 총 회원 수, 화폐 타입 조회
+        TotalAmountDto dto = customPaymentRepository.findTotalAmountByCampaignId(useCase.getCampaignId());
+        // 2. 캠페인 내 회원 아이디에 해당하는 사용 금액 조회
+        List<MemberAmountByCategoryDto> memberAmounts = customPaymentRepository
+            .findAmountByMember(useCase.getCampaignId(), useCase.getMemberId());
+        // 3. 잔여 예산을 포함한 날짜 별 금액 종합 및 잔여 예산 계산
+        float remainingBudget = 0f;
+        HashMap<String, Float> returnAmounts = new HashMap<>();
+        memberAmounts.forEach(amount -> returnAmounts.put(amount.getCategory().name(),
+            returnAmounts.getOrDefault(amount.getCategory().name(), 0f) + (float) amount.getAmount()));
+        if ((dto.getTotalAmount() - dto.getUsedAmount()) / dto.getTotalMember() > 0) {
+            remainingBudget = (dto.getTotalAmount() - dto.getUsedAmount()) / dto.getTotalMember();
+            returnAmounts.put("REMAINING_BUDGET", remainingBudget);
+        }
+        // 4. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정 및 응답
+        List<PercentageByCategory> percentage =
+            calculateCategoryPercentage(returnAmounts, dto.getUsedAmount() + remainingBudget);
+        return new PercentageByMemberResponse(dto.getCurrency().getCode(), percentage);
     }
 
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
