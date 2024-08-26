@@ -115,7 +115,7 @@ public class FindCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{campaignId}/payment/price")
-    public APIResponseEntity<PageResponse<PaymentResponse>> findCampaignDatePrice(
+    public APIResponseEntity<PageResponse<PaymentResponse>> findCampaignPricePayments(
         @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "page", defaultValue = "1") int page,
@@ -151,8 +151,25 @@ public class FindCampaignController {
         FindCampaignMemberUseCase useCase = new FindCampaignMemberUseCase(campaignId, memberId);
         PercentageByMemberResponse response = findPercentageService.findMemberPercentage(useCase);
         return APIResponseEntity.<PercentageByMemberResponse>builder()
-            .message("캠페인 인원 카테고리별 비율 조회 성공")
+            .message("캠페인 회원 카테고리별 비율 조회 성공")
             .data(response)
             .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/payment/member")
+    public APIResponseEntity<PageResponse<PaymentResponse>> findCampaignMemberPayments(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        @RequestParam(value = "memberId", defaultValue = "1") Long memberId,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, memberId, currencyType, size, page);
+        Page<PaymentResponse> response = findPaymentService.findPaymentsByMember(useCase);
+        return APIResponseEntity.toPage(
+            "캠페인 회원별 결제 내역 조회 성공",
+            response
+        );
     }
 }
