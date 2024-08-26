@@ -9,6 +9,7 @@ import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentRespons
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
+import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.currency.entity.Currency;
 import com.keypoint.keypointtravel.currency.repository.CurrencyRepository;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
@@ -33,6 +34,8 @@ public class FindPaymentService {
     private final CurrencyRepository currencyRepository;
 
     private final CampaignBudgetRepository campaignBudgetRepository;
+
+    private final MemberCampaignRepository memberCampaignRepository;
 
     /**
      * 캠페인 상세 페이지 카테고리별 결제 항목 조회 함수
@@ -75,6 +78,28 @@ public class FindPaymentService {
         // 1. campaignId에 해당하는 page, size에 맞는 결제 항목 조회
         PaymentDto paymentDto = customPaymentRepository.findPaymentsByPrice(
             useCase.getCampaignId(), direction, useCase.getSize(), useCase.getPage());
+        // 2. 응답 값 생성 후 반환
+        return createResponse(useCase, paymentDto);
+    }
+
+    /**
+     * 캠페인 상세 페이지 인원별 결제 항목 조회 함수
+     *
+     * @Param campaignId, memberId, currencyType, size, page useCase
+     * @Return CampaignDetailsResponse
+     */
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> findPaymentsByMember(FindPaymentsUseCase useCase) {
+        // 0. 캠페인에 참여한 회원인지 확인
+        if (!memberCampaignRepository.existsByCampaignIdAndMemberId(useCase.getCampaignId(), useCase.getMemberId())) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
+        // 1. campaignId와 memberId에 해당하는 page, size에 맞는 결제 항목 조회
+        PaymentDto paymentDto = customPaymentRepository.findPaymentsByMember(
+            useCase.getCampaignId(), useCase.getMemberId(), useCase.getSize(), useCase.getPage());
+        for(PaymentInfo payment : paymentDto.getPaymentList()){
+            payment.updateBudget(Math.round(payment.getAmount()));
+        }
         // 2. 응답 값 생성 후 반환
         return createResponse(useCase, paymentDto);
     }

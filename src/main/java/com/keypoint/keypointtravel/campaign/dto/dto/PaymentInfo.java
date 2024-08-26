@@ -22,4 +22,15 @@ public class PaymentInfo implements AmountDto {
     public void updateBudget(float amount) {
         this.amount = amount;
     }
+
+    public PaymentInfo(Long paymentItemId, String storeName, LocalDateTime paidAt, double amount, Long quantity,
+                       CurrencyType currencyType, Long receiptId) {
+        this.paymentItemId = paymentItemId;
+        this.storeName = storeName;
+        this.paidAt = paidAt;
+        this.amount = (float)amount;
+        this.quantity = quantity;
+        this.currencyType = currencyType;
+        this.receiptId = receiptId;
+    }
 }

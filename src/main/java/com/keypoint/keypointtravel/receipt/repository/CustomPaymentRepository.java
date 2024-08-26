@@ -220,6 +220,41 @@ public class CustomPaymentRepository {
         return new PaymentDto(payments, count);
     }
 
+    // campaignId와 memberId에 해당하는 page, size에 맞는 결제 항목 조회
+    public PaymentDto findPaymentsByMember(Long campaignId, Long memberId, int size, int page) {
+        List<PaymentInfo> payments = queryFactory.select(
+                Projections.constructor(PaymentInfo.class,
+                    paymentItem.id,
+                    receipt.store,
+                    receipt.paidAt,
+                    paymentItem.amount.divide(
+                        select(paymentMember.count())
+                            .from(paymentMember)
+                            .where(paymentMember.paymentItem.id.eq(paymentItem.id))
+                            .groupBy(paymentMember.paymentItem.id)),
+                    paymentItem.quantity,
+                    receipt.currency,
+                    receipt.id))
+            .from(paymentItem)
+            .innerJoin(paymentItem.receipt, receipt)
+            .innerJoin(paymentMember).on(paymentItem.id.eq(paymentMember.paymentItem.id))
+            .where(receipt.campaign.id.eq(campaignId)
+                .and(paymentMember.member.id.eq(memberId)))
+            .orderBy(receipt.paidAt.desc())
+            .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
+            .limit((size > 0 ? size : 1))
+            .fetch();
+        // campaignId와 category에 해당하는 결제 항목의 총 합 조회
+        Long count = queryFactory.select(paymentItem.count())
+            .from(paymentItem)
+            .innerJoin(paymentItem.receipt, receipt)
+            .innerJoin(paymentMember).on(paymentItem.id.eq(paymentMember.paymentItem.id))
+            .where(receipt.campaign.id.eq(campaignId)
+                .and(paymentMember.member.id.eq(memberId)))
+            .fetchOne();
+        return new PaymentDto(payments, count);
+    }
+
     // campaignId에 해당하는 지출 내역 및 회원 리스트 조회
     public List<PaymentMemberDto> findPaymentMembersByCampaignId(Long campaignId) {
         return queryFactory.select(
