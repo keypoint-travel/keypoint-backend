@@ -1,23 +1,5 @@
 package com.keypoint.keypointtravel.notification.controller;
 
-import com.keypoint.keypointtravel.global.annotation.ValidEnum;
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
-import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
-import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
-import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
-import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
-import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
-import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
-import com.keypoint.keypointtravel.notification.dto.useCase.PushHistoryIdUseCase;
-import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
-import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
-import com.keypoint.keypointtravel.notification.service.FCMTokenService;
-import com.keypoint.keypointtravel.notification.service.NotificationService;
-import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -34,6 +16,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.keypoint.keypointtravel.global.annotation.ValidEnum;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.dto.response.SliceResponse;
+import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
+import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
+import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
+import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
+import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
+import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.PushHistoryIdUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
+import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUseCase;
+import com.keypoint.keypointtravel.notification.service.FCMTokenService;
+import com.keypoint.keypointtravel.notification.service.NotificationService;
+import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/alarms")
@@ -44,7 +47,7 @@ public class NotificationController {
     private final PushNotificationHistoryService pushHistoryService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @PatchMapping("")
+    @PatchMapping()
     public APIResponseEntity<Void> updateNotification(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @Valid @ValidEnum(enumClass = AlarmType.class) @RequestParam(value = "alarm-type") AlarmType alarmType,
@@ -98,16 +101,17 @@ public class NotificationController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/push")
-    public APIResponseEntity<Slice<PushHistoryResponse>> findPushNotificationHistory(
+    public APIResponseEntity<SliceResponse<PushHistoryResponse>> findPushNotificationHistory(
         @PageableDefault(size = 15, sort = "arrivedAt", direction = Sort.Direction.DESC) Pageable pageable,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         ReadPushHistoryUseCase useCase = ReadPushHistoryUseCase.of(userDetails.getId(), pageable);
         Slice<PushHistoryResponse> result = pushHistoryService.findPushHistories(useCase);
 
-        return APIResponseEntity.<Slice<PushHistoryResponse>>builder()
-            .message("푸시 알림 이력 조회 성공")
-            .data(result)
-            .build();
+
+        return APIResponseEntity.toSlice(
+            "푸시 알림 이력 조회 성공",
+            result
+        );
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
