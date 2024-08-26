@@ -183,18 +183,13 @@ public class FindPercentageService {
     }
 
     private List<PercentageByCategory> calculateCategoryPercentage(HashMap<String, Float> amounts, float totalAmount) {
-        System.out.println("++++++");
-        System.out.println(totalAmount);
-
         List<PercentageByCategory> percentages = new ArrayList<>();
         // 최대 비율을 가지는 카테고리 선정
         String maxCategory = null;
         float maxPercentage = 0;
         for (HashMap.Entry<String, Float> entry : amounts.entrySet()) {
-            System.out.println(entry.getValue());
             float percentage = (entry.getValue() / totalAmount) * 100;
             percentage = Math.round(percentage);
-            System.out.println(percentage);
             percentages.add(new PercentageByCategory(entry.getKey(), Math.round(entry.getValue() * 100) / 100f, percentage));
             if (percentage > maxPercentage) {
                 maxPercentage = percentage;

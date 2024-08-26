@@ -65,4 +65,12 @@ public class FindCampaignService {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
         }
     }
+
+    @Transactional(readOnly = true)
+    public CampaignInfoDto findCampaigns(FIndCampaignUseCase useCase){
+        // 0. 캠페인에 소속되어 있는지 검증
+        validateInCampaign(useCase);
+        // 1. 캠페인 정보 조회
+        return campaignRepository.findCampaignInfo(useCase.getCampaignId());
+    }
 }

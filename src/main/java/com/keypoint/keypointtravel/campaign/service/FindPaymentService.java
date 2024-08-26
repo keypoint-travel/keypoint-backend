@@ -5,7 +5,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
-import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.PaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;

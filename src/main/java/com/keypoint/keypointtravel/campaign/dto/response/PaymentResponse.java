@@ -1,8 +1,7 @@
-package com.keypoint.keypointtravel.campaign.dto.response.category;
+package com.keypoint.keypointtravel.campaign.dto.response;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
-import com.keypoint.keypointtravel.campaign.dto.response.PaymentMemberInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

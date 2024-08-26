@@ -1,7 +1,6 @@
-package com.keypoint.keypointtravel.campaign.dto.response.details;
+package com.keypoint.keypointtravel.campaign.dto.response;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,26 +11,24 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class CampaignDetailsResponse {
+public class CampaignResponse {
 
     private Long campaignId;
     private String campaignImage;
     private String title;
     private String startDate;
     private String endDate;
-    private List<MemberInfoDto> members;
-    private List<ReceiptInfo> receipts;
+    private List<PercentageByCategory> percentages;
 
-    public static CampaignDetailsResponse of(CampaignInfoDto campaign, List<MemberInfoDto> members, List<ReceiptInfo> receipts) {
+    public static CampaignResponse of(CampaignInfoDto campaign, List<PercentageByCategory> percentages) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
-        return CampaignDetailsResponse.builder()
+        return CampaignResponse.builder()
             .campaignId(campaign.getCampaignId())
             .campaignImage(campaign.getCampaignImage())
             .title(campaign.getTitle())
             .startDate(campaign.getStartDate().toLocalDate().format(formatter))
             .endDate(campaign.getEndDate().toLocalDate().format(formatter))
-            .members(members)
-            .receipts(receipts)
+            .percentages(percentages)
             .build();
     }
 }
