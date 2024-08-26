@@ -1,10 +1,13 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
+import com.keypoint.keypointtravel.campaign.dto.response.PercentageByCategory;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.category.PaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FindCampaignMemberUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.service.FindCampaignService;
@@ -20,6 +23,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/campaigns/details")
@@ -133,6 +138,20 @@ public class FindCampaignController {
         TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(campaignId);
         return APIResponseEntity.<TotalAmountByMemberResponse>builder()
             .message("캠페인 회원별 총 금액 조회 성공")
+            .data(response)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/percentage/member/{memberId}")
+    public APIResponseEntity<PercentageByMemberResponse> findCampaignMemberPercentages(
+        @PathVariable Long campaignId,
+        @PathVariable Long memberId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindCampaignMemberUseCase useCase = new FindCampaignMemberUseCase(campaignId, memberId);
+        PercentageByMemberResponse response = findPercentageService.findMemberPercentage(useCase);
+        return APIResponseEntity.<PercentageByMemberResponse>builder()
+            .message("캠페인 인원 카테고리별 비율 조회 성공")
             .data(response)
             .build();
     }

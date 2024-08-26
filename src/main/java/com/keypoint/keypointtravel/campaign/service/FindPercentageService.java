@@ -13,6 +13,7 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.FindCampaignMemberUseCas
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
+import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.currency.entity.Currency;
 import com.keypoint.keypointtravel.currency.repository.CurrencyRepository;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
@@ -36,6 +37,8 @@ public class FindPercentageService {
     private final CampaignBudgetRepository campaignBudgetRepository;
 
     private final CurrencyRepository currencyRepository;
+
+    private final MemberCampaignRepository memberCampaignRepository;
 
     /**
      * 캠페인 카테고리별 지출 퍼센트 조회 함수
@@ -116,6 +119,10 @@ public class FindPercentageService {
      * @Return
      */
     public PercentageByMemberResponse findMemberPercentage(FindCampaignMemberUseCase useCase) {
+        // 0. 캠페인에 소속되어 있는지 검증
+        if (!memberCampaignRepository.existsByCampaignIdAndMemberId(useCase.getCampaignId(), useCase.getMemberId())) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
         // 1. 총 예산, 총 사용 금액, 총 회원 수, 화폐 타입 조회
         TotalAmountDto dto = customPaymentRepository.findTotalAmountByCampaignId(useCase.getCampaignId());
         // 2. 캠페인 내 회원 아이디에 해당하는 사용 금액 조회
@@ -123,16 +130,21 @@ public class FindPercentageService {
             .findAmountByMember(useCase.getCampaignId(), useCase.getMemberId());
         // 3. 잔여 예산을 포함한 날짜 별 금액 종합 및 잔여 예산 계산
         float remainingBudget = 0f;
+        float usedTotalAmount = 0f;
         HashMap<String, Float> returnAmounts = new HashMap<>();
-        memberAmounts.forEach(amount -> returnAmounts.put(amount.getCategory().name(),
-            returnAmounts.getOrDefault(amount.getCategory().name(), 0f) + (float) amount.getAmount()));
+        for (MemberAmountByCategoryDto amount : memberAmounts) {
+            amount.updateBudget(Math.round(amount.getAmount()));
+            usedTotalAmount += amount.getAmount();
+            returnAmounts.put(amount.getCategory().name(),
+                returnAmounts.getOrDefault(amount.getCategory().name(), 0f) + (float) amount.getAmount());
+        }
         if ((dto.getTotalAmount() - dto.getUsedAmount()) / dto.getTotalMember() > 0) {
             remainingBudget = (dto.getTotalAmount() - dto.getUsedAmount()) / dto.getTotalMember();
-            returnAmounts.put("REMAINING_BUDGET", remainingBudget);
+            returnAmounts.put("REMAINING_BUDGET", (float)Math.round(remainingBudget));
+            usedTotalAmount += remainingBudget;
         }
         // 4. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정 및 응답
-        List<PercentageByCategory> percentage =
-            calculateCategoryPercentage(returnAmounts, dto.getUsedAmount() + remainingBudget);
+        List<PercentageByCategory> percentage = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         return new PercentageByMemberResponse(dto.getCurrency().getCode(), percentage);
     }
 
@@ -171,13 +183,18 @@ public class FindPercentageService {
     }
 
     private List<PercentageByCategory> calculateCategoryPercentage(HashMap<String, Float> amounts, float totalAmount) {
+        System.out.println("++++++");
+        System.out.println(totalAmount);
+
         List<PercentageByCategory> percentages = new ArrayList<>();
         // 최대 비율을 가지는 카테고리 선정
         String maxCategory = null;
         float maxPercentage = 0;
         for (HashMap.Entry<String, Float> entry : amounts.entrySet()) {
+            System.out.println(entry.getValue());
             float percentage = (entry.getValue() / totalAmount) * 100;
             percentage = Math.round(percentage);
+            System.out.println(percentage);
             percentages.add(new PercentageByCategory(entry.getKey(), Math.round(entry.getValue() * 100) / 100f, percentage));
             if (percentage > maxPercentage) {
                 maxPercentage = percentage;
