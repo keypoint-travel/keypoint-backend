@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.member.repository.member;
 import static com.querydsl.jpa.JPAExpressions.selectOne;
 
 import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
+import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
+import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
@@ -14,6 +16,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
@@ -22,6 +26,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     private final QBlockedMember blockedMember = QBlockedMember.blockedMember;
+
+    private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
     @Override
     public MemberProfileResponse findMemberProfile(Long memberId) {
@@ -76,6 +82,21 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .from(member)
             .where(member.id.eq(memberId))
             .fetchOne();
+    }
+
+    @Override
+    public List<MemberInfoDto> findCampaignMemberList(Long campaignId) {
+        return queryFactory.select(
+                Projections.constructor(
+                    MemberInfoDto.class,
+                    member.id,
+                    uploadFile.path,
+                    member.memberDetail.name))
+            .from(member)
+            .innerJoin(memberCampaign).on(memberCampaign.member.id.eq(member.id))
+            .leftJoin(uploadFile).on(uploadFile.id.eq(member.memberDetail.profileImageId))
+            .where(memberCampaign.campaign.id.eq(campaignId))
+            .fetch();
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {

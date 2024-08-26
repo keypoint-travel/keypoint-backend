@@ -53,6 +53,7 @@ public class SchedulerService {
             Currency currency = new Currency(cur_unit, cur_name, exchangeRate, today);
             currencies.add(currency);
         }
+        currencies.add(new Currency("KRW", "한국 원", 1.0, today));
     }
 
     // 엔과 달러만 저장
