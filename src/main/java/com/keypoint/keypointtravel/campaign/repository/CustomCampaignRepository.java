@@ -21,4 +21,6 @@ public interface CustomCampaignRepository {
     List<MemberCampaign> findMembersByCampaignCode(Long campaignId);
 
     CampaignInfoDto findCampaignInfo(Long campaignId);
+
+    void updateCampaignFinished(Long campaignId);
 }

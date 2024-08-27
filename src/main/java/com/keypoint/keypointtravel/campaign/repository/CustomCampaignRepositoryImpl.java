@@ -121,4 +121,12 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
         }
         return result;
     }
+
+    @Override
+    public void updateCampaignFinished(Long campaignId) {
+        queryFactory.update(campaign)
+            .set(campaign.status, Status.FINISHED)
+            .where(campaign.id.eq(campaignId))
+            .execute();
+    }
 }
