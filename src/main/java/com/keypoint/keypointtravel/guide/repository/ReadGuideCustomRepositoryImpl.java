@@ -99,6 +99,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
                             Projections.fields(
                                 ReadGuideTranslationInAdminResponse.class,
                                 translation.id.as("guideTranslationId"),
+                                translation.languageCode,
                                 translation.title,
                                 translation.subTitle,
                                 translation.content
