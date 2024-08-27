@@ -57,7 +57,7 @@ public class ReadGuideService {
      */
     public Page<ReadGuideInAdminResponse> findGuidesInAdmin(PageUseCase useCase) {
         try {
-            return guideRepository.findGuidesInAdmin(useCase.getPageable());
+            return guideRepository.findGuidesInAdmin(useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
