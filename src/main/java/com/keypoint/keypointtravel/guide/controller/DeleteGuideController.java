@@ -18,19 +18,32 @@ public class DeleteGuideController {
 
     private final DeleteGuideService deleteGuideService;
 
-    @DeleteMapping("")
-    public APIResponseEntity<Void> deleteGuide(
+    @DeleteMapping()
+    public APIResponseEntity<Void> deleteGuides(
         @RequestParam(value = "guide-ids") Long[] ids
     ) {
         DeleteGuideGuideUseCase useCase = DeleteGuideGuideUseCase.from(ids);
         deleteGuideService.deleteGuides(useCase);
 
         return APIResponseEntity.<Void>builder()
-            .message("이용 가이드 삭제 성공")
+            .message("이용 가이드 복수건 삭제 성공")
             .build();
     }
 
     @DeleteMapping("/{guideId}")
+    public APIResponseEntity<Void> deleteGuide(
+        @PathVariable(value = "guideId") Long guideId
+    ) {
+        DeleteGuideGuideUseCase useCase = DeleteGuideGuideUseCase.from(guideId);
+        deleteGuideService.deleteGuides(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("이용 가이드 단건 삭제 성공")
+            .build();
+    }
+
+    @Deprecated
+    @DeleteMapping("/{guideId}/translations")
     public APIResponseEntity<Void> deleteGuideTranslation(
         @PathVariable(value = "guideId") Long guideId,
         @RequestParam(value = "guide-translation-ids") Long[] ids
