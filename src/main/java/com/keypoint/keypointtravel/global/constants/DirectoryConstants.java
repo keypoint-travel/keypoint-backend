@@ -15,4 +15,7 @@ public class DirectoryConstants {
     public static String CAMPAIGN_COVER_DIRECTORY = "campaign/cover";
 
     public static String RECEIPT_DIRECTORY = "receipt";
+
+    public static String NOTICE_THUMBNAIL_DIRECTORY = "notice/thumbnail";
+    public static String NOTICE_DETAIL_DIRECTORY = "notice/detail";
 }
