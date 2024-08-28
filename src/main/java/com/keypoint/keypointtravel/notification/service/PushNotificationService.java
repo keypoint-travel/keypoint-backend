@@ -1,5 +1,13 @@
 package com.keypoint.keypointtravel.notification.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
@@ -11,15 +19,11 @@ import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignA
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent.CampaignLeaderData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignPushNotificationEvent.CampaignData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPushNotificationEvent.FriendData;
+import com.keypoint.keypointtravel.notification.event.pushNotification.NoticePushNotificationEvent.NoticeData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -104,7 +108,7 @@ public class PushNotificationService {
                     );
                 }
             }
-            case CAMPAIGN_END -> {
+            case CAMPAIGN_END, CAMPAIGN_START -> {
                 if (additionalData instanceof CampaignData) {
                     CampaignData data = (CampaignData) additionalData;
                     String campaignTitle = campaignRepository.findTitleByCampaignId(
@@ -117,6 +121,22 @@ public class PushNotificationService {
                         campaignTitle,
                         locale
                     );
+                }
+            }
+            case EVENT_NOTICE -> {
+                if (additionalData instanceof NoticeData) {
+                    NoticeData data = (NoticeData) additionalData;
+                    // TODO 공지 사항 개발이 완료된 후 연결 필요
+                    // String noticeTitle = campaignRepository.findTitleByCampaignId(
+                    //         data.getNoticeId())
+                    //     .orElse("");
+
+                    // // 1. FCM 내용 구성
+                    // content = notificationMsg.getTranslatedContent(
+                    //     null,
+                    //     campaignTitle,
+                    //     locale
+                    // );
                 }
             }
             case CAMPAIGN_JOIN_REQUEST -> {

@@ -1,10 +1,12 @@
 package com.keypoint.keypointtravel.global.enumType.notification;
 
-import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -130,6 +132,17 @@ public enum PushNotificationContent {
         PushNotificationType.CAMPAIGN_D60_PASSED,
         "pushNotification.campaignD60Passed2_title",
         "pushNotification.campaignD60Passed2_content"
+    ),
+                    
+    CAMPAIGN_START(
+        PushNotificationType.CAMPAIGN_START,
+        "pushNotification.campaignStart_title",
+        "pushNotification.campaignStart_content"
+    ),
+    EVENT_NOTICE(
+        PushNotificationType.EVENT_NOTICE,
+        "pushNotification.event_notice_title",
+        "pushNotification.event_notice_content"
     );
 
     private final PushNotificationType type;
@@ -205,10 +218,16 @@ public enum PushNotificationContent {
                     locale);
             case CAMPAIGN_ACCEPT_INVITER:
             case CAMPAIGN_END:
+            case CAMPAIGN_START:
                 return MessageSourceUtils.getLocalizedLanguageWithVariables(
                     contentLangCode,
                     new Object[]{campaignName},
-                    locale);
+                        locale);
+            case EVENT_NOTICE:
+                return MessageSourceUtils.getLocalizedLanguageWithVariables(
+                    contentLangCode,
+                    new Object[]{name},
+                        locale);
         }
 
         return null;
