@@ -245,7 +245,9 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
     @Override
     public ReadNextGuideResponse findNextGuide(int order, LanguageCode languageCode) {
         BooleanBuilder translationBuilder = new BooleanBuilder();
-        translationBuilder.and(translation.isDeleted.eq(false))
+        translationBuilder
+            .and(translation.guide.id.eq(guide.id))
+            .and(translation.isDeleted.eq(false))
             .and(translation.languageCode.eq(languageCode));
 
         return queryFactory
@@ -255,6 +257,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
                     translation.id.as("guideTranslationIds"),
                     translation.title,
                     translation.subTitle,
+                    guide.order,
                     uploadFile.path.as("thumbnailImageUrl")
                 )
             )
