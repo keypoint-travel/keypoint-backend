@@ -22,6 +22,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/campaigns")
 @RequiredArgsConstructor
@@ -34,21 +36,14 @@ public class FindCampaignController {
     private final FindPaymentService findPaymentService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{campaignId}")
-    public APIResponseEntity<CampaignResponse> findCampaigns(
-        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
-        @PathVariable Long campaignId,
+    @GetMapping
+    public APIResponseEntity<List<CampaignResponse>> findCampaigns(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         // 캠페인 정보 조회
-        FIndCampaignUseCase useCase = new FIndCampaignUseCase(campaignId, userDetails.getId());
-        CampaignInfoDto dto = findCampaignService.findCampaigns(useCase);
-        // 카테고리별 비율 조회
-        FindPercentangeUseCase findPercentagesUseCase =
-            new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
-        PercentageResponse temp = findPercentageService.findCategoryPercentage(findPercentagesUseCase);
+        List<CampaignInfoDto> dtoList = findCampaignService.findCampaigns(userDetails.getId());
         // 응답
-        CampaignResponse response = CampaignResponse.of(dto, temp.getPercentages());
-        return APIResponseEntity.<CampaignResponse>builder()
+        List<CampaignResponse> response = CampaignResponse.from(dtoList);
+        return APIResponseEntity.<List<CampaignResponse>>builder()
             .message("메인화면 캠페인 목록 조회 성공")
             .data(response)
             .build();

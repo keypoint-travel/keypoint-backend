@@ -22,5 +22,7 @@ public interface CustomCampaignRepository {
 
     CampaignInfoDto findCampaignInfo(Long campaignId);
 
+    List<CampaignInfoDto> findCampaignInfoList(Long memberId);
+
     void updateCampaignFinished(Long campaignId);
 }

@@ -123,6 +123,23 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     }
 
     @Override
+    public List<CampaignInfoDto> findCampaignInfoList(Long memberId) {
+        return queryFactory.select(
+                Projections.constructor(CampaignInfoDto.class,
+                    campaign.id,
+                    uploadFile.path,
+                    campaign.title,
+                    campaign.startDate,
+                    campaign.endDate))
+            .from(campaign)
+            .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
+            .leftJoin(uploadFile).on(campaign.campaignImageId.eq(uploadFile.id))
+            .where(campaign.status.eq(Status.IN_PROGRESS)
+                .and(memberCampaign.member.id.eq(memberId)))
+            .fetch();
+    }
+
+    @Override
     public void updateCampaignFinished(Long campaignId) {
         queryFactory.update(campaign)
             .set(campaign.status, Status.FINISHED)
