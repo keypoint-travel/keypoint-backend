@@ -11,7 +11,7 @@ public class MemberInfo {
     private Long memberId;
     private String memberName;
     private String memberImage;
-    private Long amount;
+    private int amount;
 
     public static MemberInfo from(AmountByMemberDto dto) {
         return new MemberInfo(

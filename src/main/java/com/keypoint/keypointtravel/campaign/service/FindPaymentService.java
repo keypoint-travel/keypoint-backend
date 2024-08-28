@@ -112,7 +112,7 @@ public class FindPaymentService {
      */
     @Transactional(readOnly = true)
     public TotalAmountByMemberResponse findTotalPaymentsByAllMember(Long campaignId) {
-        // 1. campaignId에 해당하는 회원 별 총 금액 조회
+        // 1. campaignId에 해당하는 회원별 총 금액 조회
         List<AmountByMemberDto> dtoList = customPaymentRepository.findAmountAllMember(campaignId);
         // 2. 화폐 종류 조회
         CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(campaignId);
@@ -147,7 +147,7 @@ public class FindPaymentService {
             updateCurrency(paymentDto.getPaymentList().get(0).getCurrencyType(), useCase.getCurrencyType(),
                 paymentDto.getPaymentList(), currencies);
         }
-        // 2. 결제 항목 별 참여 인원 리스트 조회
+        // 2. 결제 항목별 참여 인원 리스트 조회
         List<PaymentMemberDto> paymentMemberList = customPaymentRepository.findPaymentMembersByCampaignId(
             useCase.getCampaignId());
         // 3. 응답

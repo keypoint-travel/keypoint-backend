@@ -4,8 +4,10 @@ import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TotalBudgetDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.MemberAmountByCategoryDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.TotalAmountDto;
+import com.keypoint.keypointtravel.campaign.dto.response.CampaignReportPrice;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.PercentageByCategory;
 import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
@@ -52,20 +54,20 @@ public class FindPercentageService {
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
         TotalBudgetDto totalBudget = new TotalBudgetDto(campaignAmount, campaignBudgets.get(0).getCurrency());
-        // 2. 캠페인 아이디를 통해 카테고리 별 사용한 금액 조회
+        // 2. 캠페인 아이디를 통해 카테고리별 사용한 금액 조회
         List<AmountByCategoryDto> categoryAmounts = customPaymentRepository.findAmountByCategory(useCase.getCampaignId());
         // 3. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
         if (useCase.getCurrencyType() != null) {
             List<Currency> currencies = currencyRepository.findAll();
             updateCurrency(useCase, totalBudget, categoryAmounts, currencies);
         }
-        // 4. 잔여 예산을 포함한 카테고리 별 금액 종합 및 잔여 예산 계산
+        // 4. 잔여 예산을 포함한 카테고리별 금액 종합 및 잔여 예산 계산
         HashMap<String, Float> returnAmounts = new HashMap<>();
         categoryAmounts.forEach(amount -> returnAmounts.put(amount.getCategory().name(), amount.getAmount()));
         float usedTotalAmount = categoryAmounts.stream().reduce(0f, (acc, amount) -> acc + amount.getAmount(), Float::sum);
         float remainBudget = calculateRemainBudget(returnAmounts, totalBudget, usedTotalAmount);
         usedTotalAmount += remainBudget;
-        // 5. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정
+        // 5. 카테고리별 비율 계산 최대 비율을 가지는 카테고리 선정
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 6. 응답
         return new PercentageResponse(
@@ -88,20 +90,20 @@ public class FindPercentageService {
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
         float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
         TotalBudgetDto totalBudget = new TotalBudgetDto(campaignAmount, campaignBudgets.get(0).getCurrency());
-        // 2. 캠페인 아이디를 통해 카테고리 별 사용한 금액 조회
+        // 2. 캠페인 아이디를 통해 날짜별 사용한 금액 조회
         List<AmountByDateDto> dateAmounts = customPaymentRepository.findAmountByDate(useCase.getCampaignId());
         // 3. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
         if (useCase.getCurrencyType() != null) {
             List<Currency> currencies = currencyRepository.findAll();
             updateCurrency(useCase, totalBudget, dateAmounts, currencies);
         }
-        // 4. 잔여 예산을 포함한 날짜 별 금액 종합 및 잔여 예산 계산
+        // 4. 잔여 예산을 포함한 날짜별 금액 종합 및 잔여 예산 계산
         HashMap<String, Float> returnAmounts = new HashMap<>();
         dateAmounts.forEach(amount -> returnAmounts.put(amount.getDate(), amount.getAmount()));
         float usedTotalAmount = dateAmounts.stream().reduce(0f, (acc, amount) -> acc + amount.getAmount(), Float::sum);
         float remainBudget = calculateRemainBudget(returnAmounts, totalBudget, usedTotalAmount);
         usedTotalAmount += remainBudget;
-        // 5. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정
+        // 5. 날짜별 비율 계산 최대 비율을 가지는 카테고리 선정
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 6. 응답
         return new PercentageResponse(
@@ -140,12 +142,55 @@ public class FindPercentageService {
         }
         if ((dto.getTotalAmount() - dto.getUsedAmount()) / dto.getTotalMember() > 0) {
             remainingBudget = (dto.getTotalAmount() - dto.getUsedAmount()) / dto.getTotalMember();
-            returnAmounts.put("REMAINING_BUDGET", (float)Math.round(remainingBudget));
+            returnAmounts.put("REMAINING_BUDGET", (float) Math.round(remainingBudget));
             usedTotalAmount += remainingBudget;
         }
         // 4. 카테고리 별 비율 계산 최대 비율을 가지는 카테고리 선정 및 응답
         List<PercentageByCategory> percentage = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         return new PercentageByMemberResponse(dto.getCurrency().getCode(), percentage);
+    }
+
+    /**
+     * 캠페인 레포트 조회 함수
+     *
+     * @Param campaignId, memberId useCase
+     * @Return
+     */
+    public CampaignReportPrice findCampaignReport(FindPercentangeUseCase useCase) {
+        // 1. 캠페인 아이디를 통해 캠페인 생성 시 지정한 총 예산 조회
+        List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());
+        float campaignAmount = campaignBudgets.stream().reduce(0f, (acc, budget) -> acc + budget.getAmount(), Float::sum);
+        TotalBudgetDto totalBudget = new TotalBudgetDto(campaignAmount, campaignBudgets.get(0).getCurrency());
+        // 2. 캠페인 아이디를 통해 카테고리 별 사용한 금액 조회
+        List<AmountByCategoryDto> categoryAmounts = customPaymentRepository.findAmountByCategory(useCase.getCampaignId());
+        // 3. 캠페인 아이디를 통해 날짜별 사용한 금액 조회
+        List<AmountByDateDto> dateAmounts = customPaymentRepository.findAmountByDate(useCase.getCampaignId());
+        // 4. 캠페인 아이디를 통해 회원별 총 금액 조회
+        List<AmountByMemberDto> memberAmounts = customPaymentRepository.findAmountAllMember(useCase.getCampaignId());
+        // 5. 화폐 타입을 따로 지정할 경우 : totalBudget, paymentDtoList 의 화폐 타입과 금액을 변환
+        if (useCase.getCurrencyType() != null) {
+            List<Currency> currencies = currencyRepository.findAll();
+            updateCurrency(useCase, totalBudget, categoryAmounts, currencies);
+            updateCurrency(useCase, totalBudget, dateAmounts, currencies);
+            updateCurrency(useCase, totalBudget, memberAmounts, currencies);
+        }
+        // 6. 잔여 예산을 포함한 카테고리 별 금액 종합 및 잔여 예산 계산
+        HashMap<String, Float> returnAmounts = new HashMap<>();
+        categoryAmounts.forEach(amount -> returnAmounts.put(amount.getCategory().name(), amount.getAmount()));
+        float usedTotalAmount = categoryAmounts.stream().reduce(0f, (acc, amount) -> acc + amount.getAmount(), Float::sum);
+        float remainBudget = calculateRemainBudget(returnAmounts, totalBudget, usedTotalAmount);
+        usedTotalAmount += remainBudget;
+        // 7. 카테고리별 비율 계산 최대 비율을 가지는 카테고리 선정
+        List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
+        // 8. 응답
+        return CampaignReportPrice.of(
+            totalBudget.getCurrencyType().getCode(),
+            Math.round((usedTotalAmount - remainBudget) * 100) / 100f,
+            Math.round(remainBudget * 100) / 100f,
+            percentages,
+            dateAmounts,
+            memberAmounts
+        );
     }
 
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
@@ -170,7 +215,7 @@ public class FindPercentageService {
         Currency toCurrency = currencies.stream()
             .filter(currency -> currency.getCur_unit().equals(to.getCode()))
             .findFirst().orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CURRENCY));
-        return (float) (amount * fromCurrency.getExchange_rate() / toCurrency.getExchange_rate());
+        return (float) Math.round(amount * fromCurrency.getExchange_rate() / toCurrency.getExchange_rate() * 100) / 100f;
     }
 
     private float calculateRemainBudget(HashMap<String, Float> returnAmounts, TotalBudgetDto totalBudget, float totalAmount) {
