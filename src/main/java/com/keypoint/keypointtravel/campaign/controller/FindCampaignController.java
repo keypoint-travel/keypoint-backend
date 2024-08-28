@@ -1,9 +1,7 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
-import com.keypoint.keypointtravel.campaign.dto.response.CampaignResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.PaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.*;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
@@ -24,6 +22,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/campaigns")
@@ -191,5 +191,23 @@ public class FindCampaignController {
             "캠페인 회원별 결제 내역 조회 성공",
             response
         );
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/report")
+    public APIResponseEntity<CampaignReportResponse> findCampaignReport(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 상단 내용 조회
+        FIndCampaignUseCase useCase = new FIndCampaignUseCase(campaignId, userDetails.getId());
+        CampaignDetailsResponse response = findCampaignService.findCampaignDetails(useCase);
+        // 카테고리별, 날짜별, 인원별 총 결제 금액
+        FindPercentangeUseCase priceUseCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        CampaignReportPrice prices = findPercentageService.findCampaignReport(priceUseCase);
+        return APIResponseEntity.<CampaignReportResponse>builder()
+            .message("캠페인 레포트 조회 성공")
+            .data(new CampaignReportResponse(response, prices))
+            .build();
     }
 }
