@@ -128,6 +128,9 @@ public class FindPercentageService {
         }
         // 1. 총 예산, 총 사용 금액, 총 회원 수, 화폐 타입 조회
         TotalAmountDto dto = customPaymentRepository.findTotalAmountByCampaignId(useCase.getCampaignId());
+        if(dto == null){
+            return new PercentageByMemberResponse(null, new ArrayList<>());
+        }
         float totalAmount = dto.getTotalAmount();
         float allMemberUsedAmount = dto.getUsedAmount();
         // 2. 캠페인 내 회원 아이디에 해당하는 사용 금액 조회
