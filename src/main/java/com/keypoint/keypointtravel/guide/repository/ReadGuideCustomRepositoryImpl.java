@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.guide.repository;
 
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
@@ -12,6 +14,8 @@ import com.keypoint.keypointtravel.guide.entity.QGuide;
 import com.keypoint.keypointtravel.guide.entity.QGuideTranslation;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -32,12 +36,45 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     @Override
-    public Page<ReadGuideInAdminResponse> findGuidesInAdmin(Pageable pageable) {
+    public Page<ReadGuideInAdminResponse> findGuidesInAdmin(PageUseCase useCase) {
+        Pageable pageable = useCase.getPageable();
+        String sortBy = useCase.getSortBy();
+        String direction = useCase.getDirection();
+
         BooleanBuilder builder = new BooleanBuilder();
         builder
             .and(translation.guide.id.eq(guide.id))
             .and(translation.languageCode.eq(LanguageCode.EN))
             .and(translation.isDeleted.eq(false));
+
+        // 기본 정렬 기준 추가
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, guide.order);
+
+        // 동적 정렬 기준 처리
+        if (sortBy != null) {
+            Order order = direction.equals("asc") ? Order.ASC : Order.DESC;
+
+            switch (sortBy) {
+                case "guideId":
+                    orderSpecifier = new OrderSpecifier<>(order, guide.id);
+                    break;
+                case "title":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.title);
+                    break;
+                case "subTitle":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.subTitle);
+                    break;
+                case "order":
+                    orderSpecifier = new OrderSpecifier<>(order, guide.order);
+                    break;
+                case "content":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.content);
+                    break;
+                case "modifyAt":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.modifyAt);
+                    break;
+            }
+        }
 
         List<ReadGuideInAdminResponse> data = queryFactory
             .select(
@@ -56,7 +93,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
             .leftJoin(translation).on(builder)
             .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
             .where(guide.isDeleted.eq(false))
-            .orderBy(guide.order.asc())
+            .orderBy(orderSpecifier)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -99,6 +136,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
                             Projections.fields(
                                 ReadGuideTranslationInAdminResponse.class,
                                 translation.id.as("guideTranslationId"),
+                                translation.languageCode,
                                 translation.title,
                                 translation.subTitle,
                                 translation.content
@@ -112,12 +150,42 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
     }
 
     @Override
-    public Slice<ReadGuideResponse> findGuides(LanguageCode languageCode, Pageable pageable) {
+    public Slice<ReadGuideResponse> findGuides(
+        LanguageCode languageCode,
+        PageAndMemberIdUseCase useCase
+    ) {
+        Pageable pageable = useCase.getPageable();
+        String sortBy = useCase.getSortBy();
+        String direction = useCase.getDirection();
+
         BooleanBuilder builder = new BooleanBuilder();
         builder
             .and(translation.guide.id.eq(guide.id))
             .and(translation.languageCode.eq(languageCode))
             .and(translation.isDeleted.eq(false));
+
+        // 기본 정렬 기준 추가
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, guide.order);
+
+        // 동적 정렬 기준 처리
+        if (sortBy != null) {
+            Order order = direction.equals("asc") ? Order.ASC : Order.DESC;
+
+            switch (sortBy) {
+                case "guideTranslationIds":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.id);
+                    break;
+                case "title":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.title);
+                    break;
+                case "subTitle":
+                    orderSpecifier = new OrderSpecifier<>(order, translation.subTitle);
+                    break;
+                case "order":
+                    orderSpecifier = new OrderSpecifier<>(order, guide.order);
+                    break;
+            }
+        }
 
         List<ReadGuideResponse> data = queryFactory
             .select(
@@ -136,7 +204,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
             .where(guide.isDeleted.eq(false))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize() + 1)
-            .orderBy(guide.order.asc())
+            .orderBy(orderSpecifier)
             .fetch();
 
         boolean hasNext = false;

@@ -14,6 +14,7 @@ public class CreateGuideTranslationRequest {
   private String subTitle;
   @NotBlank
   private String content;
+
   @ValidEnum(enumClass = LanguageCode.class)
   private LanguageCode languageCode;
 }
