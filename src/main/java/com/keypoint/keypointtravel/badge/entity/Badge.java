@@ -34,7 +34,7 @@ public class Badge extends BaseEntity {
     @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted;
 
-    @Column(nullable = false, unique = true, name = "order_number")
+    @Column(nullable = false, name = "order_number")
     private int order;
 
     public Badge(
