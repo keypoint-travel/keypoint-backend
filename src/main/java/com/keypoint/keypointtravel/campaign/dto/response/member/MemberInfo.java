@@ -11,14 +11,18 @@ public class MemberInfo {
     private Long memberId;
     private String memberName;
     private String memberImage;
-    private int amount;
+    private float amount;
 
     public static MemberInfo from(AmountByMemberDto dto) {
         return new MemberInfo(
             dto.getMemberId(), dto.getMemberName(), dto.getMemberImage(), Math.round(dto.getAmount()));
     }
 
-    public void updateAmount(double amount) {
-        this.amount += Math.round(amount);
+    public void addAmount(double amount) {
+        this.amount += amount;
+    }
+
+    public void updateAmount(float amount) {
+        this.amount = amount;
     }
 }

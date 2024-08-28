@@ -6,7 +6,6 @@ import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetails
 import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.FindCampaignMemberUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.service.FindCampaignService;
@@ -22,8 +21,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/campaigns")
@@ -153,9 +150,11 @@ public class FindCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/details/{campaignId}/member")
     public APIResponseEntity<TotalAmountByMemberResponse> findCampaignMemberTotalAmount(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(campaignId);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(useCase);
         return APIResponseEntity.<TotalAmountByMemberResponse>builder()
             .message("캠페인 회원별 총 금액 조회 성공")
             .data(response)
@@ -165,10 +164,11 @@ public class FindCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/details/{campaignId}/percentage/member/{memberId}")
     public APIResponseEntity<PercentageByMemberResponse> findCampaignMemberPercentages(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @PathVariable Long memberId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindCampaignMemberUseCase useCase = new FindCampaignMemberUseCase(campaignId, memberId);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, memberId, currencyType);
         PercentageByMemberResponse response = findPercentageService.findMemberPercentage(useCase);
         return APIResponseEntity.<PercentageByMemberResponse>builder()
             .message("캠페인 회원 카테고리별 비율 조회 성공")

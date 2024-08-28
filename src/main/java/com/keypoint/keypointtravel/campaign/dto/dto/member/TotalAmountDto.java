@@ -12,4 +12,8 @@ public class TotalAmountDto {
     private float usedAmount;
     private Long totalMember;
     private CurrencyType currency;
+
+    public void updateCurrency(CurrencyType currency) {
+        this.currency = currency;
+    }
 }

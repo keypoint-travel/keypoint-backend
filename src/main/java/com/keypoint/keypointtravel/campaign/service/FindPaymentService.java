@@ -6,8 +6,10 @@ import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.response.PaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.member.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.currency.entity.Currency;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +86,7 @@ public class FindPaymentService {
     }
 
     /**
-     * 캠페인 상세 페이지 인원별 결제 항목 조회 함수
+     * 캠페인 상세 페이지 회원별 결제 항목 조회 함수
      *
      * @Param campaignId, memberId, currencyType, size, page useCase
      * @Return CampaignDetailsResponse
@@ -111,13 +114,36 @@ public class FindPaymentService {
      * @Return TotalAmountByMemberResponse
      */
     @Transactional(readOnly = true)
-    public TotalAmountByMemberResponse findTotalPaymentsByAllMember(Long campaignId) {
+    public TotalAmountByMemberResponse findTotalPaymentsByAllMember(FindPercentangeUseCase useCase) {
         // 1. campaignId에 해당하는 회원별 총 금액 조회
-        List<AmountByMemberDto> dtoList = customPaymentRepository.findAmountAllMember(campaignId);
+        List<AmountByMemberDto> dtoList = customPaymentRepository.findAmountAllMember(useCase.getCampaignId());
         // 2. 화폐 종류 조회
-        CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(campaignId);
-        // 3. 응답
-        return TotalAmountByMemberResponse.of(currencyType, dtoList);
+        CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(useCase.getCampaignId());
+        // 3. 회원별 금액 통합 및 응답 값 변환
+        List<MemberInfo> members = new ArrayList<>();
+        for (int i = 0; i < dtoList.size(); i++) {
+            if(i == 0){
+                members.add(MemberInfo.from(dtoList.get(i)));
+            } else {
+                if(Objects.equals(dtoList.get(i - 1).getMemberId(), dtoList.get(i).getMemberId())){
+                    members.get(members.size() - 1).addAmount(dtoList.get(i).getAmount());
+                } else {
+                    members.add(MemberInfo.from(dtoList.get(i)));
+                }
+            }
+        }
+        // 4. 조회된 결제 항목을 currencyType에 맞게 변환
+        if (useCase.getCurrencyType() != null && !members.isEmpty()) {
+            List<Currency> currencies = currencyRepository.findAll();
+            for (MemberInfo memberInfo : members) {
+                memberInfo.updateAmount(
+                    convertCurrency(currencies, memberInfo.getAmount(), currencyType, useCase.getCurrencyType())
+                );
+            }
+            currencyType = useCase.getCurrencyType();
+        }
+        // 5. 응답
+        return new TotalAmountByMemberResponse(currencyType, members);
     }
 
     // totalBudget, categoryAmounts 의 화폐 타입과 금액을 변환
@@ -137,7 +163,7 @@ public class FindPaymentService {
         Currency toCurrency = currencies.stream()
             .filter(currency -> currency.getCur_unit().equals(to.getCode()))
             .findFirst().orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CURRENCY));
-        return (float) (amount * fromCurrency.getExchange_rate() / toCurrency.getExchange_rate());
+        return (float) Math.round(amount * fromCurrency.getExchange_rate() / toCurrency.getExchange_rate() * 100) / 100f;
     }
 
     private Page<PaymentResponse> createResponse(FindPaymentsUseCase useCase, PaymentDto paymentDto) {
