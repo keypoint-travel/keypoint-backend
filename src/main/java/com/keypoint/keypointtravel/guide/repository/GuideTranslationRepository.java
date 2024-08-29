@@ -12,7 +12,7 @@ public interface GuideTranslationRepository extends JpaRepository<GuideTranslati
 
     @Query("SELECT COUNT(g) > 0 "
         + "FROM GuideTranslation g "
-        + "WHERE g.guide.id = :guideId AND g.languageCode = :languageCode")
+        + "WHERE g.guide.id = :guideId AND g.languageCode = :languageCode AND g.isDeleted = false")
     boolean existsByGuideAndLanguage(@Param("guideId") Long guideId,
         @Param("languageCode") LanguageCode language);
 }

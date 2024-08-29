@@ -42,13 +42,15 @@ public class DeleteGuideController {
             .build();
     }
 
-    @Deprecated
-    @DeleteMapping("/{guideId}/translations")
+    @DeleteMapping("/{guideId}/translations/{guideTranslationId}")
     public APIResponseEntity<Void> deleteGuideTranslation(
         @PathVariable(value = "guideId") Long guideId,
-        @RequestParam(value = "guide-translation-ids") Long[] ids
+        @PathVariable(value = "guideTranslationId") Long guideTranslationId
     ) {
-        DeleteGuideTranslationUseCase useCase = DeleteGuideTranslationUseCase.of(guideId, ids);
+        DeleteGuideTranslationUseCase useCase = DeleteGuideTranslationUseCase.of(
+            guideId,
+            guideTranslationId
+        );
         deleteGuideService.deleteGuideTranslations(useCase);
 
         return APIResponseEntity.<Void>builder()

@@ -10,5 +10,5 @@ public interface UpdateGuideCustomRepository {
 
     void deleteGuides(DeleteGuideGuideUseCase useCase);
 
-    void deleteGuideTranslations(DeleteGuideTranslationUseCase useCase);
+    long deleteGuideTranslations(DeleteGuideTranslationUseCase useCase);
 }
