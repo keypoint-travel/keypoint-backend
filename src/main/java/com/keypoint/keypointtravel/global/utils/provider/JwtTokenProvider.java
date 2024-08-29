@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
+import com.keypoint.keypointtravel.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -186,6 +187,22 @@ public class JwtTokenProvider implements InitializingBean {
 
         Long now = new Date().getTime();
         return (expiration.getTime() - now);
+    }
+
+    /**
+     * Member 로 Authentication 생성하는 함수
+     *
+     * @param member
+     * @return
+     */
+    public Authentication createAuthenticationFromMember(Member member) {
+        // 1. Authentication 객체 생성
+        CustomUserDetails userDetails = CustomUserDetails.from(member);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            userDetails, member.getRole().name()
+        );
+
+        return authenticationToken;
     }
 
     /**
