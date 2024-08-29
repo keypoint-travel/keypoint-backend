@@ -33,4 +33,22 @@ public class UpdateGuideController {
             .message("이용 가이드 수정 성공")
             .build();
     }
+
+//    @DeleteMapping("/{guideId}/translations/{guideTranslationId}")
+//    public APIResponseEntity<Void> updateGuideTranslation(
+//        @PathVariable(value = "guideId") Long guideId,
+//        @PathVariable(value = "guideTranslationId") Long guideTranslationId,
+//        @Valid @RequestBody() UpdateGuideTranslationRequest request
+//    ) {
+////        UpdateGuideTranslationUseCase useCase = UpdateGuideTranslationUseCase.of(
+////            guideId,
+////            guideTranslationId,
+////            request
+////        );
+////        updateGuideService.updateGuide(useCase);
+//
+//        return APIResponseEntity.<Void>builder()
+//            .message("특정 이용 가이드 번역 정보 수정 성공")
+//            .build();
+//    }
 }

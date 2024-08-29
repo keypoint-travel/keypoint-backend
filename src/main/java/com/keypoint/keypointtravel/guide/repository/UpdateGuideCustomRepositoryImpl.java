@@ -2,7 +2,6 @@ package com.keypoint.keypointtravel.guide.repository;
 
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideGuideUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideTranslationUseCase;
-import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideTranslationUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideUseCase;
 import com.keypoint.keypointtravel.guide.entity.QGuide;
 import com.keypoint.keypointtravel.guide.entity.QGuideTranslation;
@@ -33,24 +32,26 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
             .set(guide.modifyId, currentAuditor)
             .where(guide.id.eq(useCase.getGuideId()))
             .execute();
-
-        // 이용 가이드 번역물 업데이트
-        for (UpdateGuideTranslationUseCase translation : useCase.getTranslations()) {
-            BooleanBuilder builder = new BooleanBuilder();
-            builder.and(guideTranslation.id.eq(translation.getGuideTranslationId()))
-                .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
-
-            queryFactory.update(guideTranslation)
-                .set(guideTranslation.title, translation.getTitle())
-                .set(guideTranslation.subTitle, translation.getSubTitle())
-                .set(guideTranslation.content, translation.getContent())
-
-                .set(guideTranslation.modifyAt, LocalDateTime.now())
-                .set(guideTranslation.modifyId, currentAuditor)
-                .where(builder)
-                .execute();
-        }
     }
+
+//    public void updateGuideTranslation(UpdateGuideTranslationUseCase useCase) {
+//        // 이용 가이드 번역물 업데이트
+//        for (UpdateGuideTranslationUseCase translation : useCase.getTranslations()) {
+//            BooleanBuilder builder = new BooleanBuilder();
+//            builder.and(guideTranslation.id.eq(translation.getGuideTranslationId()))
+//                .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
+//
+//            queryFactory.update(guideTranslation)
+//                .set(guideTranslation.title, translation.getTitle())
+//                .set(guideTranslation.subTitle, translation.getSubTitle())
+//                .set(guideTranslation.content, translation.getContent())
+//
+//                .set(guideTranslation.modifyAt, LocalDateTime.now())
+//                .set(guideTranslation.modifyId, currentAuditor)
+//                .where(builder)
+//                .execute();
+//        }
+//    }
 
     @Override
     public void deleteGuides(DeleteGuideGuideUseCase useCase) {
