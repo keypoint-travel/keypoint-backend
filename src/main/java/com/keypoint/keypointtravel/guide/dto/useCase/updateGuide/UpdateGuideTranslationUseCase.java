@@ -8,14 +8,20 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateGuideTranslationUseCase {
 
+  private Long guideId;
   private Long guideTranslationId;
   private String title;
   private String subTitle;
   private String content;
 
-  public static UpdateGuideTranslationUseCase from(UpdateGuideTranslationRequest request) {
+  public static UpdateGuideTranslationUseCase of(
+      Long guideId,
+      Long guideTranslationId,
+      UpdateGuideTranslationRequest request
+  ) {
     return new UpdateGuideTranslationUseCase(
-        request.getGuideTranslationId(),
+        guideId,
+        guideTranslationId,
         request.getTitle(),
         request.getSubTitle(),
         request.getContent()
