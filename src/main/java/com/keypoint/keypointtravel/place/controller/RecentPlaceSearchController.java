@@ -7,7 +7,7 @@ import com.keypoint.keypointtravel.place.dto.request.CreateRecentPlaceSearchRequ
 import com.keypoint.keypointtravel.place.dto.response.PlaceResponse;
 import com.keypoint.keypointtravel.place.dto.response.ReadRecentPlaceSearchResponse;
 import com.keypoint.keypointtravel.place.dto.useCase.DeleteRecentPlaceSearchUseCase;
-import com.keypoint.keypointtravel.place.dto.useCase.PlaceSearchUseCase;
+import com.keypoint.keypointtravel.place.dto.useCase.PlaceIdUseCase;
 import com.keypoint.keypointtravel.place.redis.service.RecentPlaceSearchService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -35,8 +35,8 @@ public class RecentPlaceSearchController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @Valid @RequestBody CreateRecentPlaceSearchRequest request
     ) {
-        PlaceSearchUseCase useCase = PlaceSearchUseCase.of(
-            userDetails.getId(), request.getSearchWord()
+        PlaceIdUseCase useCase = PlaceIdUseCase.of(
+            userDetails.getId(), request.getPlaceId()
         );
         recentPlaceSearchService.addSearchWord(useCase);
 

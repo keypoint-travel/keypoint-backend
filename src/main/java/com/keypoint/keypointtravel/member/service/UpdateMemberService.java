@@ -1,5 +1,12 @@
 package com.keypoint.keypointtravel.member.service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
@@ -20,11 +27,8 @@ import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRe
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
-import java.time.LocalDateTime;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,6 +41,7 @@ public class UpdateMemberService {
     private final NotificationRepository notificationRepository;
     private final ReadMemberService readMemberService;
     private final UploadFileService uploadFileService;
+    private final PasswordEncoder passwordEncoder;
 
 
     /**
@@ -99,7 +104,7 @@ public class UpdateMemberService {
             }
 
             // 2. 비밀번호 변경
-            memberRepository.updatePassword(memberDTO.getId(), newPassword);
+            memberRepository.updatePassword(memberDTO.getId(), passwordEncoder.encode(newPassword));
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

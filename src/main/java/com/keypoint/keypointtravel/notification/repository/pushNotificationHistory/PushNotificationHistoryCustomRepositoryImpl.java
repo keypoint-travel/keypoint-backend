@@ -1,17 +1,14 @@
 package com.keypoint.keypointtravel.notification.repository.pushNotificationHistory;
 
-import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
+import com.keypoint.keypointtravel.notification.dto.useCase.CommonPushHistoryUseCase;
 import com.keypoint.keypointtravel.notification.entity.QPushNotificationHistory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class PushNotificationHistoryCustomRepositoryImpl implements
@@ -29,24 +26,26 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
         booleanBuilder.and(pushNotificationHistory.isRead.eq(false))
             .and(pushNotificationHistory.member.id.eq(memberId));
 
-        return queryFactory.selectFrom(pushNotificationHistory)
+        Integer result = queryFactory.selectOne()
+            .from(pushNotificationHistory)
             .where(booleanBuilder)
-            .fetchOne() != null;
+            .fetchFirst(); // 첫 번째 결과만 조회하고, 없으면 null 반환
+
+        return result != null;
     }
 
     @Override
-    public Slice<PushHistoryResponse> findPushHistories(Long memberId, Pageable pageable) {
-        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
-
+    public List<CommonPushHistoryUseCase> findPushHistories(Long memberId, Pageable pageable) {
         // 1. 푸시 이력 조회
-        List<PushHistoryResponse> result = queryFactory
+        List<CommonPushHistoryUseCase> result = queryFactory
             .select(
                 Projections.fields(
-                    PushHistoryResponse.class,
+                    CommonPushHistoryUseCase.class,
                     pushNotificationHistory.id.as("historyId"),
-                    pushNotificationHistory.title,
-                    pushNotificationHistory.content,
-                    pushNotificationHistory.createAt.as("arrivedAt")
+                    pushNotificationHistory.type,
+                    pushNotificationHistory.detailData,
+                    pushNotificationHistory.createAt.as("arrivedAt"),
+                    pushNotificationHistory.isRead
                 )
             )
             .from(pushNotificationHistory)
@@ -56,23 +55,6 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
-        boolean hasNext = false;
-        if (result.size() > pageable.getPageSize()) {
-            hasNext = true;
-            result.remove(pageable.getPageSize());
-        }
-
-        // 2. 조회한 이력 읽은 상태로 변경
-        List<Long> readHistoryIds = result.stream().map(PushHistoryResponse::getHistoryId).toList();
-        queryFactory.update(pushNotificationHistory)
-            .set(pushNotificationHistory.isRead, true)
-
-            .set(pushNotificationHistory.modifyAt, LocalDateTime.now())
-            .set(pushNotificationHistory.modifyId, currentAuditor)
-
-            .where(pushNotificationHistory.id.in(readHistoryIds))
-            .execute();
-
-        return new SliceImpl<>(result, pageable, hasNext);
+        return result;
     }
 }

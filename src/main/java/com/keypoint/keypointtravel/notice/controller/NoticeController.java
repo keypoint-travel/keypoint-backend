@@ -7,11 +7,15 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.notice.dto.request.NoticeRequest;
 import com.keypoint.keypointtravel.notice.dto.useCase.NoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
 import com.keypoint.keypointtravel.notice.service.NoticeService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -37,6 +41,20 @@ public class NoticeController {
         return APIResponseEntity.<Void>builder()
             .message("공지등록 성공")
             .build();
+    }
+
+    // 이미 생성된 공지사항에 다른 언어로 추가
+    @PostMapping("/{noticeId}")
+    public ResponseEntity<Void> saveNotice(
+        @PathVariable(value = "noticeId", required = false) Long noticeId,
+        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
+        @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
+        @RequestPart(value = "detail") @Valid NoticeRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        PlusNoticeUseCase useCase = new PlusNoticeUseCase(noticeId, thumbnailImage, detailImages, findLanguageValue(request.getLanguage()), request.getTitle(),request.getContent());
+        noticeService.saveNoticeByOtherLanguage(useCase);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 

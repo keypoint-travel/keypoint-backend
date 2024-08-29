@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,6 +39,9 @@ public class Campaign extends BaseEntity {
     private Date endDate;
 
     private String invitation_code;
+
+    @OneToMany(mappedBy = "campaign", orphanRemoval = true)
+    private List<MemberCampaign> memberCampaigns = new ArrayList<>();
 
     @Builder
     public Campaign(String title, Status status, Long campaignImageId, Date startDate, Date endDate, String invitation_code) {

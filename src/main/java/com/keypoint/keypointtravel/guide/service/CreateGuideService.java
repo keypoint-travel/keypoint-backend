@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.guide.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.guide.dto.useCase.CreateGuideTranslationUseCase;
@@ -34,7 +35,7 @@ public class CreateGuideService {
         try {
             // 1. 유효성 검사
             if (readGuideService.validateOrder(useCase.getOrder())) {
-                throw new GeneralException(GuideErrorCode.DUPLICATED_ORDER);
+                throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
             }
 
             // 2. 썸네일 저장

@@ -1,11 +1,11 @@
 package com.keypoint.keypointtravel.place.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class CreateRecentPlaceSearchRequest {
 
-    @NotBlank
-    private String searchWord;
+    @NotNull
+    private Long placeId;
 }
