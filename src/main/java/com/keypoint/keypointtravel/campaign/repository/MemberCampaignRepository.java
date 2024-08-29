@@ -17,4 +17,6 @@ public interface MemberCampaignRepository extends JpaRepository<MemberCampaign, 
         + "FROM MemberCampaign mc "
         + "WHERE mc.campaign.id = :campaignId")
     List<Member> findMembersByCampaignId(@Param("campaignId") Long campaignId);
+
+    void deleteAllByCampaignId(Long campaignId);
 }

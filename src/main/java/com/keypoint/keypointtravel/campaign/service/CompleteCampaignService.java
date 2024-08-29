@@ -31,7 +31,7 @@ public class CompleteCampaignService {
         List<Long> memberIds = validateIsLeader(useCase.getMemberId(), useCase.getCampaignId());
         // 2. 캠페인 종료 (status 변경)
         campaignRepository.updateCampaignFinished(useCase.getCampaignId());
-        // 3. todo : 캠페인 종료 알림 전송
+        // 3. todo : 캠페인 종료 알림 전송, 배지 부여
     }
 
     private List<Long> validateIsLeader(Long memberId, Long campaignId) {
