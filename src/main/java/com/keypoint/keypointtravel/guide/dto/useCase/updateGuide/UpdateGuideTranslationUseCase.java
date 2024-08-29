@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.guide.dto.useCase.updateGuide;
 
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.guide.dto.request.updateGuide.UpdateGuideTranslationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ public class UpdateGuideTranslationUseCase {
 
   private Long guideId;
   private Long guideTranslationId;
+  private LanguageCode languageCode;
   private String title;
   private String subTitle;
   private String content;
@@ -22,6 +24,7 @@ public class UpdateGuideTranslationUseCase {
     return new UpdateGuideTranslationUseCase(
         guideId,
         guideTranslationId,
+        request.getLanguageCode(),
         request.getTitle(),
         request.getSubTitle(),
         request.getContent()

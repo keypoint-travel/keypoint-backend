@@ -15,4 +15,16 @@ public interface GuideTranslationRepository extends JpaRepository<GuideTranslati
         + "WHERE g.guide.id = :guideId AND g.languageCode = :languageCode AND g.isDeleted = false")
     boolean existsByGuideAndLanguage(@Param("guideId") Long guideId,
         @Param("languageCode") LanguageCode language);
+
+    @Query("SELECT COUNT(g) > 0 "
+        + "FROM GuideTranslation g "
+        + "WHERE g.guide.id = :guideId AND g.languageCode = :languageCode AND g.isDeleted = false AND NOT g.id = :guideTranslationId")
+    boolean existsByIdNotAndLanguageCodeAndIsDeletedFalse(
+        @Param("guideId") Long guideId,
+        @Param("guideTranslationId") Long guideTranslationId,
+        @Param("languageCode") LanguageCode languageCode
+    );
+
+    boolean existsByIdAndLanguageCodeAndIsDeletedFalse(Long guideTranslationId,
+        LanguageCode languageCode);
 }
