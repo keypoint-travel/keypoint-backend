@@ -3,14 +3,18 @@ package com.keypoint.keypointtravel.campaign.repository;
 import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
+import com.keypoint.keypointtravel.campaign.entity.QTravelLocation;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
+import com.keypoint.keypointtravel.place.entity.QCountry;
+import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -145,5 +149,23 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .set(campaign.status, Status.FINISHED)
             .where(campaign.id.eq(campaignId))
             .execute();
+    }
+
+    @Override
+    public List<TravelLocationDto> findTravelLocationList(Long campaignId) {
+        QPlace place = QPlace.place;
+        QCountry country = QCountry.country;
+        QTravelLocation travelLocation = QTravelLocation.travelLocation;
+        return queryFactory.select(
+                Projections.constructor(TravelLocationDto.class,
+                    travelLocation.sequence,
+                    travelLocation.placeId,
+                    place.cityKO,
+                    country.countryKO))
+            .from(travelLocation)
+            .innerJoin(place).on(travelLocation.placeId.eq(place.id))
+            .innerJoin(country).on(place.country.id.eq(country.id))
+            .where(travelLocation.campaign.id.eq(campaignId))
+            .fetch();
     }
 }
