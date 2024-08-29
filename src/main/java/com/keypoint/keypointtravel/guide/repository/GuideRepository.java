@@ -11,7 +11,7 @@ public interface GuideRepository extends JpaRepository<Guide, Long>,
 
     boolean existsByOrderAndIsDeletedFalse(int order);
 
-    boolean existsByIdNotAndOrderAndIsDeletedFalse(Long guide, int order);
+    boolean existsByIdNotAndOrderAndIsDeletedFalse(Long guideId, int order);
 
     Optional<Guide> findByIdAndIsDeletedFalse(Long id);
 }
