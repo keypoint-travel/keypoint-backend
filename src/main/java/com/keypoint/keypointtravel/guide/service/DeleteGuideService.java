@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.guide.service;
 
+import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideGuideUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideTranslationUseCase;
@@ -37,7 +38,11 @@ public class DeleteGuideService {
     @Transactional
     public void deleteGuideTranslations(DeleteGuideTranslationUseCase useCase) {
         try {
-            guideRepository.deleteGuideTranslations(useCase);
+            long result = guideRepository.deleteGuideTranslations(useCase);
+            
+            if (result != useCase.getGuideTranslationIds().length) {
+                throw new GeneralException(GuideErrorCode.NOT_EXISTED_GUIDE);
+            }
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

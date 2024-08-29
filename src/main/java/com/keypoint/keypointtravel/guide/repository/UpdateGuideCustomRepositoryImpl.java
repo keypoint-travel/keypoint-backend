@@ -76,14 +76,14 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
     }
 
     @Override
-    public void deleteGuideTranslations(DeleteGuideTranslationUseCase useCase) {
+    public long deleteGuideTranslations(DeleteGuideTranslationUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(guideTranslation.id.in(useCase.getGuideTranslationIds()))
             .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
 
-        queryFactory.update(guideTranslation)
+        return queryFactory.update(guideTranslation)
             .set(guideTranslation.isDeleted, true)
             .set(guideTranslation.modifyAt, LocalDateTime.now())
             .set(guideTranslation.modifyId, currentAuditor)
