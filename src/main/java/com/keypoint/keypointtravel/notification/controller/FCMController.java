@@ -4,15 +4,19 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 @RestController
@@ -25,7 +29,10 @@ public class FCMController {
 
     @GetMapping("/event")
     public ResponseEntity<?> testEvent() {
-        fcmService.testEvent();
+        //fcmService.testEvent();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes()).getRequest();
+        //localeConfig.resolveLocale(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -43,7 +50,7 @@ public class FCMController {
             .setNotification(notification)
             .setToken(request.getDeviceToken())
             .build();
-        //FCMUtils.sendSingleMessage(message);
+        FCMUtils.sendSingleMessage(message);
 
         CreatePushNotificationUseCase useCase = CreatePushNotificationUseCase.of(userDetails.getId(), request);
         pushNotificationHistoryService.savePushNotificationHistories(useCase);
