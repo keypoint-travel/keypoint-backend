@@ -13,7 +13,8 @@ public enum CampaignErrorCode implements ErrorCode {
     DUPLICATED_MEMBER("004_DUPLICATED_MEMBER", "이미 가입된 캠페인 회원입니다"),
     EXPIRED_INVITE_EMAIL("005_EXPIRED_INVITE_EMAIL", "초대된 이력이 없거나, 유효기간이 만료되었습니다"),
     NOT_EXISTED_CURRENCY("006_NOT_EXISTED_CURRENCY", "존재하지 않는 화폐입니다"),
-    ALREADY_IN_WAIT_LIST("007_ALREADY_IN_WAIT_LIST", "이미 대기명단에 있습니다");
+    ALREADY_IN_WAIT_LIST("007_ALREADY_IN_WAIT_LIST", "이미 대기명단에 있습니다"),
+    NOT_EXISTED_CAMPAIGN_WAIT_MEMBER("008_NOT_EXISTED_CAMPAIGN_WAIT_MEMBER", "회원이 대기명단에 존재하지 않습니다");
 
     private final String code;
     private final String msg;

@@ -142,7 +142,8 @@ public class JoinCampaignService {
     public void approveJoinByCampaignCode(ApproveByCodeUseCase useCase) {
         // 캠페인 id에 해당하는 캠페인이 존재하는지, 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
-        // 캠페인 가입 신청 대기 목록에 존재하는지 확인
+        // 캠페인 가입 신청 대기 목록에 존재하는지 확인 후 삭제
+        customMemberCampaignRepository.deleteWaitMember(useCase.getMemberId(), useCase.getCampaignId());
         if (useCase.isApprove()) {
             // 캠페인 참여 승인하였을 경우
             // 이미 캠페인 가입이 된 상태일 시 예외 처리

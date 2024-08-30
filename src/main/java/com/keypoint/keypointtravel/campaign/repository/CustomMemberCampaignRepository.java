@@ -92,4 +92,14 @@ public class CustomMemberCampaignRepository {
             .where(campaignWaitMember.campaign.id.eq(campaignId))
             .fetch();
     }
+
+    public void deleteWaitMember(Long memberId, Long campaignId) {
+        long count = queryFactory.delete(campaignWaitMember)
+            .where(campaignWaitMember.member.id.eq(memberId)
+                .and(campaignWaitMember.campaign.id.eq(campaignId)))
+            .execute();
+        if(count < 1){
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN_WAIT_MEMBER);
+        }
+    }
 }
