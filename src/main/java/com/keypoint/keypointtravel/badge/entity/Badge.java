@@ -50,12 +50,14 @@ public class Badge extends BaseEntity {
         Long activeImageId,
         Long inactiveImageId,
         String name,
-        int order
+        int order,
+        BadgeType type
     ) {
         this.activeImageId = activeImageId;
         this.inactiveImageId = inactiveImageId;
         this.name = name;
         this.order = order;
         this.isDeleted = false;
+        this.type = type;
     }
 }

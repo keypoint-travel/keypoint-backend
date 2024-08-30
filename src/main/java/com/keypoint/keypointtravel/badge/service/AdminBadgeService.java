@@ -35,12 +35,12 @@ public class AdminBadgeService {
     public void addBadge(CreateBadgeUseCase useCase) {
         try {
             // 1. 유효성 검사
-            if (badgeRepository.existsByNameAndIsDeletedFalse(useCase.getName())) {
-                throw new GeneralException(BadgeErrorCode.DUPLICATED_BADGE_NAME);
-            }
-            if (badgeRepository.existsByOrderAndIsDeletedFalse(useCase.getOrder())) {
-                throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
-            }
+//            if (badgeRepository.existsByNameAndIsDeletedFalse(useCase.getName())) {
+//                throw new GeneralException(BadgeErrorCode.DUPLICATED_BADGE_NAME);
+//            }
+//            if (badgeRepository.existsByOrderAndIsDeletedFalse(useCase.getOrder())) {
+//                throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
+//            }
 
             // 2. 배지 이미지 저장
             Long activeBadgeId = uploadFileService.saveUploadFile(
