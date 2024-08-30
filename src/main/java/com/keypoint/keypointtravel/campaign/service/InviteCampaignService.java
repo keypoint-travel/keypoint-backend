@@ -1,6 +1,8 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.campaign.dto.response.FindInvitationResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
@@ -11,6 +13,8 @@ import com.keypoint.keypointtravel.campaign.repository.CustomMemberCampaignRepos
 import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
+import com.keypoint.keypointtravel.friend.dto.FriendDto;
+import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
@@ -19,10 +23,12 @@ import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -43,6 +49,29 @@ public class InviteCampaignService {
     private final EmailInvitationHistoryRepository emailInvitationHistoryRepository;
 
     private final CustomMemberCampaignRepository customMemberCampaignRepository;
+
+    private final FriendRepository friendRepository;
+
+    /**
+     * 캠페인 초대 화면 조회 함수
+     *
+     * @Param memberId, campaignId useCase
+     *
+     * @Return 캠페인 정보 및 친구 목록
+     */
+    @Transactional
+    public FindInvitationResponse findInvitationView(FIndCampaignUseCase useCase) {
+        // 캠페인 장인인지 확인
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(), useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
+        }
+        // 캠페인 정보 조회
+        Campaign campaign = campaignRepository.findById(useCase.getCampaignId())
+            .orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN));
+        // 친구 목록 조회
+        List<FriendDto> friends = friendRepository.findAllByMemberId(useCase.getMemberId());
+        return new FindInvitationResponse(campaign.getId(), campaign.getTitle(), campaign.getInvitation_code(), friends);
+    }
 
     /**
      * 캠페인 이메일 초대 전 검증 함수
