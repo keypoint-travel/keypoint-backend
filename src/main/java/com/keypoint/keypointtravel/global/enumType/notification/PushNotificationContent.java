@@ -1,14 +1,13 @@
 package com.keypoint.keypointtravel.global.enumType.notification;
 
+import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
@@ -143,6 +142,10 @@ public enum PushNotificationContent {
         PushNotificationType.EVENT_NOTICE,
         "pushNotification.event_notice_title",
         "pushNotification.event_notice_content"
+    ),
+    PUSH_NOTIFICATION_BY_ADMIN(
+            PushNotificationType.PUSH_NOTIFICATION_BY_ADMIN,
+            "", ""
     );
 
     private final PushNotificationType type;
