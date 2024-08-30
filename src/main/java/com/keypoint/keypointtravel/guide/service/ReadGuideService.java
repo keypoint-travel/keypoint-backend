@@ -1,18 +1,19 @@
 package com.keypoint.keypointtravel.guide.service;
 
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideDetailResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadNextGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
-import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideInAdminUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
 import com.keypoint.keypointtravel.guide.entity.Guide;
 import com.keypoint.keypointtravel.guide.repository.GuideRepository;
-import com.keypoint.keypointtravel.member.dto.useCase.MemberIdAndPageableUseCase;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ public class ReadGuideService {
      * @param order
      */
     public boolean validateOrder(int order) {
-        return guideRepository.existsByOrder(order);
+        return guideRepository.existsByOrderAndIsDeletedFalse(order);
     }
 
     /**
@@ -44,7 +45,7 @@ public class ReadGuideService {
      * @return
      */
     public Guide findGuideByGuideId(Long guideId) {
-        return guideRepository.findById(guideId)
+        return guideRepository.findByIdAndIsDeletedFalse(guideId)
             .orElseThrow(() -> new GeneralException(GuideErrorCode.NOT_EXISTED_GUIDE));
     }
 
@@ -54,9 +55,9 @@ public class ReadGuideService {
      * @param useCase
      * @return
      */
-    public Page<ReadGuideInAdminResponse> findGuidesInAdmin(ReadGuideInAdminUseCase useCase) {
+    public Page<ReadGuideInAdminResponse> findGuidesInAdmin(PageUseCase useCase) {
         try {
-            return guideRepository.findGuidesInAdmin(useCase.getPageable());
+            return guideRepository.findGuidesInAdmin(useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -70,7 +71,9 @@ public class ReadGuideService {
      */
     public ReadGuideDetailInAdminResponse findGuideDetailInAdmin(GuideIdUseCase useCase) {
         try {
-            return guideRepository.findGuideDetailInAdmin(useCase.getGuideId());
+            ReadGuideDetailInAdminResponse response = guideRepository.findGuideDetailInAdmin(
+                useCase.getGuideId());
+            return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -82,11 +85,11 @@ public class ReadGuideService {
      * @param useCase
      * @return
      */
-    public Slice<ReadGuideResponse> findGuides(MemberIdAndPageableUseCase useCase) {
+    public Slice<ReadGuideResponse> findGuides(PageAndMemberIdUseCase useCase) {
         try {
             LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
                 useCase.getMemberId());
-            return guideRepository.findGuides(languageCode, useCase.getPageable());
+            return guideRepository.findGuides(languageCode, useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -100,7 +103,21 @@ public class ReadGuideService {
      */
     public ReadGuideDetailResponse findGuideDetail(ReadGuideTranslationIdUseCase useCase) {
         try {
-            return guideRepository.findGuideDetail(useCase.getGuideTranslationIds());
+            LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
+                useCase.getMemberId());
+
+            // 1. 이용 가이드 조회
+            ReadGuideDetailResponse response = guideRepository.findGuideDetail(
+                useCase.getGuideTranslationIds());
+
+            // 2. 다음 순서 이용 가이드 조회
+            ReadNextGuideResponse nextGuideResponse = guideRepository.findNextGuide(
+                response.getOrder(),
+                languageCode
+            );
+            response.setNextGuide(nextGuideResponse);
+
+            return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

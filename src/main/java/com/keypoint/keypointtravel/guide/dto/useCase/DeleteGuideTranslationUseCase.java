@@ -8,10 +8,12 @@ import lombok.Getter;
 public class DeleteGuideTranslationUseCase {
 
     private Long guideId;
-    private Long[] guideTranslationIds;
-
-
-    public static DeleteGuideTranslationUseCase of(Long guideId, Long[] ids) {
-        return new DeleteGuideTranslationUseCase(guideId, ids);
+    private Long guideTranslationId;
+    
+    public static DeleteGuideTranslationUseCase of(Long guideId, Long guideTranslationId) {
+        return new DeleteGuideTranslationUseCase(
+            guideId,
+            guideTranslationId
+        );
     }
 }

@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCustomRepository {
 
     Boolean existsByFriendIdAndMemberIdAndIsDeletedFalse(Long friendId, Long memberId);
+
+    Boolean existsByFriendIdAndMemberIdAndIsDeletedTrue(Long friendId, Long memberId);
 }

@@ -1,21 +1,20 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
-import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
+import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 
 import java.util.List;
 
 public interface CustomCampaignRepository {
 
-    boolean existsByCampaignLeaderTrue(Long memberId, Long campaignId);
-
-    boolean existsBlockedMemberInCampaign(Long memberId, Long campaignId);
-
     SendInvitationEmailDto findSendInvitationEmailInfo(Long campaignId);
 
-    MemberCampaign findCampaignLeader(Long campaignId);
+    CampaignInfoDto findCampaignInfo(Long campaignId);
 
-    List<MemberCampaign> findMembersByCampaignCode(String campaignCode);
+    List<CampaignInfoDto> findCampaignInfoList(Long memberId);
 
-    List<MemberCampaign> findMembersByCampaignCode(Long campaignId);
+    void updateCampaignFinished(Long campaignId);
+
+    List<TravelLocationDto> findTravelLocationList(Long campaignId);
 }

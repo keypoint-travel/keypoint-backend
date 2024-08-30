@@ -3,8 +3,10 @@ spring:
     multipart:
       maxFileSize: 10MB
       maxRequestSize: 10MB
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
   profiles:
+    default: local
     group:
       local: "local, local-key, mail"
       dev: "dev, key, mail"
-    active: local

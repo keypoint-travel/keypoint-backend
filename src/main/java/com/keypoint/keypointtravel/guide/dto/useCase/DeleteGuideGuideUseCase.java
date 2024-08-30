@@ -12,4 +12,8 @@ public class DeleteGuideGuideUseCase {
   public static DeleteGuideGuideUseCase from(Long[] guideId) {
     return new DeleteGuideGuideUseCase(guideId);
   }
+
+  public static DeleteGuideGuideUseCase from(Long guideId) {
+    return new DeleteGuideGuideUseCase(new Long[]{guideId});
+  }
 }

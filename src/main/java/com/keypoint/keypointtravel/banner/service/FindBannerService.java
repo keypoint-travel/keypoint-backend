@@ -20,7 +20,7 @@ public class FindBannerService {
     private final BannerRepository bannerRepository;
 
     /**
-     * 생성한 Banner 목록을 조회하는 함수 (공통 배너 목록 조회(언어 별 모두 조회))
+     * 생성한 Banner 목록을 조회하는 함수 (공통 배너 목록 조회(언어별 모두 조회))
      *
      * @Return 관리자가 확인할 수 있는 배너 목록 useCase
      */
@@ -43,7 +43,7 @@ public class FindBannerService {
     }
 
     /**
-     * Banner 상세 정보를 조회하는 함수 (공통 배너 상세 조회(언어 별 구분))
+     * Banner 상세 정보를 조회하는 함수 (공통 배너 상세 조회(언어별 구분))
      *
      * @Param language, bannerId, memberId(좋아요 여부 확인을 위한)
      *
