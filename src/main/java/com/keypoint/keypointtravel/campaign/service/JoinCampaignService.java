@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.campaign.entity.CampaignWaitMember;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByCodeUseCase;
@@ -8,6 +9,7 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
+import com.keypoint.keypointtravel.campaign.repository.CampaignWaitMemberRepository;
 import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.friend.entity.Friend;
@@ -39,6 +41,8 @@ public class JoinCampaignService {
     private final FriendRepository friendRepository;
 
     private final BlockedMemberRepository blockedMemberRepository;
+
+    private final CampaignWaitMemberRepository campaignWaitMemberRepository;
 
     /**
      * 이메일을 통한 캠페인 가입 함수
@@ -102,6 +106,11 @@ public class JoinCampaignService {
         if (memberCampaigns.isEmpty()) {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
         }
+        // 이미 신청을 하였을 경우 예외 처리
+        if (campaignWaitMemberRepository.existsByCampaignIdAndMemberId(
+            memberCampaigns.get(0).getCampaign().getId(), useCase.getMemberId())) {
+            throw new GeneralException(CampaignErrorCode.ALREADY_IN_WAIT_LIST);
+        }
         List<Long> memberIds = memberCampaigns.stream()
             .map(memberCampaign -> memberCampaign.getMember().getId())
             .toList();
@@ -115,6 +124,9 @@ public class JoinCampaignService {
         if (blockedMemberRepository.existsBlockedMembers(memberIds, useCase.getMemberId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }
+        // 캠페인 대기 회원에 추가
+        Member member = memberRepository.getReferenceById(useCase.getMemberId());
+        campaignWaitMemberRepository.save(new CampaignWaitMember(memberCampaigns.get(0).getCampaign(), member));
         // todo : 켐페인 장을 대상으로 알림 발송 (참여 승인 수락, 거절 알림)
     }
 
