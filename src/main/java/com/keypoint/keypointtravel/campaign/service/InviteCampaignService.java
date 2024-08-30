@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
+import com.keypoint.keypointtravel.campaign.repository.CustomMemberCampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
@@ -41,6 +42,8 @@ public class InviteCampaignService {
 
     private final EmailInvitationHistoryRepository emailInvitationHistoryRepository;
 
+    private final CustomMemberCampaignRepository customMemberCampaignRepository;
+
     /**
      * 캠페인 이메일 초대 전 검증 함수
      *
@@ -49,7 +52,7 @@ public class InviteCampaignService {
     @Transactional
     public void validateInvitation(InviteByEmailUseCase useCase) {
         // 캠페인 장인지 확인 campaignId, memberId
-        if (!campaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
@@ -57,7 +60,7 @@ public class InviteCampaignService {
         CommonMemberDTO dto = memberRepository.findByEmail(useCase.getEmail())
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
         // 현재 참여 인원들 중 차단 인원 여부 확인
-        if (campaignRepository.existsBlockedMemberInCampaign(dto.getId(),
+        if (customMemberCampaignRepository.existsBlockedMemberInCampaign(dto.getId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }

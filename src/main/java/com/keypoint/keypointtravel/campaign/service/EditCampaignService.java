@@ -14,10 +14,7 @@ import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.entity.TravelLocation;
-import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
-import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
-import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
-import com.keypoint.keypointtravel.campaign.repository.TravelLocationRepository;
+import com.keypoint.keypointtravel.campaign.repository.*;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
@@ -53,6 +50,8 @@ public class EditCampaignService {
 
     private final UploadFileService uploadFileService;
 
+    private final CustomMemberCampaignRepository customMemberCampaignRepository;
+
     /**
      * 수정을 위한 캠페인 조회 함수
      *
@@ -62,7 +61,7 @@ public class EditCampaignService {
     @Transactional(readOnly = true)
     public EditCampaignResponse findCampaign(FIndCampaignUseCase useCase) {
         // 캠페인 장인지 확인 필요
-        if (!campaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
@@ -88,7 +87,7 @@ public class EditCampaignService {
     @Transactional
     public void editCampaign(UpdateUseCase useCase) {
         // 1. 캠페인 장인지 확인 필요
-        if (!campaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
