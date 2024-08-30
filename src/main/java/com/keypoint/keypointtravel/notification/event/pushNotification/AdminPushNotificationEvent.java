@@ -5,8 +5,6 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AdminPushNotificationEvent extends PushNotificationEvent {
 
@@ -18,11 +16,10 @@ public class AdminPushNotificationEvent extends PushNotificationEvent {
 
     public AdminPushNotificationEvent(
             PushNotificationType type,
-            List<Long> userIds,
             String title,
             String content
     ) {
-        super(type, userIds);
+        super(type, null);
         this.additionalData = new FCMContentData(title, content);
     }
 
