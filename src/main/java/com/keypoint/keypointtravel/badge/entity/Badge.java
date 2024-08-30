@@ -1,8 +1,11 @@
 package com.keypoint.keypointtravel.badge.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -36,6 +40,11 @@ public class Badge extends BaseEntity {
 
     @Column(nullable = false, name = "order_number")
     private int order;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'SIGN_UP'")
+    private BadgeType type;
 
     public Badge(
         Long activeImageId,
