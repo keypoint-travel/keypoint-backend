@@ -11,14 +11,14 @@ spring:
     type: redis
     redis:
       cache-null-values: true
-      host: 13.209.219.32
+      host: 127.0.0.1
       port: 6379
       password: sWZXEqDGfDHm9IT
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://localhost:3306/keypoint-travel-local?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false
     username: root
-    password: root
+    password:
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
     show-sql: true
