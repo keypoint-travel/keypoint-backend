@@ -2,12 +2,10 @@ package com.keypoint.keypointtravel.campaign.repository;
 
 import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
-import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
-import com.keypoint.keypointtravel.campaign.entity.QCampaign;
-import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
-import com.keypoint.keypointtravel.campaign.entity.QTravelLocation;
+import com.keypoint.keypointtravel.campaign.entity.*;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
@@ -33,6 +31,8 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
     private final QBlockedMember blockedMember = QBlockedMember.blockedMember;
+
+    private final QCampaignWaitMember campaignWaitMember = QCampaignWaitMember.campaignWaitMember;
 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
@@ -166,6 +166,20 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .innerJoin(place).on(travelLocation.placeId.eq(place.id))
             .innerJoin(country).on(place.country.id.eq(country.id))
             .where(travelLocation.campaign.id.eq(campaignId))
+            .fetch();
+    }
+
+    @Override
+    public List<MemberInfoDto> findWaitMembers(Long campaignId) {
+        return queryFactory.select(
+                Projections.constructor(MemberInfoDto.class,
+                    memberDetail.member.id,
+                    uploadFile.path,
+                    memberDetail.name))
+            .from(memberDetail)
+            .innerJoin(campaignWaitMember).on(campaignWaitMember.member.id.eq(memberDetail.member.id))
+            .leftJoin(uploadFile).on(memberDetail.profileImageId.eq(uploadFile.id))
+            .where(campaignWaitMember.campaign.id.eq(campaignId))
             .fetch();
     }
 }

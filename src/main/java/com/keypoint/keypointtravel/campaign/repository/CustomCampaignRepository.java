@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
@@ -28,4 +29,6 @@ public interface CustomCampaignRepository {
     void updateCampaignFinished(Long campaignId);
 
     List<TravelLocationDto> findTravelLocationList(Long campaignId);
+
+    List<MemberInfoDto> findWaitMembers(Long campaignId);
 }

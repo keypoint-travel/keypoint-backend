@@ -1,6 +1,9 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
+import com.keypoint.keypointtravel.campaign.dto.response.CampaignWaitMemberResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.CampaignWaitMember;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
@@ -198,5 +201,22 @@ public class JoinCampaignService {
             friendRepository.save(buildFriend(leader, member));
             friendRepository.save(buildFriend(member, leader));
         }
+    }
+
+    /**
+     * 캠페인 참여 대기 인원 목록 조회 함수
+     *
+     * @Param memberId, campaignId useCase
+     * @Return
+     */
+    @Transactional(readOnly = true)
+    public CampaignWaitMemberResponse findCampaignWaitList(FIndCampaignUseCase useCase) {
+        // 캠페인 장인지 확인 필요
+        if (!campaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+            useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
+        }
+        List<MemberInfoDto> waitMembers = campaignRepository.findWaitMembers(useCase.getCampaignId());
+        return new CampaignWaitMemberResponse(useCase.getCampaignId(), waitMembers);
     }
 }
