@@ -17,7 +17,6 @@ import com.keypoint.keypointtravel.guide.repository.GuideRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +84,7 @@ public class ReadGuideService {
      * @param useCase
      * @return
      */
-    public Slice<ReadGuideResponse> findGuides(PageAndMemberIdUseCase useCase) {
+    public Page<ReadGuideResponse> findGuides(PageAndMemberIdUseCase useCase) {
         try {
             LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
                 useCase.getMemberId());

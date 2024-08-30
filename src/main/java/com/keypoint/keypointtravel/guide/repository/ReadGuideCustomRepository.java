@@ -9,7 +9,6 @@ import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideD
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadNextGuideResponse;
 import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Slice;
 
 public interface ReadGuideCustomRepository {
 
@@ -17,7 +16,7 @@ public interface ReadGuideCustomRepository {
 
     ReadGuideDetailInAdminResponse findGuideDetailInAdmin(Long guideId);
 
-    Slice<ReadGuideResponse> findGuides(LanguageCode languageCode, PageAndMemberIdUseCase useCase);
+    Page<ReadGuideResponse> findGuides(LanguageCode languageCode, PageAndMemberIdUseCase useCase);
 
     ReadGuideDetailResponse findGuideDetail(Long guideTranslationIds);
 
