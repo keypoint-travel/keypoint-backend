@@ -76,11 +76,6 @@ public class AdminBadgeService {
             )) {
                 throw new GeneralException(CommonErrorCode.DUPLICATED_ORDER);
             }
-            if (!useCase.getName().equals(badge.getName()) &&
-                badgeRepository.existsByNameAndIsDeletedFalse(useCase.getName())
-            ) {
-                throw new GeneralException(BadgeErrorCode.DUPLICATED_BADGE_NAME);
-            }
 
             // 2. 이미지 업데이트
             uploadFileService.updateUploadFile(

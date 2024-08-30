@@ -21,7 +21,7 @@ public class CreateBadgeUseCase {
         MultipartFile badgeOffImage
     ) {
         return new CreateBadgeUseCase(
-            request.getName(),
+            "",
             request.getOrder(),
             badgeOnImage,
             badgeOffImage

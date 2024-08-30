@@ -43,7 +43,7 @@ public class Badge extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'SIGN_UP'")
+    @ColumnDefault("'NONE'")
     private BadgeType type;
 
     public Badge(

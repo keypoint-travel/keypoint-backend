@@ -34,7 +34,6 @@ public class AdminBadgeCustomRepositoryImpl implements AdminBadgeCustomRepositor
 
         queryFactory
             .update(badge)
-            .set(badge.name, useCase.getName())
             .set(badge.order, useCase.getOrder())
 
             .set(badge.modifyAt, LocalDateTime.now())
