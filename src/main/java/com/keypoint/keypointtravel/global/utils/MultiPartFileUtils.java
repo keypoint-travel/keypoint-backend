@@ -23,9 +23,7 @@ public class MultiPartFileUtils {
         byte[] content = Files.readAllBytes(resource.getFile().toPath());
 
         // MultipartFile로 변환
-        MultipartFile multipartFile = new MockMultipartFile(fileName, fileName, "image/png",
+        return new MockMultipartFile(fileName, fileName, "image/png",
             content);
-
-        return multipartFile;
     }
 }
