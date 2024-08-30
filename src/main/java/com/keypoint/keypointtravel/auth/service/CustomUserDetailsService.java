@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        CommonMemberDTO member = memberRepository.findByEmail(email)
+        CommonMemberDTO member = memberRepository.findByEmailAndIsDeletedFalse(email)
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
 
         return CustomUserDetails.from(member);

@@ -29,7 +29,7 @@ public class ReadMemberService {
      * @return
      */
     public CommonMemberDTO findMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
+        return memberRepository.findByEmailAndIsDeletedFalse(email)
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
     }
 
@@ -53,7 +53,7 @@ public class ReadMemberService {
      */
     public boolean checkIsNotExistedEmail(EmailUseCase useCase) {
         try {
-            boolean isExisted = memberRepository.existsByEmail(useCase.getEmail());
+            boolean isExisted = memberRepository.existsByEmailAndIsDeletedFalse(useCase.getEmail());
             if (isExisted) { // 등록된 이메일인 경우 에러 반환
                 throw new GeneralException(MemberErrorCode.DUPLICATED_EMAIL);
             }
