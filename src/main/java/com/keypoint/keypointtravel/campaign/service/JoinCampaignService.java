@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
-import com.keypoint.keypointtravel.campaign.dto.dto.EmailInvitationHistory;
+import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByEmailUseCase;
