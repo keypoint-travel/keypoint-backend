@@ -4,6 +4,8 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
@@ -12,7 +14,6 @@ import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryS
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,8 @@ public class FCMController {
     public ResponseEntity<?> testEvent() {
         //fcmService.testEvent();
         Locale currentLocale = LocaleContextHolder.getLocale();
-        return new ResponseEntity<>(HttpStatus.OK);
+        throw new GeneralException(CommonErrorCode.FAIL_TO_DELETE_EN_DATA);
+        //return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/send")

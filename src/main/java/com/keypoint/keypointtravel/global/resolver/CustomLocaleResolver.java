@@ -25,20 +25,21 @@ public class CustomLocaleResolver implements LocaleResolver {
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         try {
+            // Accept-Language 헤더 확인
+            String locales = request.getHeader(HeaderConstants.LANGUAGE_HEADER);
+            if (locales != null && !locales.isBlank()) {
+                return LanguageCode.fromCode(locales).getLocale();
+            }
+            
             // Authorization 헤더 확인
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null) {
+            if (authentication != null
+                && authentication.getPrincipal() instanceof CustomUserDetails) {
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
                 LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
                     userDetails.getId());
 
                 return languageCode.getLocale();
-            }
-
-            // Accept-Language 헤더 확인
-            String locales = request.getHeader(HeaderConstants.LANGUAGE_HEADER);
-            if (locales != null && !locales.isBlank()) {
-                return LanguageCode.fromCode(locales).getLocale();
             }
         } catch (Exception ex) {
             LogUtils.writeErrorLog("resolveLocale", ex.getMessage());
