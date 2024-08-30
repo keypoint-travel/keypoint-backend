@@ -2,11 +2,12 @@ package com.keypoint.keypointtravel.global.utils;
 
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
 
 @Component
 public class MessageSourceUtils {
@@ -27,6 +28,9 @@ public class MessageSourceUtils {
      */
     public static String getLocalizedLanguage(String langCode, Locale locale) {
         try {
+            if (langCode == null || langCode.isBlank()) {
+                return "";
+            }
             return messageSource.getMessage(langCode, null, locale);
         } catch (NoSuchMessageException e) {
             throw new GeneralException(CommonErrorCode.FAIL_TO_FIND_LANGUAGE, e);

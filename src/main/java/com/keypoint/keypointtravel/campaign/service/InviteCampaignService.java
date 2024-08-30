@@ -86,7 +86,7 @@ public class InviteCampaignService {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         // 이메일 존재 여부 확인
-        CommonMemberDTO dto = memberRepository.findByEmail(useCase.getEmail())
+        CommonMemberDTO dto = memberRepository.findByEmailAndIsDeletedFalse(useCase.getEmail())
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
         // 현재 참여 인원들 중 차단 인원 여부 확인
         if (customMemberCampaignRepository.existsBlockedMemberInCampaign(dto.getId(),

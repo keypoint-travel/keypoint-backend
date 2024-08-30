@@ -1,17 +1,12 @@
 package com.keypoint.keypointtravel.member.service;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberProfileUseCase;
@@ -27,8 +22,13 @@ import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRe
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
-
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,7 +42,7 @@ public class UpdateMemberService {
     private final ReadMemberService readMemberService;
     private final UploadFileService uploadFileService;
     private final PasswordEncoder passwordEncoder;
-
+    private final JwtTokenProvider tokenProvider;
 
     /**
      * 최근 로그인 날짜 정보를 업데이트하는 함수
@@ -80,7 +80,11 @@ public class UpdateMemberService {
             memberDetailRepository.save(memberDetail);
             notificationRepository.save(notification);
 
-            return MemberResponse.from(member);
+            // 5. 토큰 데이터 발급
+            Authentication authentication = tokenProvider.createAuthenticationFromMember(member);
+            TokenInfoResponse token = tokenProvider.createToken(authentication);
+
+            return MemberResponse.of(member, token);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
