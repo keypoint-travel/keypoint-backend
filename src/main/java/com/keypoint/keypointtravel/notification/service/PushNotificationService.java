@@ -1,19 +1,12 @@
 package com.keypoint.keypointtravel.notification.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
+import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent.FCMContentData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent.CampaignLeaderData;
@@ -22,8 +15,14 @@ import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPus
 import com.keypoint.keypointtravel.notification.event.pushNotification.NoticePushNotificationEvent.NoticeData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -178,6 +177,14 @@ public class PushNotificationService {
                     );
                     content = MessageSourceUtils.getLocalizedLanguage(
                         notificationMsg.getContentLangCode(), locale);
+                }
+            }
+            case PUSH_NOTIFICATION_BY_ADMIN -> {
+                if (additionalData instanceof FCMContentData) {
+                    FCMContentData data = (FCMContentData) additionalData;
+
+                    title = data.getTitle();
+                    content = data.getContent();
                 }
             }
             // TODO 문구 미정 항목

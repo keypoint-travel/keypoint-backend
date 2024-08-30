@@ -23,7 +23,8 @@ public enum PushNotificationType {
     CAMPAIGN_D60_PASSED("마지막 캠페인 D+60일 경과"),
 
     CAMPAIGN_START("캠페인 시작 알림"),
-    EVENT_NOTICE("이벤트/전체 공지 알림");
+    EVENT_NOTICE("이벤트/전체 공지 알림"),
+    PUSH_NOTIFICATION_BY_ADMIN("관리자 페이지에서 생성된 알림");
 
     private final String description;
 }
