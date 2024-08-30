@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.campaign.service;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CompleteCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
+import com.keypoint.keypointtravel.campaign.repository.CampaignWaitMemberRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -20,6 +21,8 @@ public class CompleteCampaignService {
 
     private final CampaignRepository campaignRepository;
 
+    private final CampaignWaitMemberRepository campaignWaitMemberRepository;
+
     /**
      * 캠페인 종료 함수
      *
@@ -31,7 +34,9 @@ public class CompleteCampaignService {
         List<Long> memberIds = validateIsLeader(useCase.getMemberId(), useCase.getCampaignId());
         // 2. 캠페인 종료 (status 변경)
         campaignRepository.updateCampaignFinished(useCase.getCampaignId());
-        // 3. todo : 캠페인 종료 알림 전송, 배지 부여
+        // 3. 캠페인 대기 목록 삭제
+        campaignWaitMemberRepository.deleteAllByCampaignId(useCase.getCampaignId());
+        // 4. todo : 캠페인 종료 알림 전송, 배지 부여
     }
 
     private List<Long> validateIsLeader(Long memberId, Long campaignId) {
