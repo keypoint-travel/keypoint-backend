@@ -18,15 +18,14 @@ import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCa
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.pushNotificationHistory.PushNotificationHistoryRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -65,7 +64,7 @@ public class PushNotificationHistoryService {
      *
      * @param useCase
      */
-    public Slice<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
+    public Page<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
         try {
             Pageable pageable = useCase.getPageable();
             MemberDetail memberDetail = memberDetailRepository.findByMemberId(
@@ -75,6 +74,9 @@ public class PushNotificationHistoryService {
             List<CommonPushHistoryUseCase> histories = pushNotificationHistoryRepository.findPushHistories(
                 useCase.getMemberId(),
                 pageable
+            );
+            long count = pushNotificationHistoryRepository.countPushHistories(
+                useCase.getMemberId()
             );
 
             // 3. 다국어 적용 및 response 적용 변환
@@ -97,14 +99,7 @@ public class PushNotificationHistoryService {
                 );
             }
 
-            // 4. Slice 적용
-            boolean hasNext = false;
-            if (translatedHistories.size() > pageable.getPageSize()) {
-                hasNext = true;
-                translatedHistories.remove(pageable.getPageSize());
-            }
-
-            return new SliceImpl<>(translatedHistories, pageable, hasNext);
+            return new PageImpl<>(translatedHistories, pageable, count);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
