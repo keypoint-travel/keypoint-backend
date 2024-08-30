@@ -35,6 +35,7 @@ public class AdminBadgeController {
 
     private final AdminBadgeService adminBadgeService;
 
+    @Deprecated
     @PostMapping()
     public APIResponseEntity<Void> addBadge(
         @Valid @RequestPart(value = "badge") CreateBadgeRequest request,
@@ -73,6 +74,7 @@ public class AdminBadgeController {
             .build();
     }
 
+    @Deprecated
     @DeleteMapping()
     public APIResponseEntity<Void> deleteBadge(
         @RequestParam("badge-ids") Long[] badgeIds
