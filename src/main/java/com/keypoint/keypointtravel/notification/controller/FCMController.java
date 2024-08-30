@@ -4,6 +4,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMService;
@@ -50,7 +51,7 @@ public class FCMController {
             .setNotification(notification)
             .setToken(request.getDeviceToken())
             .build();
-        //FCMUtils.sendSingleMessage(message);
+        FCMUtils.sendSingleMessage(message);
 
         CreatePushNotificationUseCase useCase = CreatePushNotificationUseCase.of(userDetails.getId(), request);
         pushNotificationHistoryService.savePushNotificationHistories(useCase);
