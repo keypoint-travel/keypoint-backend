@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.global.config;
 
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
+import groovy.util.logging.Slf4j;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.Locale;
 
+@Slf4j
 @Configurable
 public class LocaleConfig implements WebMvcConfigurer {
     private final MemberDetailRepository memberDetailRepository;

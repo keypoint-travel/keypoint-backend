@@ -9,10 +9,13 @@ import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificati
 import com.keypoint.keypointtravel.notification.service.FCMService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
 
 
 @RestController
@@ -25,7 +28,8 @@ public class FCMController {
 
     @GetMapping("/event")
     public ResponseEntity<?> testEvent() {
-        fcmService.testEvent();
+        //fcmService.testEvent();
+        Locale aaa = LocaleContextHolder.getLocale();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
