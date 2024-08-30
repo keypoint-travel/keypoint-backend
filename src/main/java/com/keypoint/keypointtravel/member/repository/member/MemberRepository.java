@@ -4,20 +4,21 @@ import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberCustomRepository {
 
-    Optional<CommonMemberDTO> findByEmail(String email);
+    Optional<CommonMemberDTO> findByEmailAndIsDeletedFalse(String email);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailAndIsDeletedFalse(String email);
 
     @Transactional
     @Modifying
@@ -45,4 +46,11 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     @Query("SELECT m.invitationCode FROM Member m WHERE m.id = :id")
     String findInvitationCodeByMemberId(Long id);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Member m SET m.isDeleted = true WHERE m.id = :id")
+    int deleteMember(
+            @Param("id") Long id
+    );
 }

@@ -23,13 +23,14 @@ import com.keypoint.keypointtravel.member.repository.memberConsent.MemberConsent
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -106,7 +107,7 @@ public class CreateMemberService {
      * @param email 이메일
      */
     private void validateEmailForSignUp(String email) {
-        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
+        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmailAndIsDeletedFalse(email);
         if (memberOptional.isPresent()) {
             CommonMemberDTO existMember = memberOptional.get();
             if (existMember.getOauthProviderType() == OauthProviderType.NONE) {

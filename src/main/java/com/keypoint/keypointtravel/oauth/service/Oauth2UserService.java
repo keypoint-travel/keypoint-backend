@@ -15,13 +15,6 @@ import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,6 +26,10 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -137,7 +134,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
     public CommonMemberDTO registerMember(String email, OauthProviderType oauthProviderType) {
         // 1. 이메일이 등록되어 있는지 확인
-        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
+        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmailAndIsDeletedFalse(email);
 
         // 2. 등록되지 않은 경우: 저장 / 다른 제공사로 등록되어 있는 경우 예외 발생
         if (memberOptional.isPresent()) {
@@ -168,7 +165,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         // 초대코드 저장: 초대코드가 중복되지 않도록 문자열에 마지막에 memberId를 추가하여 저장
         newMember.setInvitationCode(StringUtils.getRandomString(9) + newMember.getId());
 
-        return memberRepository.findByEmail(newMember.getEmail()).get();
+        return memberRepository.findByEmailAndIsDeletedFalse(newMember.getEmail()).get();
     }
 
     /**

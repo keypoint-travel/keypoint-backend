@@ -7,8 +7,8 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
-import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
+import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
@@ -18,14 +18,15 @@ import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +55,7 @@ public class InviteCampaignService {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         // 이메일 존재 여부 확인
-        CommonMemberDTO dto = memberRepository.findByEmail(useCase.getEmail())
+        CommonMemberDTO dto = memberRepository.findByEmailAndIsDeletedFalse(useCase.getEmail())
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
         // 현재 참여 인원들 중 차단 인원 여부 확인
         if (campaignRepository.existsBlockedMemberInCampaign(dto.getId(),
