@@ -67,10 +67,8 @@ public class FindCampaignService {
     }
 
     @Transactional(readOnly = true)
-    public CampaignInfoDto findCampaigns(FIndCampaignUseCase useCase){
-        // 0. 캠페인에 소속되어 있는지 검증
-        validateInCampaign(useCase);
+    public List<CampaignInfoDto> findCampaigns(Long memberId){
         // 1. 캠페인 정보 조회
-        return campaignRepository.findCampaignInfo(useCase.getCampaignId());
+        return campaignRepository.findCampaignInfoList(memberId);
     }
 }

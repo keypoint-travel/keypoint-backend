@@ -14,4 +14,12 @@ public class CampaignInfoDto {
     private String title;
     private Date startDate;
     private Date endDate;
+
+    public void updateStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 }

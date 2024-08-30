@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FindCampaignMemberUseCase {
+public class CompleteCampaignUseCase {
 
     private Long campaignId;
     private Long memberId;

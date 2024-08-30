@@ -8,7 +8,7 @@ import lombok.Getter;
 public class PercentageByCategory implements Comparable<PercentageByCategory> {
 
     private String category;
-    private float price;
+    private float amount;
     private float percentage;
 
     public void updatePercentage(float percentage) {

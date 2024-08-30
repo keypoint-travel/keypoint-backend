@@ -14,4 +14,6 @@ public interface CampaignBudgetRepository extends JpaRepository<CampaignBudget, 
     CurrencyType findCurrencyByCampaignId(@Param("campaignId") Long campaignId);
 
     List<CampaignBudget> findAllByCampaignId(Long campaignId);
+
+    void deleteAllByCampaignId(Long campaignId);
 }

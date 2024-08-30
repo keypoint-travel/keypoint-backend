@@ -1,15 +1,17 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
-import com.keypoint.keypointtravel.campaign.dto.dto.EmailInvitationHistory;
+import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
+import com.keypoint.keypointtravel.campaign.dto.response.CampaignWaitMemberResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
+import com.keypoint.keypointtravel.campaign.entity.CampaignWaitMember;
+import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
-import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
-import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
-import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
+import com.keypoint.keypointtravel.campaign.repository.*;
 import com.keypoint.keypointtravel.friend.entity.Friend;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
@@ -40,6 +42,10 @@ public class JoinCampaignService {
 
     private final BlockedMemberRepository blockedMemberRepository;
 
+    private final CampaignWaitMemberRepository campaignWaitMemberRepository;
+
+    private final CustomMemberCampaignRepository customMemberCampaignRepository;
+
     /**
      * 이메일을 통한 캠페인 가입 함수
      *
@@ -52,7 +58,7 @@ public class JoinCampaignService {
         // redis 캠페인 초대 이메일 목록에 저장되어 있는지(만료되지 않았는지 확인)
         List<EmailInvitationHistory> emailHistories = validateEmailHistoryInRedis(useCase);
         // 캠페인 리더 member 추출 & 진행 중인 캠페인인지 확인
-        MemberCampaign leader = campaignRepository.findCampaignLeader(useCase.getCampaignId());
+        MemberCampaign leader = customMemberCampaignRepository.findCampaignLeader(useCase.getCampaignId());
         // 회원 - 캠페인 태이블 추가(가입)
         Member member = saveMemberCampaign(useCase.getMemberId(), useCase.getCampaignId());
         // 캠페인 리더와 친구관계 구축
@@ -98,9 +104,15 @@ public class JoinCampaignService {
     @Transactional
     public void requestJoinByCampaignCode(JoinByCodeUseCase useCase) {
         // 캠페인 코드에 해당하는 캠페인이 존재하지 않을 시 예외 처리
-        List<MemberCampaign> memberCampaigns = campaignRepository.findMembersByCampaignCode(useCase.getCampaignCode());
+        List<MemberCampaign> memberCampaigns = customMemberCampaignRepository
+            .findMembersByCampaignCode(useCase.getCampaignCode());
         if (memberCampaigns.isEmpty()) {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
+        // 이미 신청을 하였을 경우 예외 처리
+        if (campaignWaitMemberRepository.existsByCampaignIdAndMemberId(
+            memberCampaigns.get(0).getCampaign().getId(), useCase.getMemberId())) {
+            throw new GeneralException(CampaignErrorCode.ALREADY_IN_WAIT_LIST);
         }
         List<Long> memberIds = memberCampaigns.stream()
             .map(memberCampaign -> memberCampaign.getMember().getId())
@@ -115,6 +127,9 @@ public class JoinCampaignService {
         if (blockedMemberRepository.existsBlockedMembers(memberIds, useCase.getMemberId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }
+        // 캠페인 대기 회원에 추가
+        Member member = memberRepository.getReferenceById(useCase.getMemberId());
+        campaignWaitMemberRepository.save(new CampaignWaitMember(memberCampaigns.get(0).getCampaign(), member));
         // todo : 켐페인 장을 대상으로 알림 발송 (참여 승인 수락, 거절 알림)
     }
 
@@ -127,6 +142,8 @@ public class JoinCampaignService {
     public void approveJoinByCampaignCode(ApproveByCodeUseCase useCase) {
         // 캠페인 id에 해당하는 캠페인이 존재하는지, 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
+        // 캠페인 가입 신청 대기 목록에 존재하는지 확인 후 삭제
+        customMemberCampaignRepository.deleteWaitMember(useCase.getMemberId(), useCase.getCampaignId());
         if (useCase.isApprove()) {
             // 캠페인 참여 승인하였을 경우
             // 이미 캠페인 가입이 된 상태일 시 예외 처리
@@ -146,7 +163,8 @@ public class JoinCampaignService {
     }
 
     private List<Long> validateIsLeader(ApproveByCodeUseCase useCase) {
-        List<MemberCampaign> memberCampaigns = campaignRepository.findMembersByCampaignCode(useCase.getCampaignId());
+        List<MemberCampaign> memberCampaigns = customMemberCampaignRepository
+            .findMembersByCampaignCode(useCase.getCampaignId());
         // 캠페인 id에 해당하는 캠페인이 존재하지 않을 시 예외 처리
         if (memberCampaigns.isEmpty()) {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
@@ -186,5 +204,22 @@ public class JoinCampaignService {
             friendRepository.save(buildFriend(leader, member));
             friendRepository.save(buildFriend(member, leader));
         }
+    }
+
+    /**
+     * 캠페인 참여 대기 인원 목록 조회 함수
+     *
+     * @Param memberId, campaignId useCase
+     * @Return
+     */
+    @Transactional(readOnly = true)
+    public CampaignWaitMemberResponse findCampaignWaitList(FIndCampaignUseCase useCase) {
+        // 캠페인 장인지 확인 필요
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+            useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
+        }
+        List<MemberInfoDto> waitMembers = customMemberCampaignRepository.findWaitMembers(useCase.getCampaignId());
+        return new CampaignWaitMemberResponse(useCase.getCampaignId(), waitMembers);
     }
 }
