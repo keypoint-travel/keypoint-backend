@@ -33,10 +33,10 @@ public class SaveUseCase {
     private Double latitude;
     private Double longitude;
 
-    public static SaveUseCase from(BannerRequest request) {
+    public static SaveUseCase of(BannerRequest request, String language) {
         return SaveUseCase.builder()
             .contentId(request.getContentId())
-            .languageCode(findLanguageValue(request.getLanguage()))
+            .languageCode(findLanguageValue(language))
             .mainTitle(request.getMainTitle())
             .subTitle(request.getSubTitle())
             .placeName(request.getPlaceName())
