@@ -16,6 +16,7 @@ import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.LocaleResolver;
+
+import java.util.Locale;
 
 import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
@@ -35,17 +39,22 @@ public class CreateBannerController {
 
     private final CreateBannerService bannerService;
 
+    private final LocaleResolver localeResolver;
+
     @Value("${key.tourApi.key}")
     private String serviceKey;
 
     @GetMapping
     public APIResponseEntity<ContentListResponse> findContentList(
         @ModelAttribute BannerListRequest bannerListRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
+        Locale locale = localeResolver.resolveLocale(request);
         TourismListUseCase useCase = tourismApiService.findTourismList(
-            findLanguageValue(bannerListRequest.getLanguage()),
+            findLanguageValue(locale.getLanguage()),
             bannerListRequest.getPage(),
+            bannerListRequest.getSize(),
             serviceKey,
             BannerCode.getConstant(AreaCode.class, bannerListRequest.getRegion()).getCode(),
             bannerListRequest.getTourType(),
@@ -55,17 +64,19 @@ public class CreateBannerController {
         );
         return APIResponseEntity.<ContentListResponse>builder()
             .message("생성할 배너 리스트 조회")
-            .data(ContentListResponse.from(useCase.getResponse().getBody(), bannerListRequest.getLanguage()))
+            .data(ContentListResponse.from(useCase.getResponse().getBody(), locale.getLanguage()))
             .build();
     }
 
     @GetMapping("/{contentId}/images")
     public APIResponseEntity<ImageListResponse> findContentImageList(
         @PathVariable("contentId") String contentId,
-        @RequestParam("language") String language,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
-        ImageListUseCase useCase = tourismApiService.findImageList(findLanguageValue(language), contentId, serviceKey);
+        Locale locale = localeResolver.resolveLocale(request);
+        ImageListUseCase useCase = tourismApiService.findImageList(
+            findLanguageValue(locale.getLanguage()), contentId, serviceKey);
         return APIResponseEntity.<ImageListResponse>builder()
             .message("contentId에 해당하는 이미지 리스트 조회")
             .data(ImageListResponse.of(contentId, useCase.getResponse().getBody().getItems()))
@@ -90,10 +101,12 @@ public class CreateBannerController {
 
     @PostMapping
     public ResponseEntity<Void> saveBanner(
-        @RequestBody @Valid BannerRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestBody @Valid BannerRequest bannerRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
-        bannerService.saveBanner(SaveUseCase.from(request));
+        Locale locale = localeResolver.resolveLocale(request);
+        bannerService.saveBanner(SaveUseCase.of(bannerRequest, locale.getLanguage()));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -102,10 +115,12 @@ public class CreateBannerController {
     @PostMapping("/{bannerId}")
     public ResponseEntity<Void> saveBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
-        @RequestBody @Valid BannerRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestBody @Valid BannerRequest BannerRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
-        bannerService.saveBannerByOtherLanguage(SaveUseCase.from(request), bannerId);
+        Locale locale = localeResolver.resolveLocale(request);
+        bannerService.saveBannerByOtherLanguage(SaveUseCase.of(BannerRequest, locale.getLanguage()), bannerId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

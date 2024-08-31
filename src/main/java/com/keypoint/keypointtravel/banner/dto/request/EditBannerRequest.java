@@ -24,7 +24,4 @@ public class EditBannerRequest {
     @NotEmpty(message = "이미지 URL을 입력해주세요.")
     @NotBlank(message = "이미지 URL을 입력해주세요.")
     private String thumbnailImage;
-
-    @NotNull(message = "Language cannot be null.")
-    private String language;
 }

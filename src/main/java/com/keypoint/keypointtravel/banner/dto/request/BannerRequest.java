@@ -26,7 +26,6 @@ public class BannerRequest {
     private String thumbnailImage;
 
     @NotNull(message = "Language cannot be null.")
-    private String language;
     private String placeName;
     private String address1;
     private String address2;

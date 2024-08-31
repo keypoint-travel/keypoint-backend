@@ -24,7 +24,4 @@ public class AdvertisementRequest {
     @NotEmpty(message = "내용을 입력해주세요.")
     @NotBlank(message = "내용을 입력해주세요.")
     private String content;
-
-    @NotNull(message = "Language cannot be null.")
-    private String language;
 }
