@@ -13,6 +13,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/banners/advertisement")
@@ -32,6 +35,8 @@ public class AdvertisementBannerController {
     private final AdvertisementBannerService advertisementBannerService;
 
     private final ReadMemberService readMemberService;
+
+    private final LocaleResolver localeResolver;
 
     @GetMapping("/image")
     public APIResponseEntity<ImageUrlResponse> transformToUrl(
@@ -49,12 +54,14 @@ public class AdvertisementBannerController {
     public ResponseEntity<Void> saveAdvertisementBanner(
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
-        @RequestPart(value = "detail") @Valid AdvertisementRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestPart(value = "detail") @Valid AdvertisementRequest bannerRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
+        Locale locale = localeResolver.resolveLocale(request);
         AdvertisementUseCase useCase = new AdvertisementUseCase(
-            thumbnailImage, detailImage, findLanguageValue(request.getLanguage()), request.getMainTitle(),
-            request.getSubTitle(), request.getContent());
+            thumbnailImage, detailImage, findLanguageValue(locale.getLanguage()), bannerRequest.getMainTitle(),
+            bannerRequest.getSubTitle(), bannerRequest.getContent());
         advertisementBannerService.saveAdvertisementBanner(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -63,11 +70,13 @@ public class AdvertisementBannerController {
     @PostMapping("/{bannerId}")
     public ResponseEntity<Void> saveAdvertisementBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
-        @RequestBody @Valid AdvertisementRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestBody @Valid AdvertisementRequest bannerRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
-        PlusAdvertisementUseCase useCase = new PlusAdvertisementUseCase(bannerId, request.getMainTitle(),
-            request.getSubTitle(), request.getContent(), findLanguageValue(request.getLanguage()));
+        Locale locale = localeResolver.resolveLocale(request);
+        PlusAdvertisementUseCase useCase = new PlusAdvertisementUseCase(bannerId, bannerRequest.getMainTitle(),
+            bannerRequest.getSubTitle(), bannerRequest.getContent(), findLanguageValue(locale.getLanguage()));
         advertisementBannerService.saveBannerByOtherLanguage(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -84,13 +93,25 @@ public class AdvertisementBannerController {
             .build();
     }
 
+    // 전체 언어 삭제
     @DeleteMapping("/{bannerId}")
-    public ResponseEntity<Void> deleteBanner(
+    public ResponseEntity<Void> deleteBanners(
         @PathVariable("bannerId") Long bannerId,
-        @RequestParam(value = "language", required = false) String language,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, language));
+        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, null));
+        return ResponseEntity.noContent().build();
+    }
+
+    // 특정 언어 삭제
+    @DeleteMapping("/{bannerId}/locale")
+    public ResponseEntity<Void> deleteBanner(
+        @PathVariable("bannerId") Long bannerId,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
+        //todo: 관리자 인증 로직 추가 예정
+        Locale locale = localeResolver.resolveLocale(request);
+        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, locale.getLanguage()));
         return ResponseEntity.noContent().build();
     }
 
@@ -118,12 +139,14 @@ public class AdvertisementBannerController {
         @PathVariable("bannerId") Long bannerId,
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
-        @RequestPart(value = "detail") @Valid AdvertisementRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestPart(value = "detail") @Valid AdvertisementRequest bannerRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        HttpServletRequest request) {
         //todo: 관리자 인증 로직 추가 예정
+        Locale locale = localeResolver.resolveLocale(request);
         AdvertisementUseCase useCase = new AdvertisementUseCase(
-            thumbnailImage, detailImage, findLanguageValue(request.getLanguage()), request.getMainTitle(),
-            request.getSubTitle(), request.getContent());
+            thumbnailImage, detailImage, findLanguageValue(locale.getLanguage()), bannerRequest.getMainTitle(),
+            bannerRequest.getSubTitle(), bannerRequest.getContent());
         advertisementBannerService.editAdvertisementBanner(bannerId, useCase);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
