@@ -59,7 +59,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     public void updateIsDeletedById(Long bannerId) {
         long count = queryFactory.update(advertisementBanner)
             .set(advertisementBanner.isDeleted, true)
-            .where(advertisementBanner.id.eq(bannerId))
+            .where(advertisementBanner.id.eq(bannerId)
+                .and(advertisementBanner.isDeleted.isFalse()))
             .execute();
         // 삭제된 배너가 없을 경우
         if (count < 1) {
@@ -74,7 +75,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
         queryFactory.update(advertisementBannerContent)
             .set(advertisementBannerContent.isDeleted, true)
             .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
-                .and(languageCondition))
+                .and(languageCondition)
+                .and(advertisementBannerContent.isDeleted.isFalse()))
             .execute();
     }
 
