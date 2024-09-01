@@ -15,11 +15,19 @@ public class StringUtils {
     private static final String RANDOM_ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public static Float convertToFloat(String str) {
-        return str == null ? null : Float.parseFloat(str);
+        if (str == null || str.isBlank()) {
+            return null;
+        }
+
+        return Float.parseFloat(str);
     }
 
     public static Integer convertToInteger(String str) {
-        return str == null ? null : Integer.parseInt(str);
+        if (str == null || str.isBlank()) {
+            return null;
+        }
+
+        return Integer.parseInt(str);
     }
 
     public static String parseGrantTypeInToken(String strGrantType, String token) {
