@@ -56,4 +56,10 @@ public class Campaign extends BaseEntity {
     public void addInvitationCode(String invitation_code) {
         this.invitation_code = invitation_code;
     }
+
+    public void updateInfo(String title, Date startDate, Date endDate) {
+        this.title = title;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

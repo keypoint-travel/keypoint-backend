@@ -1,25 +1,9 @@
 package com.keypoint.keypointtravel.notification.controller;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.dto.response.SliceResponse;
+import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
@@ -33,9 +17,23 @@ import com.keypoint.keypointtravel.notification.dto.useCase.UpdateNotificationUs
 import com.keypoint.keypointtravel.notification.service.FCMTokenService;
 import com.keypoint.keypointtravel.notification.service.NotificationService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -101,14 +99,13 @@ public class NotificationController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/push")
-    public APIResponseEntity<SliceResponse<PushHistoryResponse>> findPushNotificationHistory(
+    public APIResponseEntity<PageResponse<PushHistoryResponse>> findPushNotificationHistory(
         @PageableDefault(size = 15, sort = "arrivedAt", direction = Sort.Direction.DESC) Pageable pageable,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         ReadPushHistoryUseCase useCase = ReadPushHistoryUseCase.of(userDetails.getId(), pageable);
-        Slice<PushHistoryResponse> result = pushHistoryService.findPushHistories(useCase);
+        Page<PushHistoryResponse> result = pushHistoryService.findPushHistories(useCase);
 
-
-        return APIResponseEntity.toSlice(
+        return APIResponseEntity.toPage(
             "푸시 알림 이력 조회 성공",
             result
         );

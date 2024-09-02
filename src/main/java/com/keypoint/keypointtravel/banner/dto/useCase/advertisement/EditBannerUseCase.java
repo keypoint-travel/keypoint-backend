@@ -15,9 +15,9 @@ public class EditBannerUseCase {
     private String mainTitle;
     private String subTitle;
 
-    public EditBannerUseCase(Long bannerId, EditBannerRequest request) {
+    public EditBannerUseCase(Long bannerId, EditBannerRequest request, String language) {
         this.bannerId = bannerId;
-        this.language = findLanguageValue(request.getLanguage());
+        this.language = findLanguageValue(language);
         this.thumbnailImage = request.getThumbnailImage();
         this.mainTitle = request.getMainTitle();
         this.subTitle = request.getSubTitle();

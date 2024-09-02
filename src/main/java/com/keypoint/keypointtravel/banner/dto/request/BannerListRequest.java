@@ -9,11 +9,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BannerListRequest {
 
-    private String language;
     private String region;
     private String tourType;
     private String cat1;
     private String cat2;
     private String cat3;
     private int page;
+    private int size;
 }

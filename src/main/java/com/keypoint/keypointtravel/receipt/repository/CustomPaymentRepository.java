@@ -50,7 +50,7 @@ public class CustomPaymentRepository {
 
     private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
-    // campaignId 에 해당하는 영수중 중에 카테고리 별 그룹화하여 비용의 합을 계산 AmountByCategoryDto
+    // campaignId 에 해당하는 영수중 중에 카테고리별 그룹화하여 비용의 합을 계산 AmountByCategoryDto
     public List<AmountByCategoryDto> findAmountByCategory(Long campaignId) {
         return queryFactory.select(
                 Projections.constructor(AmountByCategoryDto.class,

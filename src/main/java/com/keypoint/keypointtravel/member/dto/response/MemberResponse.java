@@ -1,8 +1,8 @@
 package com.keypoint.keypointtravel.member.dto.response;
 
 
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.member.entity.Member;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,8 +12,9 @@ public class MemberResponse {
 
     private Long id;
     private String email;
+    private TokenInfoResponse token;
 
-    public static MemberResponse from(Member member) {
-        return new MemberResponse(member.getId(), member.getEmail());
+    public static MemberResponse of(Member member, TokenInfoResponse token) {
+        return new MemberResponse(member.getId(), member.getEmail(), token);
     }
 }

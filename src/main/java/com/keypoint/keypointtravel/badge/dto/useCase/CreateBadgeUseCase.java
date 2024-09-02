@@ -1,7 +1,7 @@
 package com.keypoint.keypointtravel.badge.dto.useCase;
 
-import com.keypoint.keypointtravel.badge.dto.request.CreateBadgeRequest;
 import com.keypoint.keypointtravel.badge.entity.Badge;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,23 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class CreateBadgeUseCase {
 
-    private String name;
-    private int order;
+    private BadgeType type;
     private MultipartFile badgeOnImage;
     private MultipartFile badgeOffImage;
-
-    public static CreateBadgeUseCase of(
-        CreateBadgeRequest request,
-        MultipartFile badgeOnImage,
-        MultipartFile badgeOffImage
-    ) {
-        return new CreateBadgeUseCase(
-            request.getName(),
-            request.getOrder(),
-            badgeOnImage,
-            badgeOffImage
-        );
-    }
 
     public Badge toEntity(
         Long badgeOnImageId,
@@ -35,8 +21,9 @@ public class CreateBadgeUseCase {
         return new Badge(
             badgeOnImageId,
             badgeOffImageId,
-            this.name,
-            this.order
+            type.getDescription(),
+            type.getDefaultOrder(),
+            this.type
         );
     }
 }

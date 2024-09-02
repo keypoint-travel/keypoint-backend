@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.campaign.dto.dto;
+package com.keypoint.keypointtravel.campaign.entity;
 
 import jakarta.persistence.Id;
 import java.util.concurrent.TimeUnit;

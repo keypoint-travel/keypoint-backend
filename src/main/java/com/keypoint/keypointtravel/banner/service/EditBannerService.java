@@ -13,7 +13,7 @@ public class EditBannerService {
     private final BannerRepository bannerRepository;
 
     /**
-     * Banner 언어 별 수정하는 함수
+     * Banner 언어별 수정하는 함수
      *
      * @Param bannerId, language 및 수정 정보 useCase
      */

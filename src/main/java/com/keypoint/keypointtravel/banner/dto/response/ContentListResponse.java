@@ -14,33 +14,15 @@ import lombok.Getter;
 public class ContentListResponse {
 
     //content
-    private List<BannerDetails> contents;
+    private List<BannerDetails> content;
 
     //page 정보
-    private boolean last;
-    private int totalPages;
-    private int totalElements;
-    private boolean first;
-    private int size;
-    private int numberOfElements;
-    private boolean empty;
-    private int pageNumber;
+    private int total;
 
     public static ContentListResponse from(Body data, String language) {
         return ContentListResponse.builder()
-            .contents(data.getItems().getItem().stream().map(item -> BannerDetails.from(item, language)).toList())
-            .last(data.getPageNo() == getTotalPage(data.getTotalCount()))
-            .totalPages(getTotalPage(data.getTotalCount()))
-            .totalElements(data.getTotalCount())
-            .first(data.getPageNo() == 1)
-            .size(10)
-            .numberOfElements(data.getNumOfRows())
-            .empty(data.getNumOfRows() == 0)
-            .pageNumber(data.getPageNo())
+            .content(data.getItems().getItem().stream().map(item -> BannerDetails.from(item, language)).toList())
+            .total(data.getTotalCount())
             .build();
-    }
-
-    private static int getTotalPage(int totalCount) {
-        return totalCount / 10 + ((totalCount % 10 > 0) ? 1 : 0);
     }
 }

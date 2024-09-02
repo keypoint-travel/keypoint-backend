@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.member.service;
 
+import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.auth.service.AuthService;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
@@ -21,13 +23,14 @@ import com.keypoint.keypointtravel.member.repository.memberConsent.MemberConsent
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,6 +39,7 @@ public class CreateMemberService {
 
     private static final int EMAIL_VERIFICATION_CODE_DIGITS = 6;
 
+    private final AuthService authService;
     private final MemberRepository memberRepository;
     private final MemberConsentRepository memberConsentRepository;
     private final MemberDetailRepository memberDetailRepository;
@@ -78,7 +82,10 @@ public class CreateMemberService {
             //5. 초대코드 저장: 초대코드가 중복되지 않도록 문자열에 마지막에 memberId를 추가하여 저장
             member.setInvitationCode(StringUtils.getRandomString(9) + member.getId());
 
-            return MemberResponse.from(member);
+            // 6. 토큰 발금
+            TokenInfoResponse response = authService.getJwtTokenInfo(email, password);
+
+            return MemberResponse.of(member, response);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -100,7 +107,7 @@ public class CreateMemberService {
      * @param email 이메일
      */
     private void validateEmailForSignUp(String email) {
-        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmail(email);
+        Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmailAndIsDeletedFalse(email);
         if (memberOptional.isPresent()) {
             CommonMemberDTO existMember = memberOptional.get();
             if (existMember.getOauthProviderType() == OauthProviderType.NONE) {

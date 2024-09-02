@@ -42,7 +42,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     public void updateIsDeletedById(Long bannerId) {
         long count = queryFactory.update(banner)
             .set(banner.isDeleted, true)
-            .where(banner.id.eq(bannerId))
+            .where(banner.id.eq(bannerId)
+                .and(banner.isDeleted.isFalse()))
             .execute();
         // 삭제된 배너가 없을 경우
         if (count < 1) {
@@ -56,7 +57,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
         queryFactory.update(bannerContent)
             .set(bannerContent.isDeleted, true)
             .where(bannerContent.banner.id.eq(bannerId)
-                .and(languageCondition))
+                .and(languageCondition)
+                .and(bannerContent.isDeleted.isFalse()))
             .execute();
     }
 

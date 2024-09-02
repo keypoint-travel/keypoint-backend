@@ -23,8 +23,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository {
@@ -150,7 +148,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
     }
 
     @Override
-    public Slice<ReadGuideResponse> findGuides(
+    public Page<ReadGuideResponse> findGuides(
         LanguageCode languageCode,
         PageAndMemberIdUseCase useCase
     ) {
@@ -203,17 +201,21 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
             .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
             .where(guide.isDeleted.eq(false))
             .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + 1)
+            .limit(pageable.getPageSize())
             .orderBy(orderSpecifier)
             .fetch();
 
-        boolean hasNext = false;
-        if (data.size() > pageable.getPageSize()) {
-            hasNext = true;
-            data.remove(pageable.getPageSize());
-        }
+        long count = queryFactory
+            .select(
+                guide.count()
+            )
+            .from(guide)
+            .innerJoin(translation).on(builder)
+            .innerJoin(uploadFile).on(uploadFile.id.eq(guide.thumbnailImageId))
+            .where(guide.isDeleted.eq(false))
+            .fetchOne();
 
-        return new SliceImpl<>(data, pageable, hasNext);
+        return new PageImpl<>(data, pageable, count);
     }
 
     @Override
@@ -245,7 +247,9 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
     @Override
     public ReadNextGuideResponse findNextGuide(int order, LanguageCode languageCode) {
         BooleanBuilder translationBuilder = new BooleanBuilder();
-        translationBuilder.and(translation.isDeleted.eq(false))
+        translationBuilder
+            .and(translation.guide.id.eq(guide.id))
+            .and(translation.isDeleted.eq(false))
             .and(translation.languageCode.eq(languageCode));
 
         return queryFactory
@@ -255,6 +259,7 @@ public class ReadGuideCustomRepositoryImpl implements ReadGuideCustomRepository 
                     translation.id.as("guideTranslationIds"),
                     translation.title,
                     translation.subTitle,
+                    guide.order,
                     uploadFile.path.as("thumbnailImageUrl")
                 )
             )

@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.dto.response.commonBanner;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Items;
+import com.keypoint.keypointtravel.global.constants.TourismApiConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +35,10 @@ public class CommonBannerResponse {
 //    private Long memberId;
 
     public static CommonBannerResponse of(CommonTourismUseCase details, Items data) {
+        String imagePath = details.getCommonTourismDto().getThumbnailImage();
+        if(imagePath == null || imagePath.isEmpty() || imagePath.isBlank()) {
+            imagePath = TourismApiConstants.DEFAULT_IMAGE;
+        }
         return CommonBannerResponse.builder()
             .contentId(String.valueOf(details.getCommonTourismDto().getId()))
             .mainTitle(details.getCommonTourismDto().getMainTitle())
@@ -43,7 +48,7 @@ public class CommonBannerResponse {
             .address2(details.getCommonTourismDto().getAddress2())
             .latitude(details.getCommonTourismDto().getLatitude())
             .longitude(details.getCommonTourismDto().getLongitude())
-            .thumbnailImage(details.getCommonTourismDto().getThumbnailImage())
+            .thumbnailImage(imagePath)
             .cat1(details.getCommonTourismDto().getCat1())
             .cat2(details.getCommonTourismDto().getCat2())
             .cat3(details.getCommonTourismDto().getCat3())

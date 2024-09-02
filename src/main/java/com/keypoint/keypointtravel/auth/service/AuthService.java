@@ -18,7 +18,6 @@ import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
-import com.keypoint.keypointtravel.oauth.service.OAuthServiceFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,7 +38,6 @@ public class AuthService {
     private final AuthenticationManagerBuilder managerBuilder;
     private final UpdateMemberService updateMemberService;
     private final BlacklistService blacklistService;
-    private final OAuthServiceFactory oAuthServiceFactory;
     private final RefreshTokenService refreshTokenService;
 
     /**

@@ -37,7 +37,7 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
     @Override
     public List<CommonPushHistoryUseCase> findPushHistories(Long memberId, Pageable pageable) {
         // 1. 푸시 이력 조회
-        List<CommonPushHistoryUseCase> result = queryFactory
+        return queryFactory
             .select(
                 Projections.fields(
                     CommonPushHistoryUseCase.class,
@@ -52,9 +52,18 @@ public class PushNotificationHistoryCustomRepositoryImpl implements
             .where(pushNotificationHistory.member.id.eq(memberId))
             .orderBy(pushNotificationHistory.createAt.desc())
             .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + 1)
+            .limit(pageable.getPageSize())
             .fetch();
+    }
 
-        return result;
+    @Override
+    public long countPushHistories(Long memberId) {
+        return queryFactory
+            .select(
+                pushNotificationHistory.count()
+            )
+            .from(pushNotificationHistory)
+            .where(pushNotificationHistory.member.id.eq(memberId))
+            .fetchOne();
     }
 }

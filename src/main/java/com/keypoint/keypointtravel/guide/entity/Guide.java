@@ -28,7 +28,7 @@ public class Guide extends BaseEntity {
     @Column(nullable = false)
     private Long thumbnailImageId;
 
-    @Column(nullable = false, unique = true, name = "order_number")
+    @Column(nullable = false, name = "order_number")
     private int order;
 
     @Column(nullable = false, name = "is_deleted")

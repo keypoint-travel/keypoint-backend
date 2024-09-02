@@ -1,9 +1,21 @@
 package com.keypoint.keypointtravel.guide.controller;
 
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.dto.response.PageResponse;
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
+import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
+import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
+import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
+import com.keypoint.keypointtravel.guide.service.ReadGuideService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -14,22 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.dto.response.PageResponse;
-import com.keypoint.keypointtravel.global.dto.response.SliceResponse;
-import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
-import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideInAdminResponse;
-import com.keypoint.keypointtravel.guide.dto.response.ReadGuideResponse;
-import com.keypoint.keypointtravel.guide.dto.response.readGuideDetail.ReadGuideDetailResponse;
-import com.keypoint.keypointtravel.guide.dto.response.readGuideDetailInAdmin.ReadGuideDetailInAdminResponse;
-import com.keypoint.keypointtravel.guide.dto.useCase.GuideIdUseCase;
-import com.keypoint.keypointtravel.guide.dto.useCase.ReadGuideTranslationIdUseCase;
-import com.keypoint.keypointtravel.guide.service.ReadGuideService;
-
-import lombok.RequiredArgsConstructor;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +35,7 @@ public class ReadGuideController {
     private final ReadGuideService readGuideService;
 
     @GetMapping()
-    public APIResponseEntity<SliceResponse<ReadGuideResponse>> findGuides(
+    public APIResponseEntity<PageResponse<ReadGuideResponse>> findGuides(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
@@ -57,9 +53,9 @@ public class ReadGuideController {
                 direction,
                 pageable
         );
-        Slice<ReadGuideResponse> result = readGuideService.findGuides(useCase);
+        Page<ReadGuideResponse> result = readGuideService.findGuides(useCase);
 
-        return APIResponseEntity.toSlice(
+        return APIResponseEntity.toPage(
             "이용가이드 리스트 조회 성공",
             result
         );

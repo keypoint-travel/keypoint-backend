@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.dto.response;
 
 import com.keypoint.keypointtravel.banner.dto.response.commonBanner.AroundTourism;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Item;
+import com.keypoint.keypointtravel.global.constants.TourismApiConstants;
 import com.keypoint.keypointtravel.global.enumType.banner.*;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,8 @@ public class RecommendationResponse {
     private List<AroundTourism> around;
 
     public static RecommendationResponse of(List<Item> items, String memberName, LanguageCode language){
+        String imagePath = items.get(0).getFirstimage();
+            imagePath = TourismApiConstants.DEFAULT_IMAGE;
         RecommendationResponse response = RecommendationResponse.builder()
             .contentId(items.get(0).getContentid())
             .memberName(memberName)
@@ -37,7 +40,7 @@ public class RecommendationResponse {
             .address2(items.get(0).getAddr2())
             .latitude(items.get(0).getMapy())
             .longitude(items.get(0).getMapx())
-            .image(items.get(0).getFirstimage())
+            .image(imagePath)
             .cat1(BannerCode.getDescription(LargeCategory.class, items.get(0).getCat1()))
             .cat2(BannerCode.getDescription(MiddleCategory.class, items.get(0).getCat2()))
             .cat3(BannerCode.getDescription(SmallCategory.class, items.get(0).getCat3()))

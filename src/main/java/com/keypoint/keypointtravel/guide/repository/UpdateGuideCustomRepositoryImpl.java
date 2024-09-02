@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.guide.repository;
 
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideGuideUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.DeleteGuideTranslationUseCase;
 import com.keypoint.keypointtravel.guide.dto.useCase.updateGuide.UpdateGuideTranslationUseCase;
@@ -22,34 +23,42 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
     private final QGuideTranslation guideTranslation = QGuideTranslation.guideTranslation;
 
     @Override
-    public void updateGuide(UpdateGuideUseCase useCase) {
+    public long updateGuide(UpdateGuideUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(guide.id.eq(useCase.getGuideId()))
+            .and(guide.isDeleted.eq(false));
+
         // 이용 가이드 업데이트
-        queryFactory.update(guide)
+        return queryFactory.update(guide)
             .set(guide.order, useCase.getOrder())
 
             .set(guide.modifyAt, LocalDateTime.now())
             .set(guide.modifyId, currentAuditor)
-            .where(guide.id.eq(useCase.getGuideId()))
+            .where(builder)
             .execute();
+    }
+
+    public long updateGuideTranslation(UpdateGuideTranslationUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
         // 이용 가이드 번역물 업데이트
-        for (UpdateGuideTranslationUseCase translation : useCase.getTranslations()) {
-            BooleanBuilder builder = new BooleanBuilder();
-            builder.and(guideTranslation.id.eq(translation.getGuideTranslationId()))
-                .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(guideTranslation.id.eq(useCase.getGuideTranslationId()))
+            .and(guideTranslation.guide.id.eq(useCase.getGuideId()))
+            .and(guideTranslation.isDeleted.eq(false));
 
-            queryFactory.update(guideTranslation)
-                .set(guideTranslation.title, translation.getTitle())
-                .set(guideTranslation.subTitle, translation.getSubTitle())
-                .set(guideTranslation.content, translation.getContent())
+        return queryFactory.update(guideTranslation)
+            .set(guideTranslation.title, useCase.getTitle())
+            .set(guideTranslation.subTitle, useCase.getSubTitle())
+            .set(guideTranslation.content, useCase.getContent())
+            .set(guideTranslation.languageCode, useCase.getLanguageCode())
 
-                .set(guideTranslation.modifyAt, LocalDateTime.now())
-                .set(guideTranslation.modifyId, currentAuditor)
-                .where(builder)
-                .execute();
-        }
+            .set(guideTranslation.modifyAt, LocalDateTime.now())
+            .set(guideTranslation.modifyId, currentAuditor)
+            .where(builder)
+            .execute();
     }
 
     @Override
@@ -76,14 +85,15 @@ public class UpdateGuideCustomRepositoryImpl implements UpdateGuideCustomReposit
     }
 
     @Override
-    public void deleteGuideTranslations(DeleteGuideTranslationUseCase useCase) {
+    public long deleteGuideTranslations(DeleteGuideTranslationUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(guideTranslation.id.in(useCase.getGuideTranslationIds()))
-            .and(guideTranslation.guide.id.eq(useCase.getGuideId()));
+        builder.and(guideTranslation.id.eq(useCase.getGuideTranslationId()))
+            .and(guideTranslation.guide.id.eq(useCase.getGuideId()))
+            .and(guideTranslation.languageCode.ne(LanguageCode.EN));
 
-        queryFactory.update(guideTranslation)
+        return queryFactory.update(guideTranslation)
             .set(guideTranslation.isDeleted, true)
             .set(guideTranslation.modifyAt, LocalDateTime.now())
             .set(guideTranslation.modifyId, currentAuditor)

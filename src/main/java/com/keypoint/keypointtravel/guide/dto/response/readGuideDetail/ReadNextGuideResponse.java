@@ -10,5 +10,6 @@ public class ReadNextGuideResponse {
     private Long guideTranslationIds;
     private String title;
     private String subTitle;
+    private int order;
     private String thumbnailImageUrl;
 }

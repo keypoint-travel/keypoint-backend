@@ -1,14 +1,11 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
-import com.keypoint.keypointtravel.campaign.dto.response.CampaignResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.PercentageResponse;
-import com.keypoint.keypointtravel.campaign.dto.response.PaymentResponse;
+import com.keypoint.keypointtravel.campaign.dto.response.*;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.FindCampaignMemberUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
 import com.keypoint.keypointtravel.campaign.service.FindCampaignService;
@@ -25,6 +22,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/campaigns")
 @RequiredArgsConstructor
@@ -37,21 +36,14 @@ public class FindCampaignController {
     private final FindPaymentService findPaymentService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{campaignId}")
-    public APIResponseEntity<CampaignResponse> findCampaigns(
-        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
-        @PathVariable Long campaignId,
+    @GetMapping
+    public APIResponseEntity<List<CampaignResponse>> findCampaigns(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         // 캠페인 정보 조회
-        FIndCampaignUseCase useCase = new FIndCampaignUseCase(campaignId, userDetails.getId());
-        CampaignInfoDto dto = findCampaignService.findCampaigns(useCase);
-        // 카테고리별 비율 조회
-        FindPercentangeUseCase findPercentagesUseCase =
-            new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
-        PercentageResponse temp = findPercentageService.findCategoryPercentage(findPercentagesUseCase);
+        List<CampaignInfoDto> dtoList = findCampaignService.findCampaigns(userDetails.getId());
         // 응답
-        CampaignResponse response = CampaignResponse.of(dto, temp.getPercentages());
-        return APIResponseEntity.<CampaignResponse>builder()
+        List<CampaignResponse> response = CampaignResponse.from(dtoList);
+        return APIResponseEntity.<List<CampaignResponse>>builder()
             .message("메인화면 캠페인 목록 조회 성공")
             .data(response)
             .build();
@@ -153,9 +145,11 @@ public class FindCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/details/{campaignId}/member")
     public APIResponseEntity<TotalAmountByMemberResponse> findCampaignMemberTotalAmount(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(campaignId);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(useCase);
         return APIResponseEntity.<TotalAmountByMemberResponse>builder()
             .message("캠페인 회원별 총 금액 조회 성공")
             .data(response)
@@ -165,10 +159,11 @@ public class FindCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/details/{campaignId}/percentage/member/{memberId}")
     public APIResponseEntity<PercentageByMemberResponse> findCampaignMemberPercentages(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @PathVariable Long memberId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindCampaignMemberUseCase useCase = new FindCampaignMemberUseCase(campaignId, memberId);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, memberId, currencyType);
         PercentageByMemberResponse response = findPercentageService.findMemberPercentage(useCase);
         return APIResponseEntity.<PercentageByMemberResponse>builder()
             .message("캠페인 회원 카테고리별 비율 조회 성공")
@@ -191,5 +186,23 @@ public class FindCampaignController {
             "캠페인 회원별 결제 내역 조회 성공",
             response
         );
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}/report")
+    public APIResponseEntity<CampaignReportResponse> findCampaignReport(
+        @RequestParam(value = "currency", defaultValue = "null") String currencyType,
+        @PathVariable Long campaignId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 상단 내용 조회
+        FIndCampaignUseCase useCase = new FIndCampaignUseCase(campaignId, userDetails.getId());
+        CampaignDetailsResponse response = findCampaignService.findCampaignDetails(useCase);
+        // 카테고리별, 날짜별, 인원별 총 결제 금액
+        FindPercentangeUseCase priceUseCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        CampaignReportPrice prices = findPercentageService.findCampaignReport(priceUseCase);
+        return APIResponseEntity.<CampaignReportResponse>builder()
+            .message("캠페인 레포트 조회 성공")
+            .data(new CampaignReportResponse(response, prices))
+            .build();
     }
 }

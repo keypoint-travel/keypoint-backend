@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UpdateBadgeUseCase {
 
     private Long badgeId;
-    private String name;
     private int order;
     private MultipartFile badgeOnImage;
     private MultipartFile badgeOffImage;
@@ -23,7 +22,6 @@ public class UpdateBadgeUseCase {
     ) {
         return new UpdateBadgeUseCase(
             badgeId,
-            request.getName(),
             request.getOrder(),
             badgeOnImage,
             badgeOffImage
