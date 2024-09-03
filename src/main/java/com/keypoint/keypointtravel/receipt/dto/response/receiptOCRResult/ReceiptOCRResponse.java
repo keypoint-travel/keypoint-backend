@@ -23,8 +23,9 @@ public class ReceiptOCRResponse {
     private Float totalAccount;
     private List<PaymentItemOCRResponse> paymentItems;
 
-    public static ReceiptOCRResponse from(String receiptImageUrl, WholeReceiptUseCase dto) {
+    public static ReceiptOCRResponse of(String receiptId, String receiptImageUrl, WholeReceiptUseCase dto) {
         return ReceiptOCRResponse.builder()
+                .receiptId(receiptId)
             .receiptImageUrl(receiptImageUrl)
             .store(dto.getMerchantName())
             .storeAddress(dto.getMerchantAddress())
