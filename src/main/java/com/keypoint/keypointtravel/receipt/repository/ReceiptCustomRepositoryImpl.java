@@ -13,8 +13,10 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Repository;
 public class ReceiptCustomRepositoryImpl implements ReceiptCustomRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final AuditorAware<String> auditorProvider;
 
     private final QReceipt receipt = QReceipt.receipt;
     private final QPaymentItem paymentItem = QPaymentItem.paymentItem;
@@ -81,5 +84,19 @@ public class ReceiptCustomRepositoryImpl implements ReceiptCustomRepository {
         response.setPaymentItems(paymentItemResponses);
 
         return response;
+    }
+
+    @Override
+    public void deleteReceiptById(Long receiptId) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        queryFactory
+            .update(receipt)
+            .set(receipt.isDeleted, true)
+
+            .set(receipt.modifyId, currentAuditor)
+            .set(receipt.modifyAt, LocalDateTime.now())
+            .where(receipt.id.eq(receiptId))
+            .execute();
     }
 }

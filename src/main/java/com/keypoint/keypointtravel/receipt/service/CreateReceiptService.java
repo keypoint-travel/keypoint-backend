@@ -103,12 +103,28 @@ public class CreateReceiptService {
      * @return
      */
     public ReceiptResponse getReceipt(ReceiptIdUseCase useCase) {
-//        try {
+        try {
         return receiptRepository.findReceiptDetailByReceiptId(
             useCase.getReceiptId()
         );
-//        } catch (Exception ex) {
-//            throw new GeneralException(ex);
-//        }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 영수증 삭제 함수
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void deleteReceipt(ReceiptIdUseCase useCase) {
+        try {
+            receiptRepository.deleteReceiptById(
+                useCase.getReceiptId()
+            );
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }

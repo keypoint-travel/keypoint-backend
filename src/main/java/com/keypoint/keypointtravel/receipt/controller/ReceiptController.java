@@ -13,6 +13,7 @@ import com.keypoint.keypointtravel.receipt.service.CreateReceiptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,16 +63,29 @@ public class ReceiptController {
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{campaignId}")
+    @GetMapping("/{receiptId}")
     public APIResponseEntity<ReceiptResponse> getReceipt(
-        @PathVariable(value = "campaignId") Long campaignId
+        @PathVariable(value = "receiptId") Long receiptId
     ) {
-        ReceiptIdUseCase useCase = ReceiptIdUseCase.from(campaignId);
+        ReceiptIdUseCase useCase = ReceiptIdUseCase.from(receiptId);
         ReceiptResponse response = createReceiptService.getReceipt(useCase);
 
         return APIResponseEntity.<ReceiptResponse>builder()
             .message("영수증 조회 성공")
             .data(response)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @DeleteMapping("/{receiptId}")
+    public APIResponseEntity<Void> deleteReceipt(
+        @PathVariable(value = "receiptId") Long receiptId
+    ) {
+        ReceiptIdUseCase useCase = ReceiptIdUseCase.from(receiptId);
+        createReceiptService.deleteReceipt(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("영수증 삭제 성공")
             .build();
     }
 }

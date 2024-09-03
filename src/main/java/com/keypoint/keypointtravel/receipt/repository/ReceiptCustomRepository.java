@@ -6,4 +6,6 @@ import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptR
 public interface ReceiptCustomRepository {
 
     ReceiptResponse findReceiptDetailByReceiptId(Long receiptId);
+
+    void deleteReceiptById(Long receiptId);
 }
