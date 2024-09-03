@@ -9,6 +9,8 @@ import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.ImageUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
+import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreatePaymentItemUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
@@ -17,7 +19,6 @@ import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import com.keypoint.keypointtravel.receipt.repository.ReceiptRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,8 +44,8 @@ public class CreateReceiptService {
      * @param useCase
      */
     @Transactional
-    public void addReceipt(CreateReceiptUseCase useCase) throws IOException {
-//        try {
+    public void addReceipt(CreateReceiptUseCase useCase) {
+        try {
             Long campaignId = useCase.getCampaignId();
             String receiptImageUrl = useCase.getReceiptImageUrl();
 
@@ -92,6 +93,20 @@ public class CreateReceiptService {
                     .toList();
                 paymentItemService.addPaymentItem(receipt, paymentItem, filteredMembers);
             }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * @param useCase
+     * @return
+     */
+    public ReceiptResponse getReceipt(ReceiptIdUseCase useCase) {
+//        try {
+        return receiptRepository.findReceiptDetailByReceiptId(
+            useCase.getReceiptId()
+        );
 //        } catch (Exception ex) {
 //            throw new GeneralException(ex);
 //        }

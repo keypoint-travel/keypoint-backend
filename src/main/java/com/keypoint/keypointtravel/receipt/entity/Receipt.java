@@ -25,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
 @Entity
@@ -90,6 +91,11 @@ public class Receipt extends BaseEntity {
     private Float tax;
 
     private Float tip;
+
+    @Column(nullable = false, name = "is_deleted")
+    @ColumnDefault("false")
+    @Comment("삭제 여부")
+    private boolean isDeleted;
 
     @Builder
     public Receipt(

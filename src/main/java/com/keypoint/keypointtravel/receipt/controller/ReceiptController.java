@@ -5,11 +5,12 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult.ReceiptOCRResponse;
+import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
+import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptImageUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.service.CreateReceiptService;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +41,7 @@ public class ReceiptController {
         ReceiptOCRResponse result = azureOCRService.analyzeReceipt(useCase);
 
         return APIResponseEntity.<ReceiptOCRResponse>builder()
-            .message(" OCR 결과 요청 성공")
+            .message("OCR 결과 요청 성공")
             .data(result)
             .build();
     }
@@ -51,12 +52,26 @@ public class ReceiptController {
         @PathVariable(value = "campaignId") Long campaignId,
         @RequestParam(value = "receipt-registration-type") ReceiptRegistrationType registrationType,
         @Valid @RequestBody CreateReceiptRequest request
-    ) throws IOException {
+    ) {
         CreateReceiptUseCase useCase = CreateReceiptUseCase.of(campaignId, request, registrationType);
         createReceiptService.addReceipt(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("영수증 등록")
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{campaignId}")
+    public APIResponseEntity<ReceiptResponse> getReceipt(
+        @PathVariable(value = "campaignId") Long campaignId
+    ) {
+        ReceiptIdUseCase useCase = ReceiptIdUseCase.from(campaignId);
+        ReceiptResponse response = createReceiptService.getReceipt(useCase);
+
+        return APIResponseEntity.<ReceiptResponse>builder()
+            .message("영수증 조회 성공")
+            .data(response)
             .build();
     }
 }
