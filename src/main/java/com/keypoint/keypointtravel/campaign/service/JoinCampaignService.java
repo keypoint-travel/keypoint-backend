@@ -55,6 +55,11 @@ public class JoinCampaignService {
     public void joinByEmail(JoinByEmailUseCase useCase) {
         // 이미 캠페인 가입이 된 상태일 시 예외 처리
         validateJoinedCampaign(useCase.getCampaignId(), useCase.getMemberId());
+        // 현재 참여 인원들 중 차단 인원 여부 확인
+        if (customMemberCampaignRepository.existsBlockedMemberInCampaign(useCase.getMemberId(),
+            useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
+        }
         // redis 캠페인 초대 이메일 목록에 저장되어 있는지(만료되지 않았는지 확인)
         List<EmailInvitationHistory> emailHistories = validateEmailHistoryInRedis(useCase);
         // 캠페인 리더 member 추출 & 진행 중인 캠페인인지 확인

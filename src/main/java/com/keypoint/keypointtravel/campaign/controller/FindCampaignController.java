@@ -1,10 +1,10 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
-import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.response.*;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.PercentageByMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.TotalAmountByMemberResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignListUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPaymentsUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FindPercentangeUseCase;
@@ -37,16 +37,18 @@ public class FindCampaignController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping
-    public APIResponseEntity<List<CampaignResponse>> findCampaigns(
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public APIResponseEntity<PageResponse<CampaignResponse>> findCampaigns(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "page", defaultValue = "1") int page) {
         // 캠페인 정보 조회
-        List<CampaignInfoDto> dtoList = findCampaignService.findCampaigns(userDetails.getId());
+        FIndCampaignListUseCase useCase = new FIndCampaignListUseCase(userDetails.getId(), size,
+            page);
+        Page<CampaignResponse> response = findCampaignService.findCampaigns(useCase);
         // 응답
-        List<CampaignResponse> response = CampaignResponse.from(dtoList);
-        return APIResponseEntity.<List<CampaignResponse>>builder()
-            .message("메인화면 캠페인 목록 조회 성공")
-            .data(response)
-            .build();
+        return APIResponseEntity.toPage(
+            "메인화면 캠페인 목록 조회 성공",
+            response);
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
@@ -68,7 +70,8 @@ public class FindCampaignController {
         @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(),
+            currencyType);
         PercentageResponse response = findPercentageService.findCategoryPercentage(useCase);
         return APIResponseEntity.<PercentageResponse>builder()
             .message("캠페인 카테고리별 비율 조회 성공")
@@ -85,8 +88,10 @@ public class FindCampaignController {
         @RequestParam("category") ReceiptCategory category,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
-        Page<PaymentResponse> response = findPaymentService.findPaymentsByCategory(useCase, category);
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(),
+            currencyType, size, page);
+        Page<PaymentResponse> response = findPaymentService.findPaymentsByCategory(useCase,
+            category);
         return APIResponseEntity.toPage(
             "캠페인 카테고리별 결제 내역 조회 성공",
             response
@@ -99,7 +104,8 @@ public class FindCampaignController {
         @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(),
+            currencyType);
         PercentageResponse response = findPercentageService.findDatePercentage(useCase);
         response.sortPercentages();
         return APIResponseEntity.<PercentageResponse>builder()
@@ -117,7 +123,8 @@ public class FindCampaignController {
         @RequestParam(value = "date", defaultValue = "null") String date,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(),
+            currencyType, size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, date);
         return APIResponseEntity.toPage(
             "캠페인 날짜별 결제 내역 조회 성공",
@@ -134,7 +141,8 @@ public class FindCampaignController {
         @RequestParam(value = "direction", defaultValue = "DESC") Direction order,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(), currencyType, size, page);
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(),
+            currencyType, size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByDate(useCase, order);
         return APIResponseEntity.toPage(
             "캠페인 금액별 결제 내역 조회 성공",
@@ -148,8 +156,10 @@ public class FindCampaignController {
         @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
-        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(useCase);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, userDetails.getId(),
+            currencyType);
+        TotalAmountByMemberResponse response = findPaymentService.findTotalPaymentsByAllMember(
+            useCase);
         return APIResponseEntity.<TotalAmountByMemberResponse>builder()
             .message("캠페인 회원별 총 금액 조회 성공")
             .data(response)
@@ -163,7 +173,8 @@ public class FindCampaignController {
         @PathVariable Long campaignId,
         @PathVariable Long memberId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, memberId, currencyType);
+        FindPercentangeUseCase useCase = new FindPercentangeUseCase(campaignId, memberId,
+            currencyType);
         PercentageByMemberResponse response = findPercentageService.findMemberPercentage(useCase);
         return APIResponseEntity.<PercentageByMemberResponse>builder()
             .message("캠페인 회원 카테고리별 비율 조회 성공")
@@ -180,7 +191,8 @@ public class FindCampaignController {
         @RequestParam(value = "memberId", defaultValue = "1") Long memberId,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, memberId, currencyType, size, page);
+        FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, memberId, currencyType,
+            size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByMember(useCase);
         return APIResponseEntity.toPage(
             "캠페인 회원별 결제 내역 조회 성공",
@@ -198,7 +210,8 @@ public class FindCampaignController {
         FIndCampaignUseCase useCase = new FIndCampaignUseCase(campaignId, userDetails.getId());
         CampaignDetailsResponse response = findCampaignService.findCampaignDetails(useCase);
         // 카테고리별, 날짜별, 인원별 총 결제 금액
-        FindPercentangeUseCase priceUseCase = new FindPercentangeUseCase(campaignId, userDetails.getId(), currencyType);
+        FindPercentangeUseCase priceUseCase = new FindPercentangeUseCase(campaignId,
+            userDetails.getId(), currencyType);
         CampaignReportPrice prices = findPercentageService.findCampaignReport(priceUseCase);
         return APIResponseEntity.<CampaignReportResponse>builder()
             .message("캠페인 레포트 조회 성공")

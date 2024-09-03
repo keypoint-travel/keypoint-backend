@@ -68,7 +68,6 @@ public class EditCampaignService {
         // 캠페인 id, 이미지 url, 제목, 시작일, 종료일 조회
         CampaignInfoDto campaign = campaignRepository.findCampaignInfo(useCase.getCampaignId());
         // 여행지 리스트 조회
-        // todo : 조회 시 다국어 설정 필요
         List<TravelLocationDto> travelLocations = campaignRepository.findTravelLocationList(useCase.getCampaignId());
         // 예산 리스트 조회
         List<CampaignBudget> campaignBudgets = campaignBudgetRepository.findAllByCampaignId(useCase.getCampaignId());

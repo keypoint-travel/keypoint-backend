@@ -20,11 +20,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.Locale;
 
@@ -39,18 +39,15 @@ public class CreateBannerController {
 
     private final CreateBannerService bannerService;
 
-    private final LocaleResolver localeResolver;
-
     @Value("${key.tourApi.key}")
     private String serviceKey;
 
     @GetMapping
     public APIResponseEntity<ContentListResponse> findContentList(
         @ModelAttribute BannerListRequest bannerListRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         TourismListUseCase useCase = tourismApiService.findTourismList(
             findLanguageValue(locale.getLanguage()),
             bannerListRequest.getPage(),
@@ -71,10 +68,9 @@ public class CreateBannerController {
     @GetMapping("/{contentId}/images")
     public APIResponseEntity<ImageListResponse> findContentImageList(
         @PathVariable("contentId") String contentId,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         ImageListUseCase useCase = tourismApiService.findImageList(
             findLanguageValue(locale.getLanguage()), contentId, serviceKey);
         return APIResponseEntity.<ImageListResponse>builder()
@@ -102,10 +98,9 @@ public class CreateBannerController {
     @PostMapping
     public ResponseEntity<Void> saveBanner(
         @RequestBody @Valid BannerRequest bannerRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         bannerService.saveBanner(SaveUseCase.of(bannerRequest, locale.getLanguage()));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -116,10 +111,9 @@ public class CreateBannerController {
     public ResponseEntity<Void> saveBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
         @RequestBody @Valid BannerRequest BannerRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         bannerService.saveBannerByOtherLanguage(SaveUseCase.of(BannerRequest, locale.getLanguage()), bannerId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
