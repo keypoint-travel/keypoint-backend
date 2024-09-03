@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.banner.service.DeleteBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,6 @@ import java.util.Locale;
 public class DeleteBannerController {
 
     private final DeleteBannerService deleteBannerService;
-
-    private final LocaleResolver localeResolver;
 
     // bannerId에 해당하는 전체 배너 삭제
     @DeleteMapping("/{bannerId}")
@@ -36,10 +35,9 @@ public class DeleteBannerController {
     @DeleteMapping("/{bannerId}/locale")
     public ResponseEntity<Void> deleteBanner(
         @PathVariable("bannerId") Long bannerId,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         deleteBannerService.deleteBanner(new DeleteUseCase(bannerId, locale.getLanguage()));
         return ResponseEntity.noContent().build();
     }
