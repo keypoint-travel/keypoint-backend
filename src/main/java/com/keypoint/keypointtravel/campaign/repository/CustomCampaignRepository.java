@@ -1,9 +1,11 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 
+import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import java.util.List;
 
 public interface CustomCampaignRepository {
@@ -12,7 +14,7 @@ public interface CustomCampaignRepository {
 
     CampaignInfoDto findCampaignInfo(Long campaignId);
 
-    List<CampaignInfoDto> findCampaignInfoList(Long memberId);
+    CampaignDto findCampaignInfoList(Long memberId, Status status, int size, int page);
 
     void updateCampaignFinished(Long campaignId);
 

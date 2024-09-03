@@ -1,8 +1,7 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
-import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 import com.keypoint.keypointtravel.campaign.entity.*;
@@ -15,9 +14,11 @@ import com.keypoint.keypointtravel.place.entity.QCountry;
 import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 @RequiredArgsConstructor
 public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
@@ -71,8 +72,10 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     }
 
     @Override
-    public List<CampaignInfoDto> findCampaignInfoList(Long memberId) {
-        return queryFactory.select(
+    public CampaignDto findCampaignInfoList(
+        Long memberId, Status status, int size, int page) {
+
+        List<CampaignInfoDto> dtoList = queryFactory.select(
                 Projections.constructor(CampaignInfoDto.class,
                     campaign.id,
                     uploadFile.path,
@@ -82,9 +85,19 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .from(campaign)
             .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
             .leftJoin(uploadFile).on(campaign.campaignImageId.eq(uploadFile.id))
-            .where(campaign.status.eq(Status.IN_PROGRESS)
+            .where(campaign.status.eq(status)
                 .and(memberCampaign.member.id.eq(memberId)))
+            .orderBy(campaign.endDate.desc())
+            .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
+            .limit((size > 0 ? size : 1))
             .fetch();
+        Long count = queryFactory.select(campaign.count())
+            .from(campaign)
+            .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
+            .where(campaign.status.eq(status)
+                .and(memberCampaign.member.id.eq(memberId)))
+            .fetchOne();
+        return new CampaignDto(dtoList, count);
     }
 
     @Override
@@ -97,6 +110,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
 
     @Override
     public List<TravelLocationDto> findTravelLocationList(Long campaignId) {
+        Locale locale = LocaleContextHolder.getLocale();
         QPlace place = QPlace.place;
         QCountry country = QCountry.country;
         QTravelLocation travelLocation = QTravelLocation.travelLocation;
@@ -104,8 +118,10 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
                 Projections.constructor(TravelLocationDto.class,
                     travelLocation.sequence,
                     travelLocation.placeId,
-                    place.cityKO,
-                    country.countryKO))
+                    locale.getLanguage().equals("ko") ? place.cityKO :
+                        locale.getLanguage().equals("en") ? place.cityEN : place.cityJA,
+                    locale.getLanguage().equals("ko") ? country.countryKO :
+                        locale.getLanguage().equals("en") ? country.countryEN : country.countryJA))
             .from(travelLocation)
             .innerJoin(place).on(travelLocation.placeId.eq(place.id))
             .innerJoin(country).on(place.country.id.eq(country.id))

@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.banner.service.EditBannerService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,16 +24,13 @@ public class EditBannerController {
 
     private final EditBannerService editBannerService;
 
-    private final LocaleResolver localeResolver;
-
     @PatchMapping("/api/v1/banners/{bannerId}")
     public ResponseEntity<Void> editBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
         @RequestBody EditBannerRequest bannerRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         editBannerService.editBanner(new EditBannerUseCase(bannerId, bannerRequest, locale.getLanguage()));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

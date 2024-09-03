@@ -16,6 +16,7 @@ import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +37,6 @@ public class AdvertisementBannerController {
 
     private final ReadMemberService readMemberService;
 
-    private final LocaleResolver localeResolver;
-
     @GetMapping("/image")
     public APIResponseEntity<ImageUrlResponse> transformToUrl(
         @RequestPart(value = "image") MultipartFile image,
@@ -55,10 +54,9 @@ public class AdvertisementBannerController {
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
         @RequestPart(value = "detail") @Valid AdvertisementRequest bannerRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         AdvertisementUseCase useCase = new AdvertisementUseCase(
             thumbnailImage, detailImage, findLanguageValue(locale.getLanguage()), bannerRequest.getMainTitle(),
             bannerRequest.getSubTitle(), bannerRequest.getContent());
@@ -71,10 +69,9 @@ public class AdvertisementBannerController {
     public ResponseEntity<Void> saveAdvertisementBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
         @RequestBody @Valid AdvertisementRequest bannerRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         PlusAdvertisementUseCase useCase = new PlusAdvertisementUseCase(bannerId, bannerRequest.getMainTitle(),
             bannerRequest.getSubTitle(), bannerRequest.getContent(), findLanguageValue(locale.getLanguage()));
         advertisementBannerService.saveBannerByOtherLanguage(useCase);
@@ -107,10 +104,9 @@ public class AdvertisementBannerController {
     @DeleteMapping("/{bannerId}/locale")
     public ResponseEntity<Void> deleteBanner(
         @PathVariable("bannerId") Long bannerId,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, locale.getLanguage()));
         return ResponseEntity.noContent().build();
     }
@@ -140,10 +136,9 @@ public class AdvertisementBannerController {
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
         @RequestPart(value = "detail") @Valid AdvertisementRequest bannerRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        HttpServletRequest request) {
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = localeResolver.resolveLocale(request);
+        Locale locale = LocaleContextHolder.getLocale();
         AdvertisementUseCase useCase = new AdvertisementUseCase(
             thumbnailImage, detailImage, findLanguageValue(locale.getLanguage()), bannerRequest.getMainTitle(),
             bannerRequest.getSubTitle(), bannerRequest.getContent());

@@ -1,18 +1,27 @@
 package com.keypoint.keypointtravel.campaign.service;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.ReceiptInfoDto;
+import com.keypoint.keypointtravel.campaign.dto.response.CampaignResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.CampaignDetailsResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.details.ReceiptInfo;
+import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignListUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
+import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.receipt.repository.CustomPaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,9 +75,21 @@ public class FindCampaignService {
         }
     }
 
+    /**
+     * 메인화면 캠페인 목록(진행 중) 조회 함수
+     *
+     * @Param memberId useCase
+     * @Return List<CampaignInfoDto>
+     */
     @Transactional(readOnly = true)
-    public List<CampaignInfoDto> findCampaigns(Long memberId){
+    public Page<CampaignResponse> findCampaigns(FIndCampaignListUseCase useCase){
         // 1. 캠페인 정보 조회
-        return campaignRepository.findCampaignInfoList(memberId);
+        CampaignDto dto = campaignRepository.findCampaignInfoList(
+            useCase.getMemberId(), Status.IN_PROGRESS, useCase.getSize(), useCase.getPage());
+        // 2. 페이지 형태로 반환
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(
+            useCase.getPage() > 0 ? useCase.getPage() - 1 : 0, useCase.getSize() > 0 ? useCase.getSize() : 1, sort);
+        return new PageImpl<>(CampaignResponse.from(dto.getDtoList()), pageable, dto.getTotalCount());
     }
 }
