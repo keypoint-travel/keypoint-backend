@@ -28,6 +28,7 @@ public class ReadReceiptService {
      */
     public void validateReceipt(
         Long campaignId,
+        String receiptId,
         String receiptImageUrl,
         ReceiptRegistrationType registrationType,
         String addressAddress,
@@ -46,6 +47,9 @@ public class ReadReceiptService {
             if (receiptImageUrl == null) {
                 throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
                     "영수증 이미지가 null일 수 없습니다.");
+            } else if (receiptId == null || receiptImageUrl.isBlank()) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                    "영수증 id가 null일 수 없습니다.");
             }
         } else {
             if (addressAddress != null &&

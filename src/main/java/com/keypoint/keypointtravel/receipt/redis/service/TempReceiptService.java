@@ -27,4 +27,19 @@ public class TempReceiptService {
 
         return tempReceipt.getId();
     }
+
+    /**
+     * 영수증 찾는 함수
+     *
+     * @param id
+     * @return
+     */
+    public TempReceipt findTempReceiptById(String id) {
+        if (id == null) {
+            return null;
+        }
+
+        return tempReceiptRepository.findById(id)
+            .orElse(null);
+    }
 }

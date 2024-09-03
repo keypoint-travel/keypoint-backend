@@ -6,12 +6,12 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
+import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
@@ -19,6 +19,7 @@ import java.util.List;
 public class CreateReceiptUseCase {
 
     private ReceiptRegistrationType registrationType;
+    private String receiptId;
     private Long campaignId;
     private String store;
     private String storeAddress;
@@ -37,8 +38,9 @@ public class CreateReceiptUseCase {
         ReceiptRegistrationType registrationType
     ) {
         return CreateReceiptUseCase.builder()
+            .receiptId(request.getReceiptId())
             .registrationType(registrationType)
-                .campaignId(campaignId)
+            .campaignId(campaignId)
             .store(request.getStore())
             .storeAddress(request.getStoreAddress())
             .receiptCategory(request.getReceiptCategory())
@@ -56,7 +58,8 @@ public class CreateReceiptUseCase {
     public Receipt toEntity(
         Campaign campaign,
         Long receiptImageId,
-        CurrencyType currency
+        CurrencyType currency,
+        TempReceipt tempReceipt
     ) {
         return Receipt.builder()
             .receiptRegistrationType(registrationType)
@@ -71,6 +74,7 @@ public class CreateReceiptUseCase {
             .longitude(this.longitude)
             .latitude(this.latitude)
             .currency(currency)
+            .tempReceipt(tempReceipt)
             .build();
     }
 }

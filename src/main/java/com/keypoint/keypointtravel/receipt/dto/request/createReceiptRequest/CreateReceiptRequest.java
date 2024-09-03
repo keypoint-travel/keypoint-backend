@@ -6,15 +6,14 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class CreateReceiptRequest {
 
-    private Long receiptId;
+    private String receiptId;
 
     @NotBlank
     @Size(max = 50) // TODO 길이 확인 후 변경

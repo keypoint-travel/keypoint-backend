@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
+import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -80,6 +81,16 @@ public class Receipt extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CurrencyType currency;
 
+    private String receiptType;
+
+    private String merchantPhoneNumber;
+
+    private Float subtotal;
+
+    private Float tax;
+
+    private Float tip;
+
     @Builder
     public Receipt(
         ReceiptRegistrationType receiptRegistrationType,
@@ -93,7 +104,8 @@ public class Receipt extends BaseEntity {
         Long receiptImageId,
         Double longitude,
         Double latitude,
-        CurrencyType currency
+        CurrencyType currency,
+        TempReceipt tempReceipt
     ) {
         this.receiptRegistrationType = receiptRegistrationType;
         this.campaign = campaign;
@@ -107,5 +119,13 @@ public class Receipt extends BaseEntity {
         this.longitude = longitude;
         this.latitude = latitude;
         this.currency = currency;
+
+        if (tempReceipt != null) {
+            this.receiptType = tempReceipt.getReceiptType();
+            this.merchantPhoneNumber = tempReceipt.getMerchantPhoneNumber();
+            this.subtotal = tempReceipt.getSubtotal();
+            this.tax = tempReceipt.getTax();
+            this.tip = tempReceipt.getTip();
+        }
     }
 }

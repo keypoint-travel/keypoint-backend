@@ -12,9 +12,12 @@ import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreatePaymentItemUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
+import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
+import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import com.keypoint.keypointtravel.receipt.repository.ReceiptRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,7 @@ public class CreateReceiptService {
     private final UploadFileService uploadFileService;
     private final CampaignBudgetRepository campaignBudgetRepository;
     private final PaymentItemService paymentItemService;
+    private final TempReceiptService tempReceiptService;
 
     /**
      * 영수증 등록 함수
@@ -39,14 +43,15 @@ public class CreateReceiptService {
      * @param useCase
      */
     @Transactional
-    public void addReceipt(CreateReceiptUseCase useCase) {
-        try {
+    public void addReceipt(CreateReceiptUseCase useCase) throws IOException {
+//        try {
             Long campaignId = useCase.getCampaignId();
             String receiptImageUrl = useCase.getReceiptImageUrl();
 
             // 1. 유효성 확인 (캠페인 아이디, 주소, 경도, 위도)
             readReceiptService.validateReceipt(
                 campaignId,
+                useCase.getReceiptId(),
                 useCase.getReceiptImageUrl(),
                 useCase.getRegistrationType(),
                 useCase.getStoreAddress(),
@@ -62,7 +67,10 @@ public class CreateReceiptService {
             CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
                 campaignId
             );
-            Receipt receipt = useCase.toEntity(campaign, receiptImageId, currencyType);
+        // 2-2. 임시 영수증 데이터 가져오기
+        TempReceipt tempReceipt = tempReceiptService.findTempReceiptById(
+            useCase.getReceiptId());
+        Receipt receipt = useCase.toEntity(campaign, receiptImageId, currencyType, tempReceipt);
             receiptRepository.save(receipt);
 
             // 3. 결제 항목 저장
@@ -84,8 +92,8 @@ public class CreateReceiptService {
                     .toList();
                 paymentItemService.addPaymentItem(receipt, paymentItem, filteredMembers);
             }
-        } catch (Exception ex) {
-            throw new GeneralException(ex);
-        }
+//        } catch (Exception ex) {
+//            throw new GeneralException(ex);
+//        }
     }
 }
