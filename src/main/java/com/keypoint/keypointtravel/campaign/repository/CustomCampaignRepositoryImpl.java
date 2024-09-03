@@ -14,9 +14,11 @@ import com.keypoint.keypointtravel.place.entity.QCountry;
 import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 @RequiredArgsConstructor
 public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
@@ -108,6 +110,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
 
     @Override
     public List<TravelLocationDto> findTravelLocationList(Long campaignId) {
+        Locale locale = LocaleContextHolder.getLocale();
         QPlace place = QPlace.place;
         QCountry country = QCountry.country;
         QTravelLocation travelLocation = QTravelLocation.travelLocation;
@@ -115,8 +118,10 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
                 Projections.constructor(TravelLocationDto.class,
                     travelLocation.sequence,
                     travelLocation.placeId,
-                    place.cityKO,
-                    country.countryKO))
+                    locale.getLanguage().equals("ko") ? place.cityKO :
+                        locale.getLanguage().equals("en") ? place.cityEN : place.cityJA,
+                    locale.getLanguage().equals("ko") ? country.countryKO :
+                        locale.getLanguage().equals("en") ? country.countryEN : country.countryJA))
             .from(travelLocation)
             .innerJoin(place).on(travelLocation.placeId.eq(place.id))
             .innerJoin(country).on(place.country.id.eq(country.id))
