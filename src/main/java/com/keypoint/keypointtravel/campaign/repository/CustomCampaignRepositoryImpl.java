@@ -1,8 +1,7 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
-import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 import com.keypoint.keypointtravel.campaign.entity.*;
@@ -71,8 +70,10 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     }
 
     @Override
-    public List<CampaignInfoDto> findCampaignInfoList(Long memberId, Status status) {
-        return queryFactory.select(
+    public CampaignDto findCampaignInfoList(
+        Long memberId, Status status, int size, int page) {
+
+        List<CampaignInfoDto> dtoList = queryFactory.select(
                 Projections.constructor(CampaignInfoDto.class,
                     campaign.id,
                     uploadFile.path,
@@ -84,7 +85,17 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .leftJoin(uploadFile).on(campaign.campaignImageId.eq(uploadFile.id))
             .where(campaign.status.eq(status)
                 .and(memberCampaign.member.id.eq(memberId)))
+            .orderBy(campaign.endDate.desc())
+            .offset((long) (size > 0 ? size : 1) * (page > 0 ? page - 1 : 0))
+            .limit((size > 0 ? size : 1))
             .fetch();
+        Long count = queryFactory.select(campaign.count())
+            .from(campaign)
+            .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
+            .where(campaign.status.eq(status)
+                .and(memberCampaign.member.id.eq(memberId)))
+            .fetchOne();
+        return new CampaignDto(dtoList, count);
     }
 
     @Override
