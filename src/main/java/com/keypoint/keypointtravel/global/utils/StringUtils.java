@@ -1,10 +1,15 @@
 package com.keypoint.keypointtravel.global.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
-import org.springframework.stereotype.Component;
 
 
 @Component
@@ -13,6 +18,17 @@ public class StringUtils {
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$";
 
     private static final String RANDOM_ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
+    private static final String COUNTER_KEY = "unique_id_counter";
+    private static final String DATE_KEY = "unique_id_date";
+
+    private static StringRedisTemplate redisTemplate;
+
+    @Autowired
+    public StringUtils(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     public static Float convertToFloat(String str) {
         return str == null ? null : Float.parseFloat(str);
@@ -126,5 +142,24 @@ public class StringUtils {
         text = text.replaceAll("(?m)^\\s*-{3,}\\s*$", "");
 
         return text.trim();
+    }
+
+    /**
+     * 고유번호 생성하는 함수
+     * - 날짜가 변경될 때마다 카운터 초기화
+     *
+     * @return 고유번호
+     */
+    public static String generateUniqueNumber() {
+        String currentDate = dateFormat.format(new Date());
+        String storedDate = redisTemplate.opsForValue().get(DATE_KEY);
+
+        if (!currentDate.equals(storedDate)) {
+            redisTemplate.opsForValue().set(DATE_KEY, currentDate);
+            redisTemplate.opsForValue().set(COUNTER_KEY, "0");
+        }
+
+        Long counter = redisTemplate.opsForValue().increment(COUNTER_KEY);
+        return currentDate + String.format("%05d", counter);
     }
 }
