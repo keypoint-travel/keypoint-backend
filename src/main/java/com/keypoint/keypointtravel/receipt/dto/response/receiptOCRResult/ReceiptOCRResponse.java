@@ -1,19 +1,21 @@
 package com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult;
 
 import com.keypoint.keypointtravel.external.azure.dto.useCase.WholeReceiptUseCase;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 
 @Getter
 @Builder
 @AllArgsConstructor
 public class ReceiptOCRResponse {
 
+    private String receiptId;
     private String receiptImageUrl;
     private String store;
     private String storeAddress;

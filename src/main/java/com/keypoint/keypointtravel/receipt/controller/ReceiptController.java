@@ -11,13 +11,7 @@ import com.keypoint.keypointtravel.receipt.service.CreateReceiptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -44,12 +38,13 @@ public class ReceiptController {
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @PostMapping("")
+    @PostMapping("/{campaignId}")
     public APIResponseEntity<Void> addReceipt(
+            @PathVariable(value = "campaignId") Long campaignId,
         @RequestParam(value = "receipt-registration-type") ReceiptRegistrationType registrationType,
         @Valid @RequestBody CreateReceiptRequest request
     ) {
-        CreateReceiptUseCase useCase = CreateReceiptUseCase.of(request, registrationType);
+        CreateReceiptUseCase useCase = CreateReceiptUseCase.of(campaignId, request, registrationType);
         createReceiptService.addReceipt(useCase);
 
         return APIResponseEntity.<Void>builder()
