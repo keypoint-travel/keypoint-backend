@@ -8,9 +8,13 @@ import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.notice.dto.request.NoticeRequest;
-import com.keypoint.keypointtravel.notice.dto.response.NoticesResponse;
+import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
+import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.NoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.service.NoticeService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -20,12 +24,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -55,7 +59,7 @@ public class NoticeController {
 
     // 이미 생성된 공지사항에 다른 언어로 추가
     @PostMapping("/{noticeId}")
-    public ResponseEntity<Void> saveNotice(
+    public APIResponseEntity<Void> saveNotice(
         @PathVariable(value = "noticeId", required = false) Long noticeId,
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
@@ -64,7 +68,9 @@ public class NoticeController {
         //todo: 관리자 인증 로직 추가 예정
         PlusNoticeUseCase useCase = new PlusNoticeUseCase(noticeId, thumbnailImage, detailImages, findLanguageValue(request.getLanguage()), request.getTitle(),request.getContent());
         noticeService.saveNoticeByOtherLanguage(useCase);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return APIResponseEntity.<Void>builder()
+            .message("추가 공지등록 성공")
+            .build();
     }
 
     /**
@@ -74,7 +80,7 @@ public class NoticeController {
      * @return
      */
     @GetMapping
-    public APIResponseEntity<PageResponse<NoticesResponse>> findNotices(
+    public APIResponseEntity<PageResponse<NoticeResponse>> findNotices(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
         @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
@@ -90,12 +96,76 @@ public class NoticeController {
             direction,
             pageable
         );
-        Page<NoticesResponse> result = noticeService.findNotices(useCase);
+        Page<NoticeResponse> result = noticeService.findNotices(useCase);
 
         return APIResponseEntity.toPage(
             "공지사항 목록 조회 성공",
             result
         );
+    }
+
+    @PutMapping("/{noticeContentId}")
+    public APIResponseEntity<Void> updateNotice(
+        @PathVariable("noticeContentId") Long noticeContentId,
+        @RequestPart(value = "detail") @Valid UpdateNoticeUseCase request,
+        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
+        @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        UpdateNoticeUseCase useCase = UpdateNoticeUseCase.of(
+            noticeContentId,
+            thumbnailImage,
+            detailImages,
+            request.getTitle(),
+            request.getContent()
+        );
+        noticeService.updateNotice(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("공지 수정 성공")
+            .build();
+    }
+
+    @Deprecated
+    @DeleteMapping()
+    public APIResponseEntity<Void> deleteNotices(
+        @RequestParam("notice-ids") Long[] noticeIds
+    ) {
+        DeleteNoticeUseCase useCase = DeleteNoticeUseCase.from(
+            noticeIds
+        );
+        noticeService.deleteNotices(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("공지 삭제 성공")
+            .build();
+    }
+
+    @Deprecated
+    @DeleteMapping("/contents")
+    public APIResponseEntity<Void> deleteNoticeContents(
+        @RequestParam("noticeContent-ids") Long[] noticeContentIds
+    ) {
+        DeleteNoticeContentUseCase useCase = DeleteNoticeContentUseCase.from(
+            noticeContentIds
+        );
+        noticeService.deleteNoticeContents(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("공지 내용 삭제 성공")
+            .build();
+    }
+
+    @GetMapping("/{noticeContentId}")
+    public APIResponseEntity<NoticeDetailResponse> findNoticeById(
+        @PathVariable("noticeContentId") Long noticeContentId
+    ) {
+        NoticeDetailResponse result = noticeService.findNoticeById(noticeContentId);
+
+        return APIResponseEntity.<NoticeDetailResponse>builder()
+            .message("공지 단건 조회 성공")
+            .data(result)
+            .build();
     }
 
 

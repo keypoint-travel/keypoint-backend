@@ -70,4 +70,13 @@ public class NoticeContent extends LanguageEntity {
         }
     }
 
+    public void removeDetailImage(NoticeDetailImage detailImage) {
+        this.detailImages.remove(detailImage);
+        detailImage.setNoticeContent(null);
+    }
+
+    public void addDetailImage(NoticeDetailImage detailImage) {
+        this.detailImages.add(detailImage);
+        detailImage.setNoticeContent(this);
+    }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class NoticesResponse {
+public class NoticeResponse {
     private Long noticeId;
     private Long noticeContentId;
     private String title;
@@ -17,7 +17,7 @@ public class NoticesResponse {
     private LocalDateTime createAt;
     private LocalDateTime modifyAt;
 
-    public NoticesResponse(Long noticeId, Long noticeContentId, String title, String content, String thumbnailImageUrl,LanguageCode languageCode, LocalDateTime createAt, LocalDateTime modifyAt) {
+    public NoticeResponse(Long noticeId, Long noticeContentId, String title, String content, String thumbnailImageUrl,LanguageCode languageCode, LocalDateTime createAt, LocalDateTime modifyAt) {
         this.noticeId = noticeId;
         this.noticeContentId = noticeContentId;
         this.title = title;

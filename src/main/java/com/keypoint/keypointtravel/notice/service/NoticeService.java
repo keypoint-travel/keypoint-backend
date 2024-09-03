@@ -5,13 +5,18 @@ import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.notice.dto.response.NoticesResponse;
+import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
+import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.NoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.entity.Notice;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
 import com.keypoint.keypointtravel.notice.entity.NoticeDetailImage;
 import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
+import com.keypoint.keypointtravel.notice.repository.NoticeDetailImageRepository;
 import com.keypoint.keypointtravel.notice.repository.NoticeRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +36,7 @@ public class NoticeService {
     private final UploadFileService uploadFileService;
     private final NoticeRepository noticeRepository;
     private final NoticeContentRepository noticeContentRepository;
+    private final NoticeDetailImageRepository noticeDetailImageRepository;
 
     @Transactional
     public void saveNotice(NoticeUseCase useCase) {
@@ -146,9 +152,97 @@ public class NoticeService {
             .build();
     }
 
-    public Page<NoticesResponse> findNotices(PageUseCase useCase) {
+    public Page<NoticeResponse> findNotices(PageUseCase useCase) {
         try {
             return noticeRepository.findNotices(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 공지 수정 함수
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void updateNotice(UpdateNoticeUseCase useCase) {
+        try {
+            Long noticeContentId = useCase.getNoticeContentId();
+            NoticeContent noticeContent = findNoticeByNoticeId(noticeContentId);
+
+            // 1. 썸네일 이미지 업데이트
+            if (useCase.getThumbnailImage() != null) {
+                uploadFileService.updateUploadFile(
+                    noticeContent.getThumbnailImageId(),
+                    useCase.getThumbnailImage(),
+                    DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
+                );
+            }
+
+            // 2. 기존 상세 이미지 삭제
+            List<NoticeDetailImage> existingDetailImages = noticeContent.getDetailImages();
+            if (existingDetailImages != null && !existingDetailImages.isEmpty()) {
+                for (NoticeDetailImage detailImage : new ArrayList<>(existingDetailImages)) {
+                    uploadFileService.deleteUploadFile(detailImage.getDetailImageId()); // 파일 삭제
+                    noticeDetailImageRepository.delete(detailImage); // 데이터베이스에서 직접 삭제
+                    noticeContent.removeDetailImage(detailImage); // 부모 엔티티에서 자식 엔티티 관계 해제
+                }
+            }
+
+            // 3. 새로운 상세 이미지 추가
+            if (useCase.getDetailImages() != null && !useCase.getDetailImages().isEmpty()) {
+                for (MultipartFile detailImage : useCase.getDetailImages()) {
+                    Long detailImageId = uploadFileService.saveUploadFile(
+                        detailImage,
+                        DirectoryConstants.NOTICE_DETAIL_DIRECTORY
+                    );
+                    NoticeDetailImage noticeDetailImage = NoticeDetailImage.builder()
+                        .noticeContent(noticeContent)
+                        .detailImageId(detailImageId)
+                        .build();
+                    noticeDetailImageRepository.save(noticeDetailImage); // 새로운 이미지를 데이터베이스에 저장
+                    noticeContent.addDetailImage(noticeDetailImage); // 부모 엔티티에 자식 엔티티 추가
+                }
+            }
+
+            // 변경사항 저장
+            noticeContentRepository.updateNotice(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    private NoticeContent findNoticeByNoticeId(Long noticeId) {
+        return noticeContentRepository.findByIdAndIsDeletedFalse(noticeId).orElseThrow(
+            () -> new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE)
+        );
+    }
+
+    public NoticeDetailResponse findNoticeById(Long noticeContentId) {
+        try {
+            return noticeRepository.findNoticeById(noticeContentId);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 공지 삭제 성공
+     *
+     * @param useCase
+     */
+    public void deleteNotices(DeleteNoticeUseCase useCase) {
+        try {
+            noticeRepository.deleteNotices(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public void deleteNoticeContents(DeleteNoticeContentUseCase useCase) {
+        try {
+            noticeRepository.deleteNoticeContents(useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
