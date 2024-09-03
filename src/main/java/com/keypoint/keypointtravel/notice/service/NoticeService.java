@@ -1,9 +1,11 @@
 package com.keypoint.keypointtravel.notice.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
+import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.notice.dto.response.NoticesResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.NoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
 import com.keypoint.keypointtravel.notice.entity.Notice;
@@ -13,6 +15,7 @@ import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
 import com.keypoint.keypointtravel.notice.repository.NoticeRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -141,6 +144,14 @@ public class NoticeService {
             .thumbnailImageId(thumbnailImageId)
             .detailImages(detailImages)  // 기본적으로 빈 리스트로 설정
             .build();
+    }
+
+    public Page<NoticesResponse> findNotices(PageUseCase useCase) {
+        try {
+            return noticeRepository.findNotices(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }
 
