@@ -1,10 +1,12 @@
 package com.keypoint.keypointtravel.campaign.service;
 
+import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CompleteCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignWaitMemberRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
+import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +60,17 @@ public class CompleteCampaignService {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         return memberIds;
+    }
+
+    /**
+     * 종료된 캠페인 목록 조회 함수
+     *
+     * @Param memberId useCase
+     * @Return List<CampaignInfoDto>
+     */
+    @Transactional(readOnly = true)
+    public List<CampaignInfoDto> findCampaigns(Long memberId){
+        // 1. 캠페인 정보 조회
+        return campaignRepository.findCampaignInfoList(memberId, Status.FINISHED);
     }
 }

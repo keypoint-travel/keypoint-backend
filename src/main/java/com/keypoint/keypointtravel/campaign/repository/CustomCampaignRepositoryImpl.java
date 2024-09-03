@@ -71,7 +71,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     }
 
     @Override
-    public List<CampaignInfoDto> findCampaignInfoList(Long memberId) {
+    public List<CampaignInfoDto> findCampaignInfoList(Long memberId, Status status) {
         return queryFactory.select(
                 Projections.constructor(CampaignInfoDto.class,
                     campaign.id,
@@ -82,7 +82,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .from(campaign)
             .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
             .leftJoin(uploadFile).on(campaign.campaignImageId.eq(uploadFile.id))
-            .where(campaign.status.eq(Status.IN_PROGRESS)
+            .where(campaign.status.eq(status)
                 .and(memberCampaign.member.id.eq(memberId)))
             .fetch();
     }

@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.campaign.dto.response.details.ReceiptInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
+import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
@@ -66,9 +67,15 @@ public class FindCampaignService {
         }
     }
 
+    /**
+     * 메인화면 캠페인 목록(진행 중) 조회 함수
+     *
+     * @Param memberId useCase
+     * @Return List<CampaignInfoDto>
+     */
     @Transactional(readOnly = true)
     public List<CampaignInfoDto> findCampaigns(Long memberId){
         // 1. 캠페인 정보 조회
-        return campaignRepository.findCampaignInfoList(memberId);
+        return campaignRepository.findCampaignInfoList(memberId, Status.IN_PROGRESS);
     }
 }
