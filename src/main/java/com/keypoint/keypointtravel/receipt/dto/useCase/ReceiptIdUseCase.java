@@ -9,7 +9,7 @@ public class ReceiptIdUseCase {
 
     Long receiptId;
 
-    public static ReceiptIdUseCase from(Long campaignId) {
-        return new ReceiptIdUseCase(campaignId);
+    public static ReceiptIdUseCase from(Long receiptId) {
+        return new ReceiptIdUseCase(receiptId);
     }
 }

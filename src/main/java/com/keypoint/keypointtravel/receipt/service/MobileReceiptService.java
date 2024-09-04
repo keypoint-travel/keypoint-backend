@@ -12,7 +12,9 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationTy
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.ImageUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
+import com.keypoint.keypointtravel.receipt.dto.useCase.CampaignIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreatePaymentItemUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
@@ -207,7 +209,7 @@ public class MobileReceiptService {
      */
     @Transactional
     public void updateReceipt(UpdateReceiptUseCase useCase) {
-//        try {
+        try {
             Optional<ReceiptRegistrationType> registrationType = receiptRepository.findReceiptRegistrationTypeByReceiptId(useCase.getReceiptId());
             if (registrationType.isEmpty()) {
                 throw new GeneralException(ReceiptError.NOT_EXISTED_RECEIPT);
@@ -227,8 +229,24 @@ public class MobileReceiptService {
             // 결제 아이템 수정
             Receipt receipt = receiptRepository.getReferenceById(useCase.getReceiptId());
             paymentItemService.updatePaymentItem(receipt, useCase.getPaymentItems());
-//        } catch (Exception ex) {
-//            throw new GeneralException(ex);
-//        }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 캠페인에 등록된 영수증을 조회하는 함수
+     *
+     * @param useCase
+     * @return
+     */
+    public List<CampaignReceiptResponse> getReceiptsAboutCampaign(CampaignIdUseCase useCase) {
+        try {
+            return receiptRepository.findReceiptsByCampaign(
+                useCase.getCampaignId()
+            );
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.receipt.repository;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.PaymentItemResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
@@ -121,5 +122,25 @@ public class ReceiptCustomRepositoryImpl implements ReceiptCustomRepository {
                 .set(receipt.modifyAt, LocalDateTime.now())
                 .where(receipt.id.eq(useCase.getReceiptId()))
                 .execute();
+    }
+
+    @Override
+    public List<CampaignReceiptResponse> findReceiptsByCampaign(Long campaignId) {
+        return queryFactory
+            .select(
+                Projections.constructor(
+                    CampaignReceiptResponse.class,
+                    receipt.id.as("receiptId"),
+                    receipt.paidAt,
+                    uploadFile.path.as("receiptImageUrl"),
+                    receipt.longitude,
+                    receipt.latitude
+                )
+            )
+            .from(receipt)
+            .leftJoin(uploadFile).on(uploadFile.id.eq(receipt.receiptImageId))
+            .where(receipt.isDeleted.eq(false))
+            .orderBy(receipt.paidAt.asc())
+            .fetch();
     }
 }
