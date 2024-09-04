@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest;
+package com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest;
 
 import com.google.firebase.database.annotations.NotNull;
 import com.keypoint.keypointtravel.global.annotation.ValidEnum;
@@ -12,10 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class CreateReceiptRequest {
-
-    private String receiptId;
-
+public class UpdateReceiptRequest {
     @NotBlank
     @Size(max = 50) // TODO 길이 확인 후 변경
     private String store;
@@ -32,13 +29,11 @@ public class CreateReceiptRequest {
     private float totalAccount;
 
     @NotNull
-    private List<CreatePaymentItemRequest> paymentItems;
+    private List<UpdatePaymentItemRequest> paymentItems;
 
     private Double longitude;
 
     private Double latitude;
-
-    private String receiptImageUrl;
 
     private String memo;
 }

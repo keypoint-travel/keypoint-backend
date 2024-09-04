@@ -5,7 +5,10 @@ import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
+import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
+import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.ImageUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -13,30 +16,102 @@ import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptR
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreatePaymentItemUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
 import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
 import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import com.keypoint.keypointtravel.receipt.repository.ReceiptRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
-import java.awt.image.BufferedImage;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class CreateReceiptService {
+public class MobileReceiptService {
 
     private final ReceiptRepository receiptRepository;
-    private final ReadReceiptService readReceiptService;
     private final CampaignRepository campaignRepository;
     private final MemberCampaignRepository memberCampaignRepository;
     private final UploadFileService uploadFileService;
     private final CampaignBudgetRepository campaignBudgetRepository;
     private final PaymentItemService paymentItemService;
     private final TempReceiptService tempReceiptService;
+
+    /**
+     * (영수증 생성) 영수증 데이터 유효성 검사
+     *
+     * @param registrationType
+     * @param addressAddress
+     * @param longitude
+     * @param latitude
+     */
+    public void validateReceiptInCreate(
+            Long campaignId,
+            String receiptId,
+            String receiptImageUrl,
+            ReceiptRegistrationType registrationType,
+            String addressAddress,
+            Double longitude,
+            Double latitude
+    ) {
+        if (!campaignRepository.existsById(campaignId)) {
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
+        }
+
+        if (registrationType == ReceiptRegistrationType.PHOTO) {
+            if (addressAddress == null || longitude == null || latitude == null) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "영수증 주소 혹은 경위도가 null일 수 없습니다.");
+            }
+            if (receiptImageUrl == null) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "영수증 이미지가 null일 수 없습니다.");
+            } else if (receiptId == null || receiptId.isBlank()) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "영수증 id가 null일 수 없습니다.");
+            }
+        } else {
+            if (addressAddress != null &&
+                    (longitude == null || latitude == null)) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "영수증 주소가 압력된 상태일 때는 경위도가 null일 수 없습니다.");
+            }
+        }
+    }
+
+    /**
+     * (영수증 수정) 영수증 데이터 유효성 검사
+     *
+     * @param registrationType
+     * @param addressAddress
+     * @param longitude
+     * @param latitude
+     */
+    public void validateReceiptInUpdate(
+            ReceiptRegistrationType registrationType,
+            String addressAddress,
+            Double longitude,
+            Double latitude
+    ) {
+        if (registrationType == ReceiptRegistrationType.PHOTO) {
+            if (addressAddress == null || longitude == null || latitude == null) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "영수증 주소 혹은 경위도가 null일 수 없습니다.");
+            }
+        } else {
+            if (addressAddress != null &&
+                    (longitude == null || latitude == null)) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "영수증 주소가 압력된 상태일 때는 경위도가 null일 수 없습니다.");
+            }
+        }
+    }
 
     /**
      * 영수증 등록 함수
@@ -50,7 +125,7 @@ public class CreateReceiptService {
             String receiptImageUrl = useCase.getReceiptImageUrl();
 
             // 1. 유효성 확인 (캠페인 아이디, 주소, 경도, 위도)
-            readReceiptService.validateReceipt(
+            validateReceiptInCreate(
                 campaignId,
                 useCase.getReceiptId(),
                 useCase.getReceiptImageUrl(),
@@ -123,6 +198,36 @@ public class CreateReceiptService {
             receiptRepository.deleteReceiptById(
                 useCase.getReceiptId()
             );
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * @param useCase
+     */
+    @Transactional
+    public void updateReceipt(UpdateReceiptUseCase useCase) {
+        try {
+            Optional<ReceiptRegistrationType> registrationType = receiptRepository.findReceiptRegistrationTypeByReceiptId(useCase.getReceiptId());
+            if (registrationType.isEmpty()) {
+                throw new GeneralException(ReceiptError.NOT_EXISTED_RECEIPT);
+            }
+
+            // 1. 유효성 확인 (주소, 경도, 위도)
+            validateReceiptInUpdate(
+                    registrationType.get(),
+                    useCase.getStoreAddress(),
+                    useCase.getLongitude(),
+                    useCase.getLatitude()
+            );
+
+            // 영수증 수정
+            receiptRepository.updateReceipt(useCase);
+
+            // 결제 아이템 수정
+            Receipt receipt = receiptRepository.getReferenceById(useCase.getReceiptId());
+            paymentItemService.updatePaymentItem(receipt, useCase.getPaymentItems());
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

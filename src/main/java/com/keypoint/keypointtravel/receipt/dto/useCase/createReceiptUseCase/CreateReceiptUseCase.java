@@ -7,11 +7,12 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationTy
 import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
 import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -48,7 +49,7 @@ public class CreateReceiptUseCase {
             .totalAccount(request.getTotalAccount())
             .memo(request.getMemo())
             .paymentItems(
-                request.getPaymentItems().stream().map(CreatePaymentItemUseCase::new).toList())
+                    request.getPaymentItems().stream().map(CreatePaymentItemUseCase::new).toList())
             .longitude(request.getLongitude())
             .latitude(request.getLatitude())
             .receiptImageUrl(request.getReceiptImageUrl())

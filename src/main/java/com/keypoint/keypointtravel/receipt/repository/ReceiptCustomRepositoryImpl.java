@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.PaymentItemResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentMember;
 import com.keypoint.keypointtravel.receipt.entity.QReceipt;
@@ -13,11 +14,12 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -98,5 +100,26 @@ public class ReceiptCustomRepositoryImpl implements ReceiptCustomRepository {
             .set(receipt.modifyAt, LocalDateTime.now())
             .where(receipt.id.eq(receiptId))
             .execute();
+    }
+
+    @Override
+    public void updateReceipt(UpdateReceiptUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        queryFactory
+                .update(receipt)
+                .set(receipt.store, useCase.getStore())
+                .set(receipt.storeAddress, useCase.getStoreAddress())
+                .set(receipt.receiptCategory, useCase.getReceiptCategory())
+                .set(receipt.paidAt, useCase.getPaidAt())
+                .set(receipt.totalAmount, useCase.getTotalAccount())
+                .set(receipt.memo, useCase.getMemo())
+                .set(receipt.longitude, useCase.getLongitude())
+                .set(receipt.latitude, useCase.getLatitude())
+
+                .set(receipt.modifyId, currentAuditor)
+                .set(receipt.modifyAt, LocalDateTime.now())
+                .where(receipt.id.eq(useCase.getReceiptId()))
+                .execute();
     }
 }
