@@ -6,10 +6,9 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class UpdateReceiptRequest {
@@ -26,7 +25,7 @@ public class UpdateReceiptRequest {
     private LocalDateTime paidAt;
 
     @Min(1)
-    private float totalAccount;
+    private float totalAmount;
 
     @NotNull
     private List<UpdatePaymentItemRequest> paymentItems;

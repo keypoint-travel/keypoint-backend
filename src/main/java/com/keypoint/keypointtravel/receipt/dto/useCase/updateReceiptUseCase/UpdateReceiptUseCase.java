@@ -2,12 +2,11 @@ package com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase;
 
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest.UpdateReceiptRequest;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
@@ -34,7 +33,7 @@ public class UpdateReceiptUseCase {
                 .storeAddress(request.getStoreAddress())
                 .receiptCategory(request.getReceiptCategory())
                 .paidAt(request.getPaidAt())
-                .totalAccount(request.getTotalAccount())
+            .totalAccount(request.getTotalAmount())
                 .memo(request.getMemo())
                 .paymentItems(
                         request.getPaymentItems().stream().map(UpdatePaymentItemUseCase::new).toList())

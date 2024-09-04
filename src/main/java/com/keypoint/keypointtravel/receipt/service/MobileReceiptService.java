@@ -22,13 +22,12 @@ import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
 import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import com.keypoint.keypointtravel.receipt.repository.ReceiptRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -166,7 +165,7 @@ public class MobileReceiptService {
                 List<Member> filteredMembers = invitedMembers.stream()
                     .filter(member -> paymentItem.getMemberIds().contains(member.getId()))
                     .toList();
-                paymentItemService.addPaymentItem(receipt, paymentItem, filteredMembers);
+                paymentItemService.addPaymentItem(paymentItem.toEntity(receipt), filteredMembers);
             }
         } catch (Exception ex) {
             throw new GeneralException(ex);
@@ -179,9 +178,9 @@ public class MobileReceiptService {
      */
     public ReceiptResponse getReceipt(ReceiptIdUseCase useCase) {
         try {
-        return receiptRepository.findReceiptDetailByReceiptId(
-            useCase.getReceiptId()
-        );
+            return receiptRepository.findReceiptDetailByReceiptId(
+                useCase.getReceiptId()
+            );
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -208,7 +207,7 @@ public class MobileReceiptService {
      */
     @Transactional
     public void updateReceipt(UpdateReceiptUseCase useCase) {
-        try {
+//        try {
             Optional<ReceiptRegistrationType> registrationType = receiptRepository.findReceiptRegistrationTypeByReceiptId(useCase.getReceiptId());
             if (registrationType.isEmpty()) {
                 throw new GeneralException(ReceiptError.NOT_EXISTED_RECEIPT);
@@ -228,8 +227,8 @@ public class MobileReceiptService {
             // 결제 아이템 수정
             Receipt receipt = receiptRepository.getReferenceById(useCase.getReceiptId());
             paymentItemService.updatePaymentItem(receipt, useCase.getPaymentItems());
-        } catch (Exception ex) {
-            throw new GeneralException(ex);
-        }
+//        } catch (Exception ex) {
+//            throw new GeneralException(ex);
+//        }
     }
 }

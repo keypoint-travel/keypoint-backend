@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.receipt.dto.response.receiptResponse;
 
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
+import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class ReceiptResponse {
     private Float totalAmount;
     private CurrencyType currencyType;
     private String memo;
+    private Double longitude;
+    private Double latitude;
+    private ReceiptRegistrationType receiptRegistrationType;
 
     public ReceiptResponse(
         LocalDateTime paidAt,
@@ -31,18 +35,23 @@ public class ReceiptResponse {
         String receiptImageUrl,
         Float totalAccount,
         CurrencyType currencyType,
-        String memo
+        String memo,
+        Double longitude,
+        Double latitude,
+        ReceiptRegistrationType receiptRegistrationType
     ) {
         this.paidAt = paidAt;
         this.receiptId = receiptId;
         this.store = store;
         this.storeAddress = storeAddress;
         this.receiptCategory = receiptCategory;
-        this.paymentItems = paymentItems;
         this.receiptImageUrl = receiptImageUrl;
         this.totalAmount = totalAccount;
         this.currencyType = currencyType;
         this.memo = memo;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.receiptRegistrationType = receiptRegistrationType;
     }
 
     public void setPaymentItems(List<PaymentItemResponse> paymentItems) {

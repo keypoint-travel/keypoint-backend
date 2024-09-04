@@ -3,7 +3,6 @@ package com.keypoint.keypointtravel.receipt.repository;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.PaymentItemResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
@@ -14,12 +13,11 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,7 +30,6 @@ public class ReceiptCustomRepositoryImpl implements ReceiptCustomRepository {
     private final QPaymentItem paymentItem = QPaymentItem.paymentItem;
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
     private final QPaymentMember paymentMember = QPaymentMember.paymentMember;
-    private final QMember member = QMember.member;
 
     @Override
     public ReceiptResponse findReceiptDetailByReceiptId(Long receiptId) {
@@ -56,12 +53,15 @@ public class ReceiptCustomRepositoryImpl implements ReceiptCustomRepository {
                         uploadFile.path,
                         receipt.totalAmount,
                         receipt.currency,
-                        receipt.memo
+                        receipt.memo,
+                        receipt.longitude,
+                        receipt.latitude,
+                        receipt.receiptRegistrationType
                     )
                 )
             );
 
-        if (responses == null) {
+        if (responses == null || responses.isEmpty()) {
             throw new GeneralException(ReceiptError.NOT_EXISTED_RECEIPT);
         }
 
