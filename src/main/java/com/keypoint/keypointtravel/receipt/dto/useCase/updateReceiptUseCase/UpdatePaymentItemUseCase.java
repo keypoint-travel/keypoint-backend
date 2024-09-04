@@ -1,6 +1,6 @@
-package com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase;
+package com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase;
 
-import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreatePaymentItemRequest;
+import com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest.UpdatePaymentItemRequest;
 import com.keypoint.keypointtravel.receipt.entity.PaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
 import lombok.Getter;
@@ -8,14 +8,16 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class CreatePaymentItemUseCase {
+public class UpdatePaymentItemUseCase {
 
+    private Long paymentItemId;
     private String itemName;
     private float amount;
     private long quantity;
     private List<Long> memberIds;
 
-    public CreatePaymentItemUseCase(CreatePaymentItemRequest request) {
+    public UpdatePaymentItemUseCase(UpdatePaymentItemRequest request) {
+        this.paymentItemId = request.getPaymentItemId();
         this.itemName = request.getItemName();
         this.amount = request.getAmount();
         this.quantity = request.getQuantity();
@@ -23,11 +25,11 @@ public class CreatePaymentItemUseCase {
     }
 
     public PaymentItem toEntity(Receipt receipt) {
-        return PaymentItem.builder()
-            .receipt(receipt)
-            .itemName(this.itemName)
-            .amount(this.amount)
-            .quantity(this.quantity)
-            .build();
+        return new PaymentItem(
+                receipt,
+                itemName,
+                quantity,
+                amount
+        );
     }
 }

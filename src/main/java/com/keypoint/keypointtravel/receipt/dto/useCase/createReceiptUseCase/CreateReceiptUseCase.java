@@ -6,11 +6,13 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
-import java.time.LocalDateTime;
-import java.util.List;
+import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,6 +20,7 @@ import lombok.Getter;
 public class CreateReceiptUseCase {
 
     private ReceiptRegistrationType registrationType;
+    private String receiptId;
     private Long campaignId;
     private String store;
     private String storeAddress;
@@ -31,12 +34,14 @@ public class CreateReceiptUseCase {
     private String receiptImageUrl;
 
     public static CreateReceiptUseCase of(
+            Long campaignId,
         CreateReceiptRequest request,
         ReceiptRegistrationType registrationType
     ) {
         return CreateReceiptUseCase.builder()
+            .receiptId(request.getReceiptId())
             .registrationType(registrationType)
-            .campaignId(request.getCampaignId())
+            .campaignId(campaignId)
             .store(request.getStore())
             .storeAddress(request.getStoreAddress())
             .receiptCategory(request.getReceiptCategory())
@@ -44,7 +49,7 @@ public class CreateReceiptUseCase {
             .totalAccount(request.getTotalAccount())
             .memo(request.getMemo())
             .paymentItems(
-                request.getPaymentItems().stream().map(CreatePaymentItemUseCase::new).toList())
+                    request.getPaymentItems().stream().map(CreatePaymentItemUseCase::new).toList())
             .longitude(request.getLongitude())
             .latitude(request.getLatitude())
             .receiptImageUrl(request.getReceiptImageUrl())
@@ -54,7 +59,8 @@ public class CreateReceiptUseCase {
     public Receipt toEntity(
         Campaign campaign,
         Long receiptImageId,
-        CurrencyType currency
+        CurrencyType currency,
+        TempReceipt tempReceipt
     ) {
         return Receipt.builder()
             .receiptRegistrationType(registrationType)
@@ -69,6 +75,7 @@ public class CreateReceiptUseCase {
             .longitude(this.longitude)
             .latitude(this.latitude)
             .currency(currency)
+            .tempReceipt(tempReceipt)
             .build();
     }
 }

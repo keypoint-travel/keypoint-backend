@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest;
+package com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest;
 
 import com.google.firebase.database.annotations.NotNull;
 import jakarta.validation.constraints.Min;
@@ -9,7 +9,9 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class CreatePaymentItemRequest {
+public class UpdatePaymentItemRequest {
+
+    private Long paymentItemId;
 
     @NotBlank
     @Size(max = 50) // TODO 길이 확인 후 변경

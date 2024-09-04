@@ -12,13 +12,15 @@ import com.keypoint.keypointtravel.global.exception.HttpClientException;
 import com.keypoint.keypointtravel.global.utils.MultiPartFileUtils;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult.ReceiptOCRResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptImageUseCase;
-import java.util.Objects;
+import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Objects;
 
 
 @Service
@@ -29,6 +31,7 @@ public class AzureOCRService {
     private final AzureAPIService azureAPIService;
     private final OCRRetryableService ocrRetryableService;
     private final S3Service s3Service;
+    private final TempReceiptService tempReceiptService;
 
     @Value("${key.azure.key1}")
     private String apiKey;
@@ -54,7 +57,8 @@ public class AzureOCRService {
             String url = s3Service.uploadFileInS3(file, DirectoryConstants.RECEIPT_DIRECTORY);
             WholeReceiptUseCase dto = WholeReceiptUseCase.from(
                 response.getAnalyzeResult().getDocuments().get(0));
-            return ReceiptOCRResponse.from(url, dto);
+            String tempReceiptId = tempReceiptService.addTempReceipt(dto);
+            return ReceiptOCRResponse.of(tempReceiptId, url, dto);
         } catch (Exception e) {
             throw new GeneralException(e);
         }

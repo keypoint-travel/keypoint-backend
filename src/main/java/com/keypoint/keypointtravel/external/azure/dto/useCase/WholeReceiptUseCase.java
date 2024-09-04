@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.global.enumType.ocr.CurrencyCode;
 import com.keypoint.keypointtravel.global.enumType.ocr.OCRFieldName;
 import com.keypoint.keypointtravel.global.utils.AzureOCRUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
+import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
@@ -127,5 +128,9 @@ public class WholeReceiptUseCase {
             )
             .currencyCode(response.getCurrencyCode())
             .build();
+    }
+
+    public TempReceipt toEntity() {
+        return new TempReceipt(receiptType, merchantPhoneNumber, subtotal, tax, tip);
     }
 }
