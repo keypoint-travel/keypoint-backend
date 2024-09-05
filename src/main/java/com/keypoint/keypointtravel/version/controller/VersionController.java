@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.VersionType;
 import com.keypoint.keypointtravel.version.dto.request.UpdateVersionRequest;
 import com.keypoint.keypointtravel.version.dto.response.VersionResponse;
 import com.keypoint.keypointtravel.version.dto.useCase.UpdateVersionUseCase;
+import com.keypoint.keypointtravel.version.dto.useCase.VersionTypeUseCase;
 import com.keypoint.keypointtravel.version.service.VersionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,19 @@ public class VersionController {
 
         return APIResponseEntity.<Void>builder()
                 .message("버전 정보 수정")
+                .build();
+    }
+
+    @GetMapping()
+    public APIResponseEntity<VersionResponse> findVersionByType(
+            @RequestParam(value = "type") VersionType type
+    ) {
+        VersionTypeUseCase useCase = VersionTypeUseCase.from(type);
+        VersionResponse result = versionService.findVersionByType(useCase);
+
+        return APIResponseEntity.<VersionResponse>builder()
+                .message("버전 정보 조회")
+                .data(result)
                 .build();
     }
 }

@@ -32,4 +32,11 @@ public interface VersionRepository extends JpaRepository<Version, Long> {
             @Param("version") String version,
             @Param("type") VersionType type
     );
+
+    @Query("SELECT new com.keypoint.keypointtravel.version.dto.response.VersionResponse(v.type, v.version)" +
+            "FROM Version v " +
+            "WHERE v.type = :type")
+    VersionResponse findVersionByType(
+            @Param("type") VersionType type
+    );
 }
