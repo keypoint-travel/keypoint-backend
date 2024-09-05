@@ -6,9 +6,6 @@ import lombok.Getter;
 
 import java.util.List;
 
-/**
- * Apple Document URL ‣ https://developer.apple.com/documentation/appstorereceipts/responsebody/receipt
- */
 @Getter
 @AllArgsConstructor
 public class AppleReceipt {

@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * Apple Document URL ‣ https://developer.apple.com/documentation/appstorereceipts/responsebody/receipt/in_app
- */
 @Getter
 @AllArgsConstructor
 public class LatestReceiptInfo {

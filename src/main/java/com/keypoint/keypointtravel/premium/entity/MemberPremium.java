@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,19 +33,40 @@ public class MemberPremium extends BaseEntity {
     private Member member;
 
     @Column(nullable = false)
-    private LocalDateTime expiration_at;
+    private LocalDateTime startedAt;
 
     @Column(nullable = false)
-    private boolean is_active;
+    private LocalDateTime expirationAt;
 
     @Column(nullable = false)
-    private boolean is_free;
+    private boolean isActive;
 
-    public MemberPremium(Member member, LocalDateTime expiration_at, boolean is_active,
-        boolean is_free) {
+    @Column(nullable = false)
+    private boolean isFree;
+
+    @Builder
+    public MemberPremium(Member member, LocalDateTime expirationAt, boolean isActive,
+        boolean isFree) {
         this.member = member;
-        this.expiration_at = expiration_at;
-        this.is_active = is_active;
-        this.is_free = is_free;
+        this.startedAt = LocalDateTime.now();
+        this.expirationAt = expirationAt;
+        this.isActive = isActive;
+        this.isFree = isFree;
+    }
+
+    public void updateExpirationAt(LocalDateTime expirationAt) {
+        this.expirationAt = expirationAt;
+    }
+
+    public void updateIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void updateIsFree(boolean isFree) {
+        this.isFree = isFree;
+    }
+
+    public void updateStartedAt(LocalDateTime startedAt) {
+        this.startedAt = startedAt;
     }
 }

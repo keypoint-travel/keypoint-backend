@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.premium.service;
 
-import com.keypoint.keypointtravel.premium.dto.apple.AppStoreResponse;
+import com.keypoint.keypointtravel.premium.dto.apple.AppleAppStoreResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,5 +13,5 @@ import static com.keypoint.keypointtravel.global.constants.ApplePurchaseConstant
 public interface ApplePurchaseApiTestService {
 
     @PostMapping
-    AppStoreResponse verifyReceiptTest(@RequestBody Map<String, String> appStoreRequest);
+    AppleAppStoreResponse verifyReceiptTest(@RequestBody Map<String, String> appStoreRequest);
 }

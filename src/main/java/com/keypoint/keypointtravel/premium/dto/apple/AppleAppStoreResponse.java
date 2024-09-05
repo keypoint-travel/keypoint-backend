@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Getter
 @AllArgsConstructor
-public class AppStoreResponse {
+public class AppleAppStoreResponse {
 
     private String environment;
     @JsonAlias("is-retryable")
@@ -24,5 +24,4 @@ public class AppStoreResponse {
     private List<PendingRenewalInfo> pendingRenewalInfo;
     private AppleReceipt receipt;
     private int status;
-
 }
