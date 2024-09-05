@@ -6,8 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PurchaseStatus {
-    CANCELED,
-    PAID,
     REFUNDED,
     COMPLETED
 }
