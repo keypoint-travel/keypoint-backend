@@ -23,4 +23,9 @@ public class Version extends BaseEntity {
 
     @Column(nullable = false)
     private String version;
+
+    public Version(VersionType type) {
+        this.type = type;
+        this.version = "";
+    }
 }
