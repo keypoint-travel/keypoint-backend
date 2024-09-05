@@ -1,10 +1,10 @@
 package com.keypoint.keypointtravel.global.enumType.premium;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum PremiumTitle {
 
     TWELVE_MONTHS("12개월", "tempValue");

@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.premium.service;
 
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.PremiumErrorCode;
 import com.keypoint.keypointtravel.global.enumType.premium.PurchaseStatus;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -54,6 +55,7 @@ public class AppleService {
             response = applePurchaseApiTestService.verifyReceiptTest(appStoreRequest);
         }
         // 애플 서버 응답 상태 코드에 따른 처리
+        // 0: 영수증 검증 성공, 참고 : https://developer.apple.com/documentation/appstorereceipts/status
         else if (response.getStatus() != 0) {
             verifyStatusCode(response.getStatus());
         }
@@ -68,7 +70,13 @@ public class AppleService {
      */
     @Transactional
     public void updatePurchaseHistory(ApplePurchaseUseCase useCase) {
-        // 애플 앱 스토어 결제 성공 시, 결제 정보를 DB에 저장
+        // 1. 애플 앱 스토어 결제 성공 시, 결제 내역 저장
+        updateHistory(useCase);
+        // 2. 회원 프리미엄 적용
+        updateMemberPremium(useCase.getMemberId());
+    }
+
+    private void updateHistory(ApplePurchaseUseCase useCase) {
         InApp inApp = useCase.getAppleAppStoreResponse().getReceipt().getInApp().get(0);
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
         ApplePurchaseHistory history = ApplePurchaseHistory.builder()
@@ -86,43 +94,60 @@ public class AppleService {
         } catch (Exception e) {
             throw new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER);
         }
-        // 회원 프리미엄 적용
-        Optional<MemberPremium> memberPremium = memberPremiumRepository.findByMemberId(
-            useCase.getMemberId());
+    }
+
+    private void updateMemberPremium(Long memberId) {
+        Member member = memberRepository.getReferenceById(memberId);
+        Optional<MemberPremium> memberPremium = memberPremiumRepository.findByMemberId(memberId);
         // 이미 적용했던 기록이 있는 경우
         if (memberPremium.isPresent()) {
-            // 7일간 무료권 적용중인 경우
-            if (memberPremium.get().isFree()) {
-                memberPremium.get().updateIsFree(false);
-                memberPremium.get().updateStartedAt(LocalDateTime.now());
-                memberPremium.get().updateExpirationAt(LocalDateTime.now().plusMonths(12));
-            } else {
-                // 유료 프리미엄이 적용중인 경우
-                if (memberPremium.get().isActive()) {
-                    memberPremium.get().updateExpirationAt(
-                        memberPremium.get().getExpirationAt().plusMonths(12));
-                }
-                // 프리미엄 만료일이 지난 경우
-                else {
-                    memberPremium.get().updateIsActive(true);
-                    memberPremium.get().updateStartedAt(LocalDateTime.now());
-                    memberPremium.get().updateExpirationAt(LocalDateTime.now().plusMonths(12));
-                }
-            }
+            updateExistingMemberPremium(memberPremium.get());
+            return;
         }
         // 처음 프리미엄을 적용할 경우
-        else {
-            MemberPremium newMemberPremium = MemberPremium.builder()
-                .member(member)
-                .expirationAt(LocalDateTime.now().plusMonths(12))
-                .isActive(true)
-                .isFree(false)
-                .build();
-            memberPremiumRepository.save(newMemberPremium);
+        createNewMemberPremium(member);
+    }
+
+    private void updateExistingMemberPremium(MemberPremium memberPremium) {
+        // 7일간 무료권 적용중인 경우
+        if (memberPremium.isFree()) {
+            updateFreeToPremium(memberPremium);
+            return;
         }
+        // 유료 프리미엄이 적용중인 경우
+        if (memberPremium.getExpirationAt().isAfter(LocalDateTime.now())
+            && memberPremium.isActive()) {
+            memberPremium.updateExpirationAt(memberPremium.getExpirationAt().plusMonths(12));
+            return;
+        }
+        // 프리미엄 만료일이 지난 경우
+        reactivateExpiredMemberPremium(memberPremium);
+    }
+
+    private void updateFreeToPremium(MemberPremium memberPremium) {
+        memberPremium.updateIsFree(false);
+        memberPremium.updateStartedAt(LocalDateTime.now());
+        memberPremium.updateExpirationAt(LocalDateTime.now().plusMonths(12));
+    }
+
+    private void reactivateExpiredMemberPremium(MemberPremium memberPremium) {
+        memberPremium.updateIsActive(true);
+        memberPremium.updateStartedAt(LocalDateTime.now());
+        memberPremium.updateExpirationAt(LocalDateTime.now().plusMonths(12));
+    }
+
+    private void createNewMemberPremium(Member member) {
+        MemberPremium newMemberPremium = MemberPremium.builder()
+            .member(member)
+            .expirationAt(LocalDateTime.now().plusMonths(12))
+            .isActive(true)
+            .isFree(false)
+            .build();
+        memberPremiumRepository.save(newMemberPremium);
     }
 
     private void verifyStatusCode(int statusCode) {
+        // todo : 로그 처리 예정
         switch (statusCode) {
             case 21000:
                 System.out.println("[Status code: " + statusCode
@@ -169,7 +194,6 @@ public class AppleService {
                     + "] The receipt for the App Store is incorrect.");
                 break;
         }
-        throw new IllegalStateException(
-            "[/verifyReceipt] The receipt for the App Store is incorrect.");
+        throw new GeneralException(PremiumErrorCode.INCORRECT_RECEIPT);
     }
 }
