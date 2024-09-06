@@ -11,18 +11,14 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.global.config.GoogleCredentialsConfig;
 import com.keypoint.keypointtravel.premium.dto.useCase.GooglePurchaseUseCase;
 import com.keypoint.keypointtravel.premium.entity.GooglePurchaseHistory;
-import com.keypoint.keypointtravel.premium.entity.MemberPremium;
 import com.keypoint.keypointtravel.premium.repository.GooglePurchaseHistoryRepository;
-import com.keypoint.keypointtravel.premium.repository.MemberPremiumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +30,7 @@ public class GoogleService {
 
     private final GooglePurchaseHistoryRepository googlePurchaseHistoryRepository;
 
-    private final MemberPremiumRepository memberPremiumRepository;
+    private final PremiumService premiumService;
 
     /**
      * 소모품 (Consumable) 구매 영수증 검증 및 기록 업데이트, 프리미엄 적용 함수
@@ -48,7 +44,7 @@ public class GoogleService {
         // 2. 구글 앱 스토어 결제 성공 시, 결제 내역 저장
         updateHistory(useCase, purchase);
         // 3. 회원 프리미엄 적용
-        updateMemberPremium(useCase.getMemberId());
+        premiumService.updateMemberPremium(useCase.getMemberId());
     }
 
     private ProductPurchase googleInAppPurchaseVerify(GooglePurchaseUseCase useCase) throws GeneralSecurityException, IOException {
@@ -87,53 +83,5 @@ public class GoogleService {
         }
     }
 
-    private void updateMemberPremium(Long memberId) {
-        Member member = memberRepository.getReferenceById(memberId);
-        Optional<MemberPremium> memberPremium = memberPremiumRepository.findByMemberId(memberId);
-        // 이미 적용했던 기록이 있는 경우
-        if (memberPremium.isPresent()) {
-            updateExistingMemberPremium(memberPremium.get());
-            return;
-        }
-        // 처음 프리미엄을 적용할 경우
-        createNewMemberPremium(member);
-    }
 
-    private void updateExistingMemberPremium(MemberPremium memberPremium) {
-        // 7일간 무료권 적용중인 경우
-        if (memberPremium.isFree()) {
-            updateFreeToPremium(memberPremium);
-            return;
-        }
-        // 유료 프리미엄이 적용중인 경우
-        if (memberPremium.getExpirationAt().isAfter(LocalDateTime.now())
-            && memberPremium.isActive()) {
-            memberPremium.updateExpirationAt(memberPremium.getExpirationAt().plusMonths(12));
-            return;
-        }
-        // 프리미엄 만료일이 지난 경우
-        reactivateExpiredMemberPremium(memberPremium);
-    }
-
-    private void updateFreeToPremium(MemberPremium memberPremium) {
-        memberPremium.updateIsFree(false);
-        memberPremium.updateStartedAt(LocalDateTime.now());
-        memberPremium.updateExpirationAt(LocalDateTime.now().plusMonths(12));
-    }
-
-    private void reactivateExpiredMemberPremium(MemberPremium memberPremium) {
-        memberPremium.updateIsActive(true);
-        memberPremium.updateStartedAt(LocalDateTime.now());
-        memberPremium.updateExpirationAt(LocalDateTime.now().plusMonths(12));
-    }
-
-    private void createNewMemberPremium(Member member) {
-        MemberPremium newMemberPremium = MemberPremium.builder()
-            .member(member)
-            .expirationAt(LocalDateTime.now().plusMonths(12))
-            .isActive(true)
-            .isFree(false)
-            .build();
-        memberPremiumRepository.save(newMemberPremium);
-    }
 }
