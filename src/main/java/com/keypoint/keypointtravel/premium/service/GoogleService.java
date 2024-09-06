@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.premium.service;
 import com.google.api.services.androidpublisher.AndroidPublisher;
 import com.google.api.services.androidpublisher.model.ProductPurchase;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.PremiumErrorCode;
 import com.keypoint.keypointtravel.global.enumType.premium.PurchaseStatus;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -59,11 +60,10 @@ public class GoogleService {
         // ProductPurchase 객체 세부 내용은 https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products?hl=ko#resource:-productpurchase 참고
         ProductPurchase purchase = get.execute();
 
-        // 0이면 결제완료 1이면 취소된 주문건
+        // 0이면 결제완료 1이면 취소된 주문건, 2면 결제 보류중인 주문건
         // 검증하는데 취소된 결제건인 경우
-        if (purchase.getPurchaseState() == 1) {
-            // 결제완료 주문인 경우 해당 주문번호 조회 후 환불 처리
-            throw new IllegalArgumentException("purchase_canceled");
+        if (purchase.getPurchaseState() != 0) {
+            throw new GeneralException(PremiumErrorCode.INCORRECT_RECEIPT);
         }
         return purchase;
     }
