@@ -1,7 +1,11 @@
 package com.keypoint.keypointtravel.premium.service;
 
+import com.keypoint.keypointtravel.global.enumType.error.PremiumErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+import com.keypoint.keypointtravel.premium.dto.response.RemainingPeriodResponse;
+import com.keypoint.keypointtravel.premium.dto.useCase.PremiumMemberUseCase;
 import com.keypoint.keypointtravel.premium.entity.MemberPremium;
 import com.keypoint.keypointtravel.premium.repository.MemberPremiumRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
@@ -18,6 +23,28 @@ public class PremiumService {
     private final MemberRepository memberRepository;
     private final MemberPremiumRepository memberPremiumRepository;
 
+    /**
+     * 남은 프리미엄 기간 조회 함수
+     *
+     * @Param memberId useCase
+     */
+    @Transactional
+    public RemainingPeriodResponse findRemainingPremiumDays(PremiumMemberUseCase useCase) {
+        MemberPremium memberPremium = memberPremiumRepository.findByMemberId(useCase.getMemberId())
+            .orElseThrow(() -> new GeneralException(PremiumErrorCode.NOT_FOUND_MEMBER_PREMIUM));
+        Long remainingDays = ChronoUnit.DAYS.between(memberPremium.getStartedAt(), memberPremium.getExpirationAt());
+        return new RemainingPeriodResponse(remainingDays);
+    }
+
+
+
+
+
+    /**
+     * 유료 프리미엄 회원 업데이트 함수
+     *
+     * @Param memberId useCase
+     */
     @Transactional
     public void updateMemberPremium(Long memberId) {
         Member member = memberRepository.getReferenceById(memberId);
