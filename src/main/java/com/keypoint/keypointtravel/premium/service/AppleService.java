@@ -9,7 +9,6 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.premium.dto.apple.AppleAppStoreResponse;
 import com.keypoint.keypointtravel.premium.dto.apple.InApp;
 import com.keypoint.keypointtravel.premium.dto.useCase.ApplePurchaseUseCase;
-import com.keypoint.keypointtravel.premium.dto.useCase.AppleReceiptUseCase;
 import com.keypoint.keypointtravel.premium.entity.ApplePurchaseHistory;
 import com.keypoint.keypointtravel.premium.repository.ApplePurchaseHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +34,23 @@ public class AppleService {
     private final PremiumService premiumService;
 
     /**
-     * 영수증 검증 함수
+     * 소모품 (Consumable) 영수증 검증, 구매 기록 업데이트 및 프리미엄 적용 함수
      *
-     * @Param 영수증 데이터 useCase
-     * @Return 영수증에 해당하는 결제 정보 response
+     * @Param memberId, amount, currency, 결제 정보 useCase
      */
     @Transactional
-    public AppleAppStoreResponse verifyReceipt(AppleReceiptUseCase useCase) {
+    public void updatePurchaseHistory(ApplePurchaseUseCase useCase) {
+        // 1. 애플 영수증 검증
+        AppleAppStoreResponse response = verifyReceipt(useCase.getReceiptData());
+        // 2. 애플 앱 스토어 결제 성공 시, 결제 내역 저장
+        updateHistory(useCase, response);
+        // 3. 회원 프리미엄 적용
+        premiumService.updateMemberPremium(useCase.getMemberId());
+    }
+
+    private AppleAppStoreResponse verifyReceipt(String receiptData) {
         HashMap<String, String> appStoreRequest = new HashMap<>();
-        appStoreRequest.put("receipt-data", useCase.getReceiptData());
+        appStoreRequest.put("receipt-data", receiptData);
         // 애플 서버에 영수증 검증 요청
         AppleAppStoreResponse response = applePurchaseApiService.verifyReceipt(appStoreRequest);
         // 21007: 애플 테스트 환경에서 구매한 영수증이 실제 환경에서 검증되는 경우
@@ -59,21 +66,8 @@ public class AppleService {
         return response;
     }
 
-    /**
-     * 소모품 (Consumable) 구매 기록 업데이트 및 프리미엄 적용 함수
-     *
-     * @Param memberId, amount, currency, 결제 정보 useCase
-     */
-    @Transactional
-    public void updatePurchaseHistory(ApplePurchaseUseCase useCase) {
-        // 1. 애플 앱 스토어 결제 성공 시, 결제 내역 저장
-        updateHistory(useCase);
-        // 2. 회원 프리미엄 적용
-        premiumService.updateMemberPremium(useCase.getMemberId());
-    }
-
-    private void updateHistory(ApplePurchaseUseCase useCase) {
-        InApp inApp = useCase.getAppleAppStoreResponse().getReceipt().getInApp().get(0);
+    private void updateHistory(ApplePurchaseUseCase useCase, AppleAppStoreResponse response) {
+        InApp inApp = response.getReceipt().getInApp().get(0);
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
         ApplePurchaseHistory history = ApplePurchaseHistory.builder()
             .member(member)

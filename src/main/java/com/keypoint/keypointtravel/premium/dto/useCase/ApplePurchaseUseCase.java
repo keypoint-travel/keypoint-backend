@@ -12,6 +12,5 @@ public class ApplePurchaseUseCase {
     private Long memberId;
     private float amount;
     private CurrencyType currency;
-    private AppleAppStoreResponse appleAppStoreResponse;
     private String receiptData;
 }

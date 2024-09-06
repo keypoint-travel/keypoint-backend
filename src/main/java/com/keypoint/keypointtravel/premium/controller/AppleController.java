@@ -2,10 +2,8 @@ package com.keypoint.keypointtravel.premium.controller;
 
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.premium.dto.apple.AppleAppStoreResponse;
 import com.keypoint.keypointtravel.premium.dto.request.AppleReceiptRequest;
 import com.keypoint.keypointtravel.premium.dto.useCase.ApplePurchaseUseCase;
-import com.keypoint.keypointtravel.premium.dto.useCase.AppleReceiptUseCase;
 import com.keypoint.keypointtravel.premium.service.AppleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +27,12 @@ public class AppleController {
     public APIResponseEntity<Void> applePurchase(
         @RequestBody @Valid AppleReceiptRequest appleReceiptRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // 영수증 검증
-        AppleReceiptUseCase receiptUseCase = new AppleReceiptUseCase(
-            appleReceiptRequest.getReceiptData());
-        AppleAppStoreResponse response = appleService.verifyReceipt(receiptUseCase);
-        // 결제 내역 업데이트 및 프리미엄 적용
         ApplePurchaseUseCase purchaseUseCase = new ApplePurchaseUseCase(
             userDetails.getId(),
             appleReceiptRequest.getAmount(),
             appleReceiptRequest.getCurrency(),
-            response,
             appleReceiptRequest.getReceiptData());
         appleService.updatePurchaseHistory(purchaseUseCase);
-
         return APIResponseEntity.<Void>builder()
             .message("애플 결제 확인 및 프리미엄 적용 성공")
             .build();
