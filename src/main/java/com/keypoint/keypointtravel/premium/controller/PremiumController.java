@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,16 @@ public class PremiumController {
         return APIResponseEntity.<RemainingPeriodResponse>builder()
             .message("남은 프리미엄 기간 조히 성공")
             .data(response)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @PostMapping("/free-trial")
+    public APIResponseEntity<Void> startFreeTrial(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        premiumService.startFreeTrial(new PremiumMemberUseCase(userDetails.getId()));
+        return APIResponseEntity.<Void>builder()
+            .message("무료체험 시작 성공")
             .build();
     }
 }
