@@ -38,7 +38,8 @@ public class AppleController {
             userDetails.getId(),
             appleReceiptRequest.getAmount(),
             appleReceiptRequest.getCurrency(),
-            response);
+            response,
+            appleReceiptRequest.getReceiptData());
         appleService.updatePurchaseHistory(purchaseUseCase);
 
         return APIResponseEntity.<Void>builder()

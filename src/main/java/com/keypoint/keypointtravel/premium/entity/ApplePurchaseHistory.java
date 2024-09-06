@@ -44,6 +44,9 @@ public class ApplePurchaseHistory {
     @Column(nullable = false)
     private String originalTransactionId;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String receiptData;
+
     @Column(nullable = false)
     private float amount;
 
@@ -59,12 +62,13 @@ public class ApplePurchaseHistory {
     private PurchaseStatus purchaseStatus;
 
     @Builder
-    public ApplePurchaseHistory(Member member, String productId, String transactionId,
+    public ApplePurchaseHistory(Member member, String productId, String transactionId, String receiptData,
         String originalTransactionId, float amount, CurrencyType currency, Date purchasedAt,
         PurchaseStatus purchaseStatus) {
         this.member = member;
         this.productId = productId;
         this.transactionId = transactionId;
+        this.receiptData = receiptData;
         this.originalTransactionId = originalTransactionId;
         this.amount = amount;
         this.currency = currency;

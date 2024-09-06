@@ -83,6 +83,7 @@ public class AppleService {
             .member(member)
             .productId(inApp.getProductId())
             .transactionId(inApp.getTransactionId())
+            .receiptData(useCase.getReceiptData())
             .originalTransactionId(inApp.getOriginalTransactionId())
             .amount(useCase.getAmount())
             .currency(useCase.getCurrency())
