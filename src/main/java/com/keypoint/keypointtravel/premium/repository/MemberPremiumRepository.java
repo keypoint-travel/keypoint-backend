@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MemberPremiumRepository extends JpaRepository<MemberPremium, Long> {
 
     Optional<MemberPremium> findByMemberId(Long memberId);
+
+    boolean existsByMemberId(Long memberId);
 }

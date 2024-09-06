@@ -36,9 +36,27 @@ public class PremiumService {
         return new RemainingPeriodResponse(remainingDays);
     }
 
-
-
-
+    /**
+     * 7일 무료 프리미엄 적용 함수
+     *
+     * @Param memberId useCase
+     */
+    @Transactional
+    public void startFreeTrial(PremiumMemberUseCase premiumMemberUseCase) {
+        // 프리미엄 기록이 있는지 확인, 있다면 예외 처리
+        if (memberPremiumRepository.existsByMemberId(premiumMemberUseCase.getMemberId())) {
+            throw new GeneralException(PremiumErrorCode.ALREADY_EXIST_MEMBER_PREMIUM);
+        }
+        Member member = memberRepository.getReferenceById(premiumMemberUseCase.getMemberId());
+        // 새로운 프리미엄 생성(7일)
+        MemberPremium newMemberPremium = MemberPremium.builder()
+            .member(member)
+            .expirationAt(LocalDateTime.now().plusDays(7))
+            .isActive(true)
+            .isFree(true)
+            .build();
+        memberPremiumRepository.save(newMemberPremium);
+    }
 
     /**
      * 유료 프리미엄 회원 업데이트 함수
