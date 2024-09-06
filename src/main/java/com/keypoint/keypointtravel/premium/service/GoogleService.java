@@ -40,9 +40,10 @@ public class GoogleService {
     @Transactional
     public void updatePurchaseHistory(GooglePurchaseUseCase useCase) throws GeneralSecurityException, IOException {
         // 1. 구글 영수증 검증
-        ProductPurchase purchase = googleInAppPurchaseVerify(useCase);
-        // 2. 구글 앱 스토어 결제 성공 시, 결제 내역 저장
-        updateHistory(useCase, purchase);
+        // todo: 구글 상품 설정 후 테스트 필요
+//        ProductPurchase purchase = googleInAppPurchaseVerify(useCase);
+//        // 2. 구글 앱 스토어 결제 성공 시, 결제 내역 저장
+//        updateHistory(useCase, purchase);
         // 3. 회원 프리미엄 적용
         premiumService.updateMemberPremium(useCase.getMemberId());
     }
