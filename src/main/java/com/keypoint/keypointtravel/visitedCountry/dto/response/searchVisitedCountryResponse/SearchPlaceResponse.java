@@ -6,4 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SearchPlaceResponse {
+
+    private Long placeId;
+    private double latitude;
+    private double longitude;
+    private String markerImageUrl;
 }

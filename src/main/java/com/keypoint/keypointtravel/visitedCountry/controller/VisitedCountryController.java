@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.visitedCountry.controller;
 
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.SearchPageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.visitedCountry.dto.response.searchVisitedCountryResponse.SearchVisitedCountryResponse;
 import com.keypoint.keypointtravel.visitedCountry.service.VisitedCountryService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ public class VisitedCountryController {
     @GetMapping("/campaigns")
     public APIResponseEntity<SearchVisitedCountryResponse> findVisitedCountriesAndCampaigns(
             @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "sort-by", required = false) String sortBy,
             @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
             @PageableDefault(size = 15, sort = "order", direction = Sort.Direction.ASC) Pageable pageable
@@ -35,7 +36,8 @@ public class VisitedCountryController {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         }
 
-        PageAndMemberIdUseCase useCase = PageAndMemberIdUseCase.of(
+        SearchPageAndMemberIdUseCase useCase = SearchPageAndMemberIdUseCase.of(
+            keyword,
                 userDetails.getId(),
                 sortBy,
                 direction,
