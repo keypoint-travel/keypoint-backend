@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.keypoint.keypointtravel.visitedCountry.dto.dto.VisitedCountryWithSequenceDTO;
 import com.keypoint.keypointtravel.visitedCountry.dto.response.searchVisitedCountryResponse.SearchCampaignResponse;
+import com.keypoint.keypointtravel.visitedCountry.dto.response.searchVisitedCountryResponse.SearchPlaceResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.group.GroupBy;
@@ -19,6 +20,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -173,4 +175,18 @@ public class VisitedCountryRepository {
         return new PageImpl<>(result, pageable, count);
     }
 
+    public List<SearchPlaceResponse> findVisitedCountries(Set<Long> placeIds) {
+        return queryFactory
+            .select(
+                Projections.fields(
+                    SearchPlaceResponse.class,
+                    place.id.as("placeId"),
+                    place.latitude,
+                    place.longitude
+                )
+            )
+            .from(place)
+            .where(place.id.in(placeIds))
+            .fetch();
+    }
 }
