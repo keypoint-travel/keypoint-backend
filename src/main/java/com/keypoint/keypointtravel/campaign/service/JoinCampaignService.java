@@ -3,12 +3,9 @@ package com.keypoint.keypointtravel.campaign.service;
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.response.CampaignWaitMemberResponse;
-import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.*;
 import com.keypoint.keypointtravel.campaign.entity.CampaignWaitMember;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
-import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByCodeUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.JoinByEmailUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.*;
@@ -53,22 +50,24 @@ public class JoinCampaignService {
      */
     @Transactional
     public void joinByEmail(JoinByEmailUseCase useCase) {
-        // 이미 캠페인 가입이 된 상태일 시 예외 처리
+        // 1. redis 캠페인 초대 이메일 목록에 저장되어 있는지(만료되지 않았는지 확인)
+        List<EmailInvitationHistory> emailHistories = validateEmailHistoryInRedis(useCase);
+        // 2. 이미 캠페인 가입이 된 상태일 시 예외 처리
         validateJoinedCampaign(useCase.getCampaignId(), useCase.getMemberId());
-        // 현재 참여 인원들 중 차단 인원 여부 확인
+        // 3. 현재 참여 인원들 중 차단 인원 여부 확인
         if (customMemberCampaignRepository.existsBlockedMemberInCampaign(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }
-        // redis 캠페인 초대 이메일 목록에 저장되어 있는지(만료되지 않았는지 확인)
-        List<EmailInvitationHistory> emailHistories = validateEmailHistoryInRedis(useCase);
-        // 캠페인 리더 member 추출 & 진행 중인 캠페인인지 확인
+        // 4. 캠페인 리더 member 추출 & 진행 중인 캠페인인지 확인
         MemberCampaign leader = customMemberCampaignRepository.findCampaignLeader(useCase.getCampaignId());
-        // 회원 - 캠페인 태이블 추가(가입)
+        // 5. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        validatePremiumMember(useCase.getMemberId());
+        // 6. 회원 - 캠페인 태이블 추가(가입)
         Member member = saveMemberCampaign(useCase.getMemberId(), useCase.getCampaignId());
-        // 캠페인 리더와 친구관계 구축
+        // 7. 캠페인 리더와 친구관계 구축
         saveFriends(leader.getMember(), member);
-        // redis 에서 해당 이메일 초대 이력 삭제(중복 포함)
+        // 8. redis 에서 해당 이메일 초대 이력 삭제(중복 포함)
         emailInvitationHistoryRepository.deleteAll(emailHistories);
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
     }
@@ -76,6 +75,14 @@ public class JoinCampaignService {
     private void validateJoinedCampaign(Long campaignId, Long memberId) {
         if (memberCampaignRepository.existsByCampaignIdAndMemberId(campaignId, memberId)) {
             throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
+        }
+    }
+
+    private void validatePremiumMember(Long memberId) {
+        List<Long> memberIds = List.of(memberId);
+        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
+        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)) {
+            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
 
@@ -90,7 +97,7 @@ public class JoinCampaignService {
         if (emailHistories.isEmpty()) {
             throw new GeneralException(CampaignErrorCode.EXPIRED_INVITE_EMAIL);
         }
-        return histories;
+        return emailHistories;
     }
 
     private Friend buildFriend(Member findedMember, Member member) {
