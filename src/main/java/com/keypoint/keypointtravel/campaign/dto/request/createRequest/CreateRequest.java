@@ -4,15 +4,16 @@ import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
+@NoArgsConstructor
 public class CreateRequest {
 
     @NotEmpty(message = "제목을 입력해주세요.")
