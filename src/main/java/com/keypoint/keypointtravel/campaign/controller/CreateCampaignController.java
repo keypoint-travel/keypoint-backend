@@ -34,7 +34,7 @@ public class CreateCampaignController {
         Long campaignId = createCampaignService.createCampaign(
             CreateUseCase.of(coverImage, request, userDetails.getId()));
         // 이메일로 초대
-        if (!request.getEmails().isEmpty()) {
+        if (request.getEmails() != null && !request.getEmails().isEmpty()) {
             createCampaignService.sendEmail(
                 InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId));
         }
