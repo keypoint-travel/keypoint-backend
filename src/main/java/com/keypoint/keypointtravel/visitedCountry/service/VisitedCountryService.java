@@ -5,8 +5,13 @@ import com.keypoint.keypointtravel.global.dto.useCase.SearchPageAndMemberIdUseCa
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.visitedCountry.dto.response.searchVisitedCountryResponse.SearchCampaignResponse;
+import com.keypoint.keypointtravel.visitedCountry.dto.response.searchVisitedCountryResponse.SearchPlaceResponse;
 import com.keypoint.keypointtravel.visitedCountry.dto.response.searchVisitedCountryResponse.SearchVisitedCountryResponse;
 import com.keypoint.keypointtravel.visitedCountry.repository.VisitedCountryRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -35,7 +40,27 @@ public class VisitedCountryService {
         Page<SearchCampaignResponse> campaigns = visitedCountryRepository.findCampaignsByKeyword(useCase.getMemberId(), languageCode, useCase);
 
         // 2. 방문 도시 데이터 정리
+        HashMap<Long, List<String>> placeMap = new HashMap<>();
+        for (SearchCampaignResponse campaign : campaigns.getContent()) {
+            String imageUrl = campaign.getCoverImageUrl();
 
-        return SearchVisitedCountryResponse.of(null, campaigns);
+            for (Long placeId : campaign.getPlaceIds()) {
+                if (!placeMap.containsKey(placeId)) {
+                    placeMap.put(placeId, new ArrayList<>());
+                }
+                placeMap.get(placeId).add(imageUrl);
+            }
+        }
+        List<SearchPlaceResponse> places = visitedCountryRepository.findVisitedCountries(
+            placeMap.keySet());
+
+        // 3. 마커 이미지 넣기
+        for (SearchPlaceResponse place : places) {
+            List<String> images = placeMap.get(place.getPlaceId());
+            int randomIndex = ThreadLocalRandom.current().nextInt(images.size());
+            place.setMarkerImageUrl(images.get(randomIndex));
+        }
+
+        return SearchVisitedCountryResponse.of(places, campaigns);
     }
 }
