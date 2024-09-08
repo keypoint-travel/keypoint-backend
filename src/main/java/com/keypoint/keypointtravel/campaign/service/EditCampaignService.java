@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.BudgetInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.TravelInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.EditCampaignResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.UpdateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -93,17 +95,19 @@ public class EditCampaignService {
         // 2. 서로 차단한 회원이 있는지 검증
         useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
         validateBlockedMembers(useCase.getMembers());
-        // 1. 커버 사진 업데이트
+        // 3. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        validatePremiumMember(useCase);
+        // 4. 커버 사진 업데이트
         Campaign campaign = campaignRepository.findById(useCase.getCampaignId())
             .orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN));
         updateUploadFile(campaign.getCampaignImageId(), useCase.getCoverImage());
-        // 2. 켐페인 정보 업데이트
+        // 5. 켐페인 정보 업데이트
         campaign.updateInfo(useCase.getTitle(), useCase.getStartDate(), useCase.getEndDate());
-        // 3. 켐페인 예산 업데이트
+        // 6. 켐페인 예산 업데이트
         updateCampaignBudgets(campaign, useCase.getBudgets());
-        // 4. 회원 캠페인 업데이트
+        // 7. 회원 캠페인 업데이트
         updateMemberCampaigns(campaign, useCase.getMembers(), useCase.getMemberId());
-        // 5. 여행지 업데이트
+        // 8. 여행지 업데이트
         updateTravelLocations(campaign, useCase.getTravels());
     }
 
@@ -113,6 +117,17 @@ public class EditCampaignService {
             .toList();
         if (blockedMemberRepository.existsBlockedMembers(memberIds)) {
             throw new GeneralException(BlockedMemberErrorCode.EXISTS_BLOCKED_MEMBER);
+        }
+    }
+
+    private void validatePremiumMember(UpdateUseCase useCase){
+        List<Long> memberIds = useCase.getMembers().stream()
+            .map(MemberInfo::getMemberId)
+            .collect(Collectors.toList());
+        memberIds.add(useCase.getMemberId());
+        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
+        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)){
+            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
 
