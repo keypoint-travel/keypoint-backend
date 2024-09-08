@@ -10,15 +10,12 @@ import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.CampaignBudget;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.entity.TravelLocation;
-import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
-import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
-import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
-import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
-import com.keypoint.keypointtravel.campaign.repository.TravelLocationRepository;
+import com.keypoint.keypointtravel.campaign.repository.*;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.BlockedMemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
@@ -37,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +56,8 @@ public class CreateCampaignService {
 
     private final EmailInvitationHistoryRepository emailInvitationHistoryRepository;
 
+    private final CustomMemberCampaignRepository customMemberCampaignRepository;
+
     /**
      * 캠페인 생성 함수
      *
@@ -68,15 +68,17 @@ public class CreateCampaignService {
         // 0. 서로 차단한 회원이 있는지 검증
         useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
         validateBlockedMembers(useCase.getMembers());
-        // 1. 커버 사진 upload File 저장
+        // 1. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        validatePremiumMember(useCase);
+        // 2. 커버 사진 upload File 저장
         Long coverImageId = saveUploadFile(useCase.getCoverImage());
-        // 2. 켐페인 저장
+        // 3. 켐페인 저장
         Campaign campaign = saveCampaign(useCase, coverImageId);
-        // 3. 켐페인 예산 저장
+        // 4. 켐페인 예산 저장
         saveCampaignBudgets(campaign, useCase);
-        // 4. 회원 캠페인 저장
+        // 5. 회원 캠페인 저장
         saveMemberCampaigns(campaign, useCase);
-        // 5. 여행지 저장
+        // 6. 여행지 저장
         saveTravelLocations(campaign, useCase);
         // todo : 알림 기능 추가 예정
         return campaign.getId();
@@ -88,6 +90,17 @@ public class CreateCampaignService {
             .toList();
         if(blockedMemberRepository.existsBlockedMembers(memberIds)){
             throw new GeneralException(BlockedMemberErrorCode.EXISTS_BLOCKED_MEMBER);
+        }
+    }
+
+    private void validatePremiumMember(CreateUseCase useCase){
+        List<Long> memberIds = useCase.getMembers().stream()
+            .map(MemberInfo::getMemberId)
+            .collect(Collectors.toList());
+        memberIds.add(useCase.getMemberId());
+        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
+        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)){
+            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
 
