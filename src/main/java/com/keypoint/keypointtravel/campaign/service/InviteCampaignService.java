@@ -20,7 +20,6 @@ import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
-import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 
@@ -120,13 +119,15 @@ public class InviteCampaignService {
      */
     @Transactional
     public void inviteFriends(InviteFriendUseCase useCase) {
-        // 캠페인 장인지 확인
+        // 1. 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
-        // 차단 여부 확인
+        // 2. 차단 여부 확인
         validateBlockedMember(memberIds, useCase.getFriendIds());
-        // 이미 가입된 인원인지 확인
+        // 3. 이미 가입된 인원인지 확인
         validateJoinedMember(memberIds, useCase.getFriendIds());
-        // 회원 - 캠페인 테이블에 추가
+        // 4. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        validatePremiumMember(useCase);
+        // 5. 회원 - 캠페인 테이블에 추가
         saveMemberCampaigns(useCase);
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
     }
@@ -164,6 +165,13 @@ public class InviteCampaignService {
             if (memberIds.contains(friendId)) {
                 throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
             }
+        }
+    }
+
+    private void validatePremiumMember(InviteFriendUseCase useCase){
+        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
+        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(useCase.getFriendIds())){
+            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
 
