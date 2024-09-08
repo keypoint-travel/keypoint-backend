@@ -78,14 +78,6 @@ public class JoinCampaignService {
         }
     }
 
-    private void validatePremiumMember(Long memberId) {
-        List<Long> memberIds = List.of(memberId);
-        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
-        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)) {
-            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
-        }
-    }
-
     private List<EmailInvitationHistory> validateEmailHistoryInRedis(JoinByEmailUseCase useCase) {
         List<EmailInvitationHistory> histories =
             emailInvitationHistoryRepository.findByCampaignId(useCase.getCampaignId());
@@ -115,13 +107,13 @@ public class JoinCampaignService {
      */
     @Transactional
     public void requestJoinByCampaignCode(JoinByCodeUseCase useCase) {
-        // 캠페인 코드에 해당하는 캠페인이 존재하지 않을 시 예외 처리
+        // 1. 캠페인 코드에 해당하는 캠페인이 존재하지 않을 시 예외 처리
         List<MemberCampaign> memberCampaigns = customMemberCampaignRepository
             .findMembersByCampaignCode(useCase.getCampaignCode());
         if (memberCampaigns.isEmpty()) {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN);
         }
-        // 이미 신청을 하였을 경우 예외 처리
+        // 2. 이미 신청을 하였을 경우 예외 처리
         if (campaignWaitMemberRepository.existsByCampaignIdAndMemberId(
             memberCampaigns.get(0).getCampaign().getId(), useCase.getMemberId())) {
             throw new GeneralException(CampaignErrorCode.ALREADY_IN_WAIT_LIST);
@@ -129,17 +121,19 @@ public class JoinCampaignService {
         List<Long> memberIds = memberCampaigns.stream()
             .map(memberCampaign -> memberCampaign.getMember().getId())
             .toList();
-        // 이미 캠페인 가입이 된 상태일 시 예외 처리
+        // 3. 이미 캠페인 가입이 된 상태일 시 예외 처리
         for (Long memberId : memberIds) {
             if (memberId.equals(useCase.getMemberId())) {
                 throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
             }
         }
-        // 캠페인 인원들 중 차단 여부 확인
+        // 4. 캠페인 인원들 중 차단 여부 확인
         if (blockedMemberRepository.existsBlockedMembers(memberIds, useCase.getMemberId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }
-        // 캠페인 대기 회원에 추가
+        // 5. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        validatePremiumMember(useCase.getMemberId());
+        // 6. 캠페인 대기 회원에 추가
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
         campaignWaitMemberRepository.save(new CampaignWaitMember(memberCampaigns.get(0).getCampaign(), member));
         // todo : 켐페인 장을 대상으로 알림 발송 (참여 승인 수락, 거절 알림)
@@ -152,24 +146,26 @@ public class JoinCampaignService {
      */
     @Transactional
     public void approveJoinByCampaignCode(ApproveByCodeUseCase useCase) {
-        // 캠페인 id에 해당하는 캠페인이 존재하는지, 캠페인 장인지 확인
+        // 1. 캠페인 id에 해당하는 캠페인이 존재하는지, 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
-        // 캠페인 가입 신청 대기 목록에 존재하는지 확인 후 삭제
+        // 2. 캠페인 가입 신청 대기 목록에 존재하는지 확인 후 삭제
         customMemberCampaignRepository.deleteWaitMember(useCase.getMemberId(), useCase.getCampaignId());
         if (useCase.isApprove()) {
             // 캠페인 참여 승인하였을 경우
-            // 이미 캠페인 가입이 된 상태일 시 예외 처리
+            // 3. 이미 캠페인 가입이 된 상태일 시 예외 처리
             if (memberIds.contains(useCase.getMemberId())) {
                 throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
             }
-            // 회원 - 캠페인 태이블 추가(가입)
+            // 4. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+            validatePremiumMember(useCase.getMemberId());
+            // 5. 회원 - 캠페인 태이블 추가(가입)
             Member member = saveMemberCampaign(useCase.getMemberId(), useCase.getCampaignId());
-            // 캠페인 리더와 친구관계 구축
+            // 6. 캠페인 리더와 친구관계 구축
             Member leader = memberRepository.getReferenceById(useCase.getLeaderId());
             saveFriends(leader, member);
             // todo : 대상자 및 캠페인 참여 인원들에게 새 인원 참여 알림 발송
         } else {
-            // 캠페인 참여 거절하였을 경우
+            // 3. 캠페인 참여 거절하였을 경우
             // todo : 대상자에게 거절 알림 발송
         }
     }
@@ -233,5 +229,13 @@ public class JoinCampaignService {
         }
         List<MemberInfoDto> waitMembers = customMemberCampaignRepository.findWaitMembers(useCase.getCampaignId());
         return new CampaignWaitMemberResponse(useCase.getCampaignId(), waitMembers);
+    }
+
+    private void validatePremiumMember(Long memberId) {
+        List<Long> memberIds = List.of(memberId);
+        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
+        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)) {
+            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
+        }
     }
 }
