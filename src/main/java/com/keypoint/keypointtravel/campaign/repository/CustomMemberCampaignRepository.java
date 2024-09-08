@@ -9,7 +9,9 @@ import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
+import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class CustomMemberCampaignRepository {
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     private final QCampaignWaitMember campaignWaitMember = QCampaignWaitMember.campaignWaitMember;
+
+    private final QMemberPremium memberPremium = QMemberPremium.memberPremium;
 
     public boolean existsByCampaignLeaderTrue(Long memberId, Long campaignId) {
         // 캠페인 리더가 맞는지, 캠페인이 존재하는지 확인
@@ -98,8 +102,17 @@ public class CustomMemberCampaignRepository {
             .where(campaignWaitMember.member.id.eq(memberId)
                 .and(campaignWaitMember.campaign.id.eq(campaignId)))
             .execute();
-        if(count < 1){
+        if (count < 1) {
             throw new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN_WAIT_MEMBER);
         }
+    }
+
+    public boolean existsMultipleCampaignNotPremium(List<Long> memberIds) {
+        List<MemberCampaign> members = queryFactory.selectFrom(memberCampaign)
+            .leftJoin(memberPremium).on(memberCampaign.member.id.eq(memberPremium.member.id))
+            .where(memberCampaign.member.id.in(memberIds)
+                .and(memberPremium.member.id.isNull()))
+            .fetch();
+        return members.size() >= 1;
     }
 }
