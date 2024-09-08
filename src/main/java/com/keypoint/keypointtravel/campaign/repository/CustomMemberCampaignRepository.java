@@ -111,7 +111,7 @@ public class CustomMemberCampaignRepository {
         List<MemberCampaign> members = queryFactory.selectFrom(memberCampaign)
             .leftJoin(memberPremium).on(memberCampaign.member.id.eq(memberPremium.member.id))
             .where(memberCampaign.member.id.in(memberIds)
-                .and(memberPremium.member.id.isNull()))
+                .and(memberPremium.member.id.isNull().or(memberPremium.isActive.isFalse())))
             .fetch();
         return members.size() >= 1;
     }
