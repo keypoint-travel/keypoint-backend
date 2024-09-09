@@ -139,40 +139,53 @@ public class CompleteCampaignService {
         // 1. 이미 캠페인 레포트 이미지가 저장되어 있는지 확인
         String filePath;
         if (customCampaignReportRepository.existsByCampaignId(useCase.getCampaignId())) {
+            // DB에서 이미지 조회
             filePath = customCampaignReportRepository.findReportImageUrl(useCase.getCampaignId());
         } else {
             // 레포트 이미지 업로드
-            try {
-                UploadFile uploadFile = uploadFileService.uploadFileAndReturnUploadFile(
-                    useCase.getReportImage(), DirectoryConstants.CAMPAIGN_REPORT_DIRECTORY);
-                Campaign campaign = campaignRepository.getReferenceById(useCase.getCampaignId());
-                CampaignReport campaignReport = new CampaignReport(campaign, uploadFile.getId());
-                campaignReportRepository.save(campaignReport);
-                filePath = uploadFile.getPath();
-            } catch (Exception e) {
-                throw new GeneralException(e);
-            }
+            filePath = saveReportImage(useCase);
         }
         // 2. 이미지 url로 유효 기간(단위 : 시간)동안 다운로드 가능한 링크 생성
-        String downloadUrl;
-        try {
-            downloadUrl = s3Service.generatePreSignedUrl(filePath, 1L,
-                useCase.getReportImage().getOriginalFilename());
-        } catch (Exception e) {
-            throw new GeneralException(e);
-        }
+        String url = createDownloadUrl(filePath, useCase.getReportImage().getOriginalFilename());
         // 3. 수신자 이름, 캠페인 이름 조회
         CampaignReportDto dto = customCampaignReportRepository.findCampaignReportInfo(
             useCase.getCampaignId(), useCase.getMemberId());
         // 4. 이메일 전송
+        sendEmail(dto.getCampaignName(), dto.getMemberName(),
+            useCase.getReportImage().getOriginalFilename(), url, useCase.getEmail());
+    }
+
+    private String saveReportImage(CampaignReportUseCase useCase) {
+        try {
+            UploadFile uploadFile = uploadFileService.saveAndReturnUploadFile(
+                useCase.getReportImage(), DirectoryConstants.CAMPAIGN_REPORT_DIRECTORY);
+            Campaign campaign = campaignRepository.getReferenceById(useCase.getCampaignId());
+            CampaignReport campaignReport = new CampaignReport(campaign, uploadFile.getId());
+            campaignReportRepository.save(campaignReport);
+            return uploadFile.getPath();
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    private String createDownloadUrl(String filePath, String fileName) {
+        try {
+            return s3Service.generatePreSignedUrl(filePath, 48L, fileName);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    private void sendEmail(String campaignName, String memberName, String reportFileName,
+        String downloadUrl, String email) {
         Map<String, String> emailContent = new HashMap<>();
-        emailContent.put("campaignName", dto.getCampaignName());
-        emailContent.put("memberName", dto.getMemberName());
-        emailContent.put("reportFileName", useCase.getReportImage().getOriginalFilename());
+        emailContent.put("campaignName", campaignName);
+        emailContent.put("memberName", memberName);
+        emailContent.put("reportFileName", reportFileName);
         emailContent.put("downloadUrl", downloadUrl);
         List<String> images = new ArrayList<>();
         images.add("static/images/main-logo.jpg");
         EmailUtils.sendSingleEmailWithImages(
-            useCase.getEmail(), EmailTemplate.CAMPAIGN_REPORT, emailContent, images);
+            email, EmailTemplate.CAMPAIGN_REPORT, emailContent, images);
     }
 }

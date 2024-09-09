@@ -47,7 +47,7 @@ public class UploadFileService {
      * @throws IOException
      */
     @Transactional
-    public UploadFile uploadFileAndReturnUploadFile(MultipartFile file, String directoryName)
+    public UploadFile saveAndReturnUploadFile(MultipartFile file, String directoryName)
         throws IOException {
         // 1. s3 파일 업로드
         String fileName = s3Service.uploadFileInS3(file, directoryName);

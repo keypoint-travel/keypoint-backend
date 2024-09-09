@@ -68,7 +68,9 @@ public class CompleteCampaignController {
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         CampaignReportUseCase useCase = new CampaignReportUseCase(request.getEmail(),
             userDetails.getId(), campaignId, reportImage);
+        // 검증
         completeCampaignService.validateCampaignMember(useCase);
+        // 이메일 전송
         completeCampaignService.sendCampaignReportEmail(useCase);
         return APIResponseEntity.<Void>builder()
             .message("캠페인 레포트 내보내기 진행 중")

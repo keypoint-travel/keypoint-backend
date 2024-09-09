@@ -132,28 +132,32 @@ public class S3Service {
      */
     public String generatePreSignedUrl(String fileUrl, Long expirationInHours, String reportName)
         throws Exception {
-        // 1. URL에서 파일 이름 추출
+        // 1. Url에서 파일 경로 추출
         String fileName = extractFileNameFromUrl(fileUrl);
-        // 2. 만료 시간을 설정
+        // 2. 만료 시간 설정
         Date expiration = new Date();
         long expTimeMillis = expiration.getTime();
         expTimeMillis += 1000 * 60 * 60 * expirationInHours; // 시간 단위 설정
         expiration.setTime(expTimeMillis);
         // 3. Pre-signed URL 생성
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-            new GeneratePresignedUrlRequest(s3BucketName, fileName)
-                .withMethod(HttpMethod.GET)
-                .withExpiration(expiration)
-                .withResponseHeaders(new ResponseHeaderOverrides().withContentDisposition(
-                    "attachment; filename=\"" + reportName + "\"")); // 파일 이름 추가
-
-        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-        return url.toString();
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = generatePresignedUrlRequest(
+            fileName, expiration, reportName);
+        // 4. 응답
+        return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest).toString();
     }
 
     private String extractFileNameFromUrl(String fileUrl) throws Exception {
         URL url = new URL(fileUrl);
         String filePath = url.getPath();
         return filePath.startsWith("/") ? filePath.substring(1) : filePath;
+    }
+
+    private GeneratePresignedUrlRequest generatePresignedUrlRequest(String fileName,
+        Date expiration, String reportName) {
+        return new GeneratePresignedUrlRequest(s3BucketName, fileName)
+            .withMethod(HttpMethod.GET)
+            .withExpiration(expiration)
+            .withResponseHeaders(new ResponseHeaderOverrides().withContentDisposition(
+                "attachment; filename=\"" + reportName + "\"")); // 파일 이름 추가
     }
 }
