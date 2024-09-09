@@ -26,7 +26,7 @@ public class AdvertisementBannerContent extends LanguageEntity {
     @Column(nullable = false)
     private String subTitle;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column
