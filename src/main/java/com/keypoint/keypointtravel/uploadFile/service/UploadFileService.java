@@ -39,6 +39,25 @@ public class UploadFileService {
     }
 
     /**
+     * 파일을 S3에 업로드 후, UploadFile에 정보를 업데이트하는 함수
+     *
+     * @param file          s3에 업로드할 파일
+     * @param directoryName 파일을 업로드할 폴더 이름
+     * @return 저장된 UploadFile
+     * @throws IOException
+     */
+    @Transactional
+    public UploadFile uploadFileAndReturnUploadFile(MultipartFile file, String directoryName)
+        throws IOException {
+        // 1. s3 파일 업로드
+        String fileName = s3Service.uploadFileInS3(file, directoryName);
+        // 2. UploadFile 저장
+        UploadFile uploadFile = UploadFile.of(fileName, file);
+        uploadFileRepository.save(uploadFile);
+        return uploadFile;
+    }
+
+    /**
      * 이미지 s3에 업로드된 이미지를 저장하는 함수
      *
      * @param fileName
