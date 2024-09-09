@@ -5,7 +5,7 @@ import com.keypoint.keypointtravel.campaign.dto.response.FindInvitationResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
-import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CampaignEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
@@ -78,7 +78,7 @@ public class InviteCampaignService {
      * @Param email, memberId(요청을 보낸 사용자), campaignId useCase
      */
     @Transactional
-    public void validateInvitation(InviteByEmailUseCase useCase) {
+    public void validateInvitation(CampaignEmailUseCase useCase) {
         // 캠페인 장인지 확인 campaignId, memberId
         if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
             useCase.getCampaignId())) {
@@ -93,7 +93,7 @@ public class InviteCampaignService {
      */
     @Async
     @Transactional
-    public void sendEmail(InviteByEmailUseCase useCase) {
+    public void sendEmail(CampaignEmailUseCase useCase) {
         // 캠페인 코드 및 로고 이미지를 포함한 이메일 전송
         // todo: 이메일 템플릿 - 초대하기 클릭 시 앱 연결 링크 추가
         SendInvitationEmailDto dto = campaignRepository.findSendInvitationEmailInfo(

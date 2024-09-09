@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinByEmailRequest {
+public class CampaignEmailRequest {
 
     @NotEmpty(message = "이메일을 입력해주세요.")
     @NotBlank(message = "이메일은 공백이 될 수 없습니다.")

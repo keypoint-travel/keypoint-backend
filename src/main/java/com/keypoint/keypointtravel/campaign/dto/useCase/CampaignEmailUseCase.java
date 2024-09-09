@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class InviteByEmailUseCase {
+public class CampaignEmailUseCase {
 
     private String email;
     private Long memberId;

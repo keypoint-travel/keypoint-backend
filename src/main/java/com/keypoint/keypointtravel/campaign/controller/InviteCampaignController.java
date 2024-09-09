@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.campaign.dto.request.InviteByEmailRequest;
 import com.keypoint.keypointtravel.campaign.dto.request.InviteFriendRequest;
 import com.keypoint.keypointtravel.campaign.dto.response.FindInvitationResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CampaignEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.service.InviteCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
@@ -43,7 +43,7 @@ public class InviteCampaignController {
     public ResponseEntity<Void> inviteByEmail(
         @RequestBody @Valid InviteByEmailRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        InviteByEmailUseCase useCase = new InviteByEmailUseCase(
+        CampaignEmailUseCase useCase = new CampaignEmailUseCase(
             request.getEmail(),
             userDetails.getId(),
             request.getCampaignId());
