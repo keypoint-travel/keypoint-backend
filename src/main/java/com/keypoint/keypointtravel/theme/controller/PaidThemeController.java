@@ -6,7 +6,7 @@ import com.keypoint.keypointtravel.theme.dto.request.ThemeRequest;
 import com.keypoint.keypointtravel.theme.dto.useCase.CreateThemeUseCase;
 import com.keypoint.keypointtravel.theme.dto.useCase.DeleteThemeUseCase;
 import com.keypoint.keypointtravel.theme.dto.useCase.UpdateThemeUseCase;
-import com.keypoint.keypointtravel.theme.service.ThemeService;
+import com.keypoint.keypointtravel.theme.service.PaidThemeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,48 +21,47 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/themes")
-public class ThemeController {
-    private final ThemeService themeService;
+@RequestMapping("/api/v1/paid-themes")
+public class PaidThemeController {
+    private final PaidThemeService paidThemeService;
 
     @PostMapping
-    public APIResponseEntity<Void> saveTheme(
+    public APIResponseEntity<Void> savePaidTheme(
         @Valid @RequestBody ThemeRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정;
         CreateThemeUseCase useCase = CreateThemeUseCase.of(request);
-        themeService.saveTheme(useCase);
+        paidThemeService.savePaidTheme(useCase);
         return APIResponseEntity.<Void>builder()
-            .message("무료 테마 등록 성공")
+            .message("유료 테마 등록 성공")
             .build();
     }
 
-
-    @PutMapping("/{themeId}")
+    @PutMapping("/{paid-themeId}")
     public APIResponseEntity<Void> updateTheme(
-        @PathVariable("themeId") Long themeId,
+        @PathVariable("paid-themeId") Long themeId,
         @Valid @RequestBody ThemeRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
         UpdateThemeUseCase useCase = UpdateThemeUseCase.of(themeId, request);
-        themeService.updateTheme(useCase);
+        paidThemeService.updateTheme(useCase);
         return APIResponseEntity.<Void>builder()
-            .message("무료 테마 수정 성공")
+            .message("유료 테마 수정 성공")
             .build();
     }
 
     @DeleteMapping()
     public APIResponseEntity<Void> deleteThemes(
-        @RequestParam("theme-ids") Long[] themeIds,
+        @RequestParam("paid-theme-ids") Long[] themeIds,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
         DeleteThemeUseCase useCase = DeleteThemeUseCase.from(
             themeIds
         );
-        themeService.deleteThemes(useCase);
+        paidThemeService.deleteThemes(useCase);
 
         return APIResponseEntity.<Void>builder()
-            .message("무료 테마 삭제 성공")
+            .message("유료 테마 삭제 성공")
             .build();
     }
 

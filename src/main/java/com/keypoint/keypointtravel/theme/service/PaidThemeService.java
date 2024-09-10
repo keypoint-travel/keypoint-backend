@@ -5,25 +5,23 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.theme.dto.useCase.CreateThemeUseCase;
 import com.keypoint.keypointtravel.theme.dto.useCase.DeleteThemeUseCase;
 import com.keypoint.keypointtravel.theme.dto.useCase.UpdateThemeUseCase;
-import com.keypoint.keypointtravel.theme.entity.Theme;
-import com.keypoint.keypointtravel.theme.repository.ThemeRepository;
+import com.keypoint.keypointtravel.theme.entity.PaidTheme;
+import com.keypoint.keypointtravel.theme.repository.PaidThemeRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
-public class ThemeService {
+public class PaidThemeService {
+    private final PaidThemeRepository paidThemeRepository;
 
-    private final ThemeRepository themeRepository;
     @Transactional
-    public void saveTheme(CreateThemeUseCase useCase){
+    public void savePaidTheme(CreateThemeUseCase useCase){
         try {
-            // 1. 무료 테마 저장
-            Theme theme = useCase.toThemeEntity(useCase);
-            themeRepository.save(theme);
+            // 1. 유료 테마 저장
+            PaidTheme paidTheme = useCase.toPaidThemeEntity(useCase);
+            paidThemeRepository.save(paidTheme);
 
         } catch (Exception ex) {
             throw new GeneralException(ex);
@@ -37,7 +35,8 @@ public class ThemeService {
      */
     public void deleteThemes(DeleteThemeUseCase useCase) {
         try {
-            themeRepository.deleteThemes(useCase);
+            paidThemeRepository.deletePaidThemes(useCase);
+            paidThemeRepository.flush();
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -54,19 +53,20 @@ public class ThemeService {
             Long themeId = useCase.getThemeId();
 
             // 1. 유효성 검사
-            Theme theme = themeRepository.findByIdAndIsDeletedFalse(themeId)
+            PaidTheme theme = paidThemeRepository.findByIdAndIsDeletedFalse(themeId)
                 .orElseThrow(() -> new GeneralException(ThemeErrorCode.NOT_EXISTED_Theme));
 
             // 2. 업데이트
-            long result = themeRepository.updateTheme(useCase);
+            long result = paidThemeRepository.updatePaidTheme(useCase);
             if (result < 0) {
                 throw new GeneralException(ThemeErrorCode.NOT_EXISTED_Theme);
             }
             else{
                 // 3. 차트 컬러 업데이트
                 theme.updateChartColors(useCase.getChartColors());
-                themeRepository.save(theme);
+                paidThemeRepository.save(theme);
             }
+
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

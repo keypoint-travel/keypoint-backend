@@ -31,7 +31,7 @@ public class Theme extends BaseEntity {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "chart_colors", joinColumns = @JoinColumn(name = "main_entity_id"))
+    @CollectionTable(name = "theme_colors", joinColumns = @JoinColumn(name = "main_entity_id"))
     @Column(name = "color")
     private List<String> chartColors;
 
@@ -44,6 +44,15 @@ public class Theme extends BaseEntity {
         this.color = color;
         this.chartColors = chartColors;
         this.isDeleted = false;
+    }
+
+    public Theme() {
+        this.isDeleted = false;
+    }
+
+    public void updateChartColors(List<String> chartColors) {
+        this.chartColors.clear();
+        this.chartColors.addAll(chartColors);
     }
 
 
