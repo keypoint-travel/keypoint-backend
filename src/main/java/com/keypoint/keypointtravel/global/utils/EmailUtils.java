@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -150,7 +151,7 @@ public class EmailUtils {
         MimeMessageHelper msgHelper = new MimeMessageHelper(mimeMessage, isMultiFile, "UTF-8");
         // 템플릿에 매핑된 값을 설정
         msgHelper.setSubject(template.getSubject());
-        Context context = new Context();
+        Context context = new Context(LocaleContextHolder.getLocale());
         emailContent.forEach(context::setVariable);
         // 템플릿을 처리하여 이메일 본문 생성
         String emailBody = templateEngine.process(template.getTemplate(), context);

@@ -6,7 +6,9 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailsUseCase;
 import com.keypoint.keypointtravel.campaign.service.CreateCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import jakarta.validation.Valid;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +37,10 @@ public class CreateCampaignController {
             CreateUseCase.of(coverImage, request, userDetails.getId()));
         // 이메일로 초대
         if (request.getEmails() != null && !request.getEmails().isEmpty()) {
+            Locale locale = LocaleContextHolder.getLocale();
             createCampaignService.sendEmail(
-                InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId));
+                InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId),
+                locale);
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

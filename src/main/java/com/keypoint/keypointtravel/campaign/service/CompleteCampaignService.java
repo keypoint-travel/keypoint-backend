@@ -25,8 +25,10 @@ import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -135,7 +137,8 @@ public class CompleteCampaignService {
      */
     @Async
     @Transactional
-    public void sendCampaignReportEmail(CampaignReportUseCase useCase) {
+    public void sendCampaignReportEmail(CampaignReportUseCase useCase, Locale locale) {
+        LocaleContextHolder.setLocale(locale);
         // 1. 이미 캠페인 레포트 이미지가 저장되어 있는지 확인
         String filePath;
         if (customCampaignReportRepository.existsByCampaignId(useCase.getCampaignId())) {

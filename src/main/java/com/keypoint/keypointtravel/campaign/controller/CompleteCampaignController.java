@@ -11,7 +11,9 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import jakarta.validation.Valid;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +73,8 @@ public class CompleteCampaignController {
         // 검증
         completeCampaignService.validateCampaignMember(useCase);
         // 이메일 전송
-        completeCampaignService.sendCampaignReportEmail(useCase);
+        Locale locale = LocaleContextHolder.getLocale();
+        completeCampaignService.sendCampaignReportEmail(useCase, locale);
         return APIResponseEntity.<Void>builder()
             .message("캠페인 레포트 내보내기 진행 중")
             .build();

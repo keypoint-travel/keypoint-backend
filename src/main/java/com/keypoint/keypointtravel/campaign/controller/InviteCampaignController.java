@@ -10,7 +10,9 @@ import com.keypoint.keypointtravel.campaign.service.InviteCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import jakarta.validation.Valid;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,7 +52,8 @@ public class InviteCampaignController {
         // 초대 가능한지 확인
         inviteCampaignService.validateInvitation(useCase);
         // 이메일로 초대
-        inviteCampaignService.sendEmail(useCase);
+        Locale locale = LocaleContextHolder.getLocale();
+        inviteCampaignService.sendEmail(useCase, locale);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

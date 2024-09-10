@@ -24,8 +24,10 @@ import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -180,7 +182,8 @@ public class CreateCampaignService {
      */
     @Async
     @Transactional
-    public void sendEmail(InviteByEmailsUseCase useCase) {
+    public void sendEmail(InviteByEmailsUseCase useCase, Locale locale) {
+        LocaleContextHolder.setLocale(locale);
         // 캠페인 코드 및 로고 이미지를 포함한 이메일 전송
         // todo: 이메일 템플릿 - 초대하기 클릭 시 앱 연결 링크 추가
         SendInvitationEmailDto dto = campaignRepository.findSendInvitationEmailInfo(
