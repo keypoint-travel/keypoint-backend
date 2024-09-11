@@ -249,8 +249,10 @@ public class PushNotificationService {
      */
     @Transactional
     public Object generateNotificationDetail(Long memberId, PushNotificationType type) {
+        // 배지 타입 찾기
         BadgeType badgeType = getBadgeTypeForNotification(type);
 
+        // 배지 발급을 하는 알림 타입인 경우, 배지 발급
         if (badgeType != null) {
             return createBadgeDetailResponse(memberId, badgeType);
         }
@@ -259,9 +261,9 @@ public class PushNotificationService {
     }
 
     /**
-     * 알림 타입에 따라 배지 타입을 반환하는 메서드
+     * 알림 타입에 따라 배지 타입을 반환
      *
-     * @param type
+     * @param type 푸시 알림 타입
      * @return BadgeType or null
      */
     private BadgeType getBadgeTypeForNotification(PushNotificationType type) {
@@ -275,8 +277,8 @@ public class PushNotificationService {
     /**
      * 배지 관련 세부 응답 생성
      *
-     * @param memberId
-     * @param badgeType
+     * @param memberId 배지를 발급받을 사용자 아이디
+     * @param badgeType 발급 받을 배지 타입
      * @return FCMBadgeDetailResponse
      */
     @Transactional
