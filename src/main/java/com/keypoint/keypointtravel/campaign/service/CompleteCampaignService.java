@@ -189,6 +189,6 @@ public class CompleteCampaignService {
         List<String> images = new ArrayList<>();
         images.add("static/images/main-logo.jpg");
         EmailUtils.sendSingleEmailWithImages(
-            email, EmailTemplate.CAMPAIGN_REPORT, emailContent, images);
+            email, EmailTemplate.CAMPAIGN_REPORT, new Object[]{campaignName}, emailContent, images);
     }
 }

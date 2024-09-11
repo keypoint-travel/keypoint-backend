@@ -194,8 +194,8 @@ public class CreateCampaignService {
         emailContent.put("campaignCode", dto.getCampaignCode());
         List<String> images = new ArrayList<>();
         images.add("static/images/main-logo.jpg");
-        EmailUtils.sendMultiEmailWithImages(
-            useCase.getEmails(), EmailTemplate.INVITE_CAMPAIGN, emailContent, images);
+        EmailUtils.sendMultiEmailWithImages(useCase.getEmails(), EmailTemplate.INVITE_CAMPAIGN,
+            new Object[]{dto.getCampaignName()}, emailContent, images);
 
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
         List<EmailInvitationHistory> histories = new ArrayList<>();

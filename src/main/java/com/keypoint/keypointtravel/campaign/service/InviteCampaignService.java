@@ -57,13 +57,13 @@ public class InviteCampaignService {
      * 캠페인 초대 화면 조회 함수
      *
      * @Param memberId, campaignId useCase
-     *
      * @Return 캠페인 정보 및 친구 목록
      */
     @Transactional
     public FindInvitationResponse findInvitationView(FIndCampaignUseCase useCase) {
         // 캠페인 장인인지 확인
-        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(), useCase.getCampaignId())) {
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+            useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         // 캠페인 정보 조회
@@ -71,7 +71,8 @@ public class InviteCampaignService {
             .orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN));
         // 친구 목록 조회
         List<FriendDto> friends = friendRepository.findAllByMemberId(useCase.getMemberId());
-        return new FindInvitationResponse(campaign.getId(), campaign.getTitle(), campaign.getInvitation_code(), friends);
+        return new FindInvitationResponse(campaign.getId(), campaign.getTitle(),
+            campaign.getInvitation_code(), friends);
     }
 
     /**
@@ -107,8 +108,8 @@ public class InviteCampaignService {
         emailContent.put("campaignCode", dto.getCampaignCode());
         List<String> images = new ArrayList<>();
         images.add("static/images/main-logo.jpg");
-        EmailUtils.sendSingleEmailWithImages(
-            useCase.getEmail(), EmailTemplate.INVITE_CAMPAIGN, emailContent, images);
+        EmailUtils.sendSingleEmailWithImages(useCase.getEmail(), EmailTemplate.INVITE_CAMPAIGN,
+            new Object[]{dto.getCampaignName()}, emailContent, images);
 
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
         emailInvitationHistoryRepository.save(
@@ -171,9 +172,10 @@ public class InviteCampaignService {
         }
     }
 
-    private void validatePremiumMember(InviteFriendUseCase useCase){
+    private void validatePremiumMember(InviteFriendUseCase useCase) {
         // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
-        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(useCase.getFriendIds())){
+        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(
+            useCase.getFriendIds())) {
             throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
