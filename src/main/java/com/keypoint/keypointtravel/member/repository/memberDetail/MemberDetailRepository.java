@@ -50,4 +50,7 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
 
     @Query("SELECT md FROM MemberDetail md WHERE md.member.id = :memberId")
     MemberDetail findByMemberId(@Param("memberId") Long memberId);
+
+    @Query("SELECT md.name FROM MemberDetail md WHERE md.member.id = :memberId")
+    String findByName(@Param("memberId") Long memberId);
 }
