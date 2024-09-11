@@ -25,6 +25,17 @@ public class FCMBodyResponse {
     }
 
     public static FCMBodyResponse of(
+        PushNotificationType type,
+        String content
+    ) {
+        return new FCMBodyResponse(
+            type,
+            content,
+            null
+        );
+    }
+
+    public static FCMBodyResponse from(
         String content
     ) {
         return new FCMBodyResponse(

@@ -45,7 +45,7 @@ public class FCMUtils {
             // 각 배치에 대해 sendAll 호출
             List<Integer> failedHashCode = new ArrayList<>();
             for (List<Message> batch : batches) {
-                BatchResponse response = FirebaseMessaging.getInstance().sendEach(batch);
+                BatchResponse response = firebaseMessaging.sendEach(batch);
                 failedHashCode.addAll(findFailedMessageHashCode(batch, response.getResponses()));
             }
 
