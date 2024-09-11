@@ -4,16 +4,14 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
-import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
-import java.util.Locale;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +31,8 @@ public class FCMController {
 
     @GetMapping("/event")
     public ResponseEntity<?> testEvent() {
-        //fcmService.testEvent();
-        Locale currentLocale = LocaleContextHolder.getLocale();
-        throw new GeneralException(CommonErrorCode.FAIL_TO_DELETE_EN_DATA);
-        //return new ResponseEntity<>(HttpStatus.OK);
+        fcmService.testEvent();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/send")
@@ -44,10 +40,10 @@ public class FCMController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody FCMTestRequest request
     ) {
-
+        FCMBodyResponse response = FCMBodyResponse.from(request.getBody());
         Notification notification = Notification.builder()
             .setTitle(request.getTitle())
-            .setBody(request.getBody())
+            .setBody(response.toString())
             .build();
         Message message = Message.builder()
             .setNotification(notification)

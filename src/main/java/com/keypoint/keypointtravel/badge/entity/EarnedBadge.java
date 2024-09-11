@@ -2,15 +2,7 @@ package com.keypoint.keypointtravel.badge.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.member.entity.Member;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +25,19 @@ public class EarnedBadge extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "badge_id")
     private Badge badge;
+
+    public EarnedBadge(
+            Member member,
+            Badge badge
+    ) {
+        this.member = member;
+        this.badge = badge;
+    }
+
+    public static EarnedBadge of(
+            Member member,
+            Badge badge
+    ) {
+        return new EarnedBadge(member, badge);
+    }
 }

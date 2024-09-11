@@ -1,11 +1,15 @@
 package com.keypoint.keypointtravel.notification.service;
 
+import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
+import com.keypoint.keypointtravel.badge.service.MemberBadgeService;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBadgeDetailResponse;
 import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent.FCMContentData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
@@ -15,14 +19,13 @@ import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPus
 import com.keypoint.keypointtravel.notification.event.pushNotification.NoticePushNotificationEvent.NoticeData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,6 +34,8 @@ public class PushNotificationService {
 
     private final FCMTokenRepository fcmTokenRepository;
     private final CampaignRepository campaignRepository;
+    private final MemberBadgeService memberBadgeService;
+    private final BadgeRepository badgeRepository;
 
     /**
      * Notification 생성
@@ -231,6 +236,60 @@ public class PushNotificationService {
             }
 
             fcmTokenRepository.deleteFCMTokenByTokens(failedTokens);
+        }
+    }
+
+
+    /**
+     * FCM 알림을 구성할 Detail 생성
+     *
+     * @param memberId
+     * @param type
+     * @return
+     */
+    @Transactional
+    public Object generateNotificationDetail(Long memberId, PushNotificationType type) {
+        // 배지 타입 찾기
+        BadgeType badgeType = getBadgeTypeForNotification(type);
+
+        // 배지 발급을 하는 알림 타입인 경우, 배지 발급
+        if (badgeType != null) {
+            return createBadgeDetailResponse(memberId, badgeType);
+        }
+
+        return null;
+    }
+
+    /**
+     * 알림 타입에 따라 배지 타입을 반환
+     *
+     * @param type 푸시 알림 타입
+     * @return BadgeType or null
+     */
+    private BadgeType getBadgeTypeForNotification(PushNotificationType type) {
+        return switch (type) {
+            case CAMPAIGN_END -> BadgeType.FIRST_CAMPAIGN;
+            case FRIEND_ACCEPTED_RECEIVER, FRIEND_ACCEPTED_SENDER -> BadgeType.FRIEND_REGISTER;
+            default -> null;
+        };
+    }
+
+    /**
+     * 배지 관련 세부 응답 생성
+     *
+     * @param memberId 배지를 발급받을 사용자 아이디
+     * @param badgeType 발급 받을 배지 타입
+     * @return FCMBadgeDetailResponse
+     */
+    @Transactional
+    public FCMBadgeDetailResponse createBadgeDetailResponse(Long memberId, BadgeType badgeType) {
+        boolean isBadgeEarned = memberBadgeService.earnBadge(memberId, badgeType);
+
+        if (isBadgeEarned) {
+            String badgeUrl = badgeRepository.findByActiveBadgeUrl(badgeType);
+            return FCMBadgeDetailResponse.of(isBadgeEarned, badgeUrl);
+        } else {
+            return FCMBadgeDetailResponse.from(isBadgeEarned);
         }
     }
 }

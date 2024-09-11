@@ -38,7 +38,7 @@ public class CompleteCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping("/{campaignId}/completion")
     public ResponseEntity<Void> completeCampaign(
-        @PathVariable Long campaignId,
+        @PathVariable(value = "campaignId") Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         completeCampaignService.completeCampaign(
             new CompleteCampaignUseCase(campaignId, userDetails.getId()));

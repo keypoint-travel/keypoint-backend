@@ -2,9 +2,11 @@ package com.keypoint.keypointtravel.member.service;
 
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.service.AuthService;
+import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
@@ -23,14 +25,13 @@ import com.keypoint.keypointtravel.member.repository.memberConsent.MemberConsent
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -46,6 +47,7 @@ public class CreateMemberService {
     private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationCodeService emailVerificationCodeService;
+    private final BadgeRepository badgeRepository;
 
     /**
      * Member 생성하는 함수 (일반 회원가입)
@@ -85,7 +87,8 @@ public class CreateMemberService {
             // 6. 토큰 발금
             TokenInfoResponse response = authService.getJwtTokenInfo(email, password);
 
-            return MemberResponse.of(member, response);
+            String badgeUrl = badgeRepository.findByActiveBadgeUrl(BadgeType.SIGN_UP);
+            return MemberResponse.of(member, response, badgeUrl);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

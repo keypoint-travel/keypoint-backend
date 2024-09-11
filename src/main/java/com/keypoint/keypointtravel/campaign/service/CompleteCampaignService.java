@@ -20,7 +20,12 @@ import com.keypoint.keypointtravel.global.entity.UploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignPushNotificationEvent;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.util.ArrayList;
@@ -38,11 +43,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class CompleteCampaignService {
+
+    private final static PushNotificationType PUSH_NOTIFICATION_TYPE = PushNotificationType.CAMPAIGN_END;
 
     private final MemberCampaignRepository memberCampaignRepository;
 
@@ -50,6 +55,8 @@ public class CompleteCampaignService {
 
     private final CampaignWaitMemberRepository campaignWaitMemberRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
+    
     private final UploadFileService uploadFileService;
 
     private final CustomCampaignReportRepository customCampaignReportRepository;
@@ -71,7 +78,17 @@ public class CompleteCampaignService {
         campaignRepository.updateCampaignFinished(useCase.getCampaignId());
         // 3. 캠페인 대기 목록 삭제
         campaignWaitMemberRepository.deleteAllByCampaignId(useCase.getCampaignId());
-        // 4. todo : 캠페인 종료 알림 전송, 배지 부여
+        // 4. 캠페인 종료 알림 전송, 배지 부여
+        List<Long> invitedMemberIds = memberCampaignRepository.findMemberIdsByCampaignId(
+            useCase.getCampaignId()
+        );
+        eventPublisher.publishEvent(CampaignPushNotificationEvent.of(
+                PUSH_NOTIFICATION_TYPE,
+                invitedMemberIds,
+                useCase.getCampaignId()
+            )
+        );
+
     }
 
     private List<Long> validateIsLeader(Long memberId, Long campaignId) {

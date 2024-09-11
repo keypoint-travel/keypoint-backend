@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,4 +23,13 @@ public interface BadgeRepository extends JpaRepository<Badge, Long>,
 
     @Query("SELECT b.type FROM Badge b WHERE b.isDeleted = false")
     Set<BadgeType> findBadgeTypeByIsDeletedFalse();
+
+    @Query("SELECT b FROM Badge b WHERE b.type = :type")
+    Badge findByBadgeType(@Param(value = "type") BadgeType type);
+
+    @Query("SELECT uf.path "
+        + "FROM UploadFile uf "
+        + "INNER JOIN Badge b ON b.type = :type "
+        + "WHERE uf.id = b.activeImageId")
+    String findByActiveBadgeUrl(@Param(value = "type") BadgeType type);
 }

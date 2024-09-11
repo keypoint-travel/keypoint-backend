@@ -13,8 +13,9 @@ public class MemberResponse {
     private Long id;
     private String email;
     private TokenInfoResponse token;
+    private String badgeUrl;
 
-    public static MemberResponse of(Member member, TokenInfoResponse token) {
-        return new MemberResponse(member.getId(), member.getEmail(), token);
+    public static MemberResponse of(Member member, TokenInfoResponse token, String badgeUrl) {
+        return new MemberResponse(member.getId(), member.getEmail(), token, badgeUrl);
     }
 }
