@@ -6,11 +6,11 @@
   <div style="text-align: center; " >
     <img src='cid:image1' width="110px" height="110px" style="margin-bottom: 20px;"/>
     <div style="font-size: 14px; margin-top: 30px; margin-bottom: 20px">
-      안녕하세요, <strong th:text="${memberName}"></strong>님.
+      <span th:utext="#{campaign-report.text1(${memberName})}"></span>
     </div>
     <div style="font-size: 14px; line-height: 1.6;">
-      <span><strong th:text="${campaignName}"></strong> 캠페인이 성공적으로 종료되었습니다.</span><br/>
-      <span>캠페인 기간 동안 지출 내역을 담은 리포트를 준비했습니다.</span>
+      <span th:utext="#{campaign-report.text2(${campaignName})}"></span><br>
+      <span th:text="#{campaign-report.text3}"></span>
     </div>
     <div
         style="
@@ -19,29 +19,25 @@
             border-radius: 8px;
             margin: 20px 0;
           ">
-      <span style="color: #001ece; font-weight: bold; display: block; margin-bottom: 10px;">
-        리포트 다운로드:
-      </span>
-      <span>리포트 파일: <strong th:text="${reportFileName}"></strong></span><br/>
-      <span style="color: #555555; font-size: 12px;">(첨부 파일로 확인하실 수 있습니다.)</span><br/>
-      <span>다운로드 링크: <a th:href="${downloadUrl}" target="_blank" style="color: #1a73e8; text-decoration: none; font-weight: bold; margin-top: 10px;">클릭</a></span><br/>
-      <span style="color: #555555; font-size: 12px;">(해당 링크를 클릭하여 리포트를 다운로드 하세요.)</span><br/>
-      <span style="display: block; margin-top: 20px; font-size: 12px;">
-        *모든 리포트는 2일 후 만료되어 삭제됩니다.
-      </span>
+      <span th:text="#{campaign-report.text4}" style="color: #001ece; font-weight: bold; display: block; margin-bottom: 10px;"></span>
+      <span th:utext="#{campaign-report.text5(${reportFileName})}"></span><br>
+      <span th:text="#{campaign-report.text6}" style="color: #555555; font-size: 12px;"></span><br>
+      <span th:utext="#{campaign-report.text7(${downloadUrl})}"></span><br>
+      <span th:text="#{campaign-report.text8}" style="color: #555555; font-size: 12px;"></span><br>
+      <span th:text="#{campaign-report.text9}" style="display: block; margin-top: 20px; font-size: 12px;"></span>
     </div>
     <div style="font-size: 14px; line-height: 1.6;">
-      리포트에는 캠페인의 내역, 주요 지표를 포함하고 있습니다. 캠페인 결과를 확인하고, 여러분의 소중한 피드백을 기다리고 있습니다.
+      <span th:text="#{campaign-report.text10}"></span>
     </div>
     <div style="font-size: 14px; margin-top: 20px; margin-bottom: 20px;">
-      피드백 링크: <a href="https://forms.gle/NTZRmNuSrHGp6DbJ8" target="_blank" style="color: #1a73e8; text-decoration: none; font-weight: bold;">https://forms.gle/NTZRmNuSrHGp6DbJ8</a>
+      <span th:text="#{campaign-report.text11}"></span>
+      <a href="https://forms.gle/NTZRmNuSrHGp6DbJ8" target="_blank" style="color: #1a73e8; text-decoration: none; font-weight: bold;">https://forms.gle/NTZRmNuSrHGp6DbJ8</a>
     </div>
     <div style="font-size: 14px; margin-bottom: 20px;">
-      궁금한 점이 있거나 도움이 필요하시면 언제든지 <a href="mailto:jamsuhamHI@gmail.com" style="color: #1a73e8; text-decoration: none; font-weight: bold;">jamsuhamHI@gmail.com</a>로 문의해 주세요.
+      <span th:utext="#{campaign-report.text12}"></span>
     </div>
     <div style="font-size: 14px;">
-      <span>감사합니다.</span><br/>
-      <span>keytrip 팀 드림</span>
+      <span th:utext="#{campaign-report.text13}"></span>
     </div>
   </div>
 </div>
