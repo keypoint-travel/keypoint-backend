@@ -1,10 +1,12 @@
 package com.keypoint.keypointtravel.member.service;
 
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
@@ -43,6 +45,7 @@ public class UpdateMemberService {
     private final UploadFileService uploadFileService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final BadgeRepository badgeRepository;
 
     /**
      * 최근 로그인 날짜 정보를 업데이트하는 함수
@@ -84,7 +87,8 @@ public class UpdateMemberService {
             Authentication authentication = tokenProvider.createAuthenticationFromMember(member);
             TokenInfoResponse token = tokenProvider.createToken(authentication);
 
-            return MemberResponse.of(member, token);
+            String badgeUrl = badgeRepository.findByActiveBadgeUrl(BadgeType.SIGN_UP);
+            return MemberResponse.of(member, token, badgeUrl);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
