@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
+import com.keypoint.keypointtravel.notification.dto.response.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
@@ -44,10 +45,10 @@ public class FCMController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody FCMTestRequest request
     ) {
-
+        FCMBodyResponse response = FCMBodyResponse.of(request.getBody());
         Notification notification = Notification.builder()
             .setTitle(request.getTitle())
-            .setBody(request.getBody())
+            .setBody(response.toString())
             .build();
         Message message = Message.builder()
             .setNotification(notification)
