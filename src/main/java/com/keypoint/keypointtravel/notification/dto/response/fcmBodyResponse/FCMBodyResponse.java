@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.notification.dto.response;
+package com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +32,18 @@ public class FCMBodyResponse {
             type,
             content,
             null
+        );
+    }
+
+    public static FCMBodyResponse of(
+        PushNotificationType type,
+        String content,
+        Object detail
+    ) {
+        return new FCMBodyResponse(
+            type,
+            content,
+            detail
         );
     }
 

@@ -2,13 +2,12 @@ package com.keypoint.keypointtravel.badge.respository;
 
 import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface BadgeRepository extends JpaRepository<Badge, Long>,
@@ -27,4 +26,10 @@ public interface BadgeRepository extends JpaRepository<Badge, Long>,
 
     @Query("SELECT b FROM Badge b WHERE b.type = :type")
     Badge findByBadgeType(@Param(value = "type") BadgeType type);
+
+    @Query("SELECT uf.path "
+        + "FROM UploadFile uf "
+        + "INNER JOIN Badge b ON b.type = :type "
+        + "WHERE uf.id = b.activeImageId")
+    String findByActiveBadgeUrl(@Param(value = "type") BadgeType type);
 }

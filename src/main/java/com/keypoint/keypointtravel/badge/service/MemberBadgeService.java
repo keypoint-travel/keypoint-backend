@@ -16,12 +16,11 @@ import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -87,21 +86,25 @@ public class MemberBadgeService {
      *
      * @param memberId    발급받을 회원 아이디
      * @param badgeType 발급받을 배지
+     * @return 발급 여부
      */
-    public void earnBadge(Long memberId, BadgeType badgeType) {
+    public boolean earnBadge(Long memberId, BadgeType badgeType) {
         try {
             // 이미 발급받은 배지인지 확인
             Member member = memberRepository.getReferenceById(memberId);
             if (earnedBadgeRepository.existsByMemberIdAndBadgeType(member.getId(), badgeType)) {
-                return;
+                return false;
             }
 
             // 배지 발급
             Badge badge = badgeRepository.findByBadgeType(badgeType);
             EarnedBadge earnedBadge = EarnedBadge.of(member, badge);
             earnedBadgeRepository.save(earnedBadge);
+            return true;
         } catch (Exception ex) {
-            LogUtils.writeErrorLog("earnBadge", String.format("Fail to earn badge {0} {1}", badgeType.name(), memberId.toString()));
+            LogUtils.writeErrorLog("earnBadge",
+                String.format("Fail to earn badge {0} {1}", badgeType.name(), memberId.toString()));
+            return false;
         }
     }
 }

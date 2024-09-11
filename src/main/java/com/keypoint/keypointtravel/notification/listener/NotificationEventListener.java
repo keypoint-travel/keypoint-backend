@@ -11,7 +11,7 @@ import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
-import com.keypoint.keypointtravel.notification.dto.response.FCMBodyResponse;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.event.marketingNotification.MarketingNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
@@ -62,7 +62,11 @@ public class NotificationEventListener {
             if (notificationContent == null) {
                 return;
             }
-            FCMBodyResponse body = FCMBodyResponse.of(type, notificationContent.getBody());
+            Object detail = pushNotificationService.generateNotificationDetail(
+                memberId,
+                type
+            );
+            FCMBodyResponse body = FCMBodyResponse.of(type, notificationContent.getBody(), detail);
             Notification notification = Notification.builder()
                 .setTitle(notificationContent.getTitle())
                 .setBody(body.toString())

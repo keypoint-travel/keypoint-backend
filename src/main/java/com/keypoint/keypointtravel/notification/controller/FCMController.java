@@ -6,7 +6,7 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
-import com.keypoint.keypointtravel.notification.dto.response.FCMBodyResponse;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
