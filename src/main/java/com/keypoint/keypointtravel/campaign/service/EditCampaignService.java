@@ -93,8 +93,10 @@ public class EditCampaignService {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         // 2. 서로 차단한 회원이 있는지 검증
-        useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
-        validateBlockedMembers(useCase.getMembers());
+        if(useCase.getMembers() != null && !useCase.getMembers().isEmpty()){
+            useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
+            validateBlockedMembers(useCase.getMembers());
+        }
         // 3. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase);
         // 4. 커버 사진 업데이트
@@ -121,9 +123,12 @@ public class EditCampaignService {
     }
 
     private void validatePremiumMember(UpdateUseCase useCase){
-        List<Long> memberIds = useCase.getMembers().stream()
-            .map(MemberInfo::getMemberId)
-            .collect(Collectors.toList());
+        List<Long> memberIds = new ArrayList<>();
+        if(useCase.getMembers() != null && !useCase.getMembers().isEmpty()){
+            memberIds = useCase.getMembers().stream()
+                .map(MemberInfo::getMemberId)
+                .collect(Collectors.toList());
+        }
         memberIds.add(useCase.getMemberId());
         // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
         if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)){
@@ -156,12 +161,14 @@ public class EditCampaignService {
         memberCampaignRepository.deleteAllByCampaignId(campaign.getId());
         List<MemberCampaign> memberCampaigns = new ArrayList<>();
         // 함께 참여하는 회원들 저장
-        for (MemberInfo memberInfo : members) {
-            if (memberInfo.getMemberId().equals(leaderId)) {
-                continue;
+        if (members != null && !members.isEmpty()) {
+            for (MemberInfo memberInfo : members) {
+                if (memberInfo.getMemberId().equals(leaderId)) {
+                    continue;
+                }
+                Member member = memberRepository.getReferenceById(memberInfo.getMemberId());
+                memberCampaigns.add(new MemberCampaign(campaign, member, false));
             }
-            Member member = memberRepository.getReferenceById(memberInfo.getMemberId());
-            memberCampaigns.add(new MemberCampaign(campaign, member, false));
         }
         // 캠페인을 생성하는 회원(캠페인 장) 저장
         Member member = memberRepository.getReferenceById(leaderId);

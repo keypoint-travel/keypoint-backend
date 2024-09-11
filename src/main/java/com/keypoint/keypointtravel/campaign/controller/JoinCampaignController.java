@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.request.JoinByCampaignCodeRequest;
 import com.keypoint.keypointtravel.campaign.dto.request.ApproveByCodeRequest;
-import com.keypoint.keypointtravel.campaign.dto.request.JoinByEmailRequest;
+import com.keypoint.keypointtravel.campaign.dto.request.CampaignEmailRequest;
 import com.keypoint.keypointtravel.campaign.dto.response.CampaignWaitMemberResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.ApproveByCodeUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
@@ -30,7 +30,7 @@ public class JoinCampaignController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     public ResponseEntity<Void> joinByEmail(
         @PathVariable("campaignId") Long campaignId,
-        @RequestBody @Valid JoinByEmailRequest request,
+        @RequestBody @Valid CampaignEmailRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         joinCampaignService.joinByEmail(
             new JoinByEmailUseCase(userDetails.getId(), request.getEmail(), campaignId));
