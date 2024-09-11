@@ -4,13 +4,15 @@ import com.keypoint.keypointtravel.campaign.dto.request.InviteByEmailRequest;
 import com.keypoint.keypointtravel.campaign.dto.request.InviteFriendRequest;
 import com.keypoint.keypointtravel.campaign.dto.response.FindInvitationResponse;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
-import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CampaignEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.service.InviteCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import jakarta.validation.Valid;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,14 +45,15 @@ public class InviteCampaignController {
     public ResponseEntity<Void> inviteByEmail(
         @RequestBody @Valid InviteByEmailRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        InviteByEmailUseCase useCase = new InviteByEmailUseCase(
+        CampaignEmailUseCase useCase = new CampaignEmailUseCase(
             request.getEmail(),
             userDetails.getId(),
             request.getCampaignId());
         // 초대 가능한지 확인
         inviteCampaignService.validateInvitation(useCase);
         // 이메일로 초대
-        inviteCampaignService.sendEmail(useCase);
+        Locale locale = LocaleContextHolder.getLocale();
+        inviteCampaignService.sendEmail(useCase, locale);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
