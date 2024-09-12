@@ -9,7 +9,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.member.entity.MemberDetail;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
-import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBadgeDetailResponse;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBadgeDetailResponse;
 import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent.FCMContentData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent.CampaignAcceptorData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent.CampaignApplicantData;
@@ -19,13 +19,14 @@ import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPus
 import com.keypoint.keypointtravel.notification.event.pushNotification.NoticePushNotificationEvent.NoticeData;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -287,7 +288,11 @@ public class PushNotificationService {
 
         if (isBadgeEarned) {
             String badgeUrl = badgeRepository.findByActiveBadgeUrl(badgeType);
-            return FCMBadgeDetailResponse.of(isBadgeEarned, badgeUrl);
+            return FCMBadgeDetailResponse.of(
+                    isBadgeEarned,
+                    badgeUrl,
+                    MessageSourceUtils.getBadgeName(badgeType)
+            );
         } else {
             return FCMBadgeDetailResponse.from(isBadgeEarned);
         }
