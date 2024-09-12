@@ -62,7 +62,7 @@ public class CommonBannerResponse {
 
     private static List<AroundTourism> createAroundTourismList(Items data, CommonTourismUseCase details) {
         return data.getItem().stream()
-            .filter(item -> Integer.parseInt(item.getContentid()) != details.getCommonTourismDto().getId())
+            .filter(item -> !item.getContentid().equals(details.getCommonTourismDto().getContentId()))
             .map(AroundTourism::from).toList();
     }
 

@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
+import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.response.CommonBannerSummaryUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.BannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
@@ -47,7 +48,6 @@ public class FindBannerService {
      * Banner 상세 정보를 조회하는 함수 (공통 배너 상세 조회(언어별 구분))
      *
      * @Param language, bannerId, memberId(좋아요 여부 확인을 위한)
-     *
      * @Return 공통 배너 상세 정보 useCase
      */
     @Transactional(readOnly = true)
@@ -56,5 +56,17 @@ public class FindBannerService {
             useCase.getLanguageCode(), useCase.getBannerId(), useCase.getMemberId());
 //        List<CommentDto> dtoList = bannerRepository.findCommentListById(useCase.getBannerId());
         return new CommonTourismUseCase(dto);
+    }
+
+    /**
+     * Banner 배너 모든 언어의 상세 정보를 조회하는 함수 ((관리자)공통 배너 상세 조회)
+     *
+     * @Param bannerId
+     * @Return 공통 배너 상세 정보 useCase
+     */
+    @Transactional(readOnly = true)
+    public List<ManageCommonTourismDto> findCommonBanner(Long bannerId) {
+        // 예외 처리 추가
+        return bannerRepository.findBannerListById(bannerId);
     }
 }

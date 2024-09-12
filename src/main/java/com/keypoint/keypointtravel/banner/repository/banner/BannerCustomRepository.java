@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
+import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.EditBannerUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
@@ -23,6 +24,8 @@ public interface BannerCustomRepository {
     List<CommonBannerThumbnailDto> findThumbnailList(Long memberId);
 
     CommonTourismDto findBannerById(LanguageCode languageCode, Long bannerId, Long memberId);
+
+    List<ManageCommonTourismDto> findBannerListById(Long bannerId);
 
     List<CommentDto> findCommentListById(Long bannerId);
 

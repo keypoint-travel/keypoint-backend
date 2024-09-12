@@ -1,8 +1,11 @@
 package com.keypoint.keypointtravel.banner.controller;
 
+import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.response.BannerListResponse;
 import com.keypoint.keypointtravel.banner.dto.response.RecommendationResponse;
 import com.keypoint.keypointtravel.banner.dto.response.commonBanner.CommonBannerResponse;
+import com.keypoint.keypointtravel.banner.dto.response.commonBanner.ManageCommonBannerResponse;
+import com.keypoint.keypointtravel.banner.dto.response.commonBanner.ManageCommonInfo;
 import com.keypoint.keypointtravel.banner.dto.useCase.BannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.TourismListUseCase;
@@ -15,6 +18,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +48,28 @@ public class FindBannerController {
         return APIResponseEntity.<BannerListResponse>builder()
             .message("생성한 공통 배너 목록 조회")
             .data(new BannerListResponse(findBannerService.findBannerList()))
+            .build();
+    }
+
+    @GetMapping("management/{bannerId}")
+    public APIResponseEntity<ManageCommonBannerResponse> findBannerDetails(
+        @PathVariable("bannerId") Long bannerId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        List<ManageCommonTourismDto> details = findBannerService.findCommonBanner(bannerId);
+        ManageCommonBannerResponse response = new ManageCommonBannerResponse(
+            details.get(0).getId(), details.get(0).getLatitude(), details.get(0).getLongitude());
+        // 한국관광공사 api를 통해 주변 관광지 조회
+        for (ManageCommonTourismDto detail : details) {
+            TourismListUseCase around = tourismApiService.findAround(
+                findLanguageValue(detail.getLanguageCode()),
+                detail.getLongitude(), detail.getLatitude(), serviceKey);
+            response.getContents()
+                .add(ManageCommonInfo.of(detail, around.getResponse().getBody().getItems()));
+        }
+        return APIResponseEntity.<ManageCommonBannerResponse>builder()
+            .message("(관리자)공통 배너 상세 조회")
+            .data(response)
             .build();
     }
 
