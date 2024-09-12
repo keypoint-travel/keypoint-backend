@@ -70,7 +70,7 @@ public class AdminBadgeService {
             Badge badge = findBadgeByBadgeId(badgeId);
 
             // 1. 유효성 검사
-            if (badgeRepository.existsByIdNotAndOrderAndIsDeletedFalse(
+            if (useCase.getOrder() != null && badgeRepository.existsByIdNotAndOrderAndIsDeletedFalse(
                 badgeId,
                 useCase.getOrder()
             )) {
@@ -78,19 +78,25 @@ public class AdminBadgeService {
             }
 
             // 2. 이미지 업데이트
-            uploadFileService.updateUploadFile(
-                badge.getActiveImageId(),
-                useCase.getBadgeOnImage(),
-                DirectoryConstants.BADGE_DIRECTORY
-            );
-            uploadFileService.updateUploadFile(
-                badge.getInactiveImageId(),
-                useCase.getBadgeOffImage(),
-                DirectoryConstants.BADGE_DIRECTORY
-            );
+            if (useCase.getBadgeOnImage() != null) {
+                uploadFileService.updateUploadFile(
+                        badge.getActiveImageId(),
+                        useCase.getBadgeOnImage(),
+                        DirectoryConstants.BADGE_DIRECTORY
+                );
+            }
+            if (useCase.getBadgeOffImage() != null) {
+                uploadFileService.updateUploadFile(
+                        badge.getInactiveImageId(),
+                        useCase.getBadgeOffImage(),
+                        DirectoryConstants.BADGE_DIRECTORY
+                );
+            }
 
             // 3. 데이터 업데이트
-            badgeRepository.updateBadge(useCase);
+            if (useCase.getOrder() != null) {
+                badgeRepository.updateBadge(useCase);
+            }
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
