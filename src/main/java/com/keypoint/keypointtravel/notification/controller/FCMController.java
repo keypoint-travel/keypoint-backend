@@ -7,9 +7,10 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
+import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
-import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBadgeDetailResponse;
-import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBodyResponse;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBadgeDetailResponse;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.CreatePushNotificationUseCase;
 import com.keypoint.keypointtravel.notification.service.FCMService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
@@ -48,7 +49,11 @@ public class FCMController {
             response = FCMBodyResponse.of(
                     PushNotificationType.CAMPAIGN_END,
                     request.getBody(),
-                    FCMBadgeDetailResponse.of(isBadgeEarned, badgeUrl)
+                    FCMBadgeDetailResponse.of(
+                            isBadgeEarned,
+                            badgeUrl,
+                            MessageSourceUtils.getBadgeName(BadgeType.FIRST_CAMPAIGN)
+                    )
             );
         } else {
             response = FCMBodyResponse.from(request.getBody());
