@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.badge.dto.response.badgeInMember.BadgeInMembe
 import com.keypoint.keypointtravel.badge.dto.response.badgeInMember.BadgeResponse;
 import com.keypoint.keypointtravel.badge.dto.response.badgeInMember.RepresentativeBadgeResponse;
 import com.keypoint.keypointtravel.badge.dto.useCase.BadgeIdUseCase;
+import com.keypoint.keypointtravel.badge.dto.useCase.BadgeTypeUseCase;
 import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.badge.entity.EarnedBadge;
 import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
@@ -16,11 +17,12 @@ import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -105,6 +107,21 @@ public class MemberBadgeService {
             LogUtils.writeErrorLog("earnBadge",
                 String.format("Fail to earn badge {0} {1}", badgeType.name(), memberId.toString()));
             return false;
+        }
+    }
+
+    /**
+     * [테스트용] 발급 받은 배지 삭제
+     *
+     * @param useCase
+     * @return
+     */
+    @Transactional
+    public void deleteEarnBadge(BadgeTypeUseCase useCase) {
+        try {
+            int result = earnedBadgeRepository.deleteByMemberIdAndBadgeType(useCase.getMemberId(), useCase.getType());
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
         }
     }
 }
