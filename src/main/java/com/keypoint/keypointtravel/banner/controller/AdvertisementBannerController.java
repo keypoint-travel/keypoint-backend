@@ -5,28 +5,25 @@ import com.keypoint.keypointtravel.banner.dto.request.AdvertisementRequest;
 import com.keypoint.keypointtravel.banner.dto.response.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditAdvertisementUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditLocaleAdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.service.AdvertisementBannerService;
+import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/banners/advertisement")
@@ -56,9 +53,8 @@ public class AdvertisementBannerController {
         @RequestPart(value = "detail") @Valid AdvertisementRequest bannerRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        AdvertisementUseCase useCase = new AdvertisementUseCase(
-            thumbnailImage, detailImage, findLanguageValue(locale.getLanguage()), bannerRequest.getMainTitle(),
+        AdvertisementUseCase useCase = new AdvertisementUseCase(thumbnailImage, detailImage,
+            bannerRequest.getLanguageCode(), bannerRequest.getMainTitle(),
             bannerRequest.getSubTitle(), bannerRequest.getContent());
         advertisementBannerService.saveAdvertisementBanner(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -71,9 +67,9 @@ public class AdvertisementBannerController {
         @RequestBody @Valid AdvertisementRequest bannerRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        PlusAdvertisementUseCase useCase = new PlusAdvertisementUseCase(bannerId, bannerRequest.getMainTitle(),
-            bannerRequest.getSubTitle(), bannerRequest.getContent(), findLanguageValue(locale.getLanguage()));
+        PlusAdvertisementUseCase useCase = new PlusAdvertisementUseCase(bannerId,
+            bannerRequest.getMainTitle(), bannerRequest.getSubTitle(), bannerRequest.getContent(),
+            bannerRequest.getLanguageCode());
         advertisementBannerService.saveBannerByOtherLanguage(useCase);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -104,10 +100,10 @@ public class AdvertisementBannerController {
     @DeleteMapping("/{bannerId}/locale")
     public ResponseEntity<Void> deleteBanner(
         @PathVariable("bannerId") Long bannerId,
+        @RequestParam("languageCode") @ValidEnum(enumClass = LanguageCode.class) LanguageCode languageCode,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, locale.getLanguage()));
+        advertisementBannerService.deleteBanner(new DeleteUseCase(bannerId, languageCode));
         return ResponseEntity.noContent().build();
     }
 
@@ -130,32 +126,29 @@ public class AdvertisementBannerController {
             .build();
     }
 
-    @PatchMapping("/{bannerId}")
+    @PatchMapping("/{bannerId}/locale")
     public ResponseEntity<Void> editAdvertisementBanner(
         @PathVariable("bannerId") Long bannerId,
-        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
-        @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
-        @RequestPart(value = "detail") @Valid AdvertisementRequest bannerRequest,
+        @RequestBody @Valid AdvertisementRequest bannerRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        AdvertisementUseCase useCase = new AdvertisementUseCase(
-            thumbnailImage, detailImage, findLanguageValue(locale.getLanguage()), bannerRequest.getMainTitle(),
+        EditLocaleAdvertisementUseCase useCase = new EditLocaleAdvertisementUseCase(
+            bannerRequest.getLanguageCode(), bannerRequest.getMainTitle(),
             bannerRequest.getSubTitle(), bannerRequest.getContent());
-        advertisementBannerService.editAdvertisementBanner(bannerId, useCase);
+        advertisementBannerService.editLocaleAdvertisementBanner(bannerId, useCase);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    private static LanguageCode findLanguageValue(String language) {
-        if (language.equals("ko")) {
-            return LanguageCode.KO;
-        }
-        if (language.equals("en")) {
-            return LanguageCode.EN;
-        }
-        if (language.equals("ja")) {
-            return LanguageCode.JA;
-        }
-        throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
+    @PatchMapping("/{bannerId}")
+    public ResponseEntity<Void> editAdvertisementBannerImage(
+        @PathVariable("bannerId") Long bannerId,
+        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
+        @RequestPart(value = "detailImage", required = false) MultipartFile detailImage,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        EditAdvertisementUseCase useCase = new EditAdvertisementUseCase(thumbnailImage,
+            detailImage);
+        advertisementBannerService.editAdvertisementBanner(bannerId, useCase);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

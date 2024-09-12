@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.banner.service;
 
-import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditBannerUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.EditBannerUseCase;
 import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.dto.response;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Body;
 
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -19,9 +20,10 @@ public class ContentListResponse {
     //page 정보
     private int total;
 
-    public static ContentListResponse from(Body data, String language) {
+    public static ContentListResponse from(Body data, LanguageCode languageCode) {
         return ContentListResponse.builder()
-            .content(data.getItems().getItem().stream().map(item -> BannerDetails.from(item, language)).toList())
+            .content(data.getItems().getItem().stream()
+                .map(item -> BannerDetails.from(item, languageCode)).toList())
             .total(data.getTotalCount())
             .build();
     }
