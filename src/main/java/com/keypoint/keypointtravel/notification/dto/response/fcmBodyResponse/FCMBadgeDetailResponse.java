@@ -21,6 +21,6 @@ public class FCMBadgeDetailResponse {
     public static FCMBadgeDetailResponse of(
         boolean isBadgeEarned, String badgeUrl
     ) {
-        return new FCMBadgeDetailResponse(isBadgeEarned, badgeUrl);
+        return new FCMBadgeDetailResponse(isBadgeEarned, isBadgeEarned ? badgeUrl : null);
     }
 }
