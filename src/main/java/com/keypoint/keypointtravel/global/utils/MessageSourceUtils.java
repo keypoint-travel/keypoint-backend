@@ -1,10 +1,12 @@
 package com.keypoint.keypointtravel.global.utils;
 
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
@@ -54,6 +56,20 @@ public class MessageSourceUtils {
             return messageSource.getMessage(langCode, variables, locale);
         } catch (NoSuchMessageException e) {
             throw new GeneralException(CommonErrorCode.FAIL_TO_FIND_LANGUAGE, e);
+        }
+    }
+
+    public static String getBadgeName(BadgeType badgeType) {
+        try {
+            Locale currentLocale = LocaleContextHolder.getLocale();
+            String languageKey = badgeType.getLanguageKey();
+            return MessageSourceUtils.getLocalizedLanguage(
+                    languageKey,
+                    currentLocale
+            );
+        } catch (Exception ex) {
+            LogUtils.writeErrorLog("BadgeResponse", "Fail to get language " + ex.getMessage());
+            return badgeType.getDescription();
         }
     }
 }

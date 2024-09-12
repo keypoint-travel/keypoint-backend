@@ -11,17 +11,13 @@ import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
-import com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse.FCMBodyResponse;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.event.marketingNotification.MarketingNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -30,6 +26,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor

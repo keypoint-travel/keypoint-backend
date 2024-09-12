@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.notification.dto.response.fcmBodyResponse;
+package com.keypoint.keypointtravel.notification.dto.response.fcmBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
