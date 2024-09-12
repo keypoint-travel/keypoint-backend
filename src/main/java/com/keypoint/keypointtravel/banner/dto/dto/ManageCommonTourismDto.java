@@ -1,14 +1,18 @@
 package com.keypoint.keypointtravel.banner.dto.dto;
 
-import lombok.*;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommonTourismDto {
+public class ManageCommonTourismDto {
 
     private Long id;
     private String contentId;
+    private LanguageCode languageCode;
     private String mainTitle;
     private String subTitle;
     private String placeName;
@@ -17,7 +21,6 @@ public class CommonTourismDto {
     private Double latitude;
     private Double longitude;
     private int bannerLikesSize;
-    private boolean isLiked;
     private String thumbnailImage;
     private String cat1;
     private String cat2;
