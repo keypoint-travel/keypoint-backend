@@ -87,6 +87,18 @@ public class AdvertisementBannerController {
             .build();
     }
 
+    @GetMapping("/management/{bannerId}")
+    public APIResponseEntity<ManagementAdvBannerResponse> findAdvertisementBannerDetails(
+        @PathVariable("bannerId") Long bannerId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //todo: 관리자 인증 로직 추가 예정
+        ManagementAdvBannerResponse response = advertisementBannerService.findAdvertisementBanner(bannerId);
+        return APIResponseEntity.<ManagementAdvBannerResponse>builder()
+            .message("(관리자)광고 배너 상세페이지 조회 성공")
+            .data(response)
+            .build();
+    }
+
     // 전체 언어 삭제
     @DeleteMapping("/{bannerId}")
     public ResponseEntity<Void> deleteBanners(

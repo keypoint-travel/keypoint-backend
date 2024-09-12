@@ -2,7 +2,10 @@ package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
+import com.keypoint.keypointtravel.banner.dto.dto.ManagementAdvDetailDto;
+import com.keypoint.keypointtravel.banner.dto.response.AdvInfo;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
+import com.keypoint.keypointtravel.banner.dto.response.ManagementAdvBannerResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementUseCase;
@@ -179,6 +182,26 @@ public class AdvertisementBannerService {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return dto;
+    }
+
+    /**
+     * (관리자)광고 배너 상세 페이지 조회 함수
+     *
+     * @Param bannerId
+     * @Return dto(id, title, content, detailImageUrl)
+     */
+    @Transactional(readOnly = true)
+    public ManagementAdvBannerResponse findAdvertisementBanner(Long bannerId) {
+        List<ManagementAdvDetailDto> dtoList = advertisementBannerRepository.
+            findAdvertisementBannerById(bannerId);
+        ManagementAdvBannerResponse response = new ManagementAdvBannerResponse(
+            dtoList.get(0).getBannerId(), dtoList.get(0).getDetailImageUrl());
+        for (ManagementAdvDetailDto dto : dtoList) {
+            response.getContents().add(
+                new AdvInfo(dto.getLanguageCode(), dto.getMainTitle(), dto.getSubTitle(),
+                    dto.getContent()));
+        }
+        return response;
     }
 
     /**

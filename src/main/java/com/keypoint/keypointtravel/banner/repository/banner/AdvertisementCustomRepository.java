@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
+import com.keypoint.keypointtravel.banner.dto.dto.ManagementAdvDetailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.entity.AdvertisementBanner;
 import com.keypoint.keypointtravel.banner.entity.AdvertisementBannerContent;
@@ -20,6 +21,8 @@ public interface AdvertisementCustomRepository {
     boolean existsBannerContentByBannerId(Long bannerId);
 
     AdvertisementDetailDto findAdvertisementBannerById(Long bannerId, LanguageCode languageCode);
+
+    List<ManagementAdvDetailDto> findAdvertisementBannerById(Long bannerId);
 
     List<AdvertisementThumbnailDto> findAdvertisementThumbnailList(Long memberId);
 
