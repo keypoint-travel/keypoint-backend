@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.banner.repository.banner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
+import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.EditBannerUseCase;
 import com.keypoint.keypointtravel.banner.entity.*;
@@ -53,7 +54,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
 
     @Override
     public void updateContentIsDeletedById(Long bannerId, LanguageCode languageCode) {
-        BooleanExpression languageCondition = languageCode == null ? Expressions.TRUE : bannerContent.languageCode.eq(languageCode);
+        BooleanExpression languageCondition =
+            languageCode == null ? Expressions.TRUE : bannerContent.languageCode.eq(languageCode);
         queryFactory.update(bannerContent)
             .set(bannerContent.isDeleted, true)
             .where(bannerContent.banner.id.eq(bannerId)
@@ -67,18 +69,19 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
         List<BannerContent> contents = queryFactory.selectFrom(bannerContent)
             .where(bannerContent.banner.id.eq(bannerId).and(bannerContent.isDeleted.isFalse()))
             .fetch();
-        if (contents.size() > 0){
+        if (contents.size() > 0) {
             return true;
         }
         return false;
     }
 
     @Override
-    public List<Banner> findBannerList() {
-        return queryFactory.select(banner)
-            .from(banner)
-            .leftJoin(bannerContent).on(banner.id.eq(bannerContent.banner.id)).fetchJoin()
-            .where(banner.isDeleted.isFalse())
+    public List<BannerContent> findBannerList() {
+        return queryFactory.select(bannerContent)
+            .from(bannerContent)
+            .leftJoin(banner).on(banner.id.eq(bannerContent.banner.id)).fetchJoin()
+            .where(banner.isDeleted.isFalse().and(bannerContent.isDeleted.isFalse())
+                .and(bannerContent.languageCode.eq(LanguageCode.EN)))
             .orderBy(banner.modifyAt.desc())
             .fetch();
     }
@@ -92,7 +95,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 bannerContent.subTitle))
             .from(banner)
             .innerJoin(banner.bannerContents, bannerContent)
-            .where(bannerContent.isDeleted.isFalse().and(bannerContent.languageCode.eq(getMemberLanguage(memberId))))
+            .where(bannerContent.isDeleted.isFalse()
+                .and(bannerContent.languageCode.eq(getMemberLanguage(memberId))))
             .orderBy(bannerContent.modifyAt.desc())
             .fetch();
     }
@@ -104,9 +108,11 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     }
 
     @Override
-    public CommonTourismDto findBannerById(LanguageCode languageCode, Long bannerId, Long memberId) {
+    public CommonTourismDto findBannerById(LanguageCode languageCode, Long bannerId,
+        Long memberId) {
         CommonTourismDto dto = queryFactory.select(Projections.constructor(CommonTourismDto.class,
                 banner.id,
+                bannerContent.contentId,
                 bannerContent.mainTitle,
                 bannerContent.subTitle,
                 bannerContent.placeName,
@@ -132,6 +138,36 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
         return dto;
     }
 
+    @Override
+    public List<ManageCommonTourismDto> findBannerListById(Long bannerId) {
+        List<ManageCommonTourismDto> dtoList = queryFactory.select(
+                Projections.constructor(ManageCommonTourismDto.class,
+                    banner.id,
+                    bannerContent.contentId,
+                    bannerContent.languageCode,
+                    bannerContent.mainTitle,
+                    bannerContent.subTitle,
+                    bannerContent.placeName,
+                    bannerContent.address1,
+                    bannerContent.address2,
+                    banner.latitude,
+                    banner.longitude,
+                    banner.bannerLikes.size(),
+                    bannerContent.thumbnailImage,
+                    bannerContent.cat1,
+                    bannerContent.cat2,
+                    bannerContent.cat3))
+            .from(banner)
+            .innerJoin(banner.bannerContents, bannerContent)
+            .where(banner.id.eq(bannerId)
+                .and(bannerContent.isDeleted.isFalse()))
+            .fetch();
+        if (dtoList == null) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+        return dtoList;
+    }
+
     private BooleanExpression getBannerLikeExpression(Long bannerId, Long memberId) {
         if (memberId == null) {
             return Expressions.FALSE;
@@ -153,7 +189,8 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 uploadFile.path,
                 bannerComment.createAt))
             .from(bannerComment)
-            .leftJoin(uploadFile).on(bannerComment.member.memberDetail.profileImageId.eq(uploadFile.id))
+            .leftJoin(uploadFile)
+            .on(bannerComment.member.memberDetail.profileImageId.eq(uploadFile.id))
             .where(bannerComment.banner.id.eq(bannerId))
             .orderBy(bannerComment.createAt.desc())
             .fetch();
