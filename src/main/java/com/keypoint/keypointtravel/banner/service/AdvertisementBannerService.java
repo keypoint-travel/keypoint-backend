@@ -8,6 +8,8 @@ import com.keypoint.keypointtravel.banner.dto.useCase.*;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementContent;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditAdvertisementUseCase;
+import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditLocaleAdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.entity.AdvertisementBanner;
 import com.keypoint.keypointtravel.banner.entity.AdvertisementBannerContent;
 import com.keypoint.keypointtravel.banner.repository.banner.AdvertisementBannerContentRepository;
@@ -81,7 +83,8 @@ public class AdvertisementBannerService {
         }
     }
 
-    private void saveBanner(AdvertisementUseCase useCase, Long thumbnailImageId, Long detailImageId) {
+    private void saveBanner(AdvertisementUseCase useCase, Long thumbnailImageId,
+        Long detailImageId) {
         // 배너 생성
         AdvertisementBanner banner = new AdvertisementBanner(thumbnailImageId, detailImageId);
         // 배너 내용 생성
@@ -105,12 +108,14 @@ public class AdvertisementBannerService {
     @Transactional
     public void saveBannerByOtherLanguage(PlusAdvertisementUseCase useCase) {
         //이미 bannerId에 해당하는 배너에 저장할 언어로 배너 내용이 있는지 확인
-        if (advertisementBannerRepository.isExistBannerContentByLanguageCode(useCase.getBannerId(), useCase.getLanguage())) {
+        if (advertisementBannerRepository.isExistBannerContentByLanguageCode(useCase.getBannerId(),
+            useCase.getLanguage())) {
             throw new GeneralException(BannerErrorCode.EXISTS_BANNER_CONTENT);
         }
         try {
             // 배너 조회
-            AdvertisementBanner banner = advertisementBannerRepository.getReferenceById(useCase.getBannerId());
+            AdvertisementBanner banner = advertisementBannerRepository.getReferenceById(
+                useCase.getBannerId());
             // 배너 내용 생성
             AdvertisementBannerContent bannerContent = AdvertisementBannerContent.builder()
                 .languageCode(useCase.getLanguage())
@@ -142,14 +147,16 @@ public class AdvertisementBannerService {
         return useCases;
     }
 
-    private List<AdvertisementBannerUseCase> conversionToUseCase(List<AdvertisementBannerDto> dtoList) {
+    private List<AdvertisementBannerUseCase> conversionToUseCase(
+        List<AdvertisementBannerDto> dtoList) {
         HashMap<String, AdvertisementBannerUseCase> useCaseMap = new HashMap<>();
         // 배너 목록을 contentId를 key로 하는 배열로 저장
         for (AdvertisementBannerDto dto : dtoList) {
             String contentId = String.valueOf(dto.getBannerId());
             AdvertisementBannerUseCase useCase = useCaseMap.get(contentId);
             if (useCase == null) {
-                useCase = new AdvertisementBannerUseCase(contentId, dto.getThumbnailUrl(), dto.getDetailUrl(), new ArrayList<>());
+                useCase = new AdvertisementBannerUseCase(contentId, dto.getThumbnailUrl(),
+                    dto.getDetailUrl(), new ArrayList<>());
                 useCaseMap.put(contentId, useCase);
             }
             useCase.getContents().add(AdvertisementContent.from(dto));
@@ -167,13 +174,16 @@ public class AdvertisementBannerService {
         // 언어 코드가 없을 경우, 해당 배너 및 모든 언어 코드에 해당하는 배너 내용 삭제
         if (deleteUseCase.getLanguageCode() == null) {
             advertisementBannerRepository.updateIsDeletedById(deleteUseCase.getBannerId());
-            advertisementBannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(), deleteUseCase.getLanguageCode());
+            advertisementBannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(),
+                deleteUseCase.getLanguageCode());
             return;
         }
         // 언어 코드가 있을 경우, 해당 언어 코드에 해당하는 배너 내용 삭제
-        advertisementBannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(), deleteUseCase.getLanguageCode());
+        advertisementBannerRepository.updateContentIsDeletedById(deleteUseCase.getBannerId(),
+            deleteUseCase.getLanguageCode());
         // 해당 배너의 모든 언어 코드에 해당하는 배너 내용이 없을 경우, 배너 삭제
-        if (!advertisementBannerRepository.existsBannerContentByBannerId(deleteUseCase.getBannerId())) {
+        if (!advertisementBannerRepository.existsBannerContentByBannerId(
+            deleteUseCase.getBannerId())) {
             advertisementBannerRepository.updateIsDeletedById(deleteUseCase.getBannerId());
         }
     }
@@ -206,17 +216,17 @@ public class AdvertisementBannerService {
     }
 
     /**
-     * 광고 배너 수정 함수
+     * 전체 언어 광고 배너 이미지 수정 함수
      *
-     * @Param bannerId, language, 수정 내용을 담은 useCase
+     * @Param bannerId, 수정 내용을 담은 useCase
      */
     @Transactional
-    public void editAdvertisementBanner(Long bannerId, AdvertisementUseCase useCase) {
-        // bannerId, language로 배너(fetchJoin) 및 배너 내용 조회
-        AdvertisementBannerContent bannerContent = advertisementBannerRepository
-            .findAdvertisementBanner(bannerId, useCase.getLanguage());
-        Long prevThumbnailImageId = bannerContent.getAdvertisementBanner().getThumbnailImageId();
-        Long prevDetailImageId = bannerContent.getAdvertisementBanner().getDetailImageId();
+    public void editAdvertisementBanner(Long bannerId, EditAdvertisementUseCase useCase) {
+        // bannerId로 배너 조회
+        AdvertisementBanner banner = advertisementBannerRepository.findAdvertisementBanner(
+            bannerId);
+        Long prevThumbnailImageId = banner.getThumbnailImageId();
+        Long prevDetailImageId = banner.getDetailImageId();
         try {
             // 1. 썸네일 이미지 저장
             Long thumbnailImageId = uploadFileService.saveUploadFile(
@@ -229,13 +239,28 @@ public class AdvertisementBannerService {
                 DirectoryConstants.ADVERTISEMENT_BANNER_DETAIL_DIRECTORY
             );
             // 3. 광고 배너 수정
-            bannerContent.updateBannerContent(useCase.getMainTitle(), useCase.getSubTitle(), useCase.getContent(),
-                thumbnailImageId, detailImageId);
+            banner.updateBanner(thumbnailImageId, detailImageId);
         } catch (Exception e) {
             throw new GeneralException(e);
         }
         // 새로 저장 후 이전 이미지 삭제
         uploadFileService.deleteUploadFile(prevThumbnailImageId);
         uploadFileService.deleteUploadFile(prevDetailImageId);
+    }
+
+    /**
+     * 특정 언어 광고 배너 수정 함수
+     *
+     * @Param bannerId, language, 수정 내용을 담은 useCase
+     */
+    @Transactional
+    public void editLocaleAdvertisementBanner(Long bannerId,
+        EditLocaleAdvertisementUseCase useCase) {
+        // 1. bannerId, language로 배너 내용 조회
+        AdvertisementBannerContent bannerContent = advertisementBannerRepository
+            .findAdvertisementBanner(bannerId, useCase.getLanguage());
+        // 2. 광고 배너 수정
+        bannerContent.updateBannerContent(useCase.getMainTitle(), useCase.getSubTitle(),
+            useCase.getContent());
     }
 }

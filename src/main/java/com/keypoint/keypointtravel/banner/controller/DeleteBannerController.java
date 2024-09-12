@@ -3,16 +3,13 @@ package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.useCase.DeleteUseCase;
 import com.keypoint.keypointtravel.banner.service.DeleteBannerService;
+import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import jakarta.servlet.http.HttpServletRequest;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleResolver;
-
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/banners")
@@ -35,10 +32,10 @@ public class DeleteBannerController {
     @DeleteMapping("/{bannerId}/locale")
     public ResponseEntity<Void> deleteBanner(
         @PathVariable("bannerId") Long bannerId,
+        @RequestParam("languageCode") @ValidEnum(enumClass = LanguageCode.class) LanguageCode languageCode,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        deleteBannerService.deleteBanner(new DeleteUseCase(bannerId, locale.getLanguage()));
+        deleteBannerService.deleteBanner(new DeleteUseCase(bannerId, languageCode));
         return ResponseEntity.noContent().build();
     }
 }

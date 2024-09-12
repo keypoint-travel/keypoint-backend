@@ -33,8 +33,9 @@ public class AdvertisementBannerContent extends LanguageEntity {
     private boolean isDeleted;
 
     @Builder
-    public AdvertisementBannerContent(LanguageCode languageCode, AdvertisementBanner advertisementBanner,
-                                      String mainTitle, String subTitle, String content) {
+    public AdvertisementBannerContent(LanguageCode languageCode,
+        AdvertisementBanner advertisementBanner,
+        String mainTitle, String subTitle, String content) {
         super(languageCode);
         this.advertisementBanner = advertisementBanner;
         this.mainTitle = mainTitle;
@@ -44,14 +45,12 @@ public class AdvertisementBannerContent extends LanguageEntity {
     }
 
     public AdvertisementBannerContent() {
-        super(LanguageCode.KO);
+        super(LanguageCode.EN);
     }
 
-    public void updateBannerContent(String mainTitle, String subTitle, String content,
-                                    Long thumbnailImageId, Long detailImageId) {
+    public void updateBannerContent(String mainTitle, String subTitle, String content) {
         this.mainTitle = mainTitle;
         this.subTitle = subTitle;
         this.content = content;
-        this.getAdvertisementBanner().updateBanner(thumbnailImageId, detailImageId);
     }
 }

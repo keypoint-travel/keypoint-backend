@@ -150,8 +150,7 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     @Override
     public AdvertisementBannerContent findAdvertisementBanner(Long bannerId, LanguageCode languageCode) {
         AdvertisementBannerContent bannerContent = queryFactory.selectFrom(advertisementBannerContent)
-            .innerJoin(advertisementBannerContent.advertisementBanner, advertisementBanner).fetchJoin()
-            .where(advertisementBanner.id.eq(bannerId)
+            .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
                 .and(advertisementBannerContent.isDeleted.isFalse())
                 .and(advertisementBannerContent.languageCode.eq(languageCode)))
             .fetchOne();
@@ -159,5 +158,17 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return bannerContent;
+    }
+
+    @Override
+    public AdvertisementBanner findAdvertisementBanner(Long bannerId) {
+        AdvertisementBanner banner = queryFactory.selectFrom(advertisementBanner)
+            .where(advertisementBanner.id.eq(bannerId)
+                .and(advertisementBanner.isDeleted.isFalse()))
+            .fetchOne();
+        if(banner == null){
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+        return banner;
     }
 }

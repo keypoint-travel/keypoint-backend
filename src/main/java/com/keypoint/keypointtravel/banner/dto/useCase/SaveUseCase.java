@@ -5,9 +5,7 @@ import com.keypoint.keypointtravel.banner.entity.Banner;
 import com.keypoint.keypointtravel.banner.entity.BannerContent;
 import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
-import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +31,10 @@ public class SaveUseCase {
     private Double latitude;
     private Double longitude;
 
-    public static SaveUseCase of(BannerRequest request, String language) {
+    public static SaveUseCase of(BannerRequest request, LanguageCode languageCode) {
         return SaveUseCase.builder()
             .contentId(request.getContentId())
-            .languageCode(findLanguageValue(language))
+            .languageCode(languageCode != null ? languageCode : LanguageCode.EN)
             .mainTitle(request.getMainTitle())
             .subTitle(request.getSubTitle())
             .placeName(request.getPlaceName())
@@ -51,19 +49,6 @@ public class SaveUseCase {
             .latitude(request.getLatitude())
             .longitude(request.getLongitude())
             .build();
-    }
-
-    private static LanguageCode findLanguageValue(String language) {
-        if (language.equals("ko")) {
-            return LanguageCode.KO;
-        }
-        if (language.equals("en")) {
-            return LanguageCode.EN;
-        }
-        if (language.equals("ja")) {
-            return LanguageCode.JA;
-        }
-        throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
     }
 
     public Banner toEntity(boolean isDeleted) {
