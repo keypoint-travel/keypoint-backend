@@ -38,7 +38,8 @@ public class FindBannerController {
     private String serviceKey;
 
     @GetMapping("management")
-    public APIResponseEntity<BannerListResponse> findBannerList(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public APIResponseEntity<BannerListResponse> findBannerList(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
         return APIResponseEntity.<BannerListResponse>builder()
             .message("생성한 공통 배너 목록 조회")
@@ -59,7 +60,8 @@ public class FindBannerController {
             new BannerUseCase(languageCode, bannerId, userDetails));
         // 한국관광공사 api를 통해 주변 관광지 조회
         TourismListUseCase around = tourismApiService.findAround(findLanguageValue(languageCode),
-            details.getCommonTourismDto().getLongitude(), details.getCommonTourismDto().getLatitude(), serviceKey);
+            details.getCommonTourismDto().getLongitude(),
+            details.getCommonTourismDto().getLatitude(), serviceKey);
         return APIResponseEntity.<CommonBannerResponse>builder()
             .message("공통 배너 상세 조회 ")
             .data(CommonBannerResponse.of(details, around.getResponse().getBody().getItems()))

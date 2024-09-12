@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.EditBannerUseCase;
 import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.banner.entity.BannerContent;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface BannerCustomRepository {
 
     boolean existsBannerContentByBannerId(Long bannerId);
 
-    List<Banner> findBannerList();
+    List<BannerContent> findBannerList();
 
     List<CommonBannerThumbnailDto> findThumbnailList(Long memberId);
 

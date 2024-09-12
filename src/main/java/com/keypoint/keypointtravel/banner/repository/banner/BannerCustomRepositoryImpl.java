@@ -74,11 +74,12 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
     }
 
     @Override
-    public List<Banner> findBannerList() {
-        return queryFactory.select(banner)
-            .from(banner)
-            .leftJoin(bannerContent).on(banner.id.eq(bannerContent.banner.id)).fetchJoin()
-            .where(banner.isDeleted.isFalse())
+    public List<BannerContent> findBannerList() {
+        return queryFactory.select(bannerContent)
+            .from(bannerContent)
+            .leftJoin(banner).on(banner.id.eq(bannerContent.banner.id)).fetchJoin()
+            .where(banner.isDeleted.isFalse().and(bannerContent.isDeleted.isFalse())
+                .and(bannerContent.languageCode.eq(LanguageCode.EN)))
             .orderBy(banner.modifyAt.desc())
             .fetch();
     }

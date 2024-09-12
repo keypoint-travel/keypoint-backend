@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.banner.dto.useCase.BannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.banner.entity.Banner;
+import com.keypoint.keypointtravel.banner.entity.BannerContent;
 import com.keypoint.keypointtravel.banner.repository.banner.BannerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,8 @@ public class FindBannerService {
     @Transactional(readOnly = true)
     public List<CommonBannerSummaryUseCase> findBannerList() {
         // fetch join 으로 bannerContents 를 가져옴
-        List<Banner> banners = bannerRepository.findBannerList();
-        return banners.stream().map(CommonBannerSummaryUseCase::from).toList();
+        List<BannerContent> bannerContents = bannerRepository.findBannerList();
+        return bannerContents.stream().map(CommonBannerSummaryUseCase::from).toList();
     }
 
     /**
