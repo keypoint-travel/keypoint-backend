@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.member.dto.response;
 
 
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
+import com.keypoint.keypointtravel.badge.dto.response.CommonBadgeResponse;
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -13,8 +14,7 @@ public class MemberResponse {
     private Long id;
     private String email;
     private TokenInfoResponse token;
-    private String name;
-    private String badgeUrl;
+    private CommonBadgeResponse badge;
 
     public MemberResponse(
             Long id,
@@ -25,8 +25,10 @@ public class MemberResponse {
         this.id = id;
         this.email = email;
         this.token = token;
-        this.badgeUrl = badgeUrl;
-        this.name = MessageSourceUtils.getBadgeName(BadgeType.SIGN_UP);
+        this.badge = new CommonBadgeResponse(
+                MessageSourceUtils.getBadgeName(BadgeType.SIGN_UP),
+                badgeUrl
+        );
     }
 
     public static MemberResponse of(Member member, TokenInfoResponse token, String badgeUrl) {
