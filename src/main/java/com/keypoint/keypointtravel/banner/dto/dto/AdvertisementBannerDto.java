@@ -1,6 +1,5 @@
 package com.keypoint.keypointtravel.banner.dto.dto;
 
-import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,9 +9,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AdvertisementBannerDto {
 
-    private Long bannerId;
-    private String thumbnailUrl;
-    private String detailUrl;
+    private Long contentId;
+    private String thumbnailImage;
+    private String detailImage;
     private String mainTitle;
     private String subTitle;
     private String content;
@@ -20,5 +19,4 @@ public class AdvertisementBannerDto {
     private String writerName;
     private LocalDateTime updatedAt;
     private String updaterName;
-    private LanguageCode languageCode;
 }

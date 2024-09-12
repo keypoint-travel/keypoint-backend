@@ -2,10 +2,8 @@ package com.keypoint.keypointtravel.banner.service;
 
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
-import com.keypoint.keypointtravel.banner.dto.response.AdvertisementBannerUseCase;
 import com.keypoint.keypointtravel.banner.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.banner.dto.useCase.*;
-import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementContent;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.EditAdvertisementUseCase;
@@ -137,31 +135,9 @@ public class AdvertisementBannerService {
      * @Return
      */
     @Transactional(readOnly = true)
-    public List<AdvertisementBannerUseCase> findAdvertisementBanners() {
+    public List<AdvertisementBannerDto> findAdvertisementBanners() {
         List<AdvertisementBannerDto> dtoList = advertisementBannerRepository.findAdvertisementBanners();
-        // 배너 목록을 contentId를 key로 하는 useCase 배열로 저장
-        List<AdvertisementBannerUseCase> useCases = conversionToUseCase(dtoList);
-        Collections.reverse(useCases);
-        // 배너 내용을 최신순으로 정렬
-        useCases.forEach(AdvertisementBannerUseCase::sortContents);
-        return useCases;
-    }
-
-    private List<AdvertisementBannerUseCase> conversionToUseCase(
-        List<AdvertisementBannerDto> dtoList) {
-        HashMap<String, AdvertisementBannerUseCase> useCaseMap = new HashMap<>();
-        // 배너 목록을 contentId를 key로 하는 배열로 저장
-        for (AdvertisementBannerDto dto : dtoList) {
-            String contentId = String.valueOf(dto.getBannerId());
-            AdvertisementBannerUseCase useCase = useCaseMap.get(contentId);
-            if (useCase == null) {
-                useCase = new AdvertisementBannerUseCase(contentId, dto.getThumbnailUrl(),
-                    dto.getDetailUrl(), new ArrayList<>());
-                useCaseMap.put(contentId, useCase);
-            }
-            useCase.getContents().add(AdvertisementContent.from(dto));
-        }
-        return new ArrayList<>(useCaseMap.values());
+        return dtoList;
     }
 
     /**

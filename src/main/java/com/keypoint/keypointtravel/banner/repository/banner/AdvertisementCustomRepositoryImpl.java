@@ -45,13 +45,14 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
                 advertisementBannerContent.createAt,
                 select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.registerId)),
                 advertisementBannerContent.modifyAt,
-                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.modifyId)),
-                advertisementBannerContent.languageCode
+                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.modifyId))
             ))
             .from(advertisementBanner)
             .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .where(advertisementBanner.isDeleted.isFalse()
-                .and(advertisementBannerContent.isDeleted.isFalse()))
+                .and(advertisementBannerContent.isDeleted.isFalse())
+                .and(advertisementBannerContent.languageCode.eq(LanguageCode.EN)))
+            .orderBy(advertisementBannerContent.modifyAt.desc())
             .fetch();
     }
 
