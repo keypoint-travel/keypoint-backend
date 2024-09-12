@@ -59,13 +59,9 @@ public class FindBannerController {
         List<ManageCommonTourismDto> details = findBannerService.findCommonBanner(bannerId);
         ManageCommonBannerResponse response = new ManageCommonBannerResponse(
             details.get(0).getId(), details.get(0).getLatitude(), details.get(0).getLongitude());
-        // 한국관광공사 api를 통해 주변 관광지 조회
         for (ManageCommonTourismDto detail : details) {
-            TourismListUseCase around = tourismApiService.findAround(
-                findLanguageValue(detail.getLanguageCode()),
-                detail.getLongitude(), detail.getLatitude(), serviceKey);
             response.getContents()
-                .add(ManageCommonInfo.of(detail, around.getResponse().getBody().getItems()));
+                .add(ManageCommonInfo.from(detail));
         }
         return APIResponseEntity.<ManageCommonBannerResponse>builder()
             .message("(관리자)공통 배너 상세 조회")

@@ -1,10 +1,7 @@
 package com.keypoint.keypointtravel.banner.dto.response.commonBanner;
 
 import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
-import com.keypoint.keypointtravel.banner.dto.useCase.CommonTourismUseCase;
-import com.keypoint.keypointtravel.banner.dto.useCase.tourListUseCase.Items;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,10 +19,9 @@ public class ManageCommonInfo {
     private String cat1;
     private String cat2;
     private String cat3;
-    private List<AroundTourism> around;
     // todo: comments, totalLikes 추후 고려
 
-    public static ManageCommonInfo of(ManageCommonTourismDto dto, Items data){
+    public static ManageCommonInfo from(ManageCommonTourismDto dto){
         return new ManageCommonInfo(
             dto.getLanguageCode(),
             dto.getMainTitle(),
@@ -36,14 +32,7 @@ public class ManageCommonInfo {
             dto.getThumbnailImage(),
             dto.getCat1(),
             dto.getCat2(),
-            dto.getCat3(),
-            createAroundTourismList(data, dto)
+            dto.getCat3()
         );
-    }
-
-    private static List<AroundTourism> createAroundTourismList(Items data, ManageCommonTourismDto details) {
-        return data.getItem().stream()
-            .filter(item -> !item.getContentid().equals(details.getContentId()))
-            .map(AroundTourism::from).toList();
     }
 }
