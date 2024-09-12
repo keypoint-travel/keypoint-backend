@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
+import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTestRequest;
 import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBadgeDetailResponse;
@@ -18,7 +19,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -68,7 +74,7 @@ public class FCMController {
                 .setNotification(notification)
                 .setToken(request.getDeviceToken())
                 .build();
-        //FCMUtils.sendSingleMessage(message);
+        FCMUtils.sendSingleMessage(message);
 
         // 이력 저장
         CreatePushNotificationUseCase useCase = CreatePushNotificationUseCase.of(userDetails.getId(), request);
