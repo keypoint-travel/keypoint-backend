@@ -3,8 +3,10 @@ package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.request.BannerListRequest;
 import com.keypoint.keypointtravel.banner.dto.request.BannerRequest;
+import com.keypoint.keypointtravel.banner.dto.request.BannerLocaleRequest;
 import com.keypoint.keypointtravel.banner.dto.response.ContentListResponse;
 import com.keypoint.keypointtravel.banner.dto.response.ImageListResponse;
+import com.keypoint.keypointtravel.banner.dto.useCase.SaveLocaleUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.SaveUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.service.CreateBannerService;
@@ -104,11 +106,11 @@ public class CreateBannerController {
     @PostMapping("/{bannerId}")
     public ResponseEntity<Void> saveBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
-        @RequestBody @Valid BannerRequest BannerRequest,
+        @RequestBody @Valid BannerLocaleRequest BannerRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
         bannerService.saveBannerByOtherLanguage(
-            SaveUseCase.of(BannerRequest, BannerRequest.getLanguageCode()), bannerId);
+            SaveLocaleUseCase.of(BannerRequest, bannerId));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -162,7 +162,7 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
             .where(banner.id.eq(bannerId)
                 .and(bannerContent.isDeleted.isFalse()))
             .fetch();
-        if (dtoList == null) {
+        if (dtoList.isEmpty()) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return dtoList;
