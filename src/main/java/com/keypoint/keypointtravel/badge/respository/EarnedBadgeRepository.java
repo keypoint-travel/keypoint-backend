@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.badge.respository;
 import com.keypoint.keypointtravel.badge.entity.EarnedBadge;
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,6 +25,14 @@ public interface EarnedBadgeRepository extends JpaRepository<EarnedBadge, Long> 
             + "FROM EarnedBadge eb "
             + "WHERE eb.member.id = :memberId AND eb.badge.type = :badgeType")
     boolean existsByMemberIdAndBadgeType(
+            @Param(value = "memberId") Long memberId,
+            @Param(value = "badgeType") BadgeType badgeType
+    );
+
+    @Modifying
+    @Query("DELETE FROM EarnedBadge eb "
+            + "WHERE eb.member.id = :memberId AND eb.badge.type = :badgeType")
+    int deleteByMemberIdAndBadgeType(
             @Param(value = "memberId") Long memberId,
             @Param(value = "badgeType") BadgeType badgeType
     );
