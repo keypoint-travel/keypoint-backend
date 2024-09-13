@@ -31,8 +31,8 @@ spring:
             tokenUri: https://www.googleapis.com/oauth2/v4/token
         registration:
           apple:
-            clientId: keypoint.com
-            clientSecret: AuthKey_SQDWG4BH7J.p8
+            clientId: com.keypoint.keypointtravel
+            clientSecret: AuthKey_PH99JX6U2H.p8
             redirect-uri: https://back-dev.keypointtravel.com/login/oauth2/code/apple
             authorization-grant-type: authorization_code
             client-authentication-method: POST
@@ -48,8 +48,8 @@ spring:
               - email
 apple:
   teamId: CML94Q2G94
-  keyId: SQDWG4BH7J
-  keyPath: AuthKey_SQDWG4BH7J.p8
+  keyId: PH99JX6U2H
+  keyPath: AuthKey_PH99JX6U2H.p8
 cloud:
   aws:
     credentials:
