@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
-import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
+import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -20,23 +20,9 @@ import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleToke
 import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenResponseUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
-import io.jsonwebtoken.Jwts;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.security.PrivateKey;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +41,7 @@ public class AppleOAuthService implements OAuthService {
     private final AppleAPIService appleAPIService;
     private final Oauth2UserService oauth2UserService;
     private final JwtTokenProvider tokenProvider;
+    private final Oauth2RequestEntityConverter oauth2RequestEntityConverter;
 
     @Value("${apple.keyPath}")
     private String appleKeyPath;
@@ -77,7 +64,7 @@ public class AppleOAuthService implements OAuthService {
             // 1. Oauth 토큰 발급
             AppleTokenRequestUseCase tokenRequest = AppleTokenRequestUseCase.of(
                 clientId,
-                createClientSecret(),
+                oauth2RequestEntityConverter.createClientSecret(),
                 useCase.getOauthCode(),
                 redirectURI
             );
@@ -173,35 +160,5 @@ public class AppleOAuthService implements OAuthService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         return headers;
-    }
-
-    public String createClientSecret() throws IOException {
-        Date expirationDate = Date.from(
-            LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
-        Map<String, Object> jwtHeader = new HashMap<>();
-        jwtHeader.put("kid", appleKeyId);
-        jwtHeader.put("alg", "ES256");
-
-        return Jwts.builder()
-            .setHeaderParams(jwtHeader)
-            .setIssuer(appleTeamId)
-            .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
-            .setExpiration(expirationDate) // 만료 시간
-            .setAudience(AppleAPIConstants.COMMON_URI)
-            .setSubject(clientId)
-            .signWith(getPrivateKey())
-            .compact();
-    }
-
-    public PrivateKey getPrivateKey() throws IOException {
-        ClassPathResource resource = new ClassPathResource("static/key/" + appleKeyPath);
-
-        try (InputStream in = resource.getInputStream();
-            PEMParser pemParser = new PEMParser(
-                new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-            return converter.getPrivateKey(object);
-        }
     }
 }
