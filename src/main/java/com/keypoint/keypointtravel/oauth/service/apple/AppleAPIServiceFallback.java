@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class AppleAPIServiceFallback implements AppleAPIService {
 
     @Override
-    public AppleTokenResponseUseCase getValidateToken(String contentType,
+    public AppleTokenResponseUseCase getValidateToken(
         AppleTokenRequestUseCase request) {
         throw new GeneralException(CommonErrorCode.OPEN_API_REQUEST_FAIL);
     }

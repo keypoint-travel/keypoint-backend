@@ -6,7 +6,6 @@ import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleToke
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "appleApiClient", url = AppleAPIConstants.COMMON_URI, fallback = AppleAPIServiceFallback.class)
 public interface AppleAPIService {
@@ -14,7 +13,6 @@ public interface AppleAPIService {
     @PostMapping(value = AppleAPIConstants.VALIDATE_CODE,
         consumes = "application/x-www-form-urlencoded")
     AppleTokenResponseUseCase getValidateToken(
-        @RequestHeader("Content-Type") String contentType,
         @RequestBody AppleTokenRequestUseCase request
     );
 }
