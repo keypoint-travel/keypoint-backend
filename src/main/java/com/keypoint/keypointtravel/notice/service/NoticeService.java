@@ -35,22 +35,21 @@ public class NoticeService {
     @Transactional
     public void saveNotice(CreateNoticeUseCase useCase) {
         try {
-            // 1. 공지 생성
-            Notice notice = new Notice();
+            // 1. 썸네일 이미지 저장
+            Long thumbnailImageId = saveThumbnailImage(useCase.getThumbnailImage());
+
+            // 2. 공지 생성
+            Notice notice = Notice.from(thumbnailImageId);
 
             // 공지 저장
             noticeRepository.save(notice);
-
-            // 2. 썸네일 이미지 저장
-            Long thumbnailImageId = saveThumbnailImage(useCase.getThumbnailImage());
 
             // 3. 공지 내용 생성 및 저장 (일단 빈 리스트를 넣음, 이미지 추가는 나중에)
             NoticeContent noticeContent = createNoticeContent(
                 notice,
                 useCase.getTitle(),
                 useCase.getContent(),
-                LanguageCode.EN,
-                thumbnailImageId
+                LanguageCode.EN
             );
 
             // 5. NoticeContent 저장
@@ -70,16 +69,12 @@ public class NoticeService {
             // 1. 공지 조회
             Notice notice = noticeRepository.getReferenceById(useCase.getNoticeId());
 
-            // 2. 썸네일 이미지 저장
-            Long thumbnailImageId = saveThumbnailImage(useCase.getThumbnailImage());
-
             // 3. 공지 내용 생성 및 저장
             NoticeContent noticeContent = createNoticeContent(
                 notice,
                 useCase.getTitle(),
                 useCase.getContent(),
-                useCase.getLanguage(),
-                thumbnailImageId
+                useCase.getLanguage()
             );
 
             // 5. NoticeContent 저장
@@ -100,9 +95,21 @@ public class NoticeService {
         return null;
     }
 
-    // 공지 내용을 생성하는 메서드 (NoticeDetailImage 리스트는 나중에 설정)
-    private NoticeContent createNoticeContent(Notice notice, String title, String content,
-        LanguageCode language, Long thumbnailImageId) {
+    /**
+     * 공지 내용을 생성하는 메서드
+     *
+     * @param notice
+     * @param title
+     * @param content
+     * @param language
+     * @return
+     */
+    private NoticeContent createNoticeContent(
+        Notice notice,
+        String title,
+        String content,
+        LanguageCode language
+    ) {
         return NoticeContent.builder()
             .notice(notice)
             .title(title)

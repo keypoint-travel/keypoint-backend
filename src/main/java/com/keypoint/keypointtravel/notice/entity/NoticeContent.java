@@ -31,7 +31,7 @@ public class NoticeContent extends LanguageEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "blob")
     @Lob
     private String content;
 
@@ -39,8 +39,12 @@ public class NoticeContent extends LanguageEntity {
     private boolean isDeleted;
 
     @Builder
-    public NoticeContent(Notice notice,
-        LanguageCode languageCode, String title, String content) {
+    public NoticeContent(
+        Notice notice,
+        LanguageCode languageCode,
+        String title,
+        String content
+    ) {
         super(languageCode);
         this.notice = notice;
         this.title = title;
@@ -50,5 +54,19 @@ public class NoticeContent extends LanguageEntity {
 
     public NoticeContent() {
         super(LanguageCode.EN);
+    }
+
+    public static NoticeContent of(
+        Notice notice,
+        LanguageCode languageCode,
+        String title,
+        String content
+    ) {
+        return NoticeContent.builder()
+            .notice(notice)
+            .title(title)
+            .content(content)
+            .languageCode(languageCode)
+            .build();
     }
 }

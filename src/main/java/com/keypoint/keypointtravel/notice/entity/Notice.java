@@ -11,11 +11,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "notice")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice extends BaseEntity {
 
     @Id
@@ -32,9 +35,12 @@ public class Notice extends BaseEntity {
     @Column(nullable = false)
     private boolean isDeleted;
 
-    public Notice(
-    ) {
+    public Notice(Long thumbnailImageId) {
+        this.thumbnailImageId = thumbnailImageId;
         this.isDeleted = false;
     }
 
+    public static Notice from(Long thumbnailImageId) {
+        return new Notice(thumbnailImageId);
+    }
 }

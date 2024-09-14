@@ -18,4 +18,12 @@
     </preConditions>
     <dropColumn tableName="notice_detail_image" columnName="thumbnail_image_id" />
   </changeSet>
+
+  <changeSet author="lchy0413" id="changelog-0.02.03-240914">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="notice_content" columnName="content" />
+    </preConditions>
+
+    <modifyDataType tableName="notice_content" columnName="content" newDataType="blob" />
+  </changeSet>
 </databaseChangeLog>
