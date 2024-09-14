@@ -61,7 +61,8 @@ public class NoticeService {
 
     @Transactional
     public void saveNoticeByOtherLanguage(PlusNoticeUseCase useCase) {
-        if (noticeRepository.isExistNoticeContentByLanguageCode(useCase.getNoticeId(), useCase.getLanguage())) {
+        if (noticeRepository.isExistNoticeContentByLanguageCode(useCase.getNoticeId(),
+            useCase.getLanguageCode())) {
             throw new GeneralException(NoticeErrorCode.EXISTS_NOTICE_CONTENT);
         }
 
@@ -74,7 +75,7 @@ public class NoticeService {
                 notice,
                 useCase.getTitle(),
                 useCase.getContent(),
-                useCase.getLanguage()
+                useCase.getLanguageCode()
             );
 
             // 5. NoticeContent 저장

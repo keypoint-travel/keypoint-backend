@@ -22,15 +22,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +44,7 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public APIResponseEntity<Void> saveNotice(
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detail") @Valid CreateNoticeRequest request
@@ -53,16 +57,21 @@ public class NoticeController {
             .build();
     }
 
-    // 이미 생성된 공지사항에 다른 언어로 추가
-    @PostMapping("/{noticeId}")
+    /**
+     * 이미 생성된 공지사항에 다른 언어로 추가
+     *
+     * @param noticeId
+     * @param request
+     * @return
+     */
+    @PostMapping("/{noticeId}/translations")
+    @ResponseStatus(HttpStatus.CREATED)
     public APIResponseEntity<Void> saveNotice(
         @PathVariable(value = "noticeId", required = false) Long noticeId,
-        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
-        @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
-        @RequestPart(value = "detail") @Valid CreateNoticeContentRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestBody @Valid CreateNoticeContentRequest request
+    ) {
         //todo: 관리자 인증 로직 추가 예정
-        PlusNoticeUseCase useCase = new PlusNoticeUseCase(noticeId, thumbnailImage, detailImages,
+        PlusNoticeUseCase useCase = new PlusNoticeUseCase(noticeId,
             request.getLanguageCode(), request.getTitle(), request.getContent());
         noticeService.saveNoticeByOtherLanguage(useCase);
         return APIResponseEntity.<Void>builder()
