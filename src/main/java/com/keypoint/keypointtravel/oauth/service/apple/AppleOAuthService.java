@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
-import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
 import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
@@ -83,8 +82,7 @@ public class AppleOAuthService implements OAuthService {
                 createSecret(),
                 useCase.getOauthCode()
             );
-            AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(
-                "application/x-www-form-urlencoded", tokenRequest
+            AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(tokenRequest
             );
 
             // 2. 사용자 정보 조회
@@ -194,13 +192,13 @@ public class AppleOAuthService implements OAuthService {
             LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         try {
             return Jwts.builder()
-                .setHeaderParam("kid", appleKeyId)
                 .setHeaderParam("alg", "ES256")
-                .setIssuer(appleTeamId)
+                .setHeaderParam("kid", "ANS9W23GB3")
+                .setIssuer("N95583Y4V3")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(expirationDate)
-                .setAudience(AppleAPIConstants.COMMON_URI)
-                .setSubject(clientId)
+                .setAudience("https://appleid.apple.com")
+                .setSubject("com.keypoint.keytrip")
                 .signWith(this.getPrivateKey(), SignatureAlgorithm.ES256)
                 .compact();
         } catch (IOException e) {
