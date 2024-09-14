@@ -10,7 +10,6 @@ import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.HttpUtils;
-import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.oauth.dto.request.ReissueGoogleRequest;
@@ -103,8 +102,6 @@ public class AppleOAuthService implements OAuthService {
             Authentication authentication = tokenProvider.createAuthenticationFromMember(member);
             TokenInfoResponse token = tokenProvider.createToken(authentication);
 
-            LogUtils.writeInfoLog("login",
-                member.getRole() == RoleType.ROLE_UNCERTIFIED_USER ? "true" : "false");
             return OauthLoginResponse.of(
                 member.getRole() == RoleType.ROLE_UNCERTIFIED_USER,
                 token
