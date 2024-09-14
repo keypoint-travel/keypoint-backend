@@ -71,8 +71,7 @@ public class NoticeController {
         @RequestBody @Valid CreateNoticeContentRequest request
     ) {
         //todo: 관리자 인증 로직 추가 예정
-        PlusNoticeUseCase useCase = new PlusNoticeUseCase(noticeId,
-            request.getLanguageCode(), request.getTitle(), request.getContent());
+        PlusNoticeUseCase useCase = PlusNoticeUseCase.of(noticeId, request);
         noticeService.saveNoticeByOtherLanguage(useCase);
         return APIResponseEntity.<Void>builder()
             .message("추가 공지등록 성공")

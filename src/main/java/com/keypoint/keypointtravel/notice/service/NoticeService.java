@@ -61,13 +61,14 @@ public class NoticeService {
 
     @Transactional
     public void saveNoticeByOtherLanguage(PlusNoticeUseCase useCase) {
+        // 1. 요청한 언어 버전으로 존재하는지 확인
         if (noticeRepository.isExistNoticeContentByLanguageCode(useCase.getNoticeId(),
             useCase.getLanguageCode())) {
             throw new GeneralException(NoticeErrorCode.EXISTS_NOTICE_CONTENT);
         }
 
         try {
-            // 1. 공지 조회
+            // 2. 공지 조회
             Notice notice = noticeRepository.getReferenceById(useCase.getNoticeId());
 
             // 3. 공지 내용 생성 및 저장
@@ -78,7 +79,7 @@ public class NoticeService {
                 useCase.getLanguageCode()
             );
 
-            // 5. NoticeContent 저장
+            // 4. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
         } catch (Exception e) {
             throw new GeneralException(e);

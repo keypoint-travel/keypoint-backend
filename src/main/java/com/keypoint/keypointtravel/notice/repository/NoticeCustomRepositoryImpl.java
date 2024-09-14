@@ -36,7 +36,9 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
 
     @Override
     public boolean isExistNoticeContentByLanguageCode(Long noticeId, LanguageCode languageCode) {
-        NoticeContent content = queryFactory.selectFrom(noticeContent)
+        Long content = queryFactory
+            .select(noticeContent.id)
+            .from(noticeContent)
             .where(noticeContent.notice.id.eq(noticeId)
                 .and(noticeContent.isDeleted.isFalse())
                 .and(noticeContent.languageCode.eq(languageCode)))

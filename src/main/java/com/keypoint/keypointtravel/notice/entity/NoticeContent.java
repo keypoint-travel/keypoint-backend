@@ -31,7 +31,7 @@ public class NoticeContent extends LanguageEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "blob")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     @Lob
     private String content;
 
