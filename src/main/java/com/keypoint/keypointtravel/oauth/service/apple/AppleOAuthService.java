@@ -89,7 +89,7 @@ public class AppleOAuthService implements OAuthService {
 
             // 3. 사용자 정보 저장
             CommonMemberDTO member = oauth2UserService.registerMember(email,
-                OauthProviderType.GOOGLE);
+                OauthProviderType.APPLE);
 
             // 4. OAuth 토큰 저장
             oAuthTokenService.saveOAuthToken(
