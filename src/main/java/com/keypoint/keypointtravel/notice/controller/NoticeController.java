@@ -149,7 +149,7 @@ public class NoticeController {
     @Deprecated
     @DeleteMapping("/contents")
     public APIResponseEntity<Void> deleteNoticeContents(
-        @RequestParam("noticeContent-ids") Long[] noticeContentIds
+        @RequestParam("notice-content-ids") Long[] noticeContentIds
     ) {
         DeleteNoticeContentUseCase useCase = DeleteNoticeContentUseCase.from(
             noticeContentIds
