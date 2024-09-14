@@ -1,10 +1,10 @@
-package com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase;
+package com.keypoint.keypointtravel.oauth.dto.useCase.appleToken;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
-public class AppleTokenResponseUseCase {
+public class SuccessAppleTokenUseCase {
 
     @JsonProperty(value = "access_token")
     private String accessToken;

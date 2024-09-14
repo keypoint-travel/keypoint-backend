@@ -29,7 +29,7 @@ import org.springframework.util.MultiValueMap;
 public class Oauth2RequestEntityConverter implements
     Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
 
-    private static String appleClientId;
+    private static String serviceId;
     private static String appleTeamId;
     private static String appleKeyId;
     private static String appleKeyPath;
@@ -41,7 +41,7 @@ public class Oauth2RequestEntityConverter implements
         @Value("${apple.teamId}") String appleTeamId,
         @Value("${apple.keyId}") String appleKeyId,
         @Value("${apple.keyPath}") String appleKeyPath) {
-        this.appleClientId = appleClientId;
+        this.serviceId = appleClientId;
         this.appleTeamId = appleTeamId;
         this.appleKeyId = appleKeyId;
         this.appleKeyPath = appleKeyPath;
@@ -92,8 +92,8 @@ public class Oauth2RequestEntityConverter implements
             .setIssuer(appleTeamId)
             .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
             .setExpiration(expirationDate) // 만료 시간
-            .setAudience(AppleAPIConstants.COMMON_URI)
-            .setSubject(appleClientId)
+            .setAudience(AppleAPIConstants.COMMON_URL)
+            .setSubject(serviceId)
             .signWith(getPrivateKey())
             .compact();
     }

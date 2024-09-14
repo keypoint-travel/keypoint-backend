@@ -1,20 +1,20 @@
 package com.keypoint.keypointtravel.oauth.service.apple;
 
 import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenRequestUseCase;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenResponseUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.appleToken.SuccessAppleTokenUseCase;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "appleApiClient", url = AppleAPIConstants.COMMON_URI, fallback = AppleAPIServiceFallback.class)
+@FeignClient(name = "appleApiClient", url = AppleAPIConstants.AUTH_URL, fallback = AppleAPIServiceFallback.class)
 public interface AppleAPIService {
 
     @PostMapping(value = AppleAPIConstants.VALIDATE_CODE,
-        consumes = "application/x-www-form-urlencoded")
-    AppleTokenResponseUseCase getValidateToken(
-        @RequestHeader("Content-Type") String contentType,
-        @RequestBody AppleTokenRequestUseCase request
+        headers = "Content-Type=application/x-www-form-urlencoded")
+    SuccessAppleTokenUseCase getValidateToken(
+        @RequestParam("client_id") String clientId,
+        @RequestParam("client_secret") String clientSecret,
+        @RequestParam("code") String code,
+        @RequestParam("grant_type") String grantType
     );
 }
