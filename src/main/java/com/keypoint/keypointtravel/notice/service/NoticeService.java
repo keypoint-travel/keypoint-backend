@@ -13,6 +13,7 @@ import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.entity.Notice;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
@@ -20,6 +21,7 @@ import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
 import com.keypoint.keypointtravel.notice.repository.NoticeRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -138,20 +140,40 @@ public class NoticeService {
     @Transactional
     public void updateNotice(UpdateNoticeUseCase useCase) {
         try {
-            Long noticeContentId = useCase.getNoticeContentId();
-            NoticeContent noticeContent = findNoticeByNoticeId(noticeContentId);
+            Long noticeId = useCase.getNoticeId();
+
+            // 1. 공지 사항 존재 확인
+            Optional<Long> longOptional = noticeRepository.findThumbnailImageIdById(noticeId);
+            if (longOptional.isEmpty()) {
+                throw new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE);
+            }
 
             // 1. 썸네일 이미지 업데이트
             if (useCase.getThumbnailImage() != null) {
-//                uploadFileService.updateUploadFile(
-//                    noticeContent.getThumbnailImageId(),
-//                    useCase.getThumbnailImage(),
-//                    DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
-//                );
+                uploadFileService.updateUploadFile(
+                    longOptional.get(),
+                    useCase.getThumbnailImage(),
+                    DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
+                );
             }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    /**
+     * 공지 수정 함수
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void updateNoticeContent(UpdateNoticeContentUseCase useCase) {
+        try {
+            Long noticeContentId = useCase.getNoticeContentId();
+            NoticeContent noticeContent = findNoticeByNoticeId(noticeContentId);
 
             // 변경사항 저장
-            noticeContentRepository.updateNotice(useCase);
+            noticeContentRepository.updateNoticeContent(useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

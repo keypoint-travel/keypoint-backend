@@ -8,7 +8,7 @@ import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
-import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
 import com.keypoint.keypointtravel.notice.entity.QNotice;
 import com.keypoint.keypointtravel.notice.entity.QNoticeContent;
@@ -114,7 +114,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
     }
 
     @Override
-    public void updateNotice(UpdateNoticeUseCase useCase) {
+    public void updateNoticeContent(UpdateNoticeContentUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
         queryFactory
             .update(noticeContent)

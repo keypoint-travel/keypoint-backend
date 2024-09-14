@@ -7,7 +7,7 @@ import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
-import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase;
 import org.springframework.data.domain.Page;
 
 public interface NoticeCustomRepository {
@@ -16,7 +16,7 @@ public interface NoticeCustomRepository {
 
     Page<NoticeResponse> findNotices(PageUseCase useCase);
 
-    void updateNotice(UpdateNoticeUseCase useCase);
+    void updateNoticeContent(UpdateNoticeContentUseCase useCase);
 
     NoticeDetailResponse findNoticeById(Long noticeContentId);
 

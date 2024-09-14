@@ -1,6 +1,5 @@
 package com.keypoint.keypointtravel.notice.controller;
 
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
@@ -13,10 +12,10 @@ import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.service.NoticeService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -110,22 +108,32 @@ public class NoticeController {
         );
     }
 
-    @PutMapping("/{noticeContentId}")
+    @PutMapping("/{noticeId}")
     public APIResponseEntity<Void> updateNotice(
-        @PathVariable("noticeContentId") Long noticeContentId,
-        @RequestPart(value = "detail") @Valid UpdateNoticeUseCase request,
-        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
-        @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @PathVariable("noticeId") Long noticeId,
+        @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage) {
         //todo: 관리자 인증 로직 추가 예정
         UpdateNoticeUseCase useCase = UpdateNoticeUseCase.of(
-            noticeContentId,
-            thumbnailImage,
-            detailImages,
-            request.getTitle(),
-            request.getContent()
+            noticeId,
+            thumbnailImage
         );
         noticeService.updateNotice(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("공지 수정 성공")
+            .build();
+    }
+
+    @PutMapping("/{noticeId}/translations/{noticeContentId}")
+    public APIResponseEntity<Void> updateNoticeContent(
+        @PathVariable("noticeContentId") Long noticeContentId,
+        @RequestPart(value = "detail") @Valid UpdateNoticeContentUseCase request) {
+        //todo: 관리자 인증 로직 추가 예정
+        UpdateNoticeContentUseCase useCase = UpdateNoticeContentUseCase.of(
+            noticeContentId,
+            request
+        );
+        noticeService.updateNoticeContent(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("공지 수정 성공")
