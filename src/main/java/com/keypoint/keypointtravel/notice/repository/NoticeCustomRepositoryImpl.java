@@ -1,24 +1,24 @@
 package com.keypoint.keypointtravel.notice.repository;
 
-import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
-import com.keypoint.keypointtravel.notice.entity.*;
+import com.keypoint.keypointtravel.notice.entity.NoticeContent;
+import com.keypoint.keypointtravel.notice.entity.QNotice;
+import com.keypoint.keypointtravel.notice.entity.QNoticeContent;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
@@ -32,9 +32,6 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
     private final JPAQueryFactory queryFactory;
     private final QNotice notice = QNotice.notice;
     private final QNoticeContent noticeContent = QNoticeContent.noticeContent;
-    private final QNoticeDetailImage noticeDetailImage = QNoticeDetailImage.noticeDetailImage;
-
-    private final QUploadFile uploadFile = QUploadFile.uploadFile;
     private final AuditorAware<String> auditorProvider;
 
     @Override
@@ -141,18 +138,6 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             .where(builder)
             .fetchOne();
 
-        // 상세 이미지 URL 리스트 생성
-        List<String> detailImagesUrl = queryFactory
-            .select(activeFile.path)
-            .from(activeFile)
-            .where(activeFile.id.in(
-                JPAExpressions
-                    .select(noticeDetailImage.detailImageId)
-                    .from(noticeDetailImage)
-                    .where(noticeDetailImage.noticeContent.id.eq(content.getId()))
-            ))
-            .fetch();
-
         // 썸네일 이미지 URL 가져오기
         String thumbnailImageUrl = queryFactory
             .select(activeFile.path)
@@ -166,7 +151,6 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             content.getTitle(),
             content.getContent(),
             thumbnailImageUrl,
-            detailImagesUrl,
             content.getLanguageCode(),
             content.getCreateAt(),
             content.getModifyAt()
@@ -184,7 +168,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             .set(noticeContent.modifyAt, LocalDateTime.now())
             .set(noticeContent.modifyId, currentAuditor)
             .where(noticeContent.id.in(useCase.getNoticeContentIds()))
-            .execute();;
+            .execute();
     }
     @Transactional
     @Override

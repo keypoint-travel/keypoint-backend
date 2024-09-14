@@ -2,7 +2,6 @@ package com.keypoint.keypointtravel.notice.entity;
 
 import com.keypoint.keypointtravel.global.entity.LanguageEntity;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,9 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -41,42 +38,21 @@ public class NoticeContent extends LanguageEntity {
     @Column
     private Long thumbnailImageId;
 
-    @OneToMany(mappedBy = "noticeContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NoticeDetailImage> detailImages;
-
     @Column
     private boolean isDeleted;
 
     @Builder
     public NoticeContent(Notice notice,
-        LanguageCode languageCode, String title, String content, Long thumbnailImageId,List<NoticeDetailImage> detailImages) {
+        LanguageCode languageCode, String title, String content, Long thumbnailImageId) {
         super(languageCode);
         this.notice = notice;
         this.title = title;
         this.content = content;
-        this.detailImages = detailImages;
         this.thumbnailImageId = thumbnailImageId;
         this.isDeleted = false;
     }
 
     public NoticeContent() {
         super(LanguageCode.KO);
-    }
-
-    public void setDetailImages(List<NoticeDetailImage> detailImages) {
-        this.detailImages = detailImages;
-        for (NoticeDetailImage detailImage : detailImages) {
-            detailImage.setNoticeContent(this);
-        }
-    }
-
-    public void removeDetailImage(NoticeDetailImage detailImage) {
-        this.detailImages.remove(detailImage);
-        detailImage.setNoticeContent(null);
-    }
-
-    public void addDetailImage(NoticeDetailImage detailImage) {
-        this.detailImages.add(detailImage);
-        detailImage.setNoticeContent(this);
     }
 }

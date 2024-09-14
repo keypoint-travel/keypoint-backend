@@ -14,20 +14,15 @@ import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.entity.Notice;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
-import com.keypoint.keypointtravel.notice.entity.NoticeDetailImage;
 import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
-import com.keypoint.keypointtravel.notice.repository.NoticeDetailImageRepository;
 import com.keypoint.keypointtravel.notice.repository.NoticeRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +31,6 @@ public class NoticeService {
     private final UploadFileService uploadFileService;
     private final NoticeRepository noticeRepository;
     private final NoticeContentRepository noticeContentRepository;
-    private final NoticeDetailImageRepository noticeDetailImageRepository;
 
     @Transactional
     public void saveNotice(NoticeUseCase useCase) {
@@ -56,15 +50,8 @@ public class NoticeService {
                 useCase.getTitle(),
                 useCase.getContent(),
                 useCase.getLanguage(),
-                thumbnailImageId,
-                new ArrayList<>()
+                thumbnailImageId
             );
-
-            // 4. 상세 이미지 저장 및 NoticeContent에 연결
-            List<NoticeDetailImage> detailImages = saveDetailImages(useCase.getDetailImages(), noticeContent);
-
-            // NoticeContent에 detailImages 설정
-            noticeContent.setDetailImages(detailImages);
 
             // 5. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
@@ -92,15 +79,8 @@ public class NoticeService {
                 useCase.getTitle(),
                 useCase.getContent(),
                 useCase.getLanguage(),
-                thumbnailImageId,
-                new ArrayList<>()
+                thumbnailImageId
             );
-
-            // 4. 상세 이미지 저장 및 NoticeContent에 연결
-            List<NoticeDetailImage> detailImages = saveDetailImages(useCase.getDetailImages(), noticeContent);
-
-            // NoticeContent에 detailImages 설정
-            noticeContent.setDetailImages(detailImages);
 
             // 5. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
@@ -120,35 +100,15 @@ public class NoticeService {
         return null;
     }
 
-    // 상세 이미지 저장 로직 (NoticeContent와 연결)
-    private List<NoticeDetailImage> saveDetailImages(List<MultipartFile> detailImages, NoticeContent noticeContent) throws IOException {
-        List<NoticeDetailImage> noticeDetailImages = new ArrayList<>();
-        if (detailImages != null) {
-            for (MultipartFile detailImage : detailImages) {
-                Long detailImageId = uploadFileService.saveUploadFile(
-                    detailImage,
-                    DirectoryConstants.NOTICE_DETAIL_DIRECTORY
-                );
-                // NoticeDetailImage 객체 생성 및 NoticeContent와 연결
-                NoticeDetailImage noticeDetailImage = NoticeDetailImage.builder()
-                    .noticeContent(noticeContent)  // NoticeContent와 연결
-                    .detailImageId(detailImageId)
-                    .build();
-                noticeDetailImages.add(noticeDetailImage);
-            }
-        }
-        return noticeDetailImages;
-    }
-
     // 공지 내용을 생성하는 메서드 (NoticeDetailImage 리스트는 나중에 설정)
-    private NoticeContent createNoticeContent(Notice notice, String title, String content, LanguageCode language, Long thumbnailImageId, List<NoticeDetailImage> detailImages) {
+    private NoticeContent createNoticeContent(Notice notice, String title, String content,
+        LanguageCode language, Long thumbnailImageId) {
         return NoticeContent.builder()
             .notice(notice)
             .title(title)
             .content(content)
             .languageCode(language)
             .thumbnailImageId(thumbnailImageId)
-            .detailImages(detailImages)  // 기본적으로 빈 리스트로 설정
             .build();
     }
 
@@ -178,32 +138,6 @@ public class NoticeService {
                     useCase.getThumbnailImage(),
                     DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
                 );
-            }
-
-            // 2. 기존 상세 이미지 삭제
-            List<NoticeDetailImage> existingDetailImages = noticeContent.getDetailImages();
-            if (existingDetailImages != null && !existingDetailImages.isEmpty()) {
-                for (NoticeDetailImage detailImage : new ArrayList<>(existingDetailImages)) {
-                    uploadFileService.deleteUploadFile(detailImage.getDetailImageId()); // 파일 삭제
-                    noticeDetailImageRepository.delete(detailImage); // 데이터베이스에서 직접 삭제
-                    noticeContent.removeDetailImage(detailImage); // 부모 엔티티에서 자식 엔티티 관계 해제
-                }
-            }
-
-            // 3. 새로운 상세 이미지 추가
-            if (useCase.getDetailImages() != null && !useCase.getDetailImages().isEmpty()) {
-                for (MultipartFile detailImage : useCase.getDetailImages()) {
-                    Long detailImageId = uploadFileService.saveUploadFile(
-                        detailImage,
-                        DirectoryConstants.NOTICE_DETAIL_DIRECTORY
-                    );
-                    NoticeDetailImage noticeDetailImage = NoticeDetailImage.builder()
-                        .noticeContent(noticeContent)
-                        .detailImageId(detailImageId)
-                        .build();
-                    noticeDetailImageRepository.save(noticeDetailImage); // 새로운 이미지를 데이터베이스에 저장
-                    noticeContent.addDetailImage(noticeDetailImage); // 부모 엔티티에 자식 엔티티 추가
-                }
             }
 
             // 변경사항 저장
