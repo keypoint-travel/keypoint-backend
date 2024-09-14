@@ -4,11 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
+import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
 import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.HttpUtils;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.oauth.dto.request.ReissueGoogleRequest;
@@ -20,9 +22,22 @@ import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleToke
 import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenResponseUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,10 +76,11 @@ public class AppleOAuthService implements OAuthService {
     @Override
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
         try {
+            LogUtils.writeInfoLog("login", useCase.getOauthCode());
             // 1. Oauth 토큰 발급
             AppleTokenRequestUseCase tokenRequest = AppleTokenRequestUseCase.of(
                 clientId,
-                oauth2RequestEntityConverter.createClientSecret(),
+                createSecret(),
                 useCase.getOauthCode()
             );
             AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(
@@ -159,5 +175,36 @@ public class AppleOAuthService implements OAuthService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         return headers;
+    }
+
+    public PrivateKey getPrivateKey() throws IOException {
+        ClassPathResource resource = new ClassPathResource("static/key/" + appleKeyPath);
+
+        try (InputStream in = resource.getInputStream();
+            PEMParser pemParser = new PEMParser(
+                new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            return converter.getPrivateKey(object);
+        }
+    }
+
+    public String createSecret() {
+        Date expirationDate = Date.from(
+            LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+        try {
+            return Jwts.builder()
+                .setHeaderParam("kid", appleKeyId)
+                .setHeaderParam("alg", "ES256")
+                .setIssuer(appleTeamId)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(expirationDate)
+                .setAudience(AppleAPIConstants.COMMON_URI)
+                .setSubject(clientId)
+                .signWith(this.getPrivateKey(), SignatureAlgorithm.ES256)
+                .compact();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
