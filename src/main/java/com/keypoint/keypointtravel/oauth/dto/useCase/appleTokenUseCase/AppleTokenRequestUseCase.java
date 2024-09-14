@@ -23,7 +23,7 @@ public class AppleTokenRequestUseCase {
         String code
     ) {
         return new AppleTokenRequestUseCase(
-            "com.keypoint.keytrip",
+            clientId,
             clientSecret,
             code,
             "authorization_code"

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
+import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
 import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
@@ -193,12 +194,12 @@ public class AppleOAuthService implements OAuthService {
         try {
             return Jwts.builder()
                 .setHeaderParam("alg", "ES256")
-                .setHeaderParam("kid", "ANS9W23GB3")
-                .setIssuer("N95583Y4V3")
+                .setHeaderParam("kid", appleKeyId)
+                .setIssuer(appleTeamId)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(expirationDate)
-                .setAudience("https://appleid.apple.com")
-                .setSubject("com.keypoint.keytrip")
+                .setAudience(AppleAPIConstants.COMMON_URL)
+                .setSubject(clientId)
                 .signWith(this.getPrivateKey(), SignatureAlgorithm.ES256)
                 .compact();
         } catch (IOException e) {

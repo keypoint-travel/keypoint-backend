@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "appleApiClient", url = AppleAPIConstants.COMMON_URI, fallback = AppleAPIServiceFallback.class)
+@FeignClient(name = "appleApiClient", url = AppleAPIConstants.AUTH_URL, fallback = AppleAPIServiceFallback.class)
 public interface AppleAPIService {
 
     @PostMapping(value = AppleAPIConstants.VALIDATE_CODE,

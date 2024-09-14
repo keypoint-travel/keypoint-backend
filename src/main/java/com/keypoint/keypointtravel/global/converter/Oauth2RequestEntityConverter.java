@@ -92,7 +92,7 @@ public class Oauth2RequestEntityConverter implements
             .setIssuer(appleTeamId)
             .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
             .setExpiration(expirationDate) // 만료 시간
-            .setAudience(AppleAPIConstants.COMMON_URI)
+            .setAudience(AppleAPIConstants.COMMON_URL)
             .setSubject(serviceId)
             .signWith(getPrivateKey())
             .compact();
