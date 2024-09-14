@@ -50,6 +50,7 @@ apple:
   teamId: N95583Y4V3
   keyId: ANS9W23GB3
   keyPath: AuthKey_ANS9W23GB3.p8
+  app-id: com.keypoint.keytrip
 cloud:
   aws:
     credentials:

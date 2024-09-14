@@ -57,6 +57,8 @@ public class AppleOAuthService implements OAuthService {
     private String appleTeamId;
     @Value("${apple.keyId}")
     private String appleKeyId;
+    @Value("${apple.apple-id}")
+    private String appleAppleId;
 
     @Override
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
@@ -65,8 +67,7 @@ public class AppleOAuthService implements OAuthService {
             AppleTokenRequestUseCase tokenRequest = AppleTokenRequestUseCase.of(
                 clientId,
                 oauth2RequestEntityConverter.createClientSecret(),
-                useCase.getOauthCode(),
-                redirectURI
+                useCase.getOauthCode()
             );
             AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(
                 "application/x-www-form-urlencoded", tokenRequest

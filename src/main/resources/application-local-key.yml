@@ -50,6 +50,7 @@ apple:
   teamId: CML94Q2G94
   keyId: PH99JX6U2H
   keyPath: AuthKey_PH99JX6U2H.p8
+  apple-id: com.keypoint.keytrip
 cloud:
   aws:
     credentials:

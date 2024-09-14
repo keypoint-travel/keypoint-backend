@@ -17,21 +17,16 @@ public class AppleTokenRequestUseCase {
     @JsonProperty(value = "grant_type")
     private String grantType = "authorization_code";
 
-    @JsonProperty(value = "redirect_uri")
-    private String redirectURI;
-
     public static AppleTokenRequestUseCase of(
         String clientId,
         String clientSecret,
-        String code,
-        String redirectURI
+        String code
     ) {
         return new AppleTokenRequestUseCase(
-            clientId,
+            "com.keypoint.keytrip",
             clientSecret,
             code,
-            "authorization_code",
-            redirectURI
+            "authorization_code"
         );
     }
 }
