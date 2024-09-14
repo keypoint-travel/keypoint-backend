@@ -10,6 +10,3 @@ spring:
     group:
       local: "local, local-key, mail"
       dev: "dev, key, mail"
-logging:
-  level:
-    com.keypoint.keypointtravel: DEBUG

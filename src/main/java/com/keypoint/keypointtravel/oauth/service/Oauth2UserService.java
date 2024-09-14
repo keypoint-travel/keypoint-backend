@@ -15,6 +15,13 @@ import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,10 +33,6 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -140,7 +143,16 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         if (memberOptional.isPresent()) {
             // 2-1. 로그인 (이전에 등록되어 있는 이메일)
             CommonMemberDTO member = memberOptional.get();
-            validateOauthProvider(member, oauthProviderType);
+            if (member.getRole() == RoleType.ROLE_UNCERTIFIED_USER) {
+                // 2-1-1. 현재 등록한 Oauth 로 변경
+                memberRepository.updateOauthProviderTypeByMemberId(
+                    member.getId(),
+                    oauthProviderType
+                );
+            } else {
+                // 2-1-2. 유효성 검사
+                validateOauthProvider(member, oauthProviderType);
+            }
 
             return member;
         } else {

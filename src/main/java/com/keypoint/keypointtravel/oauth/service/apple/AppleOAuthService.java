@@ -18,7 +18,7 @@ import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
 import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
 import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
 import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenResponseUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.appleToken.SuccessAppleTokenUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
 import io.jsonwebtoken.Jwts;
@@ -75,9 +75,8 @@ public class AppleOAuthService implements OAuthService {
     @Override
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
         try {
-            LogUtils.writeInfoLog("login", useCase.getOauthCode());
             // 1. Oauth 토큰 발급
-            AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(
+            SuccessAppleTokenUseCase tokenResponse = appleAPIService.getValidateToken(
                 clientId,
                 createSecret(),
                 useCase.getOauthCode(),
@@ -104,6 +103,8 @@ public class AppleOAuthService implements OAuthService {
             Authentication authentication = tokenProvider.createAuthenticationFromMember(member);
             TokenInfoResponse token = tokenProvider.createToken(authentication);
 
+            LogUtils.writeInfoLog("login",
+                member.getRole() == RoleType.ROLE_UNCERTIFIED_USER ? "true" : "false");
             return OauthLoginResponse.of(
                 member.getRole() == RoleType.ROLE_UNCERTIFIED_USER,
                 token
