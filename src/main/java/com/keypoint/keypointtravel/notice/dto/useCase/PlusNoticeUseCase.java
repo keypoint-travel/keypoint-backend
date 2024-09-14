@@ -1,19 +1,27 @@
 package com.keypoint.keypointtravel.notice.dto.useCase;
 
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import java.util.List;
+import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeContentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor
 public class PlusNoticeUseCase {
     private Long noticeId;
-    private MultipartFile thumbnailImage;
-    private List<MultipartFile> detailImages;
-    private LanguageCode language;
+    private LanguageCode languageCode;
     private String title;
     private String content;
 
+    public static PlusNoticeUseCase of(
+        Long noticeId,
+        CreateNoticeContentRequest request
+    ) {
+        return new PlusNoticeUseCase(
+            noticeId,
+            request.getLanguageCode(),
+            request.getTitle(),
+            request.getContent()
+        );
+    }
 }

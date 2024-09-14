@@ -7,9 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DeleteNoticeContentUseCase {
 
-    private Long[] noticeContentIds;
+    private Long noticeId;
+    private Long noticeContentId;
 
-    public static DeleteNoticeContentUseCase from(Long[] noticeContentIds) {
-        return new DeleteNoticeContentUseCase(noticeContentIds);
+    public static DeleteNoticeContentUseCase of(Long noticeId, Long noticeContentId) {
+        return new DeleteNoticeContentUseCase(noticeId, noticeContentId);
     }
 }

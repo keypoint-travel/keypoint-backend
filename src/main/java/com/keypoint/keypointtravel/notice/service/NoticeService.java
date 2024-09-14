@@ -1,33 +1,35 @@
 package com.keypoint.keypointtravel.notice.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
-import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.response.adminNoticeDetail.AdminNoticeDetailResponse;
+import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
-import com.keypoint.keypointtravel.notice.dto.useCase.NoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.entity.Notice;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
-import com.keypoint.keypointtravel.notice.entity.NoticeDetailImage;
 import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
-import com.keypoint.keypointtravel.notice.repository.NoticeDetailImageRepository;
 import com.keypoint.keypointtravel.notice.repository.NoticeRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,35 +38,27 @@ public class NoticeService {
     private final UploadFileService uploadFileService;
     private final NoticeRepository noticeRepository;
     private final NoticeContentRepository noticeContentRepository;
-    private final NoticeDetailImageRepository noticeDetailImageRepository;
+    private final MemberDetailRepository memberDetailRepository;
 
     @Transactional
-    public void saveNotice(NoticeUseCase useCase) {
+    public void saveNotice(CreateNoticeUseCase useCase) {
         try {
-            // 1. 공지 생성
-            Notice notice = new Notice();
+            // 1. 썸네일 이미지 저장
+            Long thumbnailImageId = saveThumbnailImage(useCase.getThumbnailImage());
+
+            // 2. 공지 생성
+            Notice notice = Notice.from(thumbnailImageId);
 
             // 공지 저장
             noticeRepository.save(notice);
 
-            // 2. 썸네일 이미지 저장
-            Long thumbnailImageId = saveThumbnailImage(useCase.getThumbnailImage());
-
-            // 3. 공지 내용 생성 및 저장 (일단 빈 리스트를 넣음, 이미지 추가는 나중에)
+            // 3. 공지 내용 생성 및 저장
             NoticeContent noticeContent = createNoticeContent(
                 notice,
                 useCase.getTitle(),
                 useCase.getContent(),
-                useCase.getLanguage(),
-                thumbnailImageId,
-                new ArrayList<>()
+                LanguageCode.EN
             );
-
-            // 4. 상세 이미지 저장 및 NoticeContent에 연결
-            List<NoticeDetailImage> detailImages = saveDetailImages(useCase.getDetailImages(), noticeContent);
-
-            // NoticeContent에 detailImages 설정
-            noticeContent.setDetailImages(detailImages);
 
             // 5. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
@@ -75,34 +69,25 @@ public class NoticeService {
 
     @Transactional
     public void saveNoticeByOtherLanguage(PlusNoticeUseCase useCase) {
-        if (noticeRepository.isExistNoticeContentByLanguageCode(useCase.getNoticeId(), useCase.getLanguage())) {
+        // 1. 요청한 언어 버전으로 존재하는지 확인
+        if (noticeRepository.isExistNoticeContentByLanguageCode(useCase.getNoticeId(),
+            useCase.getLanguageCode())) {
             throw new GeneralException(NoticeErrorCode.EXISTS_NOTICE_CONTENT);
         }
 
         try {
-            // 1. 공지 조회
+            // 2. 공지 조회
             Notice notice = noticeRepository.getReferenceById(useCase.getNoticeId());
-
-            // 2. 썸네일 이미지 저장
-            Long thumbnailImageId = saveThumbnailImage(useCase.getThumbnailImage());
 
             // 3. 공지 내용 생성 및 저장
             NoticeContent noticeContent = createNoticeContent(
                 notice,
                 useCase.getTitle(),
                 useCase.getContent(),
-                useCase.getLanguage(),
-                thumbnailImageId,
-                new ArrayList<>()
+                useCase.getLanguageCode()
             );
 
-            // 4. 상세 이미지 저장 및 NoticeContent에 연결
-            List<NoticeDetailImage> detailImages = saveDetailImages(useCase.getDetailImages(), noticeContent);
-
-            // NoticeContent에 detailImages 설정
-            noticeContent.setDetailImages(detailImages);
-
-            // 5. NoticeContent 저장
+            // 4. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
         } catch (Exception e) {
             throw new GeneralException(e);
@@ -120,41 +105,51 @@ public class NoticeService {
         return null;
     }
 
-    // 상세 이미지 저장 로직 (NoticeContent와 연결)
-    private List<NoticeDetailImage> saveDetailImages(List<MultipartFile> detailImages, NoticeContent noticeContent) throws IOException {
-        List<NoticeDetailImage> noticeDetailImages = new ArrayList<>();
-        if (detailImages != null) {
-            for (MultipartFile detailImage : detailImages) {
-                Long detailImageId = uploadFileService.saveUploadFile(
-                    detailImage,
-                    DirectoryConstants.NOTICE_DETAIL_DIRECTORY
-                );
-                // NoticeDetailImage 객체 생성 및 NoticeContent와 연결
-                NoticeDetailImage noticeDetailImage = NoticeDetailImage.builder()
-                    .noticeContent(noticeContent)  // NoticeContent와 연결
-                    .detailImageId(detailImageId)
-                    .build();
-                noticeDetailImages.add(noticeDetailImage);
-            }
-        }
-        return noticeDetailImages;
-    }
-
-    // 공지 내용을 생성하는 메서드 (NoticeDetailImage 리스트는 나중에 설정)
-    private NoticeContent createNoticeContent(Notice notice, String title, String content, LanguageCode language, Long thumbnailImageId, List<NoticeDetailImage> detailImages) {
+    /**
+     * 공지 내용을 생성하는 메서드
+     *
+     * @param notice
+     * @param title
+     * @param content
+     * @param language
+     * @return
+     */
+    private NoticeContent createNoticeContent(
+        Notice notice,
+        String title,
+        String content,
+        LanguageCode language
+    ) {
         return NoticeContent.builder()
             .notice(notice)
             .title(title)
             .content(content)
             .languageCode(language)
-            .thumbnailImageId(thumbnailImageId)
-            .detailImages(detailImages)  // 기본적으로 빈 리스트로 설정
             .build();
     }
 
-    public Page<NoticeResponse> findNotices(PageUseCase useCase) {
+    public Page<NoticeResponse> findNoticesInApp(PageAndMemberIdUseCase useCase) {
         try {
-            return noticeRepository.findNotices(useCase);
+            LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
+                useCase.getMemberId());
+            return noticeRepository.findNotices(useCase, languageCode);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public Page<NoticeResponse> findNoticesInWeb(PageAndMemberIdUseCase useCase) {
+        try {
+            return noticeRepository.findNotices(useCase, LanguageCode.EN);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public Page<NoticeResponse> findNotices(PageAndMemberIdUseCase useCase,
+        LanguageCode languageCode) {
+        try {
+            return noticeRepository.findNotices(useCase, languageCode);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -168,46 +163,57 @@ public class NoticeService {
     @Transactional
     public void updateNotice(UpdateNoticeUseCase useCase) {
         try {
-            Long noticeContentId = useCase.getNoticeContentId();
-            NoticeContent noticeContent = findNoticeByNoticeId(noticeContentId);
+            Long noticeId = useCase.getNoticeId();
+
+            // 1. 공지 사항 존재 확인
+            Optional<Long> longOptional = noticeRepository.findThumbnailImageIdById(noticeId);
+            if (longOptional.isEmpty()) {
+                throw new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE);
+            }
 
             // 1. 썸네일 이미지 업데이트
             if (useCase.getThumbnailImage() != null) {
                 uploadFileService.updateUploadFile(
-                    noticeContent.getThumbnailImageId(),
+                    longOptional.get(),
                     useCase.getThumbnailImage(),
                     DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
                 );
             }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
 
-            // 2. 기존 상세 이미지 삭제
-            List<NoticeDetailImage> existingDetailImages = noticeContent.getDetailImages();
-            if (existingDetailImages != null && !existingDetailImages.isEmpty()) {
-                for (NoticeDetailImage detailImage : new ArrayList<>(existingDetailImages)) {
-                    uploadFileService.deleteUploadFile(detailImage.getDetailImageId()); // 파일 삭제
-                    noticeDetailImageRepository.delete(detailImage); // 데이터베이스에서 직접 삭제
-                    noticeContent.removeDetailImage(detailImage); // 부모 엔티티에서 자식 엔티티 관계 해제
-                }
+    /**
+     * 공지 수정 함수
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void updateNoticeContent(UpdateNoticeContentUseCase useCase) {
+        try {
+            Long noticeId = useCase.getNoticeId();
+            Long noticeContentId = useCase.getNoticeContentId();
+
+            // 1. 유효성 검사
+            if (noticeContentRepository.existsByIdNotAndLanguageCodeAndIsDeletedFalse(
+                // 이미 존재하는 언어 코드인지 확인
+                noticeId,
+                noticeContentId,
+                useCase.getLanguageCode()
+            )) {
+                throw new GeneralException(GuideErrorCode.DUPLICATED_GUIDE_TRANSLATION_LANGUAGE);
             }
-
-            // 3. 새로운 상세 이미지 추가
-            if (useCase.getDetailImages() != null && !useCase.getDetailImages().isEmpty()) {
-                for (MultipartFile detailImage : useCase.getDetailImages()) {
-                    Long detailImageId = uploadFileService.saveUploadFile(
-                        detailImage,
-                        DirectoryConstants.NOTICE_DETAIL_DIRECTORY
-                    );
-                    NoticeDetailImage noticeDetailImage = NoticeDetailImage.builder()
-                        .noticeContent(noticeContent)
-                        .detailImageId(detailImageId)
-                        .build();
-                    noticeDetailImageRepository.save(noticeDetailImage); // 새로운 이미지를 데이터베이스에 저장
-                    noticeContent.addDetailImage(noticeDetailImage); // 부모 엔티티에 자식 엔티티 추가
-                }
+            if (noticeContentRepository.existsByIdAndLanguageCodeAndIsDeletedFalse(
+                // 영어버전 변경을 시도하는 건지 확인
+                noticeContentId,
+                LanguageCode.EN
+            ) && useCase.getLanguageCode() != LanguageCode.EN) {
+                throw new GeneralException(CommonErrorCode.FAIL_TO_DELETE_EN_DATA);
             }
 
             // 변경사항 저장
-            noticeContentRepository.updateNotice(useCase);
+            noticeContentRepository.updateNoticeContent(useCase);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -219,9 +225,9 @@ public class NoticeService {
         );
     }
 
-    public NoticeDetailResponse findNoticeById(Long noticeContentId) {
+    public NoticeDetailResponse findNoticeByNoticeContentId(Long noticeContentId) {
         try {
-            return noticeRepository.findNoticeById(noticeContentId);
+            return noticeRepository.findNoticeByNoticeContentId(noticeContentId);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -240,9 +246,40 @@ public class NoticeService {
         }
     }
 
-    public void deleteNoticeContents(DeleteNoticeContentUseCase useCase) {
+    public void deleteNoticeContents(DeleteNoticeContentsUseCase useCase) {
         try {
             noticeRepository.deleteNoticeContents(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    @Transactional
+    public void deleteNoticeContent(DeleteNoticeContentUseCase useCase) {
+        try {
+            // 1. 유효성 검사
+            if (noticeContentRepository.existsByIdAndLanguageCodeAndIsDeletedFalse(
+                useCase.getNoticeContentId(),
+                LanguageCode.EN
+            )) {
+                throw new GeneralException(CommonErrorCode.FAIL_TO_DELETE_EN_DATA);
+            }
+
+            // 2. 삭제
+            Long result = noticeRepository.deleteNoticeContent(useCase);
+
+            if (result < 0) {
+                throw new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE);
+            }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+
+    public AdminNoticeDetailResponse findNoticeById(Long noticeId) {
+        try {
+            return noticeRepository.findNoticeById(noticeId);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

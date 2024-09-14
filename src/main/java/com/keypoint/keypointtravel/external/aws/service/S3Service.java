@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class S3Service {
 
-    private final static String UPLOAD_FILE_NAME_FORMAT = "yy-MM-dd-HH-mm-ss";
+    private final static String UPLOAD_FILE_NAME_FORMAT = "yyMMdd";
     private final AmazonS3Client amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -48,12 +48,13 @@ public class S3Service {
 
         // 2. 업로드할 파일명 지정
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(UPLOAD_FILE_NAME_FORMAT);
-        String formattedNow = LocalDateTime.now().format(formatter);
+        String createdFileName =
+            LocalDateTime.now().format(formatter) + StringUtils.generateUniqueNumber();
         String fillExtension = StringUtils.getFileExtension(file.getOriginalFilename())
             .orElse(null);
         String fileName =
-            (fillExtension == null) ? String.format("%s/%s", directoryPath, formattedNow) :
-                String.format("%s/%s.%s", directoryPath, formattedNow, fillExtension);
+            (fillExtension == null) ? String.format("%s/%s", directoryPath, createdFileName) :
+                String.format("%s/%s.%s", directoryPath, createdFileName, fillExtension);
 
         // 3. S3에 업로드
         return putFileInS3(uploadFile, fileName);

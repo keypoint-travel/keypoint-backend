@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.notice.dto.response;
 
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,20 @@ public class NoticeResponse {
     private LocalDateTime createAt;
     private LocalDateTime modifyAt;
 
-    public NoticeResponse(Long noticeId, Long noticeContentId, String title, String content, String thumbnailImageUrl,LanguageCode languageCode, LocalDateTime createAt, LocalDateTime modifyAt) {
+    public NoticeResponse(
+        Long noticeId,
+        Long noticeContentId,
+        String title,
+        String content,
+        String thumbnailImageUrl,
+        LanguageCode languageCode,
+        LocalDateTime createAt,
+        LocalDateTime modifyAt
+    ) {
         this.noticeId = noticeId;
         this.noticeContentId = noticeContentId;
         this.title = title;
-        this.content = content;
+        this.content = StringUtils.stripMarkdown(content);
         this.thumbnailImageUrl = thumbnailImageUrl;
         this.languageCode = languageCode;
         this.createAt = createAt;

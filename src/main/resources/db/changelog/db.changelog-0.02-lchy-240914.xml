@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet author="lchy0413" id="changelog-0.02.01-240914">
+    <preConditions onFail="MARK_RAN">
+      <tableExists tableName="notice_detail_image" />
+    </preConditions>
+    <dropTable tableName="notice_detail_image" />
+  </changeSet>
+
+  <changeSet author="lchy0413" id="changelog-0.02.02-240914">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="notice_detail_image" columnName="thumbnail_image_id" />
+    </preConditions>
+    <dropColumn tableName="notice_detail_image" columnName="thumbnail_image_id" />
+  </changeSet>
+
+  <changeSet author="lchy0413" id="changelog-0.02.04-240914">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="notice_content" columnName="content" />
+    </preConditions>
+
+    <modifyDataType tableName="notice_content" columnName="content" newDataType="LONGTEXT" />
+  </changeSet>
+</databaseChangeLog>
