@@ -224,9 +224,9 @@ public class NoticeService {
         );
     }
 
-    public NoticeDetailResponse findNoticeById(Long noticeContentId) {
+    public NoticeDetailResponse findNoticeByNoticeContentId(Long noticeContentId) {
         try {
-            return noticeRepository.findNoticeById(noticeContentId);
+            return noticeRepository.findNoticeByNoticeContentId(noticeContentId);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

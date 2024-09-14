@@ -228,11 +228,24 @@ public class NoticeController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/{noticeContentId}")
-    public APIResponseEntity<NoticeDetailResponse> findNoticeById(
+    public APIResponseEntity<NoticeDetailResponse> findNoticeByIdInApp(
         @PathVariable("noticeContentId") Long noticeContentId
     ) {
-        NoticeDetailResponse result = noticeService.findNoticeById(noticeContentId);
+        NoticeDetailResponse result = noticeService.findNoticeByNoticeContentId(noticeContentId);
+
+        return APIResponseEntity.<NoticeDetailResponse>builder()
+            .message("공지 단건 조회 성공")
+            .data(result)
+            .build();
+    }
+
+    @GetMapping("/management/{noticeContentId}")
+    public APIResponseEntity<NoticeDetailResponse> findNoticeByNoticeContetnIdInWeb(
+        @PathVariable("noticeContentId") Long noticeContentId
+    ) {
+        NoticeDetailResponse result = noticeService.findNoticeByNoticeContentId(noticeContentId);
 
         return APIResponseEntity.<NoticeDetailResponse>builder()
             .message("공지 단건 조회 성공")

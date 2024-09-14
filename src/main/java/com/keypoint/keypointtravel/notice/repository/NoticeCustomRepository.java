@@ -18,7 +18,7 @@ public interface NoticeCustomRepository {
 
     void updateNoticeContent(UpdateNoticeContentUseCase useCase);
 
-    NoticeDetailResponse findNoticeById(Long noticeContentId);
+    NoticeDetailResponse findNoticeByNoticeContentId(Long noticeContentId);
 
     void deleteNotices(DeleteNoticeUseCase useCase);
 

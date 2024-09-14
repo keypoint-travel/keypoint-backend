@@ -9,7 +9,6 @@ import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase;
-import com.keypoint.keypointtravel.notice.entity.NoticeContent;
 import com.keypoint.keypointtravel.notice.entity.QNotice;
 import com.keypoint.keypointtravel.notice.entity.QNoticeContent;
 import com.querydsl.core.BooleanBuilder;
@@ -116,7 +115,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
                     orderSpecifiers.add(new OrderSpecifier<>(order, noticeContent.content));
                     break;
                 case "createAt":
-                    orderSpecifiers.add(new OrderSpecifier<>(order, notice.createAt));
+                    orderSpecifiers.add(new OrderSpecifier<>(order, noticeContent.createAt));
                     break;
             }
         } else { //기본 정렬 기준
@@ -142,7 +141,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
     }
 
     @Override
-    public NoticeDetailResponse findNoticeById(Long noticeContentId) {
+    public NoticeDetailResponse findNoticeByNoticeContentId(Long noticeContentId) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(noticeContent.id.eq(noticeContentId))
             .and(noticeContent.isDeleted.eq(false));
@@ -150,29 +149,24 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
         QUploadFile activeFile = new QUploadFile("activeFile");
 
         // NoticeContent를 조회하여 상세 이미지들을 가져옴
-        NoticeContent content = queryFactory
-            .selectFrom(noticeContent)
-            .leftJoin(noticeContent.notice, notice)
+        return queryFactory
+            .select(
+                Projections.fields(
+                    NoticeDetailResponse.class,
+                    noticeContent.notice.id.as("noticeId"),
+                    noticeContent.id.as("noticeContentId"),
+                    noticeContent.title,
+                    noticeContent.content,
+                    activeFile.path.as("thumbnailImageUrl"),
+                    noticeContent.languageCode,
+                    noticeContent.createAt,
+                    noticeContent.modifyAt
+                )
+            )
+            .from(noticeContent)
+            .leftJoin(activeFile).on(activeFile.id.eq(noticeContent.notice.thumbnailImageId))
             .where(builder)
             .fetchOne();
-
-        // 썸네일 이미지 URL 가져오기
-        String thumbnailImageUrl = queryFactory
-            .select(activeFile.path)
-            .from(activeFile)
-            //.where(activeFile.id.eq(content.getThumbnailImageId())) todo change
-            .fetchOne();
-
-        return new NoticeDetailResponse(
-            content.getNotice().getId(),
-            content.getId(),
-            content.getTitle(),
-            content.getContent(),
-            thumbnailImageUrl,
-            content.getLanguageCode(),
-            content.getCreateAt(),
-            content.getModifyAt()
-        );
     }
 
     @Transactional
