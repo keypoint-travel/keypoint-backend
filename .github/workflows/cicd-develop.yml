@@ -1,6 +1,9 @@
 name: cicd-develop
 
 on:
+  push:
+    branches:
+      - feature/apple
   pull_request:
     branches:
       - develop
