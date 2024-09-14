@@ -37,7 +37,7 @@ public class Oauth2RequestEntityConverter implements
 
     @Autowired
     public Oauth2RequestEntityConverter(
-        @Value("${apple.service-id}") String appleClientId,
+        @Value("${spring.security.oauth2.client.registration.apple.clientId}") String appleClientId,
         @Value("${apple.teamId}") String appleTeamId,
         @Value("${apple.keyId}") String appleKeyId,
         @Value("${apple.keyPath}") String appleKeyPath) {

@@ -62,12 +62,10 @@ public class AppleOAuthService implements OAuthService {
     private String appleKeyPath;
     @Value("${spring.security.oauth2.client.provider.apple.tokenUri}")
     private String tokenURL;
-    @Value("${spring.security.oauth2.client.registration.apple.clientId}")
+    @Value("${apple.app-id}")
     private String clientId;
     @Value("${spring.security.oauth2.client.registration.apple.clientSecret}")
     private String clientSecret;
-    @Value("${spring.security.oauth2.client.registration.apple.redirect-uri}")
-    private String redirectURI;
     @Value("${apple.teamId}")
     private String appleTeamId;
     @Value("${apple.keyId}")
