@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
@@ -151,10 +152,27 @@ public class NoticeController {
     public APIResponseEntity<Void> deleteNoticeContents(
         @RequestParam("notice-content-ids") Long[] noticeContentIds
     ) {
-        DeleteNoticeContentUseCase useCase = DeleteNoticeContentUseCase.from(
+        DeleteNoticeContentsUseCase useCase = DeleteNoticeContentsUseCase.from(
             noticeContentIds
         );
         noticeService.deleteNoticeContents(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("공지 내용 삭제 성공")
+            .build();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{noticeId}/translations/{noticeContentId}")
+    public APIResponseEntity<Void> deleteNoticeContent(
+        @PathVariable(value = "noticeId") Long noticeId,
+        @PathVariable(value = "noticeContentId") Long noticeContentId
+    ) {
+        DeleteNoticeContentUseCase useCase = DeleteNoticeContentUseCase.of(
+            noticeId,
+            noticeContentId
+        );
+        noticeService.deleteNoticeContent(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("공지 내용 삭제 성공")

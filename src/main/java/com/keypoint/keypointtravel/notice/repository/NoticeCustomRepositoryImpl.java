@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
@@ -161,7 +162,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
 
     @Transactional
     @Override
-    public void deleteNoticeContents(DeleteNoticeContentUseCase useCase) {
+    public void deleteNoticeContents(DeleteNoticeContentsUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
         // 공지 내용 삭제
@@ -172,6 +173,24 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             .where(noticeContent.id.in(useCase.getNoticeContentIds()))
             .execute();
     }
+
+    @Override
+    public long deleteNoticeContent(DeleteNoticeContentUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(noticeContent.id.eq(useCase.getNoticeContentId()))
+            .and(noticeContent.notice.id.eq(useCase.getNoticeId()));
+
+        // 공지 내용 삭제
+        return queryFactory.update(noticeContent)
+            .set(noticeContent.isDeleted, true)
+            .set(noticeContent.modifyAt, LocalDateTime.now())
+            .set(noticeContent.modifyId, currentAuditor)
+            .where(builder)
+            .execute();
+    }
+
     @Transactional
     @Override
     public void deleteNotices(DeleteNoticeUseCase useCase) {

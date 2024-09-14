@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.notice.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -9,6 +10,7 @@ import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
+import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
@@ -182,9 +184,31 @@ public class NoticeService {
         }
     }
 
-    public void deleteNoticeContents(DeleteNoticeContentUseCase useCase) {
+    public void deleteNoticeContents(DeleteNoticeContentsUseCase useCase) {
         try {
             noticeRepository.deleteNoticeContents(useCase);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    @Transactional
+    public void deleteNoticeContent(DeleteNoticeContentUseCase useCase) {
+        try {
+            // 1. 유효성 검사
+            if (noticeContentRepository.existsByIdAndLanguageCodeAndIsDeletedFalse(
+                useCase.getNoticeContentId(),
+                LanguageCode.EN
+            )) {
+                throw new GeneralException(CommonErrorCode.FAIL_TO_DELETE_EN_DATA);
+            }
+
+            // 2. 삭제
+            Long result = noticeRepository.deleteNoticeContent(useCase);
+
+            if (result < 0) {
+                throw new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE);
+            }
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
