@@ -85,8 +85,8 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
                 )
             )
             .from(notice)
-            .leftJoin(notice.noticeContents, noticeContent)
-            .on(noticeContent.languageCode.eq(languageCode))
+            .innerJoin(notice.noticeContents, noticeContent)
+            .on(noticeContent.languageCode.eq(languageCode).and(noticeContent.isDeleted.isFalse()))
             .leftJoin(activeFile).on(activeFile.id.eq(notice.thumbnailImageId))
             .where(builder)
             .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
@@ -95,10 +95,14 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             .fetch();
 
         long count = queryFactory
-            .select(noticeContent)
-            .from(noticeContent)
+            .select(
+                notice.count()
+            )
+            .from(notice)
+            .innerJoin(notice.noticeContents, noticeContent)
+            .on(noticeContent.languageCode.eq(languageCode).and(noticeContent.isDeleted.isFalse()))
             .where(builder)
-            .fetchCount();
+            .fetchOne();
 
         return new PageImpl<>(result, pageable, count);
     }
