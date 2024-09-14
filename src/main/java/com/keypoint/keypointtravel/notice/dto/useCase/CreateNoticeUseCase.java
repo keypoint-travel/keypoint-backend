@@ -18,6 +18,4 @@ public class CreateNoticeUseCase {
     ) {
         return new CreateNoticeUseCase(thumbnailImage, request.getTitle(), request.getContent());
     }
-
-
 }

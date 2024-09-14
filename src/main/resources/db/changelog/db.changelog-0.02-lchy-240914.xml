@@ -11,4 +11,11 @@
     </preConditions>
     <dropTable tableName="notice_detail_image" />
   </changeSet>
+
+  <changeSet author="lchy0413" id="changelog-0.02.02-240914">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="notice_detail_image" columnName="thumbnail_image_id" />
+    </preConditions>
+    <dropColumn tableName="notice_detail_image" columnName="thumbnail_image_id" />
+  </changeSet>
 </databaseChangeLog>

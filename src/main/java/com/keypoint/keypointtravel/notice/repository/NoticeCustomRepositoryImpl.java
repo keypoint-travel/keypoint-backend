@@ -76,7 +76,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             )
             .from(notice)
             .leftJoin(notice.noticeContents, noticeContent)
-            .leftJoin(activeFile).on(activeFile.id.eq(noticeContent.thumbnailImageId))
+            .leftJoin(activeFile).on(activeFile.id.eq(notice.thumbnailImageId))
             .where(builder)
             .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
             .offset(pageable.getOffset())
@@ -142,7 +142,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
         String thumbnailImageUrl = queryFactory
             .select(activeFile.path)
             .from(activeFile)
-            .where(activeFile.id.eq(content.getThumbnailImageId()))
+            //.where(activeFile.id.eq(content.getThumbnailImageId())) todo change
             .fetchOne();
 
         return new NoticeDetailResponse(

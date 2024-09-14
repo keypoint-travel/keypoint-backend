@@ -36,23 +36,19 @@ public class NoticeContent extends LanguageEntity {
     private String content;
 
     @Column
-    private Long thumbnailImageId;
-
-    @Column
     private boolean isDeleted;
 
     @Builder
     public NoticeContent(Notice notice,
-        LanguageCode languageCode, String title, String content, Long thumbnailImageId) {
+        LanguageCode languageCode, String title, String content) {
         super(languageCode);
         this.notice = notice;
         this.title = title;
         this.content = content;
-        this.thumbnailImageId = thumbnailImageId;
         this.isDeleted = false;
     }
 
     public NoticeContent() {
-        super(LanguageCode.KO);
+        super(LanguageCode.EN);
     }
 }

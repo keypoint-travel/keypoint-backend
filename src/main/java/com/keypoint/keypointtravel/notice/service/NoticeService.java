@@ -49,7 +49,7 @@ public class NoticeService {
                 notice,
                 useCase.getTitle(),
                 useCase.getContent(),
-                useCase.getLanguage(),
+                LanguageCode.EN,
                 thumbnailImageId
             );
 
@@ -108,7 +108,6 @@ public class NoticeService {
             .title(title)
             .content(content)
             .languageCode(language)
-            .thumbnailImageId(thumbnailImageId)
             .build();
     }
 
@@ -133,11 +132,11 @@ public class NoticeService {
 
             // 1. 썸네일 이미지 업데이트
             if (useCase.getThumbnailImage() != null) {
-                uploadFileService.updateUploadFile(
-                    noticeContent.getThumbnailImageId(),
-                    useCase.getThumbnailImage(),
-                    DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
-                );
+//                uploadFileService.updateUploadFile(
+//                    noticeContent.getThumbnailImageId(),
+//                    useCase.getThumbnailImage(),
+//                    DirectoryConstants.NOTICE_THUMBNAIL_DIRECTORY
+//                );
             }
 
             // 변경사항 저장

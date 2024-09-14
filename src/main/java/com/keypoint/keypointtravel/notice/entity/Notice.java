@@ -26,11 +26,13 @@ public class Notice extends BaseEntity {
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<NoticeContent> noticeContents;
 
-    @Column
+    @Column(nullable = false)
+    private Long thumbnailImageId;
+
+    @Column(nullable = false)
     private boolean isDeleted;
 
     public Notice(
-
     ) {
         this.isDeleted = false;
     }
