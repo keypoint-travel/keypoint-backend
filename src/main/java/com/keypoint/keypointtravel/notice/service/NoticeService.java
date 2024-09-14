@@ -44,7 +44,7 @@ public class NoticeService {
             // 공지 저장
             noticeRepository.save(notice);
 
-            // 3. 공지 내용 생성 및 저장 (일단 빈 리스트를 넣음, 이미지 추가는 나중에)
+            // 3. 공지 내용 생성 및 저장
             NoticeContent noticeContent = createNoticeContent(
                 notice,
                 useCase.getTitle(),

@@ -43,8 +43,8 @@ public class NoticeController {
     @PostMapping
     public APIResponseEntity<Void> saveNotice(
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
-        @RequestPart(value = "detail") @Valid CreateNoticeRequest request,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        @RequestPart(value = "detail") @Valid CreateNoticeRequest request
+    ) {
         //todo: 관리자 인증 로직 추가 예정
         CreateNoticeUseCase useCase = CreateNoticeUseCase.of(thumbnailImage, request);
         noticeService.saveNotice(useCase);
