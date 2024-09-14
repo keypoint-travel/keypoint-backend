@@ -31,7 +31,7 @@ spring:
             tokenUri: https://www.googleapis.com/oauth2/v4/token
         registration:
           apple:
-            clientId: com.keypoint.keytrip
+            clientId: keytrip.keypoint.com
             clientSecret: AuthKey_ANS9W23GB3.p8
             redirect-uri: https://back-dev.keypointtravel.com/login/oauth2/code/apple
             authorization-grant-type: authorization_code
