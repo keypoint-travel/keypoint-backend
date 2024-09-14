@@ -9,6 +9,7 @@ import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeRequest;
 import com.keypoint.keypointtravel.notice.dto.request.UpdateNoticeContentRequest;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.response.adminNoticeDetail.AdminNoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
@@ -228,22 +229,23 @@ public class NoticeController {
             .build();
     }
 
-    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @GetMapping("/{noticeContentId}")
-    public APIResponseEntity<NoticeDetailResponse> findNoticeByIdInApp(
-        @PathVariable("noticeContentId") Long noticeContentId
-    ) {
-        NoticeDetailResponse result = noticeService.findNoticeByNoticeContentId(noticeContentId);
 
-        return APIResponseEntity.<NoticeDetailResponse>builder()
+    @GetMapping("/management/{noticeContentId}")
+    public APIResponseEntity<AdminNoticeDetailResponse> findNoticeById(
+        @PathVariable("noticeContentId") Long noticeId
+    ) {
+        AdminNoticeDetailResponse result = noticeService.findNoticeById(noticeId);
+
+        return APIResponseEntity.<AdminNoticeDetailResponse>builder()
             .message("공지 단건 조회 성공")
             .data(result)
             .build();
     }
 
-    @GetMapping("/management/{noticeContentId}")
-    public APIResponseEntity<NoticeDetailResponse> findNoticeByNoticeContetnIdInWeb(
-        @PathVariable("noticeContentId") Long noticeContentId
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping("/{noticeId}")
+    public APIResponseEntity<NoticeDetailResponse> findNoticeByNoticeContentId(
+        @PathVariable("noticeId") Long noticeContentId
     ) {
         NoticeDetailResponse result = noticeService.findNoticeByNoticeContentId(noticeContentId);
 

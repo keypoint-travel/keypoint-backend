@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.response.adminNoticeDetail.AdminNoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
@@ -270,6 +271,15 @@ public class NoticeService {
             if (result < 0) {
                 throw new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE);
             }
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+
+    public AdminNoticeDetailResponse findNoticeById(Long noticeId) {
+        try {
+            return noticeRepository.findNoticeById(noticeId);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

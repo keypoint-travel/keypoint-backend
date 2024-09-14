@@ -2,9 +2,13 @@ package com.keypoint.keypointtravel.notice.repository;
 
 import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.response.adminNoticeDetail.AdminNoticeContentResponse;
+import com.keypoint.keypointtravel.notice.dto.response.adminNoticeDetail.AdminNoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentsUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
@@ -12,6 +16,7 @@ import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeContentUseCase
 import com.keypoint.keypointtravel.notice.entity.QNotice;
 import com.keypoint.keypointtravel.notice.entity.QNoticeContent;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -33,6 +38,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
     private final QNotice notice = QNotice.notice;
     private final QNoticeContent noticeContent = QNoticeContent.noticeContent;
     private final AuditorAware<String> auditorProvider;
+    private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
     @Override
     public boolean isExistNoticeContentByLanguageCode(Long noticeId, LanguageCode languageCode) {
@@ -198,6 +204,48 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             .set(noticeContent.modifyId, currentAuditor)
             .where(builder)
             .execute();
+    }
+
+    @Override
+    public AdminNoticeDetailResponse findNoticeById(Long noticeId) {
+        BooleanBuilder guideBuilder = new BooleanBuilder();
+        guideBuilder.and(notice.id.eq(noticeId))
+            .and(notice.isDeleted.eq(false));
+
+        BooleanBuilder translationBuilder = new BooleanBuilder();
+        translationBuilder
+            .and(noticeContent.notice.id.eq(notice.id))
+            .and(noticeContent.isDeleted.eq(false));
+
+        List<AdminNoticeDetailResponse> data = queryFactory
+            .selectFrom(notice)
+            .leftJoin(noticeContent).on(translationBuilder)
+            .innerJoin(uploadFile).on(uploadFile.id.eq(notice.thumbnailImageId))
+            .where(guideBuilder)
+            .transform(GroupBy.groupBy(notice.id)
+                .list(
+                    Projections.fields(
+                        AdminNoticeDetailResponse.class,
+                        notice.id.as("noticeId"),
+                        uploadFile.path.as("thumbnailImageUrl"),
+                        GroupBy.list(
+                            Projections.fields(
+                                AdminNoticeContentResponse.class,
+                                noticeContent.id.as("noticeContentId"),
+                                noticeContent.languageCode,
+                                noticeContent.title,
+                                noticeContent.content
+                            )
+                        ).as("translations")
+                    )
+                )
+            );
+
+        if (data == null || data.isEmpty()) {
+            throw new GeneralException(NoticeErrorCode.NOT_EXISTED_NOTICE);
+        }
+
+        return data.get(0);
     }
 
     @Transactional
