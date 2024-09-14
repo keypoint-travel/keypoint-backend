@@ -1,12 +1,13 @@
 package com.keypoint.keypointtravel.notice.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
-import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
@@ -36,6 +37,7 @@ public class NoticeService {
     private final UploadFileService uploadFileService;
     private final NoticeRepository noticeRepository;
     private final NoticeContentRepository noticeContentRepository;
+    private final MemberDetailRepository memberDetailRepository;
 
     @Transactional
     public void saveNotice(CreateNoticeUseCase useCase) {
@@ -125,9 +127,28 @@ public class NoticeService {
             .build();
     }
 
-    public Page<NoticeResponse> findNotices(PageUseCase useCase) {
+    public Page<NoticeResponse> findNoticesInApp(PageAndMemberIdUseCase useCase) {
         try {
-            return noticeRepository.findNotices(useCase);
+            LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
+                useCase.getMemberId());
+            return noticeRepository.findNotices(useCase, languageCode);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public Page<NoticeResponse> findNoticesInWeb(PageAndMemberIdUseCase useCase) {
+        try {
+            return noticeRepository.findNotices(useCase, LanguageCode.EN);
+        } catch (Exception ex) {
+            throw new GeneralException(ex);
+        }
+    }
+
+    public Page<NoticeResponse> findNotices(PageAndMemberIdUseCase useCase,
+        LanguageCode languageCode) {
+        try {
+            return noticeRepository.findNotices(useCase, languageCode);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

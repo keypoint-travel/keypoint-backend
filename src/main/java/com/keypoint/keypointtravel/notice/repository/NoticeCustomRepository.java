@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.notice.repository;
 
-import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
@@ -14,7 +14,7 @@ public interface NoticeCustomRepository {
 
     boolean isExistNoticeContentByLanguageCode(Long bannerId, LanguageCode languageCode);
 
-    Page<NoticeResponse> findNotices(PageUseCase useCase);
+    Page<NoticeResponse> findNotices(PageAndMemberIdUseCase useCase, LanguageCode languageCode);
 
     void updateNoticeContent(UpdateNoticeContentUseCase useCase);
 

@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.notice.repository;
 
-import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
@@ -49,13 +49,15 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
     }
 
     @Override
-    public Page<NoticeResponse> findNotices(PageUseCase useCase) {
+    public Page<NoticeResponse> findNotices(PageAndMemberIdUseCase useCase,
+        LanguageCode languageCode) {
         Pageable pageable = useCase.getPageable();
         String sortBy = useCase.getSortBy();
         String direction = useCase.getDirection();
+
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(notice.isDeleted.eq(false));
-        builder.and(noticeContent.isDeleted.eq(false));
+        builder.and(notice.isDeleted.eq(false))
+            .and(noticeContent.isDeleted.eq(false));
 
         QUploadFile activeFile = new QUploadFile("activeFile");
 
@@ -79,6 +81,7 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             )
             .from(notice)
             .leftJoin(notice.noticeContents, noticeContent)
+            .on(noticeContent.languageCode.eq(languageCode))
             .leftJoin(activeFile).on(activeFile.id.eq(notice.thumbnailImageId))
             .where(builder)
             .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
@@ -102,9 +105,18 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
             Order order = direction.equalsIgnoreCase("asc") ? Order.ASC : Order.DESC;
 
             switch (sortBy) {
-                case "id":
+                case "noticeId":
                     orderSpecifiers.add(new OrderSpecifier<>(order, notice.id));
                     orderSpecifiers.add(new OrderSpecifier<>(order, noticeContent.id));
+                    break;
+                case "title":
+                    orderSpecifiers.add(new OrderSpecifier<>(order, noticeContent.title));
+                    break;
+                case "content":
+                    orderSpecifiers.add(new OrderSpecifier<>(order, noticeContent.content));
+                    break;
+                case "createAt":
+                    orderSpecifiers.add(new OrderSpecifier<>(order, notice.createAt));
                     break;
             }
         } else { //기본 정렬 기준

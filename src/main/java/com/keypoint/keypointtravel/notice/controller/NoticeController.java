@@ -1,8 +1,9 @@
 package com.keypoint.keypointtravel.notice.controller;
 
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
-import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeContentRequest;
 import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeRequest;
 import com.keypoint.keypointtravel.notice.dto.request.UpdateNoticeContentRequest;
@@ -24,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,8 +87,8 @@ public class NoticeController {
      * @param pageable
      * @return
      */
-    @GetMapping
-    public APIResponseEntity<PageResponse<NoticeResponse>> findNotices(
+    @GetMapping("/management")
+    public APIResponseEntity<PageResponse<NoticeResponse>> findNoticesInWeb(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
         @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
@@ -96,12 +99,47 @@ public class NoticeController {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         }
 
-        PageUseCase useCase = PageUseCase.of(
+        PageAndMemberIdUseCase useCase = PageAndMemberIdUseCase.of(
+            null,
             sortBy,
             direction,
             pageable
         );
-        Page<NoticeResponse> result = noticeService.findNotices(useCase);
+        Page<NoticeResponse> result = noticeService.findNoticesInWeb(useCase);
+
+        return APIResponseEntity.toPage(
+            "공지사항 목록 조회 성공",
+            result
+        );
+    }
+
+    /**
+     * @param sortBy    id
+     * @param direction asc, desc
+     * @param pageable
+     * @return
+     */
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @GetMapping
+    public APIResponseEntity<PageResponse<NoticeResponse>> findNoticesInApp(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(name = "sort-by", required = false) String sortBy,
+        @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
+        @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        // sortBy를 제공한 경우, direction 에 따라 정렬 객체 생성
+        if (sortBy != null && !sortBy.isEmpty()) {
+            Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        }
+
+        PageAndMemberIdUseCase useCase = PageAndMemberIdUseCase.of(
+            userDetails.getId(),
+            sortBy,
+            direction,
+            pageable
+        );
+        Page<NoticeResponse> result = noticeService.findNoticesInApp(useCase);
 
         return APIResponseEntity.toPage(
             "공지사항 목록 조회 성공",
