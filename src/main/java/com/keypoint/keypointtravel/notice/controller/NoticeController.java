@@ -7,12 +7,12 @@ import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.notice.dto.request.NoticeRequest;
+import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeRequest;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
+import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeContentUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.DeleteNoticeUseCase;
-import com.keypoint.keypointtravel.notice.dto.useCase.NoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.PlusNoticeUseCase;
 import com.keypoint.keypointtravel.notice.dto.useCase.UpdateNoticeUseCase;
 import com.keypoint.keypointtravel.notice.service.NoticeService;
@@ -45,12 +45,10 @@ public class NoticeController {
     @PostMapping
     public APIResponseEntity<Void> saveNotice(
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
-        @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
-        @RequestPart(value = "detail") @Valid NoticeRequest request,
+        @RequestPart(value = "detail") @Valid CreateNoticeRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        NoticeUseCase useCase = new NoticeUseCase(
-            thumbnailImage, detailImages, findLanguageValue(request.getLanguage()), request.getTitle(),request.getContent());
+        CreateNoticeUseCase useCase = CreateNoticeUseCase.of(thumbnailImage, request);
         noticeService.saveNotice(useCase);
         return APIResponseEntity.<Void>builder()
             .message("공지등록 성공")
@@ -63,7 +61,7 @@ public class NoticeController {
         @PathVariable(value = "noticeId", required = false) Long noticeId,
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
         @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
-        @RequestPart(value = "detail") @Valid NoticeRequest request,
+        @RequestPart(value = "detail") @Valid CreateNoticeRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
         PlusNoticeUseCase useCase = new PlusNoticeUseCase(noticeId, thumbnailImage, detailImages, findLanguageValue(request.getLanguage()), request.getTitle(),request.getContent());

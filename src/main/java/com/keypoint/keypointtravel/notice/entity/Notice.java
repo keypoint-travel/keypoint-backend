@@ -1,7 +1,15 @@
 package com.keypoint.keypointtravel.notice.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.List;
 import lombok.Getter;
 
@@ -21,7 +29,9 @@ public class Notice extends BaseEntity {
     @Column
     private boolean isDeleted;
 
-    public Notice() {
+    public Notice(
+
+    ) {
         this.isDeleted = false;
     }
 
