@@ -18,7 +18,6 @@ import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
 import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
 import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
 import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenRequestUseCase;
 import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenResponseUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
@@ -52,6 +51,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class AppleOAuthService implements OAuthService {
 
+    private static final String GRANT_TYPE = "authorization_code";
+
     private final OAuthTokenService oAuthTokenService;
     private final AppleAPIService appleAPIService;
     private final Oauth2UserService oauth2UserService;
@@ -76,12 +77,11 @@ public class AppleOAuthService implements OAuthService {
         try {
             LogUtils.writeInfoLog("login", useCase.getOauthCode());
             // 1. Oauth 토큰 발급
-            AppleTokenRequestUseCase tokenRequest = AppleTokenRequestUseCase.of(
+            AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(
                 clientId,
                 createSecret(),
-                useCase.getOauthCode()
-            );
-            AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(tokenRequest
+                useCase.getOauthCode(),
+                GRANT_TYPE
             );
 
             // 2. 사용자 정보 조회

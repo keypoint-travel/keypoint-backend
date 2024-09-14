@@ -12,6 +12,7 @@ public class AppleTokenRequestUseCase {
     @JsonProperty(value = "client_secret")
     private String clientSecret;
 
+    @JsonProperty(value = "code")
     private String code;
 
     @JsonProperty(value = "grant_type")
