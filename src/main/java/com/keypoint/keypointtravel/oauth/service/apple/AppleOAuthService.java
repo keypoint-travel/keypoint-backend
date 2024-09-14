@@ -57,8 +57,6 @@ public class AppleOAuthService implements OAuthService {
     private String appleTeamId;
     @Value("${apple.keyId}")
     private String appleKeyId;
-    @Value("${apple.apple-id}")
-    private String appleAppleId;
 
     @Override
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
