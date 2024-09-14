@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeContentRequest;
 import com.keypoint.keypointtravel.notice.dto.request.CreateNoticeRequest;
+import com.keypoint.keypointtravel.notice.dto.request.UpdateNoticeContentRequest;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
 import com.keypoint.keypointtravel.notice.dto.useCase.CreateNoticeUseCase;
@@ -126,10 +127,12 @@ public class NoticeController {
 
     @PutMapping("/{noticeId}/translations/{noticeContentId}")
     public APIResponseEntity<Void> updateNoticeContent(
+        @PathVariable("noticeId") Long noticeId,
         @PathVariable("noticeContentId") Long noticeContentId,
-        @RequestPart(value = "detail") @Valid UpdateNoticeContentUseCase request) {
+        @RequestBody @Valid UpdateNoticeContentRequest request) {
         //todo: 관리자 인증 로직 추가 예정
         UpdateNoticeContentUseCase useCase = UpdateNoticeContentUseCase.of(
+            noticeId,
             noticeContentId,
             request
         );

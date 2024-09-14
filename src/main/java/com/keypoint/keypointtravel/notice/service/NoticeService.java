@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.notice.service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -169,8 +170,25 @@ public class NoticeService {
     @Transactional
     public void updateNoticeContent(UpdateNoticeContentUseCase useCase) {
         try {
+            Long noticeId = useCase.getNoticeId();
             Long noticeContentId = useCase.getNoticeContentId();
-            NoticeContent noticeContent = findNoticeByNoticeId(noticeContentId);
+
+            // 1. 유효성 검사
+            if (noticeContentRepository.existsByIdNotAndLanguageCodeAndIsDeletedFalse(
+                // 이미 존재하는 언어 코드인지 확인
+                noticeId,
+                noticeContentId,
+                useCase.getLanguageCode()
+            )) {
+                throw new GeneralException(GuideErrorCode.DUPLICATED_GUIDE_TRANSLATION_LANGUAGE);
+            }
+            if (noticeContentRepository.existsByIdAndLanguageCodeAndIsDeletedFalse(
+                // 영어버전 변경을 시도하는 건지 확인
+                noticeContentId,
+                LanguageCode.EN
+            ) && useCase.getLanguageCode() != LanguageCode.EN) {
+                throw new GeneralException(CommonErrorCode.FAIL_TO_DELETE_EN_DATA);
+            }
 
             // 변경사항 저장
             noticeContentRepository.updateNoticeContent(useCase);

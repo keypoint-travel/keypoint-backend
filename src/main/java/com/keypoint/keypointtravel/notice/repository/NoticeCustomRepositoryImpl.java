@@ -116,10 +116,13 @@ public class NoticeCustomRepositoryImpl implements NoticeCustomRepository {
     @Override
     public void updateNoticeContent(UpdateNoticeContentUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
         queryFactory
             .update(noticeContent)
             .set(noticeContent.title, useCase.getTitle())
             .set(noticeContent.content, useCase.getContent())
+            .set(noticeContent.languageCode, useCase.getLanguageCode())
+
             .set(noticeContent.modifyAt, LocalDateTime.now())
             .set(noticeContent.modifyId, currentAuditor)
             .where(noticeContent.id.eq(useCase.getNoticeContentId()))
