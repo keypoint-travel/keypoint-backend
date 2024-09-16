@@ -8,10 +8,12 @@ import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.ImageUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CommonPushNotificationEvent;
 import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.CampaignIdUseCase;
@@ -25,9 +27,12 @@ import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import com.keypoint.keypointtravel.receipt.repository.ReceiptRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +48,7 @@ public class MobileReceiptService {
     private final CampaignBudgetRepository campaignBudgetRepository;
     private final PaymentItemService paymentItemService;
     private final TempReceiptService tempReceiptService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * (영수증 생성) 영수증 데이터 유효성 검사
@@ -144,10 +150,10 @@ public class MobileReceiptService {
             CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
                 campaignId
             );
-        // 2-2. 임시 영수증 데이터 가져오기
-        TempReceipt tempReceipt = tempReceiptService.findTempReceiptById(
-            useCase.getReceiptId());
-        Receipt receipt = useCase.toEntity(campaign, receiptImageId, currencyType, tempReceipt);
+            // 2-2. 임시 영수증 데이터 가져오기
+            TempReceipt tempReceipt = tempReceiptService.findTempReceiptById(
+                useCase.getReceiptId());
+            Receipt receipt = useCase.toEntity(campaign, receiptImageId, currencyType, tempReceipt);
             receiptRepository.save(receipt);
 
             // 3. 결제 항목 저장
@@ -156,8 +162,10 @@ public class MobileReceiptService {
                 campaignId
             );
             List<Long> invitedMemberIds = invitedMembers.stream().map(Member::getId).toList();
+            Set<Long> receiptMemberIds = new HashSet<>();
             for (CreatePaymentItemUseCase paymentItem : useCase.getPaymentItems()) {
                 // 3-1. 참여 리스트가 모두 캠페인에 초대된 회원인지 확인
+                receiptMemberIds.addAll(paymentItem.getMemberIds());
                 if (!invitedMemberIds.containsAll(paymentItem.getMemberIds())) {
                     throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
                         "캠페인에 초대되지 않은 참가자가 포함되어 있습니다.");
@@ -169,6 +177,12 @@ public class MobileReceiptService {
                     .toList();
                 paymentItemService.addPaymentItem(paymentItem.toEntity(receipt), filteredMembers);
             }
+
+            // 4. 영수증 FCM 전달
+            eventPublisher.publishEvent(CommonPushNotificationEvent.of(
+                PushNotificationType.RECEIPT_REGISTER,
+                receiptMemberIds.stream().toList()
+            ));
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
