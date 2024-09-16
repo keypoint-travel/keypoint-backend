@@ -18,6 +18,10 @@ import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotif
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
 import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryService;
 import com.keypoint.keypointtravel.notification.service.PushNotificationService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -26,11 +30,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -49,6 +48,10 @@ public class NotificationEventListener {
         List<PushNotificationHistory> pushNotificationHistories = new ArrayList<>();
         for (Long memberId : event.getMemberIds()) {
             Member member = readMemberService.findMemberById(memberId);
+            if (!member.getNotification().isPushNotificationEnabled()) { // 알림 설정이 안되어 있는 경우
+                continue;
+            }
+
             PushNotificationType type = event.getPushNotificationType();
 
             // 1. FCM 내용 구성
