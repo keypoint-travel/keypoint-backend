@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class PlaceInitializer {
 
+    private final static String VERSION = "1.0";
+
     private final PlaceService placeService;
     private final CountryService countryService;
 
