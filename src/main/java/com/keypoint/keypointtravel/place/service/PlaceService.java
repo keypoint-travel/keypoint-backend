@@ -53,8 +53,8 @@ public class PlaceService {
      *
      * @return
      */
-    public long countAllPlaces() {
-        return placeRepository.count();
+    public List<Place> findAllPlaces() {
+        return placeRepository.findAll();
     }
 
     /**

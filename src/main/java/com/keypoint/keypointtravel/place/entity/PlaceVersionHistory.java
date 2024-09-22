@@ -28,5 +28,9 @@ public class PlaceVersionHistory extends BaseEntity {
   public PlaceVersionHistory(String version) {
     this.version = version;
   }
+
+  public static PlaceVersionHistory from(String version) {
+    return new PlaceVersionHistory(version);
+  }
   
 }
