@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.place.service;
 
+import com.keypoint.keypointtravel.global.enumType.PlaceType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
@@ -53,8 +54,8 @@ public class PlaceService {
      *
      * @return
      */
-    public List<Place> findAllPlaces() {
-        return placeRepository.findAll();
+    public List<Place> findAllPlacesForCity() {
+        return placeRepository.findByPlaceTypeOrderByCityId(PlaceType.CITY);
     }
 
     /**
@@ -72,5 +73,15 @@ public class PlaceService {
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
+    }
+
+    /**
+     * City 데이터 수정
+     *
+     * @param city
+     */
+    @Transactional
+    public void updatePlace(CityExcelUseCase city) {
+        placeRepository.updatePlace(city);
     }
 }

@@ -55,7 +55,7 @@ public class PlaceInitializer {
             Workbook workbook = ExcelUtils.readExcel("static/excel/countries-v1_0.xlsx");
 
             // 1, 국가, 주요 국가 도시 Object 생성
-            List<Place> existedPlaces = placeService.findAllPlaces();
+            List<Place> existedPlaces = placeService.findAllPlacesForCity();
             List<CountryExcelUseCase> countries = createCountryExcelUseCase(workbook);
             Map<String, List<CityExcelUseCase>> cities = createCityCountryExcelUseCase(workbook);
 
@@ -78,7 +78,23 @@ public class PlaceInitializer {
                 }
             } else {
                 // 2-2 기존에 데이터가 존재했던 경우
+                for (List<CityExcelUseCase> places : cities.values()) {
+                    for (CityExcelUseCase city : places) {
+                        Long cityId = city.getId();
+                        if (cityId > existedPlaces.size()) {
+                            // 새로 생성해야 하는 데이터인 경우 (현재 X)
+                        }
 
+                        // 이미 존재하는 데이터인 경우 (유지, 수정)
+                        Place checkPlace = existedPlaces.get(cityId.intValue() - 1);
+                        if (!checkPlace.equals(city)) {
+                            // 수정
+                            placeService.updatePlace(city);
+                        }
+
+                        // 삭제해야 하는 데이터인 경우 (현재 X)
+                    }
+                }
             }
 
             // 3. 버전 데이터 생성
