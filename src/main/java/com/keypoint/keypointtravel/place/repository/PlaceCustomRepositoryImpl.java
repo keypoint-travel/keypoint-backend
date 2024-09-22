@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.place.dto.response.PlaceResponse;
 import com.keypoint.keypointtravel.place.dto.response.QPlaceResponse;
 import com.keypoint.keypointtravel.place.dto.response.QReadRecentPlaceSearchResponse;
 import com.keypoint.keypointtravel.place.dto.response.ReadRecentPlaceSearchResponse;
+import com.keypoint.keypointtravel.place.dto.useCase.CityExcelUseCase;
 import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.keypoint.keypointtravel.place.redis.entity.RecentPlaceSearch;
 import com.querydsl.core.BooleanBuilder;
@@ -94,6 +95,19 @@ public class PlaceCustomRepositoryImpl implements PlaceCustomRepository {
             .sorted(Comparator.comparingInt(
                 response -> sortedPlaceIdIndexMap.get(response.getPlaceId())))
             .toList();
+    }
+
+    @Override
+    public void updatePlace(CityExcelUseCase city) {
+        queryFactory.update(place)
+            .set(place.cityEN, city.getNameEN())
+            .set(place.cityKO, city.getNameKO())
+            .set(place.cityJA, city.getNameJA())
+            .set(place.longitude, city.getLongitude())
+            .set(place.latitude, city.getLatitude())
+
+            .where(place.cityId.eq(city.getId()))
+            .execute();
     }
 
     private BooleanBuilder checkIsContainSearchWord(LanguageCode languageCode, String searchWord) {
