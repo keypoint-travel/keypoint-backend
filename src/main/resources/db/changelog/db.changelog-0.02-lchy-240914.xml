@@ -26,4 +26,16 @@
 
     <modifyDataType tableName="notice_content" columnName="content" newDataType="LONGTEXT" />
   </changeSet>
+
+  <changeSet author="lchy0413" id="changelog-0.02.05-240914">
+    <preConditions onFail="MARK_RAN">
+      <tableExists tableName="place" />
+      <tableExists tableName="country" />
+      <not>
+        <tableExists tableName="place_version_history" />
+      </not>
+    </preConditions>
+    <dropTable tableName="place" />
+    <dropTable tableName="country" />
+  </changeSet>
 </databaseChangeLog>
