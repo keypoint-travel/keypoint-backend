@@ -28,6 +28,8 @@ public class Place {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_id")
     private Long id;
+    
+    private Long cityId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
@@ -43,11 +45,11 @@ public class Place {
     private String cityJA;
 
     @Comment("경도")
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private Double longitude;
 
     @Comment("위도")
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private Double latitude;
 
     @Column(nullable = false)
@@ -62,7 +64,8 @@ public class Place {
         String cityJA,
         Double longitude,
         Double latitude,
-        PlaceType placeType
+        PlaceType placeType,
+        Long cityId
     ) {
         this.country = country;
         this.cityEN = cityEN;
@@ -71,5 +74,6 @@ public class Place {
         this.longitude = longitude;
         this.latitude = latitude;
         this.placeType = placeType;
+        this.cityId = cityId;
     }
 }
