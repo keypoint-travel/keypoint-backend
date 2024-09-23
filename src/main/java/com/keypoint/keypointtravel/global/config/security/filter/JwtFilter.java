@@ -46,7 +46,7 @@ public class JwtFilter extends GenericFilterBean {
         String requestURI = httpServletRequest.getRequestURI();
 
         try {
-            if (StringUtils.hasText(jwtAccessToken)) {
+            if (!requestURI.contains("reissue") && StringUtils.hasText(jwtAccessToken)) {
                 TokenErrorCode tokenError = tokenProvider.validateToken(jwtAccessToken);
 
                 switch (tokenError) {
