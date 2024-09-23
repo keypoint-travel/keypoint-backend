@@ -1,12 +1,5 @@
 package com.keypoint.keypointtravel.auth.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.keypoint.keypointtravel.auth.dto.request.LoginRequest;
 import com.keypoint.keypointtravel.auth.dto.request.RefreshTokenRequest;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
@@ -15,10 +8,16 @@ import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.service.AuthService;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +31,8 @@ public class AuthController {
         LoginUseCase useCase = LoginUseCase.from(request);
         TokenInfoResponse result = authService.login(useCase);
 
+        LogUtils.writeInfoLog("login", String.format("Success login %s", result.getAccessToken()));
+
         return APIResponseEntity.<TokenInfoResponse>builder()
             .message("로그인 성공")
             .data(result)
@@ -42,6 +43,12 @@ public class AuthController {
     public APIResponseEntity<TokenInfoResponse> reissueToken(
         @RequestHeader(value = HeaderConstants.AUTHORIZATION_HEADER) String accessToken,
         @Valid @RequestBody RefreshTokenRequest request) {
+        LogUtils.writeInfoLog("reissueToken",
+            String.format(
+                "access token: %s / refresh token: %s",
+                accessToken,
+                request.getRefreshToken())
+        );
         ReissueUseCase useCase = ReissueUseCase.of(accessToken, request.getRefreshToken());
         TokenInfoResponse result = authService.reissueToken(useCase);
 
