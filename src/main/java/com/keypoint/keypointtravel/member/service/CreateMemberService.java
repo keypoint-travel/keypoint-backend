@@ -25,10 +25,14 @@ import com.keypoint.keypointtravel.member.repository.memberConsent.MemberConsent
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.entity.Notification;
 import com.keypoint.keypointtravel.notification.repository.notification.NotificationRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,8 +139,13 @@ public class CreateMemberService {
             String code = StringUtils.getRandomNumber(EMAIL_VERIFICATION_CODE_DIGITS);
 
             // 2. 이메일 전송
+            Locale currentLocale = LocaleContextHolder.getLocale();
             Map<String, String> emailContent = new HashMap<>();
             emailContent.put("code", code);
+            emailContent.put("timestamp",
+                LocalDateTime.now().plusMinutes(5)
+                    .format(DateTimeFormatter.ofPattern("YYYY/MM/dd hh:mm:ss"))
+            );
             EmailUtils.sendSingleEmail(email, EmailTemplate.EMAIL_VERIFICATION, emailContent);
 
             // 3. 이메일 전송이 성공일 경우, 인증 코드 저장

@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,12 @@ public class EmailUtils {
         try {
             // 이메일 전송을 위한 MimeMessageHelper 객체 생성
             MimeMessageHelper msgHelper = prepareMessage(template, emailContent, false);
-            msgHelper.setSubject(template.getSubject());
+            Locale currentLocale = LocaleContextHolder.getLocale();
+            msgHelper.setSubject(
+                MessageSourceUtils.getLocalizedLanguage(
+                    template.getSubject(),
+                    currentLocale)
+            );
             msgHelper.setTo(receiver);
             // 이메일 전송
             javaMailSender.send(msgHelper.getMimeMessage());
