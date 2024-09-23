@@ -31,6 +31,8 @@ public class AuthController {
         LoginUseCase useCase = LoginUseCase.from(request);
         TokenInfoResponse result = authService.login(useCase);
 
+        LogUtils.writeInfoLog("login", String.format("Success login %s", result.getAccessToken()));
+
         return APIResponseEntity.<TokenInfoResponse>builder()
             .message("로그인 성공")
             .data(result)
