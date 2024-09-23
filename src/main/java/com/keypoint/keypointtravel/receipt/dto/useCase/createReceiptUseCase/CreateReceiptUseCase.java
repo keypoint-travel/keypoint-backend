@@ -44,7 +44,7 @@ public class CreateReceiptUseCase {
             .campaignId(campaignId)
             .store(request.getStore())
             .storeAddress(request.getStoreAddress())
-            .receiptCategory(request.getReceiptCategory())
+            .receiptCategory(ReceiptCategory.getConstant(request.getReceiptCategory()))
             .paidAt(request.getPaidAt())
             .totalAccount(request.getTotalAccount())
             .memo(request.getMemo())
