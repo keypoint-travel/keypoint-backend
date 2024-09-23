@@ -20,9 +20,11 @@ import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,7 @@ public class AuthService {
     private final UpdateMemberService updateMemberService;
     private final BlacklistService blacklistService;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * JWT 토큰을 재발급하는 함수
@@ -112,6 +115,8 @@ public class AuthService {
 
             // 4. JWT 토큰 생성
             return getJwtTokenInfo(email, password);
+        } catch (BadCredentialsException ex) {
+            throw new GeneralException(MemberErrorCode.INVALID_PASSWORD);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
