@@ -117,7 +117,6 @@ public class NotificationEventListener {
         MarketingNotificationType type = event.getMarketingNotificationType();
         EmailTemplate emailTemplate = type.getTemplate();
 
-        // TODO 나중에 이메일 템플릿에 맞게 수정 필요
         EmailUtils.sendMultiEmail(
             event.getMemberEmails()
             , emailTemplate,
