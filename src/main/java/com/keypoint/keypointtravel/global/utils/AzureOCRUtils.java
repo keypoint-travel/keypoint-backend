@@ -58,7 +58,7 @@ public class AzureOCRUtils {
     }
 
     private static String getDateValue(DocumentField fieldData) {
-        return fieldData.getValueDate().format(DateTimeFormatter.ofPattern("YYYY-MM-DD"));
+        return fieldData.getValueDate().format(DateTimeFormatter.ofPattern("YYYY-MM-dd"));
     }
 
     private static String getTimeValue(DocumentField fieldData) {
