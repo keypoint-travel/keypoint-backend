@@ -23,9 +23,11 @@ import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Async;
@@ -135,14 +137,16 @@ public class CreateCampaignService {
     }
 
     private void saveCampaignBudgets(Campaign campaign, CreateUseCase useCase) {
-        List<CampaignBudget> campaignBudgets = useCase.getBudgets().stream()
-            .map(budget -> CampaignBudget.builder()
-                .campaign(campaign)
-                .category(budget.getCategory())
-                .amount(budget.getAmount())
-                .currency(budget.getCurrency())
-                .build()).toList();
-        campaignBudgetRepository.saveAll(campaignBudgets);
+        if (useCase.getBudgets() != null && !useCase.getBudgets().isEmpty()) {
+            List<CampaignBudget> campaignBudgets = useCase.getBudgets().stream()
+                .map(budget -> CampaignBudget.builder()
+                    .campaign(campaign)
+                    .category(budget.getCategory())
+                    .amount(budget.getAmount())
+                    .currency(budget.getCurrency())
+                    .build()).toList();
+            campaignBudgetRepository.saveAll(campaignBudgets);
+        }
     }
 
     private void saveMemberCampaigns(Campaign campaign, CreateUseCase useCase) {
@@ -168,10 +172,12 @@ public class CreateCampaignService {
     }
 
     private void saveTravelLocations(Campaign campaign, CreateUseCase useCase) {
-        List<TravelLocation> travelLocations = useCase.getTravels().stream()
-            .map(travel -> new TravelLocation(campaign, travel.getPlaceId(), travel.getSequence()))
-            .toList();
-        travelLocationRepository.saveAll(travelLocations);
+        if (useCase.getTravels() != null && !useCase.getTravels().isEmpty()) {
+            List<TravelLocation> travelLocations = useCase.getTravels().stream()
+                .map(travel -> new TravelLocation(campaign, travel.getPlaceId(), travel.getSequence()))
+                .toList();
+            travelLocationRepository.saveAll(travelLocations);
+        }
     }
 
 

@@ -1,18 +1,29 @@
 package com.keypoint.keypointtravel.global.enumType.receipt;
 
+import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
 public enum ReceiptCategory {
-    TRANSPORTATION(1, "교통비"),
-    ACCOMMODATION(2, "숙박비"),
-    SHOPPING(3, "쇼핑"),
-    FOOD(4, "식비"),
-    OTHER(5, "기타");
+    TRANSPORTATION(1, "transportation_expenses"),
+    ACCOMMODATION(2, "accommodation_expenses"),
+    SHOPPING(3, "shopping_expenses"),
+    FOOD(4, "food_expenses"),
+    OTHER(5, "other_expenses");
 
     private final int code;
     private final String description;
+
+    public static ReceiptCategory getConstant(String description) {
+        return Arrays.stream(ReceiptCategory.values())
+            .filter(constant -> constant.getDescription().equals(description))
+            .findFirst()
+            .orElseThrow(() -> new GeneralException(BannerErrorCode.REQUEST_DATA_MISMATCH));
+    }
 }
 

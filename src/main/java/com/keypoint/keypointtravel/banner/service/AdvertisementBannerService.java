@@ -194,6 +194,9 @@ public class AdvertisementBannerService {
     public ManagementAdvBannerResponse findAdvertisementBanner(Long bannerId) {
         List<ManagementAdvDetailDto> dtoList = advertisementBannerRepository.
             findAdvertisementBannerById(bannerId);
+        if(dtoList.isEmpty()){
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
         ManagementAdvBannerResponse response = new ManagementAdvBannerResponse(
             dtoList.get(0).getBannerId(), dtoList.get(0).getDetailImageUrl());
         for (ManagementAdvDetailDto dto : dtoList) {
