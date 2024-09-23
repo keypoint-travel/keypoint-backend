@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,9 @@ public class SecurityConfig {
 
     private static final String[] DEFAULT_WHITELIST = {
         "/status", "/images/**", "/error/**, /favicon.ico"
+    };
+    private static final String[] IGNORE_API = {
+        "/api/v1/auth/reissue", "/api/v1/versions"
     };
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -72,6 +76,7 @@ public class SecurityConfig {
             .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
             .requestMatchers("/**").permitAll()
             .requestMatchers(DEFAULT_WHITELIST).permitAll()
+            .requestMatchers(IGNORE_API).permitAll()
             .anyRequest().authenticated()
         );
         http.cors(withDefaults());
@@ -84,5 +89,13 @@ public class SecurityConfig {
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler));
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+            .requestMatchers("/**")
+            .requestMatchers(IGNORE_API)
+            .requestMatchers(DEFAULT_WHITELIST);
     }
 }

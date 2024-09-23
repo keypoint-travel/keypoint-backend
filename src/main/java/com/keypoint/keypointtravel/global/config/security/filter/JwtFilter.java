@@ -1,10 +1,7 @@
 package com.keypoint.keypointtravel.global.config.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.auth.redis.service.BlacklistService;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
-import com.keypoint.keypointtravel.global.dto.response.ErrorDTO;
-import com.keypoint.keypointtravel.global.enumType.error.ErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
@@ -15,10 +12,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -45,8 +40,7 @@ public class JwtFilter extends GenericFilterBean {
         String jwtAccessToken = parseBearerToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
 
-        try {
-            if (!requestURI.contains("reissue") && StringUtils.hasText(jwtAccessToken)) {
+        if (StringUtils.hasText(jwtAccessToken)) {
                 TokenErrorCode tokenError = tokenProvider.validateToken(jwtAccessToken);
 
                 switch (tokenError) {
@@ -55,33 +49,12 @@ public class JwtFilter extends GenericFilterBean {
                             Authentication authentication = tokenProvider.getAuthentication(
                                 jwtAccessToken);
                             SecurityContextHolder.getContext().setAuthentication(authentication);
-                        } else {
-                            throw new GeneralException(TokenErrorCode.LOGGED_OUT_TOKEN);
                         }
                         break;
-                    case EXPIRED_TOKEN:
-                        throw new GeneralException(TokenErrorCode.EXPIRED_TOKEN);
-                    default:
-                        throw new GeneralException(TokenErrorCode.EXPIRED_TOKEN);
                 }
-            }
-            filterChain.doFilter(servletRequest, servletResponse);
-        } catch (GeneralException e) {
-            setErrorResponse(httpServletResponse, e.getErrorCode());
         }
-    }
 
-    private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode)
-        throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-
-        ErrorDTO errorDTO = ErrorDTO.from(errorCode);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String errorJson = objectMapper.writeValueAsString(errorDTO);
-        response.getWriter().write(errorJson);
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     /**
