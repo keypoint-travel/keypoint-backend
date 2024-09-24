@@ -8,11 +8,15 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.CompleteCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignListUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.CampaignReport;
+import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
+import com.keypoint.keypointtravel.campaign.entity.InvitationProhibitionHistory;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.CampaignReportRepository;
 import com.keypoint.keypointtravel.campaign.repository.CustomCampaignReportRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignWaitMemberRepository;
+import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
+import com.keypoint.keypointtravel.campaign.repository.InvitationProhibitionHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.external.aws.service.S3Service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
@@ -56,7 +60,7 @@ public class CompleteCampaignService {
     private final CampaignWaitMemberRepository campaignWaitMemberRepository;
 
     private final ApplicationEventPublisher eventPublisher;
-    
+
     private final UploadFileService uploadFileService;
 
     private final CustomCampaignReportRepository customCampaignReportRepository;
@@ -64,6 +68,10 @@ public class CompleteCampaignService {
     private final CampaignReportRepository campaignReportRepository;
 
     private final S3Service s3Service;
+
+    private final EmailInvitationHistoryRepository emailInvitationHistoryRepository;
+
+    private final InvitationProhibitionHistoryRepository invitationProhibitionHistoryRepository;
 
     /**
      * 캠페인 종료 함수
@@ -78,7 +86,14 @@ public class CompleteCampaignService {
         campaignRepository.updateCampaignFinished(useCase.getCampaignId());
         // 3. 캠페인 대기 목록 삭제
         campaignWaitMemberRepository.deleteAllByCampaignId(useCase.getCampaignId());
-        // 4. 캠페인 종료 알림 전송, 배지 부여
+        // 4. 해당 캠페인 관련 Redis 내부 항목 제거
+        List<EmailInvitationHistory> emailInvitationHistories = emailInvitationHistoryRepository.findAllByCampaignId(
+            useCase.getCampaignId());
+        emailInvitationHistoryRepository.deleteAll(emailInvitationHistories);
+        List<InvitationProhibitionHistory> histories = invitationProhibitionHistoryRepository.findAllByCampaignId(
+            useCase.getCampaignId());
+        invitationProhibitionHistoryRepository.deleteAll(histories);
+        // 5. 캠페인 종료 알림 전송, 배지 부여
         List<Long> invitedMemberIds = memberCampaignRepository.findMemberIdsByCampaignId(
             useCase.getCampaignId()
         );
@@ -88,7 +103,6 @@ public class CompleteCampaignService {
                 useCase.getCampaignId()
             )
         );
-
     }
 
     private List<Long> validateIsLeader(Long memberId, Long campaignId) {

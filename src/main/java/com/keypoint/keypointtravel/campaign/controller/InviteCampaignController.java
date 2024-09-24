@@ -9,6 +9,8 @@ import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.service.InviteCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import jakarta.validation.Valid;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +50,12 @@ public class InviteCampaignController {
         CampaignEmailUseCase useCase = new CampaignEmailUseCase(
             request.getEmail(),
             userDetails.getId(),
-            request.getCampaignId());
+            request.getCampaignId(),
+            request.isResend());
+        // 자기 자신을 초대하는지 확인
+        if(userDetails.getEmail().equals(request.getEmail())){
+            throw new GeneralException(CampaignErrorCode.CANNOT_INVITE_SELF);
+        }
         // 초대 가능한지 확인
         inviteCampaignService.validateInvitation(useCase);
         // 이메일로 초대

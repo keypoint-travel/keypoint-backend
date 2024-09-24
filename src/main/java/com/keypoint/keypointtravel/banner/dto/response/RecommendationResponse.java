@@ -29,9 +29,9 @@ public class RecommendationResponse {
     private String cat3;
     private List<AroundTourism> around;
 
-    public static RecommendationResponse of(List<Item> items, String memberName, LanguageCode language){
-        String imagePath = items.get(0).getFirstimage();
-            imagePath = TourismApiConstants.DEFAULT_IMAGE;
+    public static RecommendationResponse of(List<Item> items, String memberName,
+        LanguageCode language) {
+        String imagePath = findImage(items.get(0));
         RecommendationResponse response = RecommendationResponse.builder()
             .contentId(items.get(0).getContentid())
             .memberName(memberName)
@@ -49,7 +49,7 @@ public class RecommendationResponse {
                 .map(AroundTourism::from).toList())
             .build();
         response.buildTypeByLanguage(items.get(0), language);
-        return  response;
+        return response;
     }
 
     private void buildTypeByLanguage(Item data, LanguageCode language) {
@@ -68,5 +68,13 @@ public class RecommendationResponse {
             this.cat2 = BannerCode.getDescription(MiddleCategoryByJap.class, data.getCat2());
             this.cat3 = BannerCode.getDescription(SmallCategoryByJap.class, data.getCat3());
         }
+    }
+
+    private static String findImage(Item item){
+        String imagePath = item.getFirstimage();
+        if (imagePath == null || imagePath.isEmpty() || imagePath.isBlank()) {
+            imagePath = TourismApiConstants.DEFAULT_IMAGE;
+        }
+        return imagePath;
     }
 }

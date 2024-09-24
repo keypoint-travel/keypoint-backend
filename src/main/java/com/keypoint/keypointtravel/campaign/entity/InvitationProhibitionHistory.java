@@ -1,15 +1,17 @@
 package com.keypoint.keypointtravel.campaign.entity;
 
 import jakarta.persistence.Id;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @NoArgsConstructor
-@RedisHash(value = "emailRequestHistory")
-public class EmailInvitationHistory {
+@RedisHash(value = "emailProhibitionHistory")
+public class InvitationProhibitionHistory {
 
     @Id
     private String id;
@@ -17,18 +19,11 @@ public class EmailInvitationHistory {
     @Indexed
     private Long campaignId;
 
-    @Indexed
-    private String email;
+    @TimeToLive(unit = TimeUnit.DAYS)
+    private Long expiration;
 
-    private int count;
-
-    public EmailInvitationHistory(Long campaignId, String email, int count) {
+    public InvitationProhibitionHistory(Long campaignId, Long expiration) {
         this.campaignId = campaignId;
-        this.email = email;
-        this.count = count;
-    }
-
-    public void addCount(){
-        this.count++;
+        this.expiration = expiration;
     }
 }
