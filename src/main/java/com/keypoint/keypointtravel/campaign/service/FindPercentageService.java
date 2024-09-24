@@ -143,7 +143,7 @@ public class FindPercentageService {
         }
         if (totalAmount - allMemberUsedAmount > 0) {
             remainingBudget = (totalAmount - allMemberUsedAmount) / dto.getTotalMember();
-            returnAmounts.put("REMAINING_BUDGET", remainingBudget);
+            returnAmounts.put("remaining_budget", remainingBudget);
             usedTotalAmount += remainingBudget;
         }
         // 4. 조회된 결제 항목을 currencyType에 맞게 변환
@@ -258,7 +258,7 @@ public class FindPercentageService {
         float remainBudget = 0;
         if (totalBudget.getTotalAmount() - totalAmount > 0) {
             remainBudget = totalBudget.getTotalAmount() - totalAmount;
-            returnAmounts.put("REMAINING_BUDGET", remainBudget);
+            returnAmounts.put("remaining_budget", remainBudget);
         }
         return remainBudget;
     }
