@@ -8,10 +8,12 @@ import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CampaignEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
+import com.keypoint.keypointtravel.campaign.entity.InvitationProhibitionHistory;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.CustomMemberCampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
+import com.keypoint.keypointtravel.campaign.repository.InvitationProhibitionHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.friend.dto.FriendDto;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Async;
@@ -48,6 +51,8 @@ public class InviteCampaignService {
     private final BlockedMemberRepository blockedMemberRepository;
 
     private final EmailInvitationHistoryRepository emailInvitationHistoryRepository;
+
+    private final InvitationProhibitionHistoryRepository invitationProhibitionHistoryRepository;
 
     private final CustomMemberCampaignRepository customMemberCampaignRepository;
 
@@ -80,12 +85,35 @@ public class InviteCampaignService {
      *
      * @Param email, memberId(요청을 보낸 사용자), campaignId useCase
      */
-    @Transactional
     public void validateInvitation(CampaignEmailUseCase useCase) {
+        // 이메일 초대 금지 상태 확인
+        if (invitationProhibitionHistoryRepository.existsByCampaignId(useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.PROHIBIT_INVITE_EMAIL);
+        }
         // 캠페인 장인지 확인 campaignId, memberId
         if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
+        }
+        //  email 초대 기록 조회
+        Optional<EmailInvitationHistory> emailInvitationHistory =
+            emailInvitationHistoryRepository.findByCampaignIdAndEmail(useCase.getCampaignId(),
+                useCase.getEmail());
+        // 재전송이 아닐 경우 - 이미 초대한 메일 기록이 있는지 확인
+        if (!useCase.isResend()) {
+            // 이미 초대한 이력이 있을 경우
+            if (emailInvitationHistory.isPresent()) {
+                throw new GeneralException(CampaignErrorCode.ALREADY_INVITE_EMAIL);
+            }
+        }
+        // 재전송일 경우 - 3회 이상 초대하였을 경우 예외 처리 및 초대 금지 기한 설정
+        if (useCase.isResend() && emailInvitationHistory.isPresent()
+            && emailInvitationHistory.get().getCount() >= 3) {
+            // 1일동안 초대 금지 부여
+            InvitationProhibitionHistory history = new InvitationProhibitionHistory(
+                useCase.getCampaignId(), 1L);
+            invitationProhibitionHistoryRepository.save(history);
+            throw new GeneralException(CampaignErrorCode.PROHIBIT_INVITE_EMAIL);
         }
     }
 
@@ -112,8 +140,11 @@ public class InviteCampaignService {
             new Object[]{dto.getCampaignName()}, emailContent, images);
 
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
-        emailInvitationHistoryRepository.save(
-            new EmailInvitationHistory(useCase.getCampaignId(), useCase.getEmail(), 1L));
+        EmailInvitationHistory history = emailInvitationHistoryRepository.findByCampaignIdAndEmail(
+            useCase.getCampaignId(), useCase.getEmail()).orElse(
+            new EmailInvitationHistory(useCase.getCampaignId(), useCase.getEmail(), 0));
+        history.addCount();
+        emailInvitationHistoryRepository.save(history);
     }
 
     /**

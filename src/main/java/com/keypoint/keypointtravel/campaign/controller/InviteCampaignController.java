@@ -50,7 +50,8 @@ public class InviteCampaignController {
         CampaignEmailUseCase useCase = new CampaignEmailUseCase(
             request.getEmail(),
             userDetails.getId(),
-            request.getCampaignId());
+            request.getCampaignId(),
+            request.isResend());
         // 자기 자신을 초대하는지 확인
         if(userDetails.getEmail().equals(request.getEmail())){
             throw new GeneralException(CampaignErrorCode.CANNOT_INVITE_SELF);

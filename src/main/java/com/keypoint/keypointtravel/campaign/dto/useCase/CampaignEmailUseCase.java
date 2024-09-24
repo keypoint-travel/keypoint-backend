@@ -10,4 +10,5 @@ public class CampaignEmailUseCase {
     private String email;
     private Long memberId;
     private Long campaignId;
+    private boolean resend;
 }

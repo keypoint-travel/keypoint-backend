@@ -207,7 +207,7 @@ public class CreateCampaignService {
         List<EmailInvitationHistory> histories = new ArrayList<>();
         for (String email : useCase.getEmails()) {
             histories.add(new EmailInvitationHistory(useCase.getCampaignId(), email,
-                useCase.getCampaignId()));
+                1));
         }
         emailInvitationHistoryRepository.saveAll(histories);
     }
