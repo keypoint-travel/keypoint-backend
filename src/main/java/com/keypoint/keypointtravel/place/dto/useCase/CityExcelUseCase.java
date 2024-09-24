@@ -10,6 +10,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CityExcelUseCase {
 
+    private Long id;
+
     private String iso2;
 
     private String nameEN;
@@ -23,6 +25,7 @@ public class CityExcelUseCase {
     private Double latitude;
 
     public static CityExcelUseCase of(
+        Long id,
         String iso2,
         String nameEN,
         String nameKO,
@@ -31,6 +34,7 @@ public class CityExcelUseCase {
         Double latitude
     ) {
         return new CityExcelUseCase(
+            id,
             iso2,
             nameEN,
             nameKO,
@@ -49,6 +53,7 @@ public class CityExcelUseCase {
             .longitude(this.longitude)
             .latitude(this.latitude)
             .placeType(PlaceType.CITY)
+            .cityId(id)
             .build();
     }
 

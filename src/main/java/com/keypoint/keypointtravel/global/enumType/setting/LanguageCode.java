@@ -18,7 +18,7 @@ public enum LanguageCode {
 
     public static LanguageCode fromCode(String code) {
         for (LanguageCode languageCode : LanguageCode.values()) {
-            if (code.contains(languageCode.getCode())) {
+            if (code.contains(languageCode.getCode()) || languageCode.getCode().contains(code)) {
                 return languageCode;
             }
         }

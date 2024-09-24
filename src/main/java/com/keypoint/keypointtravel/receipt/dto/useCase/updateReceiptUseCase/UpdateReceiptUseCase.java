@@ -31,7 +31,7 @@ public class UpdateReceiptUseCase {
                 .receiptId(receiptId)
                 .store(request.getStore())
                 .storeAddress(request.getStoreAddress())
-                .receiptCategory(request.getReceiptCategory())
+                .receiptCategory(ReceiptCategory.getConstant(request.getReceiptCategory()))
                 .paidAt(request.getPaidAt())
             .totalAccount(request.getTotalAmount())
                 .memo(request.getMemo())

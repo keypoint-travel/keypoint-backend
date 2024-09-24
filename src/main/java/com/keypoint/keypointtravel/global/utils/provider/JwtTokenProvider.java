@@ -166,6 +166,8 @@ public class JwtTokenProvider implements InitializingBean {
             return TokenErrorCode.UNSUPPORTED_TOKEN;
         } catch (IllegalStateException e) {
             return TokenErrorCode.INVALID_TOKEN;
+        } catch (Exception e) {
+            return TokenErrorCode.INVALID_TOKEN;
         }
     }
 

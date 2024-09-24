@@ -53,7 +53,8 @@ public class VisitedCountryRepository {
             .and(memberCampaign.member.id.eq(memberId));
 
         // 정렬 기준 추가
-        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, campaign.title);
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.DESC, campaign.startDate);
+
         if (sortBy != null) {
             Order order = direction.equals("asc") ? Order.ASC : Order.DESC;
 

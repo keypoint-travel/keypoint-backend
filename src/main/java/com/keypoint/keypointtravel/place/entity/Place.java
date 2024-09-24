@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.place.entity;
 
 import com.keypoint.keypointtravel.global.enumType.PlaceType;
+import com.keypoint.keypointtravel.place.dto.useCase.CityExcelUseCase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,6 +30,8 @@ public class Place {
     @Column(name = "place_id")
     private Long id;
 
+    private Long cityId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;
@@ -43,11 +46,11 @@ public class Place {
     private String cityJA;
 
     @Comment("경도")
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private Double longitude;
 
     @Comment("위도")
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private Double latitude;
 
     @Column(nullable = false)
@@ -62,7 +65,8 @@ public class Place {
         String cityJA,
         Double longitude,
         Double latitude,
-        PlaceType placeType
+        PlaceType placeType,
+        Long cityId
     ) {
         this.country = country;
         this.cityEN = cityEN;
@@ -71,5 +75,20 @@ public class Place {
         this.longitude = longitude;
         this.latitude = latitude;
         this.placeType = placeType;
+        this.cityId = cityId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass() == CityExcelUseCase.class) {
+            CityExcelUseCase city = (CityExcelUseCase) o;
+            return city.getNameEN().equals(cityEN) &&
+                city.getNameKO().equals(cityKO) &&
+                city.getNameJA().equals(cityJA) &&
+                city.getLatitude().equals(latitude) &&
+                city.getLongitude().equals(longitude);
+        }
+
+        return o.equals(this);
     }
 }

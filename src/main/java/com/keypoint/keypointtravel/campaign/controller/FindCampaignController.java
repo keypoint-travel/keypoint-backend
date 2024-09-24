@@ -85,13 +85,13 @@ public class FindCampaignController {
         @RequestParam(value = "currency", defaultValue = "null") String currencyType,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam("category") ReceiptCategory category,
+        @RequestParam("category") String category,
         @PathVariable Long campaignId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         FindPaymentsUseCase useCase = new FindPaymentsUseCase(campaignId, userDetails.getId(),
             currencyType, size, page);
         Page<PaymentResponse> response = findPaymentService.findPaymentsByCategory(useCase,
-            category);
+            ReceiptCategory.getConstant(category));
         return APIResponseEntity.toPage(
             "캠페인 카테고리별 결제 내역 조회 성공",
             response
