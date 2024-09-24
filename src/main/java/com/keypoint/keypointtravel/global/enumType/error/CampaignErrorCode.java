@@ -15,7 +15,8 @@ public enum CampaignErrorCode implements ErrorCode {
     NOT_EXISTED_CURRENCY("006_NOT_EXISTED_CURRENCY", "존재하지 않는 화폐입니다"),
     ALREADY_IN_WAIT_LIST("007_ALREADY_IN_WAIT_LIST", "이미 대기명단에 있습니다"),
     NOT_EXISTED_CAMPAIGN_WAIT_MEMBER("008_NOT_EXISTED_CAMPAIGN_WAIT_MEMBER", "회원이 대기명단에 존재하지 않습니다"),
-    MULTIPLE_CAMPAIGN_NON_PREMIUM("009_MANY_CAMPAIGN_NOT_PREMIUM_MEMBER", "프리미엄 회원이 아닌 회원은 하나의 캠페인 참여만 가능합니다.");
+    MULTIPLE_CAMPAIGN_NON_PREMIUM("009_MANY_CAMPAIGN_NOT_PREMIUM_MEMBER", "프리미엄 회원이 아닌 회원은 하나의 캠페인 참여만 가능합니다."),
+    CANNOT_INVITE_SELF("010_CANNOT_INVITE_SELF", "자기 자신을 초대할 수 없습니다.");
 
     private final String code;
     private final String msg;
