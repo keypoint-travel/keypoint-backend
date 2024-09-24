@@ -38,4 +38,11 @@
     <dropTable tableName="place" />
     <dropTable tableName="country" />
   </changeSet>
+
+  <changeSet author="lchy0413" id="changelog-0.02.06-240924">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="receipt" columnName="receipt_image_id" />
+    </preConditions>
+      <dropNotNullConstraint tableName="receipt" columnName="receipt_image_id" columnDataType="bigint(20)" />
+  </changeSet>
 </databaseChangeLog>
