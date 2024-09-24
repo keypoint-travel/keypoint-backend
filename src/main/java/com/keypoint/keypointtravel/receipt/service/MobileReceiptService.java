@@ -143,17 +143,26 @@ public class MobileReceiptService {
             );
 
             // 2. 영수증 저장
-            // 2-1. 영수증 이미지 저장
             Campaign campaign = campaignRepository.getReferenceById(campaignId);
-            BufferedImage image = ImageUtils.convertImageUrlToImage(receiptImageUrl);
-            Long receiptImageId = uploadFileService.saveUploadFile(receiptImageUrl, image);
             CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
                 campaignId
             );
-            // 2-2. 임시 영수증 데이터 가져오기
-            TempReceipt tempReceipt = tempReceiptService.findTempReceiptById(
-                useCase.getReceiptId());
-            Receipt receipt = useCase.toEntity(campaign, receiptImageId, currencyType, tempReceipt);
+            Receipt receipt;
+
+            if (useCase.getRegistrationType() == ReceiptRegistrationType.PHOTO) {
+                // 2-1. 영수증 이미지 저장
+                BufferedImage image = ImageUtils.convertImageUrlToImage(receiptImageUrl);
+                Long receiptImageId = uploadFileService.saveUploadFile(receiptImageUrl, image);
+
+                // 2-2. 임시 영수증 데이터 가져오기
+                TempReceipt tempReceipt = tempReceiptService.findTempReceiptById(
+                    useCase.getReceiptId());
+                receipt = useCase.toEntity(campaign, receiptImageId, currencyType,
+                    tempReceipt);
+            } else {
+                receipt = useCase.toEntity(campaign, currencyType);
+            }
+
             receiptRepository.save(receipt);
 
             // 3. 결제 항목 저장

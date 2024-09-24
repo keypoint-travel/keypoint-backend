@@ -65,7 +65,7 @@ public class Receipt extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime paidAt;
 
-    @Column(nullable = false)
+    @Column()
     private Long receiptImageId;
 
     @Comment("경도")

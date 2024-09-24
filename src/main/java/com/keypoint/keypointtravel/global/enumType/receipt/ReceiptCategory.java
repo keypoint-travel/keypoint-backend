@@ -1,12 +1,10 @@
 package com.keypoint.keypointtravel.global.enumType.receipt;
 
-import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,7 +22,8 @@ public enum ReceiptCategory {
         return Arrays.stream(ReceiptCategory.values())
             .filter(constant -> constant.getDescription().equals(description))
             .findFirst()
-            .orElseThrow(() -> new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA));
+            .orElseThrow(() -> new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                "ReceiptCategory 변환에 실패하였습니다."));
     }
 }
 
