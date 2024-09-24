@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static com.keypoint.keypointtravel.global.constants.ApplePurchaseConstants.APPLE_PRODUCTION_URL;
 
-@FeignClient(name = "appleApi", url = APPLE_PRODUCTION_URL)
+@FeignClient(name = "appleApi", url = APPLE_PRODUCTION_URL, fallback = ApplePurchaseApiServiceFallback.class)
 public interface ApplePurchaseApiService {
 
     @PostMapping
