@@ -25,5 +25,10 @@ public enum ReceiptCategory {
             .orElseThrow(() -> new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
                 "ReceiptCategory 변환에 실패하였습니다."));
     }
+
+    public static boolean isExist(String description) {
+        return Arrays.stream(ReceiptCategory.values())
+            .anyMatch(constant -> constant.getDescription().equals(description) && constant != OTHER);
+    }
 }
 
