@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
+import com.keypoint.keypointtravel.campaign.dto.request.createRequest.BudgetInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.CreateRequest;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.EmailInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
@@ -36,6 +37,11 @@ public class CreateCampaignController {
         @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
         @RequestPart(value = "detail") @Valid CreateRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 총 예산과 카테고리별 합산 예산이 일치하지 않는 경우 예외 처리
+        if (request.getBudgets().stream().mapToDouble(BudgetInfo::getAmount).sum()
+            != request.getTotalBudget()) {
+            throw new GeneralException(CampaignErrorCode.NOT_MATCH_BUDGET);
+        }
         // 이메일 초대 명단에 자기 자신이 있는지 확인
         if (request.getEmails() != null && !request.getEmails().isEmpty()) {
             validateInviteSelf(request.getEmails(), userDetails.getEmail());
