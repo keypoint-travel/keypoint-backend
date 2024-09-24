@@ -82,16 +82,10 @@ public class InviteCampaignService {
      */
     @Transactional
     public void validateInvitation(CampaignEmailUseCase useCase) {
-        // 캠페인 장 조회
-        MemberCampaign memberCampaign = customMemberCampaignRepository.findCampaignLeader(
-            useCase.getCampaignId());
-        // 요청자가 캠페인 장이 맞는지 확인
-        if (!memberCampaign.getMember().getId().equals(useCase.getMemberId())) {
+        // 캠페인 장인지 확인 campaignId, memberId
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+            useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
-        }
-        // email에 해당하는 회원이 캠페인 장 본인으로 등록되어있는지 확인
-        if (memberCampaign.getMember().getEmail().equals(useCase.getEmail())) {
-            throw new GeneralException(CampaignErrorCode.CANNOT_INVITE_SELF);
         }
     }
 

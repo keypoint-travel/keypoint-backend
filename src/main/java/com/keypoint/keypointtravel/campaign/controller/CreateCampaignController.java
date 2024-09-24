@@ -1,11 +1,15 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.CreateRequest;
+import com.keypoint.keypointtravel.campaign.dto.request.createRequest.EmailInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailsUseCase;
 import com.keypoint.keypointtravel.campaign.service.CreateCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -32,6 +36,10 @@ public class CreateCampaignController {
         @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
         @RequestPart(value = "detail") @Valid CreateRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 이메일 초대 명단에 자기 자신이 있는지 확인
+        if (request.getEmails() != null && !request.getEmails().isEmpty()) {
+            validateInviteSelf(request.getEmails(), userDetails.getEmail());
+        }
         // 캠페인 생성
         Long campaignId = createCampaignService.createCampaign(
             CreateUseCase.of(coverImage, request, userDetails.getId()));
@@ -43,5 +51,13 @@ public class CreateCampaignController {
                 locale);
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    private void validateInviteSelf(List<EmailInfo> emails, String leaderEmail) {
+        for (EmailInfo email : emails) {
+            if (leaderEmail.equals(email.getEmail())) {
+                throw new GeneralException(CampaignErrorCode.CANNOT_INVITE_SELF);
+            }
+        }
     }
 }
