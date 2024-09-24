@@ -54,8 +54,10 @@ public class VisitedCountryRepository {
 
         // 정렬 기준 추가
         OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.DESC, campaign.startDate);
-        OrderSpecifier<?> defaultOrderSpecifier = new OrderSpecifier<>(Order.ASC,
-            campaign.createAt);
+        OrderSpecifier<?> defaultOrderSpecifier = new OrderSpecifier<>(
+            Order.DESC,
+            campaign.createAt
+        );
 
         if (sortBy != null) {
             Order order = direction.equals("asc") ? Order.ASC : Order.DESC;
