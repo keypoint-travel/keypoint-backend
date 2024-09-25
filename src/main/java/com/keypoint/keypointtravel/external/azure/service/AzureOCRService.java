@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.external.azure.dto.response.OCRResultResponse
 import com.keypoint.keypointtravel.external.azure.dto.useCase.OCRAnalysisUseCase;
 import com.keypoint.keypointtravel.external.azure.dto.useCase.WholeReceiptUseCase;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.exception.HttpClientException;
@@ -13,14 +14,13 @@ import com.keypoint.keypointtravel.global.utils.MultiPartFileUtils;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult.ReceiptOCRResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptImageUseCase;
 import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Objects;
 
 
 @Service
@@ -45,6 +45,11 @@ public class AzureOCRService {
     public ReceiptOCRResponse analyzeReceipt(ReceiptImageUseCase useCase) {
         try {
             MultipartFile file = useCase.getReceiptImage();
+            if (file == null) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                    "receiptImage 는 null일 수 없습니다"
+                );
+            }
 
             // 1. ocr 분석 요청 및 결과 URL 가져오기
             String base64Source = MultiPartFileUtils.convertToBase64(file);
