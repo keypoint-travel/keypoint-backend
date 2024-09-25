@@ -27,10 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +68,7 @@ public class FindPercentageService {
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 사용되지 않은 캠페인 예산 0원으로 추가
         addBudgetPercentage(percentages);
+        Collections.sort(percentages);
         // 6. 응답
         return new PercentageResponse(
             totalBudget.getCurrencyType().getCode(),
@@ -161,6 +159,7 @@ public class FindPercentageService {
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 사용되지 않은 캠페인 예산 0원으로 추가
         addBudgetPercentage(percentages);
+        Collections.sort(percentages);
         // 6. 응답
         return new PercentageByMemberResponse(dto.getCurrency().getCode(), percentages);
     }
@@ -215,6 +214,7 @@ public class FindPercentageService {
         List<PercentageByCategory> percentages = calculateCategoryPercentage(returnAmounts, usedTotalAmount);
         // 사용되지 않은 캠페인 예산 0원으로 추가
         addBudgetPercentage(percentages);
+        Collections.sort(percentages);
         // 8. 응답
         return new CampaignReportPrice(
             totalBudget.getCurrencyType().getCode(),
