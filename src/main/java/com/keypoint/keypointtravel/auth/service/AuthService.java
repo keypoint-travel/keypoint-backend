@@ -65,8 +65,6 @@ public class AuthService {
             CommonRefreshTokenDTO refreshTokenDTO = refreshTokenService.findRefreshTokenByEmail(
                 email);
             if (refreshTokenDTO == null) { // 토큰이 만료되어 존재하지 않는 경우
-                LogUtils.writeErrorLog("reissueToken",
-                    "There is no refresh token for email: " + email);
                 throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.EXPIRED_TOKEN);
             }
             String refreshToken = refreshTokenDTO.getRefreshToken();
@@ -74,8 +72,6 @@ public class AuthService {
             // 2-1. 저장된 refresh_token과 요청한 refresh_token이 동일한지 확인
             // 다른 경우: 토큰이 탈취된 경우 
             if (!refreshToken.equals(useCase.getRefreshToken())) {
-                LogUtils.writeErrorLog("reissueToken",
-                    "The refresh token does not match the user's token");
                 throw new GeneralException(HttpStatus.UNAUTHORIZED, TokenErrorCode.INVALID_TOKEN,
                     "저장된 refresh token과 유효하지 않습니다.");
             }
@@ -83,8 +79,6 @@ public class AuthService {
             // 2-2. refresh token 토큰이 유효한지 확인
             TokenErrorCode validateResult = tokenProvider.validateToken(refreshToken);
             if (validateResult != TokenErrorCode.NONE) {
-                LogUtils.writeErrorLog("reissueToken",
-                    "The token is invalid");
                 throw new GeneralException(HttpStatus.UNAUTHORIZED, validateResult);
             }
 
