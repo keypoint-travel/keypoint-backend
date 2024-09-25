@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +31,17 @@ public class LoggingConfig {
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         Map<String, Object> requestInfo = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         long start = System.currentTimeMillis();
 
         try {
-            //requestInfo.put("Request body", pjp.getArgs());
+//            requestInfo.put("Request body", pjp.getArgs());
+//            for (Object arg : pjp.getArgs()) {
+//                if (arg instanceof MultipartFile) {
+//                    requestInfo.remove("Request body");
+//                    break;
+//                }
+//            }
 
             return pjp.proceed(pjp.getArgs());
         } finally {
@@ -44,6 +52,12 @@ public class LoggingConfig {
             requestInfo.put("URI", request.getRequestURI());
             requestInfo.put("Request parameters", request.getQueryString() == null ? "" : request.getQueryString());
             requestInfo.put("Response time", end - start);
+
+            try {
+                logger.info(objectMapper.writeValueAsString(requestInfo));
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
     }
 }

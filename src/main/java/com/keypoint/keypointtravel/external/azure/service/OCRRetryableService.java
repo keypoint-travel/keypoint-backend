@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.constants.AzureAPIConstants;
 import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.enumType.ocr.OCROperationStatus;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +54,7 @@ public class OCRRetryableService {
             apiKey
         );
         OCRResultResponse response = ocrResult.getBody();
+        LogUtils.writeInfoLog("getOCRResult", response.getStatus().name());
         // 2. 응답 상태 확인
         if (!VALID_OCR_STATUS.contains(response.getStatus())) {
             // 2-1. 아직 분석을 진행 중이거나 시작하지 않은 경우 재시도 요청
