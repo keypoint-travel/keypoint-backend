@@ -31,8 +31,6 @@ public class AuthController {
         LoginUseCase useCase = LoginUseCase.from(request);
         TokenInfoResponse result = authService.login(useCase);
 
-        LogUtils.writeInfoLog("login", String.format("Success login %s", result.getAccessToken()));
-
         return APIResponseEntity.<TokenInfoResponse>builder()
             .message("로그인 성공")
             .data(result)
@@ -43,12 +41,6 @@ public class AuthController {
     public APIResponseEntity<TokenInfoResponse> reissueToken(
         @RequestHeader(value = HeaderConstants.AUTHORIZATION_HEADER) String accessToken,
         @Valid @RequestBody RefreshTokenRequest request) {
-        LogUtils.writeInfoLog("reissueToken",
-            String.format(
-                "access token: %s / refresh token: %s",
-                accessToken,
-                request.getRefreshToken())
-        );
         ReissueUseCase useCase = ReissueUseCase.of(accessToken, request.getRefreshToken());
         TokenInfoResponse result = authService.reissueToken(useCase);
 

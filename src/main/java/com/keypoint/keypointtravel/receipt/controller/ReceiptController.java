@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.receipt.controller;
 
 import com.keypoint.keypointtravel.external.azure.service.AzureOCRService;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest.UpdateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult.ReceiptOCRResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
@@ -36,6 +37,9 @@ public class ReceiptController {
     public APIResponseEntity<ReceiptOCRResponse> analyzeReceipt(
         @RequestPart(value = "receiptImage", required = false) MultipartFile receiptImage
     ) {
+        LogUtils.writeInfoLog("analyzeReceipt",
+            "/api/v1/receipts/analyze"
+        );
         ReceiptImageUseCase useCase = ReceiptImageUseCase.from(receiptImage);
         ReceiptOCRResponse result = azureOCRService.analyzeReceipt(useCase);
 
