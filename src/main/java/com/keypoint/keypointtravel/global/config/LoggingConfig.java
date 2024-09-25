@@ -20,7 +20,7 @@ public class LoggingConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingConfig.class);
 
-    @Pointcut("@within(org.springframework.web.bind.annotation.RestController) ")
+    @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
     public void onRequest() {
     }
 
