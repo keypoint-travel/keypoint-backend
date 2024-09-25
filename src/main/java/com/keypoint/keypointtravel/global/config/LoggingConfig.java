@@ -33,7 +33,7 @@ public class LoggingConfig {
         long start = System.currentTimeMillis();
 
         try {
-            requestInfo.put("Request body", pjp.getArgs());
+            //requestInfo.put("Request body", pjp.getArgs());
 
             return pjp.proceed(pjp.getArgs());
         } finally {
@@ -44,8 +44,6 @@ public class LoggingConfig {
             requestInfo.put("URI", request.getRequestURI());
             requestInfo.put("Request parameters", request.getQueryString() == null ? "" : request.getQueryString());
             requestInfo.put("Response time", end - start);
-
-            logger.info(objectMapper.writeValueAsString(requestInfo));
         }
     }
 }
