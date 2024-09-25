@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.receipt.repository;
 
 import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
-import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt.UpdateReceiptUseCase;
 import java.util.List;
 
 

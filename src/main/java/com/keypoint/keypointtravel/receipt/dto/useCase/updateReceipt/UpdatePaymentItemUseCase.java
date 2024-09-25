@@ -1,11 +1,10 @@
-package com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase;
+package com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt;
 
 import com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest.UpdatePaymentItemRequest;
 import com.keypoint.keypointtravel.receipt.entity.PaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
-import lombok.Getter;
-
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class UpdatePaymentItemUseCase {

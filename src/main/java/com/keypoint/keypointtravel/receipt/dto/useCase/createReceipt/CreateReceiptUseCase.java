@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase;
+package com.keypoint.keypointtravel.receipt.dto.useCase.createReceipt;
 
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;

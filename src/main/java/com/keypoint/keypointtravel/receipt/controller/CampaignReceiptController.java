@@ -5,7 +5,7 @@ import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationTy
 import com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest.CreateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.CampaignIdUseCase;
-import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.createReceipt.CreateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.service.MobileReceiptService;
 import jakarta.validation.Valid;
 import java.util.List;

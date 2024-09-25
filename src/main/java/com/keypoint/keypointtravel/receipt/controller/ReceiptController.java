@@ -7,7 +7,7 @@ import com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult.Receipt
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptImageUseCase;
-import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt.UpdateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.service.MobileReceiptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

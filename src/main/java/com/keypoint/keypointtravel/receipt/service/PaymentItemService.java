@@ -6,7 +6,7 @@ import com.keypoint.keypointtravel.global.enumType.error.ReceiptError;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.receipt.dto.dto.PaymentMemberDTO;
-import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdatePaymentItemUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt.UpdatePaymentItemUseCase;
 import com.keypoint.keypointtravel.receipt.entity.PaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.PaymentMember;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;

@@ -6,7 +6,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.PaymentItemResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
-import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt.UpdateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentMember;
 import com.keypoint.keypointtravel.receipt.entity.QReceipt;
