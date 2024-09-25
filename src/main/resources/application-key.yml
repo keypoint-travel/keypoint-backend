@@ -62,3 +62,7 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+    cloudwatch:
+      credentials:
+        access-key: AKIA47CRUIKOTJL5PMZE
+        secret-access-key: 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

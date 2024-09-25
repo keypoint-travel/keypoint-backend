@@ -6,8 +6,6 @@ services:
     image: lchy0413/keypoint-travel-dev:travel-dev
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-    volumes:
-      - ./logs:/application/logs
     expose:
       - 8080
     ports:

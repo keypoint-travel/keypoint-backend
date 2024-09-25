@@ -197,7 +197,11 @@ public class FindPercentageService {
             List<Currency> currencies = currencyRepository.findAll();
             CurrencyType fromCurrency = totalBudget.getCurrencyType();
             updateCurrency(useCase, totalBudget, fromCurrency, categoryAmounts, currencies);
-            updateCurrency(useCase, totalBudget, fromCurrency, dateAmounts, currencies);
+            for (AmountDto amount : dateAmounts) {
+                amount.updateBudget(
+                    convertCurrency(currencies, amount.getAmount(), fromCurrency, useCase.getCurrencyType())
+                );
+            }
             for (MemberInfo memberInfo : members) {
                 memberInfo.updateAmount(
                     convertCurrency(currencies, memberInfo.getAmount(), fromCurrency, useCase.getCurrencyType())
