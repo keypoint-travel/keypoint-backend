@@ -18,9 +18,9 @@ import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.useCase.CampaignIdUseCase;
 import com.keypoint.keypointtravel.receipt.dto.useCase.ReceiptIdUseCase;
-import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreatePaymentItemUseCase;
-import com.keypoint.keypointtravel.receipt.dto.useCase.createReceiptUseCase.CreateReceiptUseCase;
-import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.createReceipt.CreatePaymentItemUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.createReceipt.CreateReceiptUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt.UpdateReceiptUseCase;
 import com.keypoint.keypointtravel.receipt.entity.Receipt;
 import com.keypoint.keypointtravel.receipt.redis.entity.TempReceipt;
 import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
@@ -130,7 +130,7 @@ public class MobileReceiptService {
             Campaign campaign = campaignRepository.getReferenceById(campaignId);
             CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
                 campaignId
-            );
+            ).orElse(null);
             Receipt receipt;
 
             if (useCase.getRegistrationType() == ReceiptRegistrationType.PHOTO) {

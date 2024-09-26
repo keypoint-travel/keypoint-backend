@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "googleApiClient", url = GoogleAPIConstants.COMMON_URI, fallback = GoogleAPIServiceFallback.class)
+@FeignClient(name = "googleApiClient", url = GoogleAPIConstants.COMMON_URL, fallback = GoogleAPIServiceFallback.class)
 public interface GoogleAPIService {
 
     @GetMapping(GoogleAPIConstants.FIND_USER_INFO)

@@ -51,6 +51,8 @@ apple:
   keyId: ANS9W23GB3
   keyPath: AuthKey_ANS9W23GB3.p8
   app-id: com.keypoint.keytrip
+google:
+  api-key: AIzaSyDhMfYyGegclAGBrSXp2_V6d2zvjpXl00A
 cloud:
   aws:
     credentials:

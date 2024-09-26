@@ -1,4 +1,4 @@
-package com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase;
+package com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt;
 
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest.UpdateReceiptRequest;

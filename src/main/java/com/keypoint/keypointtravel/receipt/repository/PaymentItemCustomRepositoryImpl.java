@@ -1,6 +1,6 @@
 package com.keypoint.keypointtravel.receipt.repository;
 
-import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceiptUseCase.UpdatePaymentItemUseCase;
+import com.keypoint.keypointtravel.receipt.dto.useCase.updateReceipt.UpdatePaymentItemUseCase;
 import com.keypoint.keypointtravel.receipt.entity.PaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentItem;
 import com.keypoint.keypointtravel.receipt.entity.QPaymentMember;
