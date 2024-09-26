@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.RefreshTokenService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -197,9 +198,9 @@ public class JwtTokenProvider implements InitializingBean {
      * @param member
      * @return
      */
-    public Authentication createAuthenticationFromMember(Member member) {
+    public Authentication createAuthenticationFromMember(Member member, RoleType roleType) {
         // 1. Authentication 객체 생성
-        CustomUserDetails userDetails = CustomUserDetails.from(member);
+        CustomUserDetails userDetails = CustomUserDetails.of(member, roleType);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
             userDetails, member.getRole().name()
         );
@@ -215,7 +216,7 @@ public class JwtTokenProvider implements InitializingBean {
      */
     public Authentication createAuthenticationFromMember(CommonMemberDTO member) {
         // 1. Authentication 객체 생성
-        CustomUserDetails userDetails = CustomUserDetails.from(member);
+        CustomUserDetails userDetails = CustomUserDetails.of(member);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
             userDetails, member.getRole().name()
         );

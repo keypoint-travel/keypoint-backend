@@ -24,6 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         CommonMemberDTO member = memberRepository.findByEmailAndIsDeletedFalse(email)
             .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_EMAIL));
 
-        return CustomUserDetails.from(member);
+        return CustomUserDetails.of(member);
     }
 }

@@ -84,7 +84,8 @@ public class UpdateMemberService {
             notificationRepository.save(notification);
 
             // 5. 토큰 데이터 발급
-            Authentication authentication = tokenProvider.createAuthenticationFromMember(member);
+            Authentication authentication = tokenProvider.createAuthenticationFromMember(member,
+                RoleType.ROLE_CERTIFIED_USER);
             TokenInfoResponse token = tokenProvider.createToken(authentication);
 
             String badgeUrl = badgeRepository.findByActiveBadgeUrl(BadgeType.SIGN_UP);

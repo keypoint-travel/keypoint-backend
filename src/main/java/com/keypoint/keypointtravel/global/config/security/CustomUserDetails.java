@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.global.config.security;
 
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import java.util.Collection;
@@ -43,9 +44,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         this.authorities = authorities;
     }
 
-    public static CustomUserDetails from(Member member) {
+    public static CustomUserDetails of(Member member, RoleType roleType) {
         List<GrantedAuthority> authorities = Collections.
-            singletonList(new SimpleGrantedAuthority(member.getRole().name()));
+            singletonList(new SimpleGrantedAuthority(roleType.name()));
 
         return new CustomUserDetails(
             member.getId(),
@@ -55,7 +56,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         );
     }
 
-    public static CustomUserDetails from(CommonMemberDTO member) {
+    public static CustomUserDetails of(CommonMemberDTO member) {
         List<GrantedAuthority> authorities = Collections.
             singletonList(new SimpleGrantedAuthority(member.getRole().name()));
 
@@ -71,7 +72,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         CommonMemberDTO member,
         Map<String, Object> attributes
     ) {
-        CustomUserDetails userDetails = CustomUserDetails.from(member);
+        CustomUserDetails userDetails = CustomUserDetails.of(member);
         userDetails.setAttributes(attributes);
         return userDetails;
     }
