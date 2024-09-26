@@ -37,11 +37,7 @@ public class CreateCampaignController {
         @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
         @RequestPart(value = "detail") @Valid CreateRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        // 총 예산과 카테고리별 합산 예산이 일치하지 않는 경우 예외 처리
-        if (request.getBudgets().stream().mapToDouble(BudgetInfo::getAmount).sum()
-            != request.getTotalBudget()) {
-            throw new GeneralException(CampaignErrorCode.NOT_MATCH_BUDGET);
-        }
+        validateBudget(request);
         // 이메일 초대 명단에 자기 자신이 있는지 확인
         if (request.getEmails() != null && !request.getEmails().isEmpty()) {
             validateInviteSelf(request.getEmails(), userDetails.getEmail());
@@ -59,6 +55,17 @@ public class CreateCampaignController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    private void validateBudget(CreateRequest request){
+        // 예산 미입력 시 예외 처리
+        if(request.getBudgets() == null || request.getBudgets().isEmpty()){
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_BUDGET);
+        }
+        // 총 예산과 카테고리별 합산 예산이 일치하지 않는 경우 예외 처리
+        if (request.getBudgets().stream().mapToDouble(BudgetInfo::getAmount).sum()
+            != request.getTotalBudget()) {
+            throw new GeneralException(CampaignErrorCode.NOT_MATCH_BUDGET);
+        }
+    }
     private void validateInviteSelf(List<EmailInfo> emails, String leaderEmail) {
         for (EmailInfo email : emails) {
             if (leaderEmail.equals(email.getEmail())) {

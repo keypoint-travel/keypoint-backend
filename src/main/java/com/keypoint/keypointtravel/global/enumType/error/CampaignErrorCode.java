@@ -19,7 +19,8 @@ public enum CampaignErrorCode implements ErrorCode {
     CANNOT_INVITE_SELF("010_CANNOT_INVITE_SELF", "자기 자신을 초대할 수 없습니다."),
     ALREADY_INVITE_EMAIL("011_ALREADY_INVITE_EMAIL", "이미 초대된 이메일입니다."),
     PROHIBIT_INVITE_EMAIL("012_PROHIBIT_INVITE_EMAIL", "3회 이상 재전송하였습니다. 하루동안 이메일로 초대할 수 없습니다."),
-    NOT_MATCH_BUDGET("013_NOT_MATCH_BUDGET", "총 예산이 일치하지 않습니다.");
+    NOT_MATCH_BUDGET("013_NOT_MATCH_BUDGET", "총 예산이 일치하지 않습니다."),
+    NOT_EXISTED_BUDGET("014_NOT_EXISTED_BUDGET", "예산을 하나 이상 입력해주세요.");
 
     private final String code;
     private final String msg;
