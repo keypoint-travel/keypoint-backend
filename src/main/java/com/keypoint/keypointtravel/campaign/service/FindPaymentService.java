@@ -122,8 +122,8 @@ public class FindPaymentService {
         List<AmountByMemberDto> dtoList = customPaymentRepository.findAmountAllMember(useCase.getCampaignId());
         // 2. 화폐 종류 조회
         CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
-                useCase.getCampaignId())
-            .orElse(CurrencyType.USD);
+            useCase.getCampaignId()
+        ).orElse(CurrencyType.USD); // TODO 변경 필요
         // 3. 회원별 금액 통합 및 응답 값 변환
         List<MemberInfo> members = new ArrayList<>();
         for (int i = 0; i < dtoList.size(); i++) {
