@@ -130,7 +130,7 @@ public class MobileReceiptService {
             Campaign campaign = campaignRepository.getReferenceById(campaignId);
             CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
                 campaignId
-            );
+            ).orElse(null);
             Receipt receipt;
 
             if (useCase.getRegistrationType() == ReceiptRegistrationType.PHOTO) {

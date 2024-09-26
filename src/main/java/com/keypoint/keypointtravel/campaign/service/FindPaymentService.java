@@ -2,8 +2,8 @@ package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.AmountDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.response.PaymentResponse;
 import com.keypoint.keypointtravel.campaign.dto.response.member.MemberInfo;
@@ -19,14 +19,17 @@ import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.receipt.repository.CustomPaymentRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -115,10 +118,12 @@ public class FindPaymentService {
      */
     @Transactional(readOnly = true)
     public TotalAmountByMemberResponse findTotalPaymentsByAllMember(FindPercentangeUseCase useCase) {
-        // 1. campaignId에 해당하는 회원별 총 금액 조회
+        // 1. campaignId 에 해당하는 회원별 총 금액 조회
         List<AmountByMemberDto> dtoList = customPaymentRepository.findAmountAllMember(useCase.getCampaignId());
         // 2. 화폐 종류 조회
-        CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(useCase.getCampaignId());
+        CurrencyType currencyType = campaignBudgetRepository.findCurrencyByCampaignId(
+                useCase.getCampaignId())
+            .orElse(CurrencyType.USD);
         // 3. 회원별 금액 통합 및 응답 값 변환
         List<MemberInfo> members = new ArrayList<>();
         for (int i = 0; i < dtoList.size(); i++) {
