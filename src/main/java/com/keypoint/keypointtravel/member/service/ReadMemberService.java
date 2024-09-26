@@ -78,7 +78,7 @@ public class ReadMemberService {
             if (response == null) {
                 throw new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER);
             }
-            
+
             return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);

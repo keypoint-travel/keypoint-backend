@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.member.repository.member;
 
 import static com.querydsl.jpa.JPAExpressions.selectOne;
 
+import com.keypoint.keypointtravel.badge.entity.QEarnedBadge;
 import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
@@ -11,19 +12,23 @@ import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileRespons
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.entity.QMember;
+import com.keypoint.keypointtravel.member.entity.QMemberDetail;
+import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     private final JPAQueryFactory queryFactory;
     private final QMember member = QMember.member;
+    private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
+    private final QEarnedBadge earnedBadge = QEarnedBadge.earnedBadge;
+    private final QMemberPremium memberPremium = QMemberPremium.memberPremium;
 
     private final QBlockedMember blockedMember = QBlockedMember.blockedMember;
 
@@ -31,23 +36,35 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     @Override
     public MemberProfileResponse findMemberProfile(Long memberId) {
+        QUploadFile badgeFile = new QUploadFile("badgeFile");
+
         return queryFactory
             .select(
-                Projections.fields(
+                Projections.constructor(
                     MemberProfileResponse.class,
-                    member.memberDetail.name,
+                    member.id,
+                    memberDetail.name,
                     member.email,
-                    uploadFile.path.as("profileImageUrl"),
-                    member.memberDetail.language,
+                    uploadFile.path,
+                    memberDetail.language,
                     Projections.fields(
                         MemberAlarmResponse.class,
                         member.notification.pushNotificationEnabled,
                         member.notification.marketingNotificationEnabled
-                    ).as("alarms")
+                    ),
+                    earnedBadge.count(),
+                    memberCampaign.count(),
+                    badgeFile.path,
+                    memberPremium.count()
                 )
             )
             .from(member)
             .leftJoin(uploadFile).on(uploadFile.id.eq(member.memberDetail.profileImageId))
+            .innerJoin(member.memberDetail, memberDetail)
+            .leftJoin(badgeFile).on(memberDetail.representativeBadge.id.eq(badgeFile.id))
+            .leftJoin(memberPremium).on(memberPremium.member.id.eq(memberId))
+            .leftJoin(earnedBadge).on(earnedBadge.member.id.eq(memberId))
+            .leftJoin(memberCampaign).on(memberCampaign.member.id.eq(memberId))
             .where(member.id.eq(memberId))
             .fetchOne();
     }
