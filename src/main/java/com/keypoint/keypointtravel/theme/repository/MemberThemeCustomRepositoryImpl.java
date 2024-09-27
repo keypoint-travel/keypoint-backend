@@ -27,17 +27,16 @@ public class MemberThemeCustomRepositoryImpl  implements MemberThemeCustomReposi
 
     @Override
     public MemberThemeResponse findThemeByUserId(Long memberId) {
-
         MemberThemeResponse response = queryFactory
             .select(
                 Projections.fields(
                     MemberThemeResponse.class,
                     new CaseBuilder()
-                        .when(memberDetail.paidTheme.isNotNull())
+                        .when(paidTheme.isNotNull())
                         .then(paidTheme.color)
                         .otherwise(theme.color).as("color"),
                     new CaseBuilder()
-                        .when(memberDetail.paidTheme.isNotNull())
+                        .when(paidTheme.isNotNull())
                         .then(paidTheme.name)
                         .otherwise(theme.name).as("name")
                 )
