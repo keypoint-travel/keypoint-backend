@@ -47,9 +47,6 @@ public class MemberDetail extends BaseEntity {
     @Column(nullable = true)
     private LocalDate birth;
 
-    @Column(nullable = false)
-    private String name;
-
     @Column(nullable = true)
     @Comment("국적")
     private String country;
@@ -65,14 +62,12 @@ public class MemberDetail extends BaseEntity {
         Member member,
         GenderType gender,
         LocalDate birth,
-        String name,
         LanguageCode language,
         String country
     ) {
         this.member = member;
         this.gender = gender;
         this.birth = birth;
-        this.name = name;
         this.language = language;
         this.country = country;
     }

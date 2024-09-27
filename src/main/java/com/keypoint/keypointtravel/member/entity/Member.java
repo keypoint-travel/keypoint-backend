@@ -34,6 +34,9 @@ public class Member extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String email;
 
     @Convert(converter = AES256ToStringConverter.class)
@@ -78,9 +81,10 @@ public class Member extends BaseEntity {
         this.isDeleted = false;
     }
 
-    public Member(String email, String password) {
+    public Member(String email, String password, String name) {
         this.email = email;
         this.password = password;
+        this.name = name;
         this.role = RoleType.ROLE_CERTIFIED_USER;
         this.oauthProviderType = OauthProviderType.NONE;
         this.lastPasswordUpdatedAt = LocalDateTime.now();
@@ -92,8 +96,8 @@ public class Member extends BaseEntity {
         return new Member(email, oauthProviderType);
     }
 
-    public static Member of(String email, String password) {
-        return new Member(email, password);
+    public static Member of(String email, String password, String name) {
+        return new Member(email, password, name);
     }
 
     public void setInvitationCode(String invitationCode) {
