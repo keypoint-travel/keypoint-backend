@@ -59,7 +59,8 @@ public class NotificationEventListener {
                 type
             );
             PushNotificationDTO notificationContent = pushNotificationService.generateNotificationDTO(
-                member.getMemberDetail(),
+                member.getName(),
+                member.getMemberDetail().getLanguage(),
                 event,
                 notificationMsg
             );
