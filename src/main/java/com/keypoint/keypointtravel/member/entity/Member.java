@@ -5,13 +5,22 @@ import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.notification.entity.Notification;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -67,7 +76,6 @@ public class Member extends BaseEntity {
         this.oauthProviderType = oauthProviderType;
         this.role = RoleType.ROLE_UNCERTIFIED_USER;
         this.isDeleted = false;
-
     }
 
     public Member(String email, String password) {
