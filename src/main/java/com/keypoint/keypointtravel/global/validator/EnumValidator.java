@@ -18,7 +18,7 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, Enum> {
         boolean result = false;
         Object[] enumValues = this.annotation.enumClass().getEnumConstants();
 
-        if (this.annotation.nullable() && enumValues == null) {
+        if (this.annotation.nullable() && value == null) {
             return true;
         }
 
