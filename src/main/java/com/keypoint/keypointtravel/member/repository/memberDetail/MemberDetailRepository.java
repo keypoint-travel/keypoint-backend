@@ -24,17 +24,6 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
     @Transactional
     @Modifying
     @Query("UPDATE MemberDetail md "
-        + "SET md.name = :name, md.profileImageId = :profileImageId "
-        + "WHERE md.member.id = :memberId")
-    int updateMemberProfile(
-        @Param("memberId") Long memberId,
-        @Param("name") String name,
-        @Param("profileImageId") Long profileImageId
-    );
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE MemberDetail md "
         + "SET md.representativeBadge = :representativeBadge "
         + "WHERE md.member.id = :memberId")
     int updateRepresentativeBadge(
@@ -50,7 +39,4 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
 
     @Query("SELECT md FROM MemberDetail md WHERE md.member.id = :memberId")
     MemberDetail findByMemberId(@Param("memberId") Long memberId);
-
-    @Query("SELECT md.name FROM MemberDetail md WHERE md.member.id = :memberId")
-    String findByName(@Param("memberId") Long memberId);
 }

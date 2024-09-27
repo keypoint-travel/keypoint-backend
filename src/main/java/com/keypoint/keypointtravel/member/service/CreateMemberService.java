@@ -74,7 +74,7 @@ public class CreateMemberService {
             }
 
             // 3. Member, MemberConsent, MemberDetail, Notification 생성
-            Member member = Member.of(email, encodePassword(password));
+            Member member = Member.of(email, encodePassword(password), useCase.getName());
             MemberConsent memberConsent = MemberConsent.from(member);
             MemberDetail memberDetail = useCase.toEntity(member);
             Notification notification = Notification.from(member);

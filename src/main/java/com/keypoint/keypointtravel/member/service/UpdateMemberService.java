@@ -163,7 +163,7 @@ public class UpdateMemberService {
                 );
             }
             // 3. 프로필 데이터 변경
-            memberDetailRepository.updateMemberProfile(memberId, useCase.getName(), profileImageId);
+            memberRepository.updateMemberProfile(memberId, useCase.getName(), profileImageId);
 
         } catch (Exception ex) {
             throw new GeneralException(ex);

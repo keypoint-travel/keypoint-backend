@@ -1,10 +1,15 @@
 package com.keypoint.keypointtravel.banner.repository.banner;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
 import com.keypoint.keypointtravel.banner.dto.dto.ManagementAdvDetailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
-import com.keypoint.keypointtravel.banner.entity.*;
+import com.keypoint.keypointtravel.banner.entity.AdvertisementBanner;
+import com.keypoint.keypointtravel.banner.entity.AdvertisementBannerContent;
+import com.keypoint.keypointtravel.banner.entity.QAdvertisementBanner;
+import com.keypoint.keypointtravel.banner.entity.QAdvertisementBannerContent;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
@@ -15,11 +20,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
-
-import static com.querydsl.jpa.JPAExpressions.select;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRepository {
@@ -46,10 +48,10 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
                 advertisementBannerContent.subTitle,
                 advertisementBannerContent.content,
                 advertisementBannerContent.createAt,
-                select(memberDetail.name).from(memberDetail).where(
+                select(memberDetail.member.name).from(memberDetail).where(
                     memberDetail.member.id.stringValue().eq(advertisementBannerContent.registerId)),
                 advertisementBannerContent.modifyAt,
-                select(memberDetail.name).from(memberDetail)
+                select(memberDetail.member.name).from(memberDetail)
                     .where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.modifyId))
             ))
             .from(advertisementBanner)

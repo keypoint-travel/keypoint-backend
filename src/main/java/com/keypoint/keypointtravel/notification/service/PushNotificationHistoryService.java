@@ -2,11 +2,12 @@ package com.keypoint.keypointtravel.notification.service;
 
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.entity.MemberDetail;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
@@ -35,6 +36,7 @@ public class PushNotificationHistoryService {
     private final PushNotificationHistoryRepository pushNotificationHistoryRepository;
     private final PushNotificationService pushNotificationService;
     private final MemberDetailRepository memberDetailRepository;
+    private final MemberRepository memberRepository;
     private final ReadMemberService readMemberService;
 
 
@@ -67,8 +69,10 @@ public class PushNotificationHistoryService {
     public Page<PushHistoryResponse> findPushHistories(ReadPushHistoryUseCase useCase) {
         try {
             Pageable pageable = useCase.getPageable();
-            MemberDetail memberDetail = memberDetailRepository.findByMemberId(
-                useCase.getMemberId());
+            String memberName = memberRepository.findNameByMemberId(useCase.getMemberId());
+            LanguageCode languageCode = memberDetailRepository.findLanguageCodeByMemberId(
+                useCase.getMemberId()
+            );
 
             // 1. 푸시 데이터 조회
             List<CommonPushHistoryUseCase> histories = pushNotificationHistoryRepository.findPushHistories(
@@ -84,7 +88,8 @@ public class PushNotificationHistoryService {
             for (CommonPushHistoryUseCase history : histories) {
 
                 PushNotificationDTO notificationDTO = pushNotificationService.generateNotificationDTO(
-                    memberDetail,
+                    memberName,
+                    languageCode,
                     history.getDetailData(),
                     history.getType()
                 );

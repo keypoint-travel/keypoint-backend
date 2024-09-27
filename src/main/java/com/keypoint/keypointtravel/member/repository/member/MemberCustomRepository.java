@@ -4,7 +4,6 @@ import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
-
 import java.util.List;
 
 public interface MemberCustomRepository {
@@ -16,4 +15,6 @@ public interface MemberCustomRepository {
     MemberSettingResponse findSettingByMemberId(Long memberId);
 
     List<MemberInfoDto> findCampaignMemberList(Long CampaignId);
+
+    void updateMemberProfile(Long memberId, String name, Long profileImageId);
 }

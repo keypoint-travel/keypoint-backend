@@ -56,9 +56,15 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     @Transactional
     @Modifying
-    @Query("UPDATE Member m SET m.oauthProviderType = :oauthProviderType WHERE m.id = :id")
+    @Query("UPDATE Member m "
+        + "SET m.oauthProviderType = :oauthProviderType, m.name = :name "
+        + "WHERE m.id = :id")
     int updateOauthProviderTypeByMemberId(
         @Param("id") Long id,
+        @Param("name") String name,
         @Param("oauthProviderType") OauthProviderType oauthProviderType
     );
+
+    @Query("SELECT m.name FROM Member m WHERE m.id = :memberId")
+    String findNameByMemberId(@Param("memberId") Long memberId);
 }

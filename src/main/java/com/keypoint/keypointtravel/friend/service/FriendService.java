@@ -61,8 +61,8 @@ public class FriendService {
         friendRepository.save(buildFriend(findedMember, member));
         friendRepository.save(buildFriend(member, findedMember));
         // 6. 친구 등록 알림 전송, 배지 부여
-        String memberName = memberDetailRepository.findByName(member.getId());
-        String findedMemberName = memberDetailRepository.findByName(findedMember.getId());
+        String memberName = memberRepository.findNameByMemberId(member.getId());
+        String findedMemberName = memberRepository.findNameByMemberId(findedMember.getId());
         eventPublisher.publishEvent(FriendPushNotificationEvent.of( // 친구 수락 (친추 보낸 사람)
             PushNotificationType.FRIEND_ACCEPTED_SENDER,
             List.of(member.getId()),

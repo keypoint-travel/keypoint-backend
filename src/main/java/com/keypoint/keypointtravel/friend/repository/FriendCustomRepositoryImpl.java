@@ -11,9 +11,8 @@ import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class FriendCustomRepositoryImpl implements FriendCustomRepository {
@@ -61,7 +60,7 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository {
     public List<FriendDto> findAllByMemberId(Long memberId) {
         return queryFactory.select(Projections.constructor(FriendDto.class,
                 friend.friendId, // 친구 고유 아이디
-                memberDetail.name, // 친구 이름
+                member.name, // 친구 이름
                 uploadFile.path // 친구 프로필 이미지
             ))
             .from(friend)

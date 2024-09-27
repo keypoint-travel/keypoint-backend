@@ -17,21 +17,23 @@ import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.AuditorAware;
 
 @RequiredArgsConstructor
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final AuditorAware<String> auditorProvider;
+
     private final QMember member = QMember.member;
     private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
     private final QEarnedBadge earnedBadge = QEarnedBadge.earnedBadge;
     private final QMemberPremium memberPremium = QMemberPremium.memberPremium;
-
     private final QBlockedMember blockedMember = QBlockedMember.blockedMember;
-
     private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
     @Override
@@ -43,7 +45,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 Projections.constructor(
                     MemberProfileResponse.class,
                     member.id,
-                    memberDetail.name,
+                    member.name,
                     member.email,
                     uploadFile.path,
                     memberDetail.language,
@@ -76,7 +78,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                     OtherMemberProfileResponse.class,
                     member.id.as("memberId"),
                     uploadFile.path.as("profileImageUrl"),
-                    member.memberDetail.name.as("memberName"),
+                    member.name.as("memberName"),
                     isBlocked(myId, otherMemberId).as("isBlocked")
                 )
             )
@@ -108,12 +110,31 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                     MemberInfoDto.class,
                     member.id,
                     uploadFile.path,
-                    member.memberDetail.name))
+                    member.name))
             .from(member)
             .innerJoin(memberCampaign).on(memberCampaign.member.id.eq(member.id))
             .leftJoin(uploadFile).on(uploadFile.id.eq(member.memberDetail.profileImageId))
             .where(memberCampaign.campaign.id.eq(campaignId))
             .fetch();
+    }
+
+    @Override
+    public void updateMemberProfile(Long memberId, String name, Long profileImageId) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        queryFactory.update(member)
+            .set(member.name, name)
+            .set(member.modifyAt, LocalDateTime.now())
+            .set(member.modifyId, currentAuditor)
+            .where(member.id.eq(memberId))
+            .execute();
+
+        queryFactory.update(memberDetail)
+            .set(memberDetail.profileImageId, profileImageId)
+            .set(memberDetail.modifyAt, LocalDateTime.now())
+            .set(memberDetail.modifyId, currentAuditor)
+            .where(memberDetail.member.id.eq(memberId))
+            .execute();
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {

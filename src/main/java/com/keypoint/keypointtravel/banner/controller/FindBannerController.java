@@ -1,5 +1,9 @@
 package com.keypoint.keypointtravel.banner.controller;
 
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.ENGLISH;
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.JAPANESE;
+import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.KOREAN;
+
 import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.response.BannerListResponse;
 import com.keypoint.keypointtravel.banner.dto.response.RecommendationResponse;
@@ -23,9 +27,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/banners")
@@ -109,7 +115,7 @@ public class FindBannerController {
             .message("추천 배너 조회")
             .data(RecommendationResponse.of(
                 around.getResponse().getBody().getItems().getItem(),
-                member.getMemberDetail().getName(), languageCode))
+                member.getName(), languageCode))
             .build();
     }
 

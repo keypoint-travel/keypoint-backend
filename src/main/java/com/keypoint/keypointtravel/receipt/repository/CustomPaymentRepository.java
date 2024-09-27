@@ -1,10 +1,12 @@
 package com.keypoint.keypointtravel.receipt.repository;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentDto;
+import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.PaymentMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.ReceiptInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.category.AmountByCategoryDto;
-import com.keypoint.keypointtravel.campaign.dto.dto.PaymentInfo;
 import com.keypoint.keypointtravel.campaign.dto.dto.date.AmountByDateDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.AmountByMemberDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.member.MemberAmountByCategoryDto;
@@ -22,13 +24,10 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
-
-import static com.querydsl.jpa.JPAExpressions.select;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -79,7 +78,7 @@ public class CustomPaymentRepository {
         return queryFactory.select(
                 Projections.constructor(AmountByMemberDto.class,
                     paymentMember.member.id,
-                    paymentMember.member.memberDetail.name,
+                    paymentMember.member.name,
                     uploadFile.path,
                     paymentItem.amount.multiply(paymentItem.quantity).divide(
                         select(paymentMember.count())
@@ -261,7 +260,7 @@ public class CustomPaymentRepository {
                 Projections.constructor(PaymentMemberDto.class,
                     paymentItem.id,
                     member.id,
-                    member.memberDetail.name))
+                    member.name))
             .from(paymentMember)
             .innerJoin(paymentMember.member, member)
             .innerJoin(paymentMember.paymentItem, paymentItem)

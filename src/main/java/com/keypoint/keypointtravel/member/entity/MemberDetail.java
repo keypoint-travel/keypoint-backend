@@ -40,17 +40,14 @@ public class MemberDetail extends BaseEntity {
     @JoinColumn(name = "representative_badge_id")
     private Badge representativeBadge;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private GenderType gender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate birth;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Comment("국적")
     private String country;
 
@@ -65,14 +62,12 @@ public class MemberDetail extends BaseEntity {
         Member member,
         GenderType gender,
         LocalDate birth,
-        String name,
         LanguageCode language,
         String country
     ) {
         this.member = member;
         this.gender = gender;
         this.birth = birth;
-        this.name = name;
         this.language = language;
         this.country = country;
     }
