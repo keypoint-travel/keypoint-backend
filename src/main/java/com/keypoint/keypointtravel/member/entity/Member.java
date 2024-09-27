@@ -74,8 +74,9 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
     private Notification notification;
 
-    public Member(String email, OauthProviderType oauthProviderType) {
+    public Member(String email, String name, OauthProviderType oauthProviderType) {
         this.email = email;
+        this.name = name;
         this.oauthProviderType = oauthProviderType;
         this.role = RoleType.ROLE_UNCERTIFIED_USER;
         this.isDeleted = false;
@@ -92,8 +93,8 @@ public class Member extends BaseEntity {
         this.invitationCode = "";
     }
 
-    public static Member of(String email, OauthProviderType oauthProviderType) {
-        return new Member(email, oauthProviderType);
+    public static Member of(String email, String name, OauthProviderType oauthProviderType) {
+        return new Member(email, name, oauthProviderType);
     }
 
     public static Member of(String email, String password, String name) {
