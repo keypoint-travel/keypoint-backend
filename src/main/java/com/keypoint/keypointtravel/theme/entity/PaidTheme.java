@@ -1,15 +1,15 @@
 package com.keypoint.keypointtravel.theme.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
-import jakarta.persistence.CollectionTable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,16 +30,14 @@ public class PaidTheme extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @ElementCollection
-    @CollectionTable(name = "paid_theme_colors", joinColumns = @JoinColumn(name = "main_entity_id"))
-    @Column(name = "color")
-    private List<String> chartColors;
+    @OneToMany(mappedBy = "paidTheme", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ThemeColor> chartColors = new ArrayList<>();
 
     @Column
     private boolean isDeleted;
 
     @Builder
-    public PaidTheme(String name, String color, List<String> chartColors) {
+    public PaidTheme(String name, String color, List<ThemeColor> chartColors) {
         this.name = name;
         this.color = color;
         this.chartColors = chartColors;
@@ -50,7 +48,7 @@ public class PaidTheme extends BaseEntity {
         this.isDeleted = false;
     }
 
-    public void updateChartColors(List<String> chartColors) {
+    public void updateChartColors(List<ThemeColor> chartColors) {
         this.chartColors.clear();
         this.chartColors.addAll(chartColors);
     }

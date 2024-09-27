@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PaidThemeRepository extends
-    JpaRepository<PaidTheme, Long>, UpdateThemeCustomRepository, DeleteThemeCustomRepository  {
+    JpaRepository<PaidTheme, Long>, UpdateThemeCustomRepository, DeleteThemeCustomRepository, MemberThemeCustomRepository  {
     Optional<PaidTheme> findByIdAndIsDeletedFalse(Long themeId);
 
 }
