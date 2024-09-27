@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignReportDto;
 import com.keypoint.keypointtravel.campaign.entity.QCampaignReport;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
@@ -9,8 +11,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import static com.querydsl.jpa.JPAExpressions.select;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ public class CustomCampaignReportRepository {
         return queryFactory.select(Projections.constructor(CampaignReportDto.class,
                     campaignReport.campaign.title.as("campaignName"),
                     ExpressionUtils.as(
-                        select(memberDetail.name).from(memberDetail)
+                        select(memberDetail.member.name).from(memberDetail)
                             .where(memberDetail.member.id.eq(memberId)), "memberName")
                 )
             )

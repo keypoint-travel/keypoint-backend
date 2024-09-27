@@ -1,12 +1,19 @@
 package com.keypoint.keypointtravel.banner.repository.banner;
 
 
+import static com.querydsl.jpa.JPAExpressions.select;
+import static com.querydsl.jpa.JPAExpressions.selectOne;
+
 import com.keypoint.keypointtravel.banner.dto.dto.CommentDto;
 import com.keypoint.keypointtravel.banner.dto.dto.CommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.dto.ManageCommonTourismDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.CommonBannerThumbnailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.EditBannerUseCase;
-import com.keypoint.keypointtravel.banner.entity.*;
+import com.keypoint.keypointtravel.banner.entity.BannerContent;
+import com.keypoint.keypointtravel.banner.entity.QBanner;
+import com.keypoint.keypointtravel.banner.entity.QBannerComment;
+import com.keypoint.keypointtravel.banner.entity.QBannerContent;
+import com.keypoint.keypointtravel.banner.entity.QBannerLike;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
@@ -17,12 +24,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
-
-import static com.querydsl.jpa.JPAExpressions.select;
-import static com.querydsl.jpa.JPAExpressions.selectOne;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class BannerCustomRepositoryImpl implements BannerCustomRepository {
@@ -185,7 +188,7 @@ public class BannerCustomRepositoryImpl implements BannerCustomRepository {
                 bannerComment.id,
                 bannerComment.content,
                 bannerComment.member.id,
-                bannerComment.member.memberDetail.name,
+                bannerComment.member.name,
                 uploadFile.path,
                 bannerComment.createAt))
             .from(bannerComment)

@@ -9,15 +9,13 @@ import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -89,7 +87,7 @@ public class CustomMemberCampaignRepository {
                 Projections.constructor(MemberInfoDto.class,
                     memberDetail.member.id,
                     uploadFile.path,
-                    memberDetail.name))
+                    memberDetail.member.name))
             .from(memberDetail)
             .innerJoin(campaignWaitMember).on(campaignWaitMember.member.id.eq(memberDetail.member.id))
             .leftJoin(uploadFile).on(memberDetail.profileImageId.eq(uploadFile.id))

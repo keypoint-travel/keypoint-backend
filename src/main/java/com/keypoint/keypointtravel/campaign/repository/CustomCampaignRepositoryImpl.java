@@ -4,7 +4,9 @@ import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
-import com.keypoint.keypointtravel.campaign.entity.*;
+import com.keypoint.keypointtravel.campaign.entity.QCampaign;
+import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
+import com.keypoint.keypointtravel.campaign.entity.QTravelLocation;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
@@ -14,10 +16,9 @@ import com.keypoint.keypointtravel.place.entity.QCountry;
 import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
         // 캠페인 이메일 초대에 필요한 캠페인 리더의 이름, 캠페인 제목, 초대 코드 조회
         SendInvitationEmailDto dto = queryFactory.select(
                 Projections.constructor(SendInvitationEmailDto.class,
-                    memberDetail.name,
+                    memberDetail.member.name,
                     campaign.title,
                     campaign.invitation_code))
             .from(campaign)
