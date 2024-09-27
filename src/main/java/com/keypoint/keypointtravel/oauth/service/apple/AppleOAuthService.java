@@ -72,6 +72,7 @@ public class AppleOAuthService implements OAuthService {
     private String appleKeyId;
 
     @Override
+    @Transactional
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
         try {
             // 1. Oauth 토큰 발급
@@ -86,8 +87,11 @@ public class AppleOAuthService implements OAuthService {
             String email = getEmailFromIdToken(tokenResponse.getIdToken());
 
             // 3. 사용자 정보 저장
-            CommonMemberDTO member = oauth2UserService.registerMember(email,
-                OauthProviderType.APPLE);
+            CommonMemberDTO member = oauth2UserService.registerMember(
+                email,
+                useCase.getName(),
+                OauthProviderType.APPLE
+            );
 
             // 4. OAuth 토큰 저장
             oAuthTokenService.saveOAuthToken(
