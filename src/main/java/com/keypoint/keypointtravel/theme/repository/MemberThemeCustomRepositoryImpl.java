@@ -51,6 +51,7 @@ public class MemberThemeCustomRepositoryImpl  implements MemberThemeCustomReposi
         List<String> chartColors = queryFactory
             .select(themeColor.color)
             .from(themeColor)
+            .leftJoin(memberDetail).on(memberDetail.member.id.eq(memberId))
             .leftJoin(paidTheme).on(memberDetail.paidTheme.eq(paidTheme))
             .leftJoin(theme).on(memberDetail.theme.eq(theme))
             .where(
