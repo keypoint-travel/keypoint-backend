@@ -22,7 +22,7 @@ public enum CampaignErrorCode implements ErrorCode {
     NOT_MATCH_BUDGET("013_NOT_MATCH_BUDGET", "총 예산이 일치하지 않습니다."),
     NOT_EXISTED_BUDGET("014_NOT_EXISTED_BUDGET", "예산을 하나 이상 입력해주세요."),
     MEMBER_CAMPAIGN_PERIOD_OVERLAP("015_MEMBER_CAMPAIGN_PERIOD_OVERLAP", "기간이 겹치는 다른 캠페인을 진행중인 회원입니다."),
-    FRIEND_CAMPAIGN_PERIOD_OVERLAP("016_FRIEND_CAMPAIGN_PERIOD_OVERLAP", "다른 캠페인과 기간이 겹치는 회원이 있습니다.");
+    CAMPAIGN_PERIOD_OVERLAP("016_CAMPAIGN_PERIOD_OVERLAP", "다른 캠페인과 기간이 겹치는 회원이 있습니다.");
 
     private final String code;
     private final String msg;
