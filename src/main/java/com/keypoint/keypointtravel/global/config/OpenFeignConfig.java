@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
     "com.keypoint.keypointtravel.currency.service",
     "com.keypoint.keypointtravel.place.service",
     "com.keypoint.keypointtravel.external.azure.service",
-    "com.keypoint.keypointtravel.premium.service"
+    "com.keypoint.keypointtravel.premium.service",
+    "com.keypoint.keypointtravel.external.google.service",
 })
 public class OpenFeignConfig {
 
