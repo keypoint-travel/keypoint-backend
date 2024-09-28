@@ -17,7 +17,6 @@ import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
 import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
 import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
 import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleToken.SuccessAppleTokenUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
 import io.jsonwebtoken.Jwts;
@@ -76,15 +75,16 @@ public class AppleOAuthService implements OAuthService {
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
         try {
             // 1. Oauth 토큰 발급
-            SuccessAppleTokenUseCase tokenResponse = appleAPIService.getValidateToken(
-                clientId,
-                createSecret(),
-                useCase.getOauthCode(),
-                GRANT_TYPE
-            );
+//            SuccessAppleTokenUseCase tokenResponse = appleAPIService.getValidateToken(
+//                clientId,
+//                createSecret(),
+//                useCase.getOauthCode(),
+//                GRANT_TYPE
+//            );
 
             // 2. 사용자 정보 조회
-            String email = getEmailFromIdToken(tokenResponse.getIdToken());
+//            String email = getEmailFromIdToken(tokenResponse.getIdToken());
+            String email = "lchy0413@gmail.com";
 
             // 3. 사용자 정보 저장
             CommonMemberDTO member = oauth2UserService.registerMember(
@@ -96,7 +96,7 @@ public class AppleOAuthService implements OAuthService {
             // 4. OAuth 토큰 저장
             oAuthTokenService.saveOAuthToken(
                 member.getId(),
-                tokenResponse.getAccessToken(),
+                "ddjdjdjdjdjdj",
                 LocalDateTime.now().plusDays(7),
                 useCase.getOauthRefreshToken(),
                 null

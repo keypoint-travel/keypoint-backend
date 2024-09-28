@@ -11,6 +11,7 @@ import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -154,8 +155,8 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
                 && member.getOauthProviderType() != oauthProviderType) {
                 // 2-1-1. 현재 등록한 Oauth 로 변경 (Oauth type 의 변경된 경우)
                 if (name == null) {
-                    throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
-                        "간편 로그인의 첫 번쨰 시도인 경우, name이 null이면 안됩니다.");
+                    name = member.getName();
+                    LogUtils.writeWarnLog("registerMember", "Name receives null value");
                 }
 
                 memberRepository.updateOauthProviderTypeByMemberId(
