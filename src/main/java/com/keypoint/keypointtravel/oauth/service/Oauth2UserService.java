@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
 import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
@@ -147,8 +149,15 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         if (memberOptional.isPresent()) {
             // 2-1. 로그인 (이전에 등록되어 있는 이메일)
             CommonMemberDTO member = memberOptional.get();
-            if (member.getRole() == RoleType.ROLE_UNCERTIFIED_USER) {
-                // 2-1-1. 현재 등록한 Oauth 로 변경
+
+            if (member.getRole() == RoleType.ROLE_UNCERTIFIED_USER
+                && member.getOauthProviderType() != oauthProviderType) {
+                // 2-1-1. 현재 등록한 Oauth 로 변경 (Oauth type 의 변경된 경우)
+                if (name == null) {
+                    throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                        "간편 로그인의 첫 번쨰 시도인 경우, name이 null이면 안됩니다.");
+                }
+
                 memberRepository.updateOauthProviderTypeByMemberId(
                     member.getId(),
                     name,
@@ -162,6 +171,11 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             return member;
         } else {
             // 2-2. 회원가입: 임시 회원으로 등록 (등록되어 있지 않은 이메일)
+            if (name == null) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                    "간편 로그인의 첫 번쨰 시도인 경우, name이 null이면 안됩니다.");
+            }
+
             return addUser(email, name, oauthProviderType);
         }
     }
