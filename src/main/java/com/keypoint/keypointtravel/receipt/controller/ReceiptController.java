@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.receipt.controller;
 
 import com.keypoint.keypointtravel.external.azure.service.AzureOCRService;
+import com.keypoint.keypointtravel.external.google.service.GoogleMapService;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.receipt.dto.request.updateReceiptRequest.UpdateReceiptRequest;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptOCRResult.ReceiptOCRResponse;
@@ -29,8 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReceiptController {
 
     private final AzureOCRService azureOCRService;
-
     private final MobileReceiptService mobileReceiptService;
+    private final GoogleMapService googleMapService;
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PostMapping("/analyze")

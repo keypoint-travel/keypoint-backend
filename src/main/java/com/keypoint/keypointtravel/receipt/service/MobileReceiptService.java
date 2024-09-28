@@ -50,13 +50,14 @@ public class MobileReceiptService {
     private final TempReceiptService tempReceiptService;
     private final ApplicationEventPublisher eventPublisher;
 
+
     /**
      * (영수증 생성) 영수증 데이터 유효성 검사
      *
+     * @param campaignId
+     * @param receiptId
+     * @param receiptImageUrl
      * @param registrationType
-     * @param addressAddress
-     * @param longitude
-     * @param latitude
      */
     public void validateReceiptInCreate(
             Long campaignId,
