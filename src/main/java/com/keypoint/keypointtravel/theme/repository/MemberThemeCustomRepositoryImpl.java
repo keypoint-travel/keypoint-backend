@@ -27,17 +27,16 @@ public class MemberThemeCustomRepositoryImpl  implements MemberThemeCustomReposi
 
     @Override
     public MemberThemeResponse findThemeByUserId(Long memberId) {
-
         MemberThemeResponse response = queryFactory
             .select(
                 Projections.fields(
                     MemberThemeResponse.class,
                     new CaseBuilder()
-                        .when(memberDetail.paidTheme.isNotNull())
+                        .when(paidTheme.isNotNull())
                         .then(paidTheme.color)
                         .otherwise(theme.color).as("color"),
                     new CaseBuilder()
-                        .when(memberDetail.paidTheme.isNotNull())
+                        .when(paidTheme.isNotNull())
                         .then(paidTheme.name)
                         .otherwise(theme.name).as("name")
                 )
@@ -52,6 +51,7 @@ public class MemberThemeCustomRepositoryImpl  implements MemberThemeCustomReposi
         List<String> chartColors = queryFactory
             .select(themeColor.color)
             .from(themeColor)
+            .leftJoin(memberDetail).on(memberDetail.member.id.eq(memberId))
             .leftJoin(paidTheme).on(memberDetail.paidTheme.eq(paidTheme))
             .leftJoin(theme).on(memberDetail.theme.eq(theme))
             .where(
