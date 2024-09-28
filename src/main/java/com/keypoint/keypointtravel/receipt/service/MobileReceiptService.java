@@ -4,6 +4,9 @@ import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.repository.CampaignBudgetRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
+import com.keypoint.keypointtravel.external.google.dto.geocoding.GeocodingUseCase;
+import com.keypoint.keypointtravel.external.google.service.GoogleMapService;
+import com.keypoint.keypointtravel.global.enumType.api.MapResultStatus;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
@@ -12,6 +15,7 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptRegistrationType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.ImageUtils;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CommonPushNotificationEvent;
 import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
@@ -49,6 +53,7 @@ public class MobileReceiptService {
     private final PaymentItemService paymentItemService;
     private final TempReceiptService tempReceiptService;
     private final ApplicationEventPublisher eventPublisher;
+    private final GoogleMapService googleMapService;
 
 
     /**
@@ -144,6 +149,13 @@ public class MobileReceiptService {
                     useCase.getReceiptId());
                 receipt = useCase.toEntity(campaign, receiptImageId, currencyType,
                     tempReceipt);
+
+                // 2-3. 영수증 분석 결과의 storeAddress 를 그대로 사용하는 경우, 경도/위도 API 조회 (storeAddress 존재하지만, 경도/위도가 존재하지 않는 경우)
+                if (useCase.getStoreAddress() != null
+                    && useCase.getLongitude() == null && useCase.getLatitude() == null) {
+                    updateReceiptGeocoding(receipt, useCase.getStoreAddress());
+                }
+
             } else {
                 receipt = useCase.toEntity(campaign, currencyType);
             }
@@ -180,6 +192,20 @@ public class MobileReceiptService {
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
+    }
+
+    private void updateReceiptGeocoding(Receipt receipt, String storeAddress) {
+        GeocodingUseCase useCase = googleMapService.getGeocodingUseCase(storeAddress);
+        if (useCase.getStatus() != MapResultStatus.OK) {
+            LogUtils.writeWarnLog("updateReceiptGeocoding",
+                String.format("Fail to get geocoding data. address: %s, result: %s",
+                    storeAddress,
+                    useCase.getStatus()
+                )
+            );
+        }
+
+        receipt.setGeocoding(useCase.getResults().get(0).getGeometry().getLocation());
     }
 
     /**

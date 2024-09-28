@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.receipt.entity;
 
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
+import com.keypoint.keypointtravel.external.google.dto.geocoding.GeometryLocationUseCase;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.currency.CurrencyType;
 import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
@@ -96,6 +97,11 @@ public class Receipt extends BaseEntity {
     @ColumnDefault("false")
     @Comment("삭제 여부")
     private boolean isDeleted;
+
+    public void setGeocoding(GeometryLocationUseCase location) {
+        this.longitude = location.getLng();
+        this.latitude = location.getLat();
+    }
 
     @Builder
     public Receipt(
