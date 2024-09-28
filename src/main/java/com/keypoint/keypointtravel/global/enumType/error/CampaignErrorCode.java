@@ -21,9 +21,8 @@ public enum CampaignErrorCode implements ErrorCode {
     PROHIBIT_INVITE_EMAIL("012_PROHIBIT_INVITE_EMAIL", "3회 이상 재전송하였습니다. 하루동안 이메일로 초대할 수 없습니다."),
     NOT_MATCH_BUDGET("013_NOT_MATCH_BUDGET", "총 예산이 일치하지 않습니다."),
     NOT_EXISTED_BUDGET("014_NOT_EXISTED_BUDGET", "예산을 하나 이상 입력해주세요."),
-    CAMPAIGN_PERIOD_OVERLAP("015_CAMPAIGN_PERIOD_OVERLAP", "다른 캠페인과 기간이 겹칠 수 없습니다."),
-    MEMBER_CAMPAIGN_PERIOD_OVERLAP("016_MEMBER_CAMPAIGN_PERIOD_OVERLAP", "기간이 겹치는 다른 캠페인을 진행중인 회원입니다."),
-    FRIEND_CAMPAIGN_PERIOD_OVERLAP("017_FRIEND_CAMPAIGN_PERIOD_OVERLAP", "다른 캠페인과 기간이 겹치는 회원이 있습니다.");
+    MEMBER_CAMPAIGN_PERIOD_OVERLAP("015_MEMBER_CAMPAIGN_PERIOD_OVERLAP", "기간이 겹치는 다른 캠페인을 진행중인 회원입니다."),
+    FRIEND_CAMPAIGN_PERIOD_OVERLAP("016_FRIEND_CAMPAIGN_PERIOD_OVERLAP", "다른 캠페인과 기간이 겹치는 회원이 있습니다.");
 
     private final String code;
     private final String msg;
