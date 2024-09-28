@@ -7,6 +7,8 @@ public interface CommonMemberDTO {
 
     Long getId();
 
+    String getName();
+
     String getEmail();
 
     String getPassword();
