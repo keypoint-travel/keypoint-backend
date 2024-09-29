@@ -116,7 +116,7 @@ public class CreateCampaignService {
         }
         memberIds.add(useCase.getMemberId());
         if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate())) {
-            throw new GeneralException(CampaignErrorCode.MEMBER_CAMPAIGN_PERIOD_OVERLAP);
+            throw new GeneralException(CampaignErrorCode.CAMPAIGN_PERIOD_OVERLAP);
         }
     }
 

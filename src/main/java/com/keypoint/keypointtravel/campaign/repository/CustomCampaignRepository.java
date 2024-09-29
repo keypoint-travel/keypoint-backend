@@ -23,4 +23,6 @@ public interface CustomCampaignRepository {
     List<TravelLocationDto> findTravelLocationList(Long campaignId);
 
     boolean existsOverlappingCampaign(List<Long> memberIds, Date startDate, Date endDate);
+
+    boolean existsOverlappingCampaign(List<Long> memberIds, Long campaignId);
 }
