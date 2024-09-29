@@ -6,6 +6,8 @@ import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
 
 import com.keypoint.keypointtravel.global.enumType.campaign.Status;
+
+import java.sql.Date;
 import java.util.List;
 
 public interface CustomCampaignRepository {
@@ -19,4 +21,8 @@ public interface CustomCampaignRepository {
     void updateCampaignFinished(Long campaignId);
 
     List<TravelLocationDto> findTravelLocationList(Long campaignId);
+
+    boolean existsOverlappingCampaign(List<Long> memberIds, Date startDate, Date endDate);
+
+    boolean existsOverlappingCampaign(List<Long> memberIds, Long campaignId);
 }

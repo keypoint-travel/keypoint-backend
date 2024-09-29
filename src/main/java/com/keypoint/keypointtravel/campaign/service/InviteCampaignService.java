@@ -1,7 +1,9 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.FindInvitationResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
@@ -32,6 +34,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Async;
@@ -156,13 +160,15 @@ public class InviteCampaignService {
     public void inviteFriends(InviteFriendUseCase useCase) {
         // 1. 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
-        // 2. 차단 여부 확인
-        validateBlockedMember(memberIds, useCase.getFriendIds());
-        // 3. 이미 가입된 인원인지 확인
+        // 2. 이미 가입된 인원인지 확인
         validateJoinedMember(memberIds, useCase.getFriendIds());
+        // 3. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
+        validatePeriodOverlap(useCase);
         // 4. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase);
-        // 5. 회원 - 캠페인 테이블에 추가
+        // 5. 차단 여부 확인
+        validateBlockedMember(memberIds, useCase.getFriendIds());
+        // 6. 회원 - 캠페인 테이블에 추가
         saveMemberCampaigns(useCase);
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
     }
@@ -187,6 +193,13 @@ public class InviteCampaignService {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         return memberIds;
+    }
+
+    private void validatePeriodOverlap(InviteFriendUseCase useCase) {
+        // 회원 중 기간이 겹치는 다른 캠페인이 있는지 검증
+        if (campaignRepository.existsOverlappingCampaign(useCase.getFriendIds(), useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.CAMPAIGN_PERIOD_OVERLAP);
+        }
     }
 
     private void validateBlockedMember(List<Long> memberIds, List<Long> friendIds) {

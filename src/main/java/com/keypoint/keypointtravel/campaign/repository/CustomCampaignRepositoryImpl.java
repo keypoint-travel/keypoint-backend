@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
+import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.QCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QTravelLocation;
@@ -15,9 +16,14 @@ import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.place.entity.QCountry;
 import com.keypoint.keypointtravel.place.entity.QPlace;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import static com.querydsl.jpa.JPAExpressions.select;
+
+import java.sql.Date;
 import java.util.List;
 import java.util.Locale;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -128,5 +134,35 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
             .innerJoin(country).on(place.country.id.eq(country.id))
             .where(travelLocation.campaign.id.eq(campaignId))
             .fetch();
+    }
+
+    @Override
+    public boolean existsOverlappingCampaign(List<Long> memberIds, Date startDate, Date endDate) {
+        // startDate, endDate 사이 기간에 해당하는 캠페인이 있는지 조회
+        List<Campaign> campaigns = queryFactory.selectFrom(campaign)
+            .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
+            .where(memberCampaign.member.id.in(memberIds)
+                .and(campaign.startDate.loe(endDate).and(campaign.endDate.goe(startDate))))
+            .fetch();
+        return !campaigns.isEmpty();
+    }
+
+    @Override
+    public boolean existsOverlappingCampaign(List<Long> memberIds, Long campaignId) {
+        // startDate, endDate 사이 기간에 해당하는 캠페인이 있는지 조회
+        List<Campaign> campaigns = queryFactory.selectFrom(campaign)
+            .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
+            .where(memberCampaign.member.id.in(memberIds)
+                .and(campaign.startDate.loe(
+                    select(campaign.endDate)
+                        .from(campaign)
+                        .where(campaign.id.eq(campaignId)))
+                    .and(campaign.endDate.goe(
+                        select(campaign.startDate)
+                            .from(campaign).
+                            where(campaign.id.eq(campaignId)))
+                    )))
+            .fetch();
+        return !campaigns.isEmpty();
     }
 }
