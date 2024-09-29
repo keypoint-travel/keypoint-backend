@@ -92,34 +92,27 @@ public class EditCampaignService {
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
-        // 2. 서로 차단한 회원이 있는지 검증
+        // 2. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        validatePremiumMember(useCase);
+        // 3. 참여 회원 중 캠페인 기간이 겹치는 다른 캠페인이 있는지 검증
+        validatePeriodOverlap(useCase);
+        // 4. 서로 차단한 회원이 있는지 검증
         if(useCase.getMembers() != null && !useCase.getMembers().isEmpty()){
             useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
             validateBlockedMembers(useCase.getMembers());
         }
-        // 3. 참여한 캠페인 수 및 프리미엄 회원인지 검증
-        validatePremiumMember(useCase);
-        // 4. 커버 사진 업데이트
+        // 5. 커버 사진 업데이트
         Campaign campaign = campaignRepository.findById(useCase.getCampaignId())
             .orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN));
         updateUploadFile(campaign.getCampaignImageId(), useCase.getCoverImage());
-        // 5. 켐페인 정보 업데이트
+        // 6. 켐페인 정보 업데이트
         campaign.updateInfo(useCase.getTitle(), useCase.getStartDate(), useCase.getEndDate());
-        // 6. 켐페인 예산 업데이트
+        // 7. 켐페인 예산 업데이트
         updateCampaignBudgets(campaign, useCase.getBudgets());
-        // 7. 회원 캠페인 업데이트
+        // 8. 회원 캠페인 업데이트
         updateMemberCampaigns(campaign, useCase.getMembers(), useCase.getMemberId());
-        // 8. 여행지 업데이트
+        // 9. 여행지 업데이트
         updateTravelLocations(campaign, useCase.getTravels());
-    }
-
-    private void validateBlockedMembers(List<MemberInfo> members) {
-        List<Long> memberIds = members.stream()
-            .map(MemberInfo::getMemberId)
-            .toList();
-        if (blockedMemberRepository.existsBlockedMembers(memberIds)) {
-            throw new GeneralException(BlockedMemberErrorCode.EXISTS_BLOCKED_MEMBER);
-        }
     }
 
     private void validatePremiumMember(UpdateUseCase useCase){
@@ -133,6 +126,29 @@ public class EditCampaignService {
         // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
         if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)){
             throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
+        }
+    }
+
+    private void validatePeriodOverlap(UpdateUseCase useCase) {
+        // 회원 중 기간이 겹치는 다른 캠페인이 있는지 검증
+        List<Long> memberIds = new ArrayList<>();
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
+            memberIds = useCase.getMembers().stream()
+                .map(MemberInfo::getMemberId)
+                .collect(Collectors.toList());
+        }
+        memberIds.add(useCase.getMemberId());
+        if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate())) {
+            throw new GeneralException(CampaignErrorCode.MEMBER_CAMPAIGN_PERIOD_OVERLAP);
+        }
+    }
+
+    private void validateBlockedMembers(List<MemberInfo> members) {
+        List<Long> memberIds = members.stream()
+            .map(MemberInfo::getMemberId)
+            .toList();
+        if (blockedMemberRepository.existsBlockedMembers(memberIds)) {
+            throw new GeneralException(BlockedMemberErrorCode.EXISTS_BLOCKED_MEMBER);
         }
     }
 
