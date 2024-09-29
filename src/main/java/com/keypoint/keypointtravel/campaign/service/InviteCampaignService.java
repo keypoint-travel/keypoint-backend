@@ -160,14 +160,14 @@ public class InviteCampaignService {
     public void inviteFriends(InviteFriendUseCase useCase) {
         // 1. 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
-        // 2. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
-        validatePeriodOverlap(useCase);
-        // 3. 차단 여부 확인
-        validateBlockedMember(memberIds, useCase.getFriendIds());
-        // 4. 이미 가입된 인원인지 확인
+        // 2. 이미 가입된 인원인지 확인
         validateJoinedMember(memberIds, useCase.getFriendIds());
-        // 5. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        // 3. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
+        validatePeriodOverlap(useCase);
+        // 4. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase);
+        // 5. 차단 여부 확인
+        validateBlockedMember(memberIds, useCase.getFriendIds());
         // 6. 회원 - 캠페인 테이블에 추가
         saveMemberCampaigns(useCase);
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
