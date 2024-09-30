@@ -2,13 +2,16 @@ package com.keypoint.keypointtravel.premium.service;
 
 import com.keypoint.keypointtravel.global.enumType.error.PremiumErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.premium.dto.response.RemainingPeriodResponse;
 import com.keypoint.keypointtravel.premium.dto.useCase.PremiumMemberUseCase;
 import com.keypoint.keypointtravel.premium.entity.MemberPremium;
 import com.keypoint.keypointtravel.premium.repository.MemberPremiumRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +35,8 @@ public class PremiumService {
     public RemainingPeriodResponse findRemainingPremiumDays(PremiumMemberUseCase useCase) {
         MemberPremium memberPremium = memberPremiumRepository.findByMemberId(useCase.getMemberId())
             .orElseThrow(() -> new GeneralException(PremiumErrorCode.NOT_FOUND_MEMBER_PREMIUM));
-        Long remainingDays = ChronoUnit.DAYS.between(memberPremium.getStartedAt(), memberPremium.getExpirationAt());
+        Long remainingDays = ChronoUnit.DAYS.between(memberPremium.getStartedAt(),
+            memberPremium.getExpirationAt());
         return new RemainingPeriodResponse(remainingDays);
     }
 
@@ -112,5 +116,16 @@ public class PremiumService {
             .isFree(false)
             .build();
         memberPremiumRepository.save(newMemberPremium);
+    }
+
+    @Scheduled(cron = "0 0/5 * * * *", zone = "Asia/Seoul")
+    public void updateCurrency() {
+        List<MemberPremium> memberPremiums = memberPremiumRepository.findExpiredMemberPremiums();
+        for (MemberPremium memberPremium : memberPremiums) {
+            memberPremium.updateIsActive(false);
+            LogUtils.writeInfoLog("updatePremiumMember",
+                "inactive expired premium member, memberId : " + memberPremium.getMember().getId());
+        }
+        memberPremiumRepository.saveAll(memberPremiums);
     }
 }
