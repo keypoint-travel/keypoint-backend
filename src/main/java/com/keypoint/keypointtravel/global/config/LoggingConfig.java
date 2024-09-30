@@ -2,8 +2,12 @@ package com.keypoint.keypointtravel.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -14,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 @Aspect
 @Component
@@ -31,18 +36,11 @@ public class LoggingConfig {
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         Map<String, Object> requestInfo = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         long start = System.currentTimeMillis();
 
         try {
-//            requestInfo.put("Request body", pjp.getArgs());
-//            for (Object arg : pjp.getArgs()) {
-//                if (arg instanceof MultipartFile) {
-//                    requestInfo.remove("Request body");
-//                    break;
-//                }
-//            }
-
             return pjp.proceed(pjp.getArgs());
         } finally {
             long end = System.currentTimeMillis();
@@ -54,6 +52,18 @@ public class LoggingConfig {
             requestInfo.put("Response time", end - start);
 
             try {
+                List<Object> requestBodyInfo = new ArrayList<>();
+                for (Object arg : pjp.getArgs()) {
+                    if (arg instanceof MultipartFile) {
+                        requestBodyInfo.add(((MultipartFile) arg).getOriginalFilename());
+                    } else if (arg instanceof CustomUserDetails) {
+                        continue;
+                    } else {
+                        requestBodyInfo.add(arg);
+                    }
+                    requestInfo.put("Request body", requestBodyInfo);
+                }
+
                 logger.info(objectMapper.writeValueAsString(requestInfo));
             } catch (Exception e) {
                 logger.error(e.getMessage());
