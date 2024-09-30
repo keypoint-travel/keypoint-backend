@@ -24,7 +24,7 @@ public class SchedulerService {
     private String key;
 
     // 월 ~ 금 14시 00분 부터 5분 주기로 55분까지 12회 진행
-    @Scheduled(cron = "0 0/1 * * * MON-FRI", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0/5 14 * * MON-FRI", zone = "Asia/Seoul")
     public void updateCurrency() {
         try {
             String today = DateUtils.getToday();
