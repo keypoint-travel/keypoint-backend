@@ -8,7 +8,6 @@ import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.service.AuthService;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,9 +43,6 @@ public class AuthController {
         ReissueUseCase useCase = ReissueUseCase.of(accessToken, request.getRefreshToken());
         TokenInfoResponse result = authService.reissueToken(useCase);
 
-        LogUtils.writeInfoLog("reissueToken",
-            "Success to reissue token " + result.getAccessToken()
-        );
         return APIResponseEntity.<TokenInfoResponse>builder()
             .data(result)
             .build();

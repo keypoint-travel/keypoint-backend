@@ -12,7 +12,6 @@ import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
@@ -85,8 +84,6 @@ public class AuthService {
             // 3. JWT 토큰 재발급
             return tokenProvider.createToken(authentication);
         } catch (Exception ex) {
-            LogUtils.writeErrorLog("reissueToken",
-                String.format("error: %s", ex));
             throw new GeneralException(ex);
         }
     }
