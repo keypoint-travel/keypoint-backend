@@ -4,6 +4,8 @@ import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.GenderType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.theme.entity.PaidTheme;
+import com.keypoint.keypointtravel.theme.entity.Theme;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,6 +42,15 @@ public class MemberDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "representative_badge_id")
     private Badge representativeBadge;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "theme_id")
+    private Theme theme;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paid_theme_id")
+    private PaidTheme paidTheme;
+
 
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
