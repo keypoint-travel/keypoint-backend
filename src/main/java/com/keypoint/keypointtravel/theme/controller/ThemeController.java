@@ -77,7 +77,7 @@ public class ThemeController {
     }
 
     /**
-     * @param sortBy id
+     * @param sortBy createAt
      * @param direction asc, desc
      * @param pageable
      * @return
@@ -86,7 +86,7 @@ public class ThemeController {
     public APIResponseEntity<PageResponse<ThemeResponse>> findThemes(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
-        @PageableDefault(size = 15, sort = "modifyAt", direction = Direction.ASC) Pageable pageable
+        @PageableDefault(sort = "createAt", direction = Direction.ASC) Pageable pageable
     ) {
         // sortBy를 제공한 경우, direction 에 따라 정렬 객체 생성
         if (sortBy != null && !sortBy.isEmpty()) {

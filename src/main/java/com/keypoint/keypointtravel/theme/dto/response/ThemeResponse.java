@@ -24,4 +24,10 @@ public class ThemeResponse {
         this.createAt = createAt;
         this.modifyAt = modifyAt;
     }
+
+    public void setChartColors(List<String> chartColors) {
+        this.chartColors = chartColors;
+    }
+
+
 }

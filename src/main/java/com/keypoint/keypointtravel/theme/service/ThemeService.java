@@ -98,7 +98,6 @@ public class ThemeService {
         try {
             return themeRepository.findThemes(useCase);
         } catch (Exception ex) {
-            log.error("Error occurred while finding themes: ", ex);
             throw new GeneralException(ex);
         }
     }

@@ -75,7 +75,7 @@ public class PaidThemeController {
     }
 
     /**
-     * @param sortBy id
+     * @param sortBy createAt
      * @param direction asc, desc
      * @param pageable
      * @return
@@ -84,7 +84,7 @@ public class PaidThemeController {
     public APIResponseEntity<PageResponse<ThemeResponse>> findPaidThemes(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
-        @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
+        @PageableDefault(sort = "createAt", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         // sortBy를 제공한 경우, direction 에 따라 정렬 객체 생성
         if (sortBy != null && !sortBy.isEmpty()) {

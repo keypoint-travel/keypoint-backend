@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.theme.entity.QTheme;
 import com.keypoint.keypointtravel.theme.entity.QThemeColor;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -40,8 +41,8 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
         // 정렬 기준 추가
         List<OrderSpecifier<?>> orderSpecifiers = getThemeOrderSpecifiers(sortBy, direction);
 
-        // Query 실행
-        List<ThemeResponse> result = queryFactory
+        // 1. 테마 목록 페이징 처리
+        List<ThemeResponse> pagedThemes = queryFactory
             .from(theme)
             .leftJoin(themeColor).on(themeColor.theme.id.eq(theme.id))
             .where(builder)
@@ -50,25 +51,37 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
             .limit(pageable.getPageSize())
             .transform(
                 GroupBy.groupBy(theme.id).list(
-                    Projections.constructor(
+                    Projections.fields(
                         ThemeResponse.class,
                         theme.id.as("themeId"),
                         theme.name,
                         theme.color,
-                        GroupBy.list(themeColor.color),
+                        ExpressionUtils.as(Projections.list(themeColor.color), "chartColors"),
                         theme.createAt,
                         theme.modifyAt
                     )
                 )
             );
 
+        // 2. 각 테마에 대한 chartColors 리스트 조회 후 추가
+        pagedThemes.forEach(themeResponse -> {
+            List<String> chartColors = queryFactory
+                .select(themeColor.color)
+                .from(themeColor)
+                .where(themeColor.theme.id.eq(themeResponse.getThemeId()))
+                .fetch();
+            themeResponse.setChartColors(chartColors); // chartColors 추가
+        });
+
+        // 3. 전체 테마 개수 계산
         long count = queryFactory
             .select(theme)
             .from(theme)
             .where(builder)
             .fetchCount();
 
-        return new PageImpl<>(result, pageable, count);
+        // 4. 페이지 결과 반환
+        return new PageImpl<>(pagedThemes, pageable, count);
     }
 
     private List<OrderSpecifier<?>> getThemeOrderSpecifiers(String sortBy, String direction) {
@@ -81,9 +94,12 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
                 case "id":
                     orderSpecifiers.add(new OrderSpecifier<>(order, theme.id));
                     break;
+                case "modifyAt":
+                    orderSpecifiers.add(new OrderSpecifier<>(order, theme.modifyAt));
+                    break;
             }
         } else { //기본 정렬 기준
-            orderSpecifiers.add(new OrderSpecifier<>(Order.ASC, theme.modifyAt));
+            orderSpecifiers.add(new OrderSpecifier<>(Order.ASC, theme.createAt));
         }
         return orderSpecifiers;
     }
@@ -100,8 +116,8 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
         // 정렬 기준 추가
         List<OrderSpecifier<?>> orderSpecifiers = getPaidThemeOrderSpecifiers(sortBy, direction);
 
-        // Query 실행
-        List<ThemeResponse> result = queryFactory
+        // 1. 테마 목록 페이징 처리
+        List<ThemeResponse> pagedThemes = queryFactory
             .from(paidTheme)
             .leftJoin(themeColor).on(themeColor.paidTheme.id.eq(paidTheme.id))
             .where(builder)
@@ -110,17 +126,27 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
             .limit(pageable.getPageSize())
             .transform(
                 GroupBy.groupBy(paidTheme.id).list(
-                    Projections.constructor(
+                    Projections.fields(
                         ThemeResponse.class,
                         paidTheme.id.as("themeId"),
                         paidTheme.name,
                         paidTheme.color,
-                        GroupBy.list(themeColor.color),
+                        ExpressionUtils.as(Projections.list(themeColor.color), "chartColors"),
                         paidTheme.createAt,
                         paidTheme.modifyAt
                     )
                 )
             );
+
+        // 2. 각 테마에 대한 chartColors 리스트 조회 후 추가
+        pagedThemes.forEach(themeResponse -> {
+            List<String> chartColors = queryFactory
+                .select(themeColor.color)
+                .from(themeColor)
+                .where(themeColor.paidTheme.id.eq(themeResponse.getThemeId()))
+                .fetch();
+            themeResponse.setChartColors(chartColors); // chartColors 추가
+        });
 
         long count = queryFactory
             .select(paidTheme)
@@ -128,7 +154,7 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
             .where(builder)
             .fetchCount();
 
-        return new PageImpl<>(result, pageable, count);
+        return new PageImpl<>(pagedThemes, pageable, count);
     }
 
     private List<OrderSpecifier<?>> getPaidThemeOrderSpecifiers(String sortBy, String direction) {
@@ -141,9 +167,12 @@ public class ThemeCustomRepositoryImpl implements ThemeCustomRepository {
                 case "id":
                     orderSpecifiers.add(new OrderSpecifier<>(order, paidTheme.id));
                     break;
+                case "modifyAt":
+                    orderSpecifiers.add(new OrderSpecifier<>(order, paidTheme.modifyAt));
+                    break;
             }
         } else { //기본 정렬 기준
-            orderSpecifiers.add(new OrderSpecifier<>(Order.ASC, paidTheme.modifyAt));
+            orderSpecifiers.add(new OrderSpecifier<>(Order.ASC, paidTheme.createAt));
         }
         return orderSpecifiers;
     }
