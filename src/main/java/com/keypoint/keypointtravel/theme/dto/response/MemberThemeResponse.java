@@ -22,4 +22,9 @@ public class MemberThemeResponse {
         this.name = name;
         this.chartColors = chartColors;
     }
+
+    public MemberThemeResponse(String color, String name) {
+        this.color = color;
+        this.name = name;
+    }
 }

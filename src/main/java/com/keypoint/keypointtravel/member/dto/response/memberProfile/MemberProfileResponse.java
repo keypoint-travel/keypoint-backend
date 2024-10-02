@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.member.dto.response.memberProfile;
 
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.theme.dto.response.MemberThemeResponse;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,8 @@ public class MemberProfileResponse {
 
     private String representativeBadgeUrl;
 
+    private MemberThemeResponse themes;
+
     @QueryProjection
     public MemberProfileResponse(
         Long memberId,
@@ -40,7 +43,8 @@ public class MemberProfileResponse {
         Long badgeCnt,
         Long campaginCnt,
         String representativeBadgeUrl,
-        Long premiumMemberCnt
+        Long premiumMemberCnt,
+        MemberThemeResponse themes
     ) {
         this.memberId = memberId;
         this.name = name;
@@ -52,5 +56,6 @@ public class MemberProfileResponse {
         this.campaginCnt = campaginCnt;
         this.representativeBadgeUrl = representativeBadgeUrl;
         this.isPremiumMember = premiumMemberCnt > 0;
+        this.themes = themes;
     }
 }

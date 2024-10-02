@@ -14,8 +14,13 @@ import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfi
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
+import com.keypoint.keypointtravel.theme.dto.response.MemberThemeResponse;
+import com.keypoint.keypointtravel.theme.entity.QPaidTheme;
+import com.keypoint.keypointtravel.theme.entity.QTheme;
+import com.keypoint.keypointtravel.theme.entity.QThemeColor;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,11 +41,15 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final QBlockedMember blockedMember = QBlockedMember.blockedMember;
     private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
+    private final QTheme theme = QTheme.theme;
+    private final QPaidTheme paidTheme = QPaidTheme.paidTheme;
+    private final QThemeColor themeColor = QThemeColor.themeColor;
+
     @Override
     public MemberProfileResponse findMemberProfile(Long memberId) {
         QUploadFile badgeFile = new QUploadFile("badgeFile");
 
-        return queryFactory
+        MemberProfileResponse profileResponse = queryFactory
             .select(
                 Projections.constructor(
                     MemberProfileResponse.class,
@@ -57,7 +66,19 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                     earnedBadge.count(),
                     memberCampaign.count(),
                     badgeFile.path,
-                    memberPremium.count()
+                    memberPremium.count(),
+                    // 테마 정보 추가
+                    Projections.constructor(
+                        MemberThemeResponse.class,
+                        new CaseBuilder()
+                            .when(paidTheme.isNotNull())
+                            .then(paidTheme.color)
+                            .otherwise(theme.color).as("color"),
+                        new CaseBuilder()
+                            .when(paidTheme.isNotNull())
+                            .then(paidTheme.name)
+                            .otherwise(theme.name).as("name")
+                    )
                 )
             )
             .from(member)
@@ -67,8 +88,32 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .leftJoin(memberPremium).on(memberPremium.member.id.eq(memberId))
             .leftJoin(earnedBadge).on(earnedBadge.member.id.eq(memberId))
             .leftJoin(memberCampaign).on(memberCampaign.member.id.eq(memberId))
+            .leftJoin(theme).on(memberDetail.theme.eq(theme))
+            .leftJoin(paidTheme).on(memberDetail.paidTheme.eq(paidTheme))
             .where(member.id.eq(memberId))
             .fetchOne();
+
+        // chartColors 가져오기
+        List<String> chartColors = queryFactory
+            .select(themeColor.color)
+            .from(themeColor)
+            .leftJoin(memberDetail).on(memberDetail.member.id.eq(memberId))
+            .leftJoin(paidTheme).on(memberDetail.paidTheme.eq(paidTheme))
+            .leftJoin(theme).on(memberDetail.theme.eq(theme))
+            .where(
+                memberDetail.paidTheme.isNotNull()
+                    .and(themeColor.paidTheme.eq(paidTheme))
+                    .or(memberDetail.paidTheme.isNull()
+                        .and(themeColor.theme.eq(theme)))
+            )
+            .fetch();
+
+        // 응답에 테마 chartColors 추가
+        if (profileResponse != null && profileResponse.getThemes() != null) {
+            profileResponse.getThemes().withChartColors(chartColors);
+        }
+
+        return profileResponse;
     }
 
     @Override
