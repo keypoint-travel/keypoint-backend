@@ -98,6 +98,10 @@ public class RequestFilter implements Filter {
     }
 
     private int getResponseStatus(final HttpServletResponse response) throws IOException {
+        ContentCachingResponseWrapper wrapper = WebUtils.getNativeResponse(response,
+            ContentCachingResponseWrapper.class);
+        wrapper.copyBodyToResponse();
+
         return response.getStatus();
     }
 
