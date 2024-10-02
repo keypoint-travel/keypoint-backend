@@ -21,14 +21,6 @@ public class GeneralExceptionHandler {
     @ExceptionHandler(GeneralException.class)
     public ResponseEntity<APIResponseEntity<ErrorDTO>> handleGeneralException(
         GeneralException exception) {
-        log.warn(
-            String.format("http-status={%s} code={%s} msg={%s} detail={%s}",
-                exception.getStatus().value(),
-                exception.getErrorCode().getCode(),
-                exception.getErrorCode().getMsg(),
-                exception.getDetail()
-            )
-        );
 
         return ResponseEntity
             .status(exception.getStatus())
@@ -40,13 +32,6 @@ public class GeneralExceptionHandler {
         HttpClientException exception
     ) {
         ErrorCode code = CommonErrorCode.OPEN_API_REQUEST_FAIL;
-        log.warn(
-            String.format("http-status={%s} code={%s} msg={%s}",
-                exception.getStatusCode(),
-                code,
-                exception.getMessage()
-            )
-        );
 
         return ErrorDTO.of(exception, code);
     }
