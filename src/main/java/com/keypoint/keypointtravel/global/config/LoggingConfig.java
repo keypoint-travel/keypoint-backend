@@ -1,10 +1,17 @@
 package com.keypoint.keypointtravel.global.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.constants.HeaderConstants;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,15 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Aspect
 @Component
@@ -58,6 +56,7 @@ public class LoggingConfig {
             requestInfo.put("URI", request.getRequestURI());
             requestInfo.put("Request parameters", request.getQueryString() == null ? "" : request.getQueryString());
             requestInfo.put("Response time", end - start);
+            requestInfo.put("Accept-Language", request.getHeader(HeaderConstants.LANGUAGE_HEADER));
 
             try {
                 List<Object> requestBodyInfo = new ArrayList<>();

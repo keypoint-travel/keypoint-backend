@@ -36,7 +36,6 @@ public class BadgeInitializer {
             availableTypes.removeAll(existedTypes);
 
             // 존재하지 않는 Badge 만 생성
-
             for (BadgeType type : availableTypes) {
                 CreateBadgeUseCase useCase = null;
                 switch (type) {
