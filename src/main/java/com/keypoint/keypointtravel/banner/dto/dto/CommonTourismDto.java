@@ -8,6 +8,7 @@ import lombok.*;
 public class CommonTourismDto {
 
     private Long id;
+    private String contentId;
     private String mainTitle;
     private String subTitle;
     private String placeName;

@@ -20,8 +20,12 @@ public class OCRDocumentResponse {
 
     public CurrencyCode getCurrencyCode() {
         DocumentField fieldData = this.fields.get(OCRFieldName.TOTAL.getFieldName());
-        String content = fieldData.getContent();
+        if (fieldData != null) {
+            String content = fieldData.getContent();
 
-        return CurrencyCode.fromContent(content);
+            return CurrencyCode.fromContent(content);
+        }
+
+        return null;
     }
 }

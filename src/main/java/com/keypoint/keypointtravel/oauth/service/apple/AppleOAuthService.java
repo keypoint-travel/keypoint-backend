@@ -5,6 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
 import com.keypoint.keypointtravel.auth.redis.service.OAuthTokenService;
 import com.keypoint.keypointtravel.global.constants.AppleAPIConstants;
+import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
@@ -16,11 +17,11 @@ import com.keypoint.keypointtravel.oauth.dto.response.OauthLoginResponse;
 import com.keypoint.keypointtravel.oauth.dto.response.ReissueOAuthResponse;
 import com.keypoint.keypointtravel.oauth.dto.useCase.OauthLoginUseCase;
 import com.keypoint.keypointtravel.oauth.dto.useCase.ReissueRefreshTokenUseCase;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenRequestUseCase;
-import com.keypoint.keypointtravel.oauth.dto.useCase.appleTokenUseCase.AppleTokenResponseUseCase;
+import com.keypoint.keypointtravel.oauth.dto.useCase.appleToken.SuccessAppleTokenUseCase;
 import com.keypoint.keypointtravel.oauth.service.OAuthService;
 import com.keypoint.keypointtravel.oauth.service.Oauth2UserService;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,8 +30,6 @@ import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
@@ -51,46 +50,48 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class AppleOAuthService implements OAuthService {
 
+    private static final String GRANT_TYPE = "authorization_code";
+
     private final OAuthTokenService oAuthTokenService;
     private final AppleAPIService appleAPIService;
     private final Oauth2UserService oauth2UserService;
     private final JwtTokenProvider tokenProvider;
+    private final Oauth2RequestEntityConverter oauth2RequestEntityConverter;
 
     @Value("${apple.keyPath}")
     private String appleKeyPath;
     @Value("${spring.security.oauth2.client.provider.apple.tokenUri}")
     private String tokenURL;
-    @Value("${spring.security.oauth2.client.registration.apple.clientId}")
+    @Value("${apple.app-id}")
     private String clientId;
     @Value("${spring.security.oauth2.client.registration.apple.clientSecret}")
     private String clientSecret;
-    @Value("${spring.security.oauth2.client.registration.apple.redirect-uri}")
-    private String redirectURI;
     @Value("${apple.teamId}")
     private String appleTeamId;
     @Value("${apple.keyId}")
     private String appleKeyId;
 
     @Override
+    @Transactional
     public OauthLoginResponse login(OauthLoginUseCase useCase) {
         try {
             // 1. Oauth 토큰 발급
-            AppleTokenRequestUseCase tokenRequest = AppleTokenRequestUseCase.of(
+            SuccessAppleTokenUseCase tokenResponse = appleAPIService.getValidateToken(
                 clientId,
-                createClientSecret(),
+                createSecret(),
                 useCase.getOauthCode(),
-                redirectURI
-            );
-            AppleTokenResponseUseCase tokenResponse = appleAPIService.getValidateToken(
-                "application/x-www-form-urlencoded", tokenRequest
+                GRANT_TYPE
             );
 
             // 2. 사용자 정보 조회
             String email = getEmailFromIdToken(tokenResponse.getIdToken());
 
             // 3. 사용자 정보 저장
-            CommonMemberDTO member = oauth2UserService.registerMember(email,
-                OauthProviderType.GOOGLE);
+            CommonMemberDTO member = oauth2UserService.registerMember(
+                email,
+                useCase.getName(),
+                OauthProviderType.APPLE
+            );
 
             // 4. OAuth 토큰 저장
             oAuthTokenService.saveOAuthToken(
@@ -175,24 +176,6 @@ public class AppleOAuthService implements OAuthService {
         return headers;
     }
 
-    public String createClientSecret() throws IOException {
-        Date expirationDate = Date.from(
-            LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
-        Map<String, Object> jwtHeader = new HashMap<>();
-        jwtHeader.put("kid", appleKeyId);
-        jwtHeader.put("alg", "ES256");
-
-        return Jwts.builder()
-            .setHeaderParams(jwtHeader)
-            .setIssuer(appleTeamId)
-            .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
-            .setExpiration(expirationDate) // 만료 시간
-            .setAudience(AppleAPIConstants.COMMON_URI)
-            .setSubject(clientId)
-            .signWith(getPrivateKey())
-            .compact();
-    }
-
     public PrivateKey getPrivateKey() throws IOException {
         ClassPathResource resource = new ClassPathResource("static/key/" + appleKeyPath);
 
@@ -202,6 +185,25 @@ public class AppleOAuthService implements OAuthService {
             PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             return converter.getPrivateKey(object);
+        }
+    }
+
+    public String createSecret() {
+        Date expirationDate = Date.from(
+            LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+        try {
+            return Jwts.builder()
+                .setHeaderParam("alg", "ES256")
+                .setHeaderParam("kid", appleKeyId)
+                .setIssuer(appleTeamId)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(expirationDate)
+                .setAudience(AppleAPIConstants.COMMON_URL)
+                .setSubject(clientId)
+                .signWith(this.getPrivateKey(), SignatureAlgorithm.ES256)
+                .compact();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -1,9 +1,15 @@
 package com.keypoint.keypointtravel.banner.repository.banner;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementDetailDto;
+import com.keypoint.keypointtravel.banner.dto.dto.ManagementAdvDetailDto;
 import com.keypoint.keypointtravel.banner.dto.useCase.advertisement.AdvertisementThumbnailDto;
-import com.keypoint.keypointtravel.banner.entity.*;
+import com.keypoint.keypointtravel.banner.entity.AdvertisementBanner;
+import com.keypoint.keypointtravel.banner.entity.AdvertisementBannerContent;
+import com.keypoint.keypointtravel.banner.entity.QAdvertisementBanner;
+import com.keypoint.keypointtravel.banner.entity.QAdvertisementBannerContent;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
@@ -14,11 +20,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
-
-import static com.querydsl.jpa.JPAExpressions.select;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRepository {
@@ -37,21 +40,26 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     public List<AdvertisementBannerDto> findAdvertisementBanners() {
         return queryFactory.select(Projections.constructor(AdvertisementBannerDto.class,
                 advertisementBanner.id,
-                select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.thumbnailImageId)),
-                select(uploadFile.path).from(uploadFile).where(uploadFile.id.eq(advertisementBanner.detailImageId)),
+                select(uploadFile.path).from(uploadFile)
+                    .where(uploadFile.id.eq(advertisementBanner.thumbnailImageId)),
+                select(uploadFile.path).from(uploadFile)
+                    .where(uploadFile.id.eq(advertisementBanner.detailImageId)),
                 advertisementBannerContent.mainTitle,
                 advertisementBannerContent.subTitle,
                 advertisementBannerContent.content,
                 advertisementBannerContent.createAt,
-                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.registerId)),
+                select(memberDetail.member.name).from(memberDetail).where(
+                    memberDetail.member.id.stringValue().eq(advertisementBannerContent.registerId)),
                 advertisementBannerContent.modifyAt,
-                select(memberDetail.name).from(memberDetail).where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.modifyId)),
-                advertisementBannerContent.languageCode
+                select(memberDetail.member.name).from(memberDetail)
+                    .where(memberDetail.member.id.stringValue().eq(advertisementBannerContent.modifyId))
             ))
             .from(advertisementBanner)
             .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
             .where(advertisementBanner.isDeleted.isFalse()
-                .and(advertisementBannerContent.isDeleted.isFalse()))
+                .and(advertisementBannerContent.isDeleted.isFalse())
+                .and(advertisementBannerContent.languageCode.eq(LanguageCode.EN)))
+            .orderBy(advertisementBannerContent.modifyAt.desc())
             .fetch();
     }
 
@@ -82,18 +90,20 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
 
     @Override
     public boolean existsBannerContentByBannerId(Long bannerId) {
-        List<AdvertisementBannerContent> contents = queryFactory.selectFrom(advertisementBannerContent)
+        List<AdvertisementBannerContent> contents = queryFactory.selectFrom(
+                advertisementBannerContent)
             .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
                 .and(advertisementBannerContent.isDeleted.isFalse()))
             .fetch();
-        if (contents.size() > 0){
+        if (contents.size() > 0) {
             return true;
         }
         return false;
     }
 
     @Override
-    public AdvertisementDetailDto findAdvertisementBannerById(Long bannerId, LanguageCode languageCode) {
+    public AdvertisementDetailDto findAdvertisementBannerById(Long bannerId,
+        LanguageCode languageCode) {
         return queryFactory.select(Projections.constructor(AdvertisementDetailDto.class,
                 advertisementBanner.id,
                 advertisementBannerContent.mainTitle,
@@ -108,6 +118,29 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
                 .and(advertisementBannerContent.languageCode.eq(languageCode))
                 .and(advertisementBannerContent.isDeleted.isFalse()))
             .fetchOne();
+    }
+
+    @Override
+    public List<ManagementAdvDetailDto> findAdvertisementBannerById(Long bannerId) {
+        List<ManagementAdvDetailDto> dtoList = queryFactory.select(
+                Projections.constructor(ManagementAdvDetailDto.class,
+                    advertisementBanner.id,
+                    advertisementBannerContent.mainTitle,
+                    advertisementBannerContent.subTitle,
+                    advertisementBannerContent.content,
+                    uploadFile.path,
+                    advertisementBannerContent.languageCode
+                ))
+            .from(advertisementBanner)
+            .innerJoin(advertisementBanner.bannerContents, advertisementBannerContent)
+            .leftJoin(uploadFile).on(advertisementBanner.detailImageId.eq(uploadFile.id))
+            .where(advertisementBanner.id.eq(bannerId)
+                .and(advertisementBannerContent.isDeleted.isFalse()))
+            .fetch();
+        if(dtoList.isEmpty()){
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+        return dtoList;
     }
 
     @Override
@@ -127,7 +160,7 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
             .fetch();
     }
 
-    private JPQLQuery<LanguageCode> getMemberLanguage(Long memberId){
+    private JPQLQuery<LanguageCode> getMemberLanguage(Long memberId) {
         return select(memberDetail.language)
             .from(memberDetail)
             .where(memberDetail.member.id.eq(memberId));
@@ -135,7 +168,8 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
 
     @Override
     public boolean isExistBannerContentByLanguageCode(Long bannerId, LanguageCode languageCode) {
-        AdvertisementBannerContent bannerContent = queryFactory.selectFrom(advertisementBannerContent)
+        AdvertisementBannerContent bannerContent = queryFactory.selectFrom(
+                advertisementBannerContent)
             .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
                 .and(advertisementBannerContent.isDeleted.isFalse())
                 .and(advertisementBannerContent.languageCode.eq(languageCode)))
@@ -148,16 +182,29 @@ public class AdvertisementCustomRepositoryImpl implements AdvertisementCustomRep
     }
 
     @Override
-    public AdvertisementBannerContent findAdvertisementBanner(Long bannerId, LanguageCode languageCode) {
-        AdvertisementBannerContent bannerContent = queryFactory.selectFrom(advertisementBannerContent)
-            .innerJoin(advertisementBannerContent.advertisementBanner, advertisementBanner).fetchJoin()
-            .where(advertisementBanner.id.eq(bannerId)
+    public AdvertisementBannerContent findAdvertisementBanner(Long bannerId,
+        LanguageCode languageCode) {
+        AdvertisementBannerContent bannerContent = queryFactory.selectFrom(
+                advertisementBannerContent)
+            .where(advertisementBannerContent.advertisementBanner.id.eq(bannerId)
                 .and(advertisementBannerContent.isDeleted.isFalse())
                 .and(advertisementBannerContent.languageCode.eq(languageCode)))
             .fetchOne();
-        if(bannerContent == null){
+        if (bannerContent == null) {
             throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
         }
         return bannerContent;
+    }
+
+    @Override
+    public AdvertisementBanner findAdvertisementBanner(Long bannerId) {
+        AdvertisementBanner banner = queryFactory.selectFrom(advertisementBanner)
+            .where(advertisementBanner.id.eq(bannerId)
+                .and(advertisementBanner.isDeleted.isFalse()))
+            .fetchOne();
+        if (banner == null) {
+            throw new GeneralException(BannerErrorCode.NOT_EXISTED_BANNER);
+        }
+        return banner;
     }
 }

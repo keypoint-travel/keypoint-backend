@@ -5,11 +5,13 @@ import com.google.firebase.messaging.Notification;
 import com.keypoint.keypointtravel.global.enumType.email.EmailTemplate;
 import com.keypoint.keypointtravel.global.enumType.notification.MarketingNotificationType;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationContent;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
+import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
 import com.keypoint.keypointtravel.notification.event.marketingNotification.MarketingNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
@@ -46,21 +48,33 @@ public class NotificationEventListener {
         List<PushNotificationHistory> pushNotificationHistories = new ArrayList<>();
         for (Long memberId : event.getMemberIds()) {
             Member member = readMemberService.findMemberById(memberId);
+            if (!member.getNotification().isPushNotificationEnabled()) { // 알림 설정이 안되어 있는 경우
+                continue;
+            }
+
+            PushNotificationType type = event.getPushNotificationType();
 
             // 1. FCM 내용 구성
             PushNotificationContent notificationMsg = PushNotificationContent.getRandomNotificationContent(
-                event.getPushNotificationType());
+                type
+            );
             PushNotificationDTO notificationContent = pushNotificationService.generateNotificationDTO(
-                member.getMemberDetail(),
+                member.getName(),
+                member.getMemberDetail().getLanguage(),
                 event,
                 notificationMsg
             );
             if (notificationContent == null) {
                 return;
             }
+            Object detail = pushNotificationService.generateNotificationDetail(
+                memberId,
+                type
+            );
+            FCMBodyResponse body = FCMBodyResponse.of(type, notificationContent.getBody(), detail);
             Notification notification = Notification.builder()
                 .setTitle(notificationContent.getTitle())
-                .setBody(notificationContent.getBody())
+                .setBody(body.toString())
                 .build();
 
             // 2. FCM Message 생성
@@ -104,7 +118,6 @@ public class NotificationEventListener {
         MarketingNotificationType type = event.getMarketingNotificationType();
         EmailTemplate emailTemplate = type.getTemplate();
 
-        // TODO 나중에 이메일 템플릿에 맞게 수정 필요
         EmailUtils.sendMultiEmail(
             event.getMemberEmails()
             , emailTemplate,

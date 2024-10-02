@@ -1,12 +1,19 @@
 package com.keypoint.keypointtravel.campaign.controller;
 
+import com.keypoint.keypointtravel.campaign.dto.request.createRequest.BudgetInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.CreateRequest;
+import com.keypoint.keypointtravel.campaign.dto.request.createRequest.EmailInfo;
 import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailsUseCase;
 import com.keypoint.keypointtravel.campaign.service.CreateCampaignService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+import com.keypoint.keypointtravel.global.enumType.error.CampaignErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,14 +37,40 @@ public class CreateCampaignController {
         @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
         @RequestPart(value = "detail") @Valid CreateRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        validateBudget(request);
+        // 이메일 초대 명단에 자기 자신이 있는지 확인
+        if (request.getEmails() != null && !request.getEmails().isEmpty()) {
+            validateInviteSelf(request.getEmails(), userDetails.getEmail());
+        }
         // 캠페인 생성
         Long campaignId = createCampaignService.createCampaign(
             CreateUseCase.of(coverImage, request, userDetails.getId()));
         // 이메일로 초대
         if (request.getEmails() != null && !request.getEmails().isEmpty()) {
+            Locale locale = LocaleContextHolder.getLocale();
             createCampaignService.sendEmail(
-                InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId));
+                InviteByEmailsUseCase.of(request.getEmails(), userDetails.getId(), campaignId),
+                locale);
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    private void validateBudget(CreateRequest request){
+        // 예산 미입력 시 예외 처리
+        if(request.getBudgets() == null || request.getBudgets().isEmpty()){
+            throw new GeneralException(CampaignErrorCode.NOT_EXISTED_BUDGET);
+        }
+        // 총 예산과 카테고리별 합산 예산이 일치하지 않는 경우 예외 처리
+        if (request.getBudgets().stream().mapToDouble(BudgetInfo::getAmount).sum()
+            != request.getTotalBudget()) {
+            throw new GeneralException(CampaignErrorCode.NOT_MATCH_BUDGET);
+        }
+    }
+    private void validateInviteSelf(List<EmailInfo> emails, String leaderEmail) {
+        for (EmailInfo email : emails) {
+            if (leaderEmail.equals(email.getEmail())) {
+                throw new GeneralException(CampaignErrorCode.CANNOT_INVITE_SELF);
+            }
+        }
     }
 }

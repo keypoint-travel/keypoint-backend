@@ -6,9 +6,8 @@ import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRepository {
@@ -43,7 +42,7 @@ public class CustomBlockedMemberRepositoryImpl implements CustomBlockedMemberRep
         // 내가 차단한 회원 목록 조회
         return queryFactory.select(Projections.constructor(BlockedMemberDto.class,
                 blockedMember.blockedMemberId,
-                memberDetail.name))
+                memberDetail.member.name))
             .from(blockedMember)
             .innerJoin(memberDetail).on(blockedMember.blockedMemberId.eq(memberDetail.member.id))
             .where(blockedMember.member.id.eq(memberId))

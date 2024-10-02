@@ -16,29 +16,37 @@ public class AzureOCRUtils {
         OCRFieldName fieldName,
         Map<String, DocumentField> fieldMap
     ) {
-        DocumentField fieldData = fieldMap.get(fieldName.getFieldName());
-        if (fieldData == null) {
+        try {
+            DocumentField fieldData = fieldMap.get(fieldName.getFieldName());
+            if (fieldData == null) {
+                return null;
+            }
+
+            switch (fieldName.getType()) {
+                case ADDRESS:
+                    return getAddressValue(fieldData);
+                case STRING:
+                    return getStringValue(fieldData);
+                case PHONE_NUMBER:
+                    return getPhoneNumberValue(fieldData);
+                case NUMBER:
+                    return getNumberValue(fieldData).toString();
+                case DATE:
+                    return getDateValue(fieldData);
+                case TIME:
+                    return getTimeValue(fieldData);
+                case CURRENCY:
+                    return getCurrencyValue(fieldData);
+                default:
+                    return null;
+            }
+        } catch (Exception e) {
+            LogUtils.writeErrorLog("getDocumentValue",
+                String.format("Error occurred while getting document: %s", fieldName));
             return null;
         }
 
-        switch (fieldName.getType()) {
-            case ADDRESS:
-                return getAddressValue(fieldData);
-            case STRING:
-                return getStringValue(fieldData);
-            case PHONE_NUMBER:
-                return getPhoneNumberValue(fieldData);
-            case NUMBER:
-                return getNumberValue(fieldData).toString();
-            case DATE:
-                return getDateValue(fieldData);
-            case TIME:
-                return getTimeValue(fieldData);
-            case CURRENCY:
-                return getCurrencyValue(fieldData);
-            default:
-                return null;
-        }
+
     }
 
     private static String getAddressValue(DocumentField fieldData) {
@@ -58,7 +66,7 @@ public class AzureOCRUtils {
     }
 
     private static String getDateValue(DocumentField fieldData) {
-        return fieldData.getValueDate().format(DateTimeFormatter.ofPattern("YYYY-MM-DD"));
+        return fieldData.getValueDate().format(DateTimeFormatter.ofPattern("YYYY-MM-dd"));
     }
 
     private static String getTimeValue(DocumentField fieldData) {

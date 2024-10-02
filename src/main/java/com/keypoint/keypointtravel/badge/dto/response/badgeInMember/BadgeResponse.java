@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.badge.dto.response.badgeInMember;
 
 import com.keypoint.keypointtravel.badge.entity.Badge;
 import com.keypoint.keypointtravel.badge.entity.EarnedBadge;
+import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +25,8 @@ public class BadgeResponse {
         String inactiveImageUrl
     ) {
         this.badgeId = badge.getId();
-        this.name = badge.getName();
         this.order = badge.getOrder();
+        this.name = MessageSourceUtils.getBadgeName(badge.getType());
 
         if (earnedBadge != null) {
             this.badgeImageUrl = activeImageUrl;
@@ -34,6 +35,5 @@ public class BadgeResponse {
             this.badgeImageUrl = inactiveImageUrl;
             this.isEarned = false;
         }
-
     }
 }

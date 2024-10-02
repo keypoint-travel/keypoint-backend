@@ -16,7 +16,7 @@ public class ReceiptResponse {
     private Long receiptId;
     private String store;
     private String storeAddress;
-    private ReceiptCategory receiptCategory;
+    private String receiptCategory;
     private List<PaymentItemResponse> paymentItems;
     private String receiptImageUrl;
     private Float totalAmount;
@@ -44,7 +44,7 @@ public class ReceiptResponse {
         this.receiptId = receiptId;
         this.store = store;
         this.storeAddress = storeAddress;
-        this.receiptCategory = receiptCategory;
+        this.receiptCategory = receiptCategory.getDescription();
         this.receiptImageUrl = receiptImageUrl;
         this.totalAmount = totalAccount;
         this.currencyType = currencyType;

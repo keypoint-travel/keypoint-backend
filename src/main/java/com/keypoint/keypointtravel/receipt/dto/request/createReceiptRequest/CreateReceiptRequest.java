@@ -1,15 +1,12 @@
 package com.keypoint.keypointtravel.receipt.dto.request.createReceiptRequest;
 
 import com.google.firebase.database.annotations.NotNull;
-import com.keypoint.keypointtravel.global.annotation.ValidEnum;
-import com.keypoint.keypointtravel.global.enumType.receipt.ReceiptCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class CreateReceiptRequest {
@@ -22,8 +19,8 @@ public class CreateReceiptRequest {
 
     private String storeAddress;
 
-    @ValidEnum(enumClass = ReceiptCategory.class)
-    private ReceiptCategory receiptCategory;
+    @NotNull
+    private String receiptCategory;
 
     @NotNull
     private LocalDateTime paidAt;

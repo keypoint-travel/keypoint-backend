@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ public class MemberDetail extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "representative_badge_id")
     private Badge representativeBadge;
 
@@ -50,17 +51,15 @@ public class MemberDetail extends BaseEntity {
     @JoinColumn(name = "paid_theme_id")
     private PaidTheme paidTheme;
 
-    @Column(nullable = false)
+
+    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private GenderType gender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate birth;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Comment("국적")
     private String country;
 
@@ -75,14 +74,12 @@ public class MemberDetail extends BaseEntity {
         Member member,
         GenderType gender,
         LocalDate birth,
-        String name,
         LanguageCode language,
         String country
     ) {
         this.member = member;
         this.gender = gender;
         this.birth = birth;
-        this.name = name;
         this.language = language;
         this.country = country;
     }

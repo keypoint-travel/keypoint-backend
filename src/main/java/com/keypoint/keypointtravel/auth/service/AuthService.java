@@ -12,6 +12,7 @@ import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
@@ -20,6 +21,7 @@ import com.keypoint.keypointtravel.member.service.ReadMemberService;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -83,6 +85,8 @@ public class AuthService {
             // 3. JWT 토큰 재발급
             return tokenProvider.createToken(authentication);
         } catch (Exception ex) {
+            LogUtils.writeErrorLog("reissueToken",
+                String.format("error: %s", ex));
             throw new GeneralException(ex);
         }
     }
@@ -112,6 +116,8 @@ public class AuthService {
 
             // 4. JWT 토큰 생성
             return getJwtTokenInfo(email, password);
+        } catch (BadCredentialsException ex) {
+            throw new GeneralException(MemberErrorCode.INVALID_PASSWORD);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

@@ -1,12 +1,5 @@
 package com.keypoint.keypointtravel.auth.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.keypoint.keypointtravel.auth.dto.request.LoginRequest;
 import com.keypoint.keypointtravel.auth.dto.request.RefreshTokenRequest;
 import com.keypoint.keypointtravel.auth.dto.response.TokenInfoResponse;
@@ -15,10 +8,16 @@ import com.keypoint.keypointtravel.auth.dto.useCase.ReissueUseCase;
 import com.keypoint.keypointtravel.auth.service.AuthService;
 import com.keypoint.keypointtravel.global.constants.HeaderConstants;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.dto.useCase.LoginUseCase;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,6 +44,9 @@ public class AuthController {
         ReissueUseCase useCase = ReissueUseCase.of(accessToken, request.getRefreshToken());
         TokenInfoResponse result = authService.reissueToken(useCase);
 
+        LogUtils.writeInfoLog("reissueToken",
+            "Success to reissue token " + result.getAccessToken()
+        );
         return APIResponseEntity.<TokenInfoResponse>builder()
             .data(result)
             .build();

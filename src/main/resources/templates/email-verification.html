@@ -1,19 +1,77 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div>
+      <div style="padding: 40px 0">
+        <div
+          style="
+            background-color: #f9f9f9;
+            border-top: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+            text-align: center;
+            padding: 80px 20px;
+          ">
+          <div
+            style="
+              height: 31px;
+              font-weight: 700;
+              font-size: 24px;
+              line-height: 130%;
+              text-align: left;
+              color: #000000;
+            " th:utext="#{email-verification.title}">
+          </div>
+          <br />
+          <div
+            style="
+              width: 390px;
+              height: 143px;
+              text-align: left;
+              font-weight: 400;
+              font-size: 16px;
+              line-height: 130%;
+              color: #000000;
+            ">
+            <span th:utext="#{email-verification.text1}"></span>
+            <br />
+            <br />
+            <br />
+            <span th:utext="#{email-verification.text2}"></span>
+            <br />
+            <span
+                th:utext="#{email-verification.text3}">
+            </span>
+          </div>
 
-<body>
-<div style="margin:100px;">
-  <h1> 안녕하세요.</h1>
-  <br>
-  <p> 아래 코드를 이메일 인증 화면으로 돌아가 입력해주세요.</p>
-  <br>
-
-  <div align="center" style="border:1px solid black; font-family:verdana;">
-    <h3 style="color:blue"> 이메일 인증 코드 입니다. </h3>
-    <div style="font-size:130%" th:text="${code}"> </div>
-  </div>
-  <br/>
-</div>
-
-</body>
+          <div
+            style="
+              background-color: #ffffff;
+              padding: 30px;
+              width: 80%;
+              margin: auto;
+            ">
+            <span
+              style="
+                font-size: 48px;
+                line-height: 130%;
+                color: #001ece;
+              "
+              th:text="${code}"
+            >
+            </span>
+            <br/>
+            <br/>
+            <p th:utext="#{email-verification.text4(${timestamp})}">
+            </p>
+            <script>
+              const expiryElement = document.getElementById('expiry-time');
+              const utcTime = expiryElement.textContent;
+              const localTime = new Date(utcTime).toLocaleString();
+              expiryElement.textContent = localTime;
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

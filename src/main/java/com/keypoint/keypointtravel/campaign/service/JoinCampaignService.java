@@ -19,6 +19,7 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 
 import java.util.List;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,24 +52,27 @@ public class JoinCampaignService {
     @Transactional
     public void joinByEmail(JoinByEmailUseCase useCase) {
         // 1. redis 캠페인 초대 이메일 목록에 저장되어 있는지(만료되지 않았는지 확인)
-        List<EmailInvitationHistory> emailHistories = validateEmailHistoryInRedis(useCase);
+        EmailInvitationHistory emailHistory = validateEmailHistoryInRedis(useCase);
         // 2. 이미 캠페인 가입이 된 상태일 시 예외 처리
         validateJoinedCampaign(useCase.getCampaignId(), useCase.getMemberId());
-        // 3. 현재 참여 인원들 중 차단 인원 여부 확인
+        // 3. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
+        validatePeriodOverlap(useCase.getMemberId(), useCase.getCampaignId());
+        // 4. 현재 참여 인원들 중 차단 인원 여부 확인
         if (customMemberCampaignRepository.existsBlockedMemberInCampaign(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }
-        // 4. 캠페인 리더 member 추출 & 진행 중인 캠페인인지 확인
-        MemberCampaign leader = customMemberCampaignRepository.findCampaignLeader(useCase.getCampaignId());
-        // 5. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        // 5. 캠페인 리더 member 추출 & 진행 중인 캠페인인지 확인
+        MemberCampaign leader = customMemberCampaignRepository.findCampaignLeader(
+            useCase.getCampaignId());
+        // 6. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase.getMemberId());
-        // 6. 회원 - 캠페인 태이블 추가(가입)
+        // 7. 회원 - 캠페인 태이블 추가(가입)
         Member member = saveMemberCampaign(useCase.getMemberId(), useCase.getCampaignId());
-        // 7. 캠페인 리더와 친구관계 구축
+        // 8. 캠페인 리더와 친구관계 구축
         saveFriends(leader.getMember(), member);
-        // 8. redis 에서 해당 이메일 초대 이력 삭제(중복 포함)
-        emailInvitationHistoryRepository.deleteAll(emailHistories);
+        // 9. redis 에서 해당 이메일 초대 이력 삭제(중복 포함)
+        emailInvitationHistoryRepository.delete(emailHistory);
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
     }
 
@@ -78,18 +82,16 @@ public class JoinCampaignService {
         }
     }
 
-    private List<EmailInvitationHistory> validateEmailHistoryInRedis(JoinByEmailUseCase useCase) {
-        List<EmailInvitationHistory> histories =
-            emailInvitationHistoryRepository.findByCampaignId(useCase.getCampaignId());
-        // 중복 포함 동일한 email 가진 기록 조회
-        List<EmailInvitationHistory> emailHistories = histories.stream()
-            .filter(history -> history.getEmail().equals(useCase.getEmail()))
-            .toList();
+    private EmailInvitationHistory validateEmailHistoryInRedis(JoinByEmailUseCase useCase) {
+        //  email 초대 기록 조회
+        Optional<EmailInvitationHistory> history =
+            emailInvitationHistoryRepository.findByCampaignIdAndEmail(useCase.getCampaignId(),
+                useCase.getEmail());
         // 기간 만료 시 예외 처리
-        if (emailHistories.isEmpty()) {
+        if (history.isEmpty()) {
             throw new GeneralException(CampaignErrorCode.EXPIRED_INVITE_EMAIL);
         }
-        return emailHistories;
+        return history.get();
     }
 
     private Friend buildFriend(Member findedMember, Member member) {
@@ -127,15 +129,18 @@ public class JoinCampaignService {
                 throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
             }
         }
-        // 4. 캠페인 인원들 중 차단 여부 확인
+        // 4. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
+        validatePeriodOverlap(useCase.getMemberId(), memberCampaigns.get(0).getCampaign().getId());
+        // 5. 캠페인 인원들 중 차단 여부 확인
         if (blockedMemberRepository.existsBlockedMembers(memberIds, useCase.getMemberId())) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
         }
-        // 5. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+        // 6. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase.getMemberId());
-        // 6. 캠페인 대기 회원에 추가
+        // 7. 캠페인 대기 회원에 추가
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
-        campaignWaitMemberRepository.save(new CampaignWaitMember(memberCampaigns.get(0).getCampaign(), member));
+        campaignWaitMemberRepository.save(
+            new CampaignWaitMember(memberCampaigns.get(0).getCampaign(), member));
         // todo : 켐페인 장을 대상으로 알림 발송 (참여 승인 수락, 거절 알림)
     }
 
@@ -149,18 +154,21 @@ public class JoinCampaignService {
         // 1. 캠페인 id에 해당하는 캠페인이 존재하는지, 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
         // 2. 캠페인 가입 신청 대기 목록에 존재하는지 확인 후 삭제
-        customMemberCampaignRepository.deleteWaitMember(useCase.getMemberId(), useCase.getCampaignId());
+        customMemberCampaignRepository.deleteWaitMember(useCase.getMemberId(),
+            useCase.getCampaignId());
         if (useCase.isApprove()) {
             // 캠페인 참여 승인하였을 경우
             // 3. 이미 캠페인 가입이 된 상태일 시 예외 처리
             if (memberIds.contains(useCase.getMemberId())) {
                 throw new GeneralException(CampaignErrorCode.DUPLICATED_MEMBER);
             }
-            // 4. 참여한 캠페인 수 및 프리미엄 회원인지 검증
+            // 4. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
+            validatePeriodOverlap(useCase.getMemberId(), useCase.getCampaignId());
+            // 5. 참여한 캠페인 수 및 프리미엄 회원인지 검증
             validatePremiumMember(useCase.getMemberId());
-            // 5. 회원 - 캠페인 태이블 추가(가입)
+            // 6. 회원 - 캠페인 태이블 추가(가입)
             Member member = saveMemberCampaign(useCase.getMemberId(), useCase.getCampaignId());
-            // 6. 캠페인 리더와 친구관계 구축
+            // 7. 캠페인 리더와 친구관계 구축
             Member leader = memberRepository.getReferenceById(useCase.getLeaderId());
             saveFriends(leader, member);
             // todo : 대상자 및 캠페인 참여 인원들에게 새 인원 참여 알림 발송
@@ -208,9 +216,17 @@ public class JoinCampaignService {
     }
 
     private void saveFriends(Member leader, Member member) {
-        if (!friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(leader.getId(), member.getId())) {
+        if (!friendRepository.existsByFriendIdAndMemberIdAndIsDeletedFalse(leader.getId(),
+            member.getId())) {
             friendRepository.save(buildFriend(leader, member));
             friendRepository.save(buildFriend(member, leader));
+        }
+    }
+
+    private void validatePeriodOverlap(Long memberId, Long campaignId) {
+        // 회원 중 기간이 겹치는 다른 캠페인이 있는지 검증
+        if (campaignRepository.existsOverlappingCampaign(List.of(memberId), campaignId)) {
+            throw new GeneralException(CampaignErrorCode.MEMBER_CAMPAIGN_PERIOD_OVERLAP);
         }
     }
 
@@ -227,7 +243,8 @@ public class JoinCampaignService {
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
-        List<MemberInfoDto> waitMembers = customMemberCampaignRepository.findWaitMembers(useCase.getCampaignId());
+        List<MemberInfoDto> waitMembers = customMemberCampaignRepository.findWaitMembers(
+            useCase.getCampaignId());
         return new CampaignWaitMemberResponse(useCase.getCampaignId(), waitMembers);
     }
 

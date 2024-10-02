@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.banner.dto.request;
 
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -37,4 +38,5 @@ public class BannerRequest {
     private String cat1;
     private String cat2;
     private String cat3;
+    private LanguageCode languageCode;
 }

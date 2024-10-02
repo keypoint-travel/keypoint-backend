@@ -48,7 +48,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
     public CommentWriterDto findWriterById(Long writerId) {
         return queryFactory.select(Projections.constructor(CommentWriterDto.class,
                 member.id,
-                member.memberDetail.name,
+                member.name,
                 uploadFile.path))
             .from(member)
             .leftJoin(uploadFile).on(member.memberDetail.profileImageId.eq(uploadFile.id))

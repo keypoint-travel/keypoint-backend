@@ -1,17 +1,21 @@
 package com.keypoint.keypointtravel.campaign.service;
 
 import com.keypoint.keypointtravel.blocked_member.repository.BlockedMemberRepository;
+import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.FindInvitationResponse;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.EmailInvitationHistory;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
-import com.keypoint.keypointtravel.campaign.dto.useCase.InviteByEmailUseCase;
+import com.keypoint.keypointtravel.campaign.dto.useCase.CampaignEmailUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.InviteFriendUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
+import com.keypoint.keypointtravel.campaign.entity.InvitationProhibitionHistory;
 import com.keypoint.keypointtravel.campaign.entity.MemberCampaign;
 import com.keypoint.keypointtravel.campaign.repository.CustomMemberCampaignRepository;
 import com.keypoint.keypointtravel.campaign.repository.EmailInvitationHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.CampaignRepository;
+import com.keypoint.keypointtravel.campaign.repository.InvitationProhibitionHistoryRepository;
 import com.keypoint.keypointtravel.campaign.repository.MemberCampaignRepository;
 import com.keypoint.keypointtravel.friend.dto.FriendDto;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
@@ -26,9 +30,14 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +56,8 @@ public class InviteCampaignService {
 
     private final EmailInvitationHistoryRepository emailInvitationHistoryRepository;
 
+    private final InvitationProhibitionHistoryRepository invitationProhibitionHistoryRepository;
+
     private final CustomMemberCampaignRepository customMemberCampaignRepository;
 
     private final FriendRepository friendRepository;
@@ -55,13 +66,13 @@ public class InviteCampaignService {
      * 캠페인 초대 화면 조회 함수
      *
      * @Param memberId, campaignId useCase
-     *
      * @Return 캠페인 정보 및 친구 목록
      */
     @Transactional
     public FindInvitationResponse findInvitationView(FIndCampaignUseCase useCase) {
         // 캠페인 장인인지 확인
-        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(), useCase.getCampaignId())) {
+        if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
+            useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
         }
         // 캠페인 정보 조회
@@ -69,7 +80,8 @@ public class InviteCampaignService {
             .orElseThrow(() -> new GeneralException(CampaignErrorCode.NOT_EXISTED_CAMPAIGN));
         // 친구 목록 조회
         List<FriendDto> friends = friendRepository.findAllByMemberId(useCase.getMemberId());
-        return new FindInvitationResponse(campaign.getId(), campaign.getTitle(), campaign.getInvitation_code(), friends);
+        return new FindInvitationResponse(campaign.getId(), campaign.getTitle(),
+            campaign.getInvitation_code(), friends);
     }
 
     /**
@@ -77,12 +89,35 @@ public class InviteCampaignService {
      *
      * @Param email, memberId(요청을 보낸 사용자), campaignId useCase
      */
-    @Transactional
-    public void validateInvitation(InviteByEmailUseCase useCase) {
+    public void validateInvitation(CampaignEmailUseCase useCase) {
+        // 이메일 초대 금지 상태 확인
+        if (invitationProhibitionHistoryRepository.existsByCampaignId(useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.PROHIBIT_INVITE_EMAIL);
+        }
         // 캠페인 장인지 확인 campaignId, memberId
         if (!customMemberCampaignRepository.existsByCampaignLeaderTrue(useCase.getMemberId(),
             useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.NOT_CAMPAIGN_OWNER);
+        }
+        //  email 초대 기록 조회
+        Optional<EmailInvitationHistory> emailInvitationHistory =
+            emailInvitationHistoryRepository.findByCampaignIdAndEmail(useCase.getCampaignId(),
+                useCase.getEmail());
+        // 재전송이 아닐 경우 - 이미 초대한 메일 기록이 있는지 확인
+        if (!useCase.isResend()) {
+            // 이미 초대한 이력이 있을 경우
+            if (emailInvitationHistory.isPresent()) {
+                throw new GeneralException(CampaignErrorCode.ALREADY_INVITE_EMAIL);
+            }
+        }
+        // 재전송일 경우 - 3회 이상 초대하였을 경우 예외 처리 및 초대 금지 기한 설정
+        if (useCase.isResend() && emailInvitationHistory.isPresent()
+            && emailInvitationHistory.get().getCount() >= 3) {
+            // 1일동안 초대 금지 부여
+            InvitationProhibitionHistory history = new InvitationProhibitionHistory(
+                useCase.getCampaignId(), 1L);
+            invitationProhibitionHistoryRepository.save(history);
+            throw new GeneralException(CampaignErrorCode.PROHIBIT_INVITE_EMAIL);
         }
     }
 
@@ -93,7 +128,8 @@ public class InviteCampaignService {
      */
     @Async
     @Transactional
-    public void sendEmail(InviteByEmailUseCase useCase) {
+    public void sendEmail(CampaignEmailUseCase useCase, Locale locale) {
+        LocaleContextHolder.setLocale(locale);
         // 캠페인 코드 및 로고 이미지를 포함한 이메일 전송
         // todo: 이메일 템플릿 - 초대하기 클릭 시 앱 연결 링크 추가
         SendInvitationEmailDto dto = campaignRepository.findSendInvitationEmailInfo(
@@ -104,12 +140,15 @@ public class InviteCampaignService {
         emailContent.put("campaignCode", dto.getCampaignCode());
         List<String> images = new ArrayList<>();
         images.add("static/images/main-logo.jpg");
-        EmailUtils.sendSingleEmailWithImages(
-            useCase.getEmail(), EmailTemplate.INVITE_CAMPAIGN, emailContent, images);
+        EmailUtils.sendSingleEmailWithImages(useCase.getEmail(), EmailTemplate.INVITE_CAMPAIGN,
+            new Object[]{dto.getCampaignName()}, emailContent, images);
 
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
-        emailInvitationHistoryRepository.save(
-            new EmailInvitationHistory(useCase.getCampaignId(), useCase.getEmail(), 1L));
+        EmailInvitationHistory history = emailInvitationHistoryRepository.findByCampaignIdAndEmail(
+            useCase.getCampaignId(), useCase.getEmail()).orElse(
+            new EmailInvitationHistory(useCase.getCampaignId(), useCase.getEmail(), 0));
+        history.addCount();
+        emailInvitationHistoryRepository.save(history);
     }
 
     /**
@@ -121,13 +160,15 @@ public class InviteCampaignService {
     public void inviteFriends(InviteFriendUseCase useCase) {
         // 1. 캠페인 장인지 확인
         List<Long> memberIds = validateIsLeader(useCase);
-        // 2. 차단 여부 확인
-        validateBlockedMember(memberIds, useCase.getFriendIds());
-        // 3. 이미 가입된 인원인지 확인
+        // 2. 이미 가입된 인원인지 확인
         validateJoinedMember(memberIds, useCase.getFriendIds());
+        // 3. 캠페인 기간이 겹치는 다른 캠페인이 있는지 확인
+        validatePeriodOverlap(useCase);
         // 4. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase);
-        // 5. 회원 - 캠페인 테이블에 추가
+        // 5. 차단 여부 확인
+        validateBlockedMember(memberIds, useCase.getFriendIds());
+        // 6. 회원 - 캠페인 테이블에 추가
         saveMemberCampaigns(useCase);
         // todo : 대상자 및 캠페인 참여 인원들에게 알림 발송
     }
@@ -154,6 +195,13 @@ public class InviteCampaignService {
         return memberIds;
     }
 
+    private void validatePeriodOverlap(InviteFriendUseCase useCase) {
+        // 회원 중 기간이 겹치는 다른 캠페인이 있는지 검증
+        if (campaignRepository.existsOverlappingCampaign(useCase.getFriendIds(), useCase.getCampaignId())) {
+            throw new GeneralException(CampaignErrorCode.CAMPAIGN_PERIOD_OVERLAP);
+        }
+    }
+
     private void validateBlockedMember(List<Long> memberIds, List<Long> friendIds) {
         if (blockedMemberRepository.existsBlockedMembers(memberIds, friendIds)) {
             throw new GeneralException(CampaignErrorCode.BLOCKED_MEMBER_IN_CAMPAIGN);
@@ -168,9 +216,10 @@ public class InviteCampaignService {
         }
     }
 
-    private void validatePremiumMember(InviteFriendUseCase useCase){
+    private void validatePremiumMember(InviteFriendUseCase useCase) {
         // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
-        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(useCase.getFriendIds())){
+        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(
+            useCase.getFriendIds())) {
             throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }

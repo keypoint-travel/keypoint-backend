@@ -1,6 +1,5 @@
 package com.keypoint.keypointtravel.banner.dto.useCase.advertisement;
 
-import com.keypoint.keypointtravel.banner.dto.dto.AdvertisementBannerDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -18,16 +17,4 @@ public class AdvertisementContent {
     private String writerName;
     private LocalDateTime updatedAt;
     private String updaterName;
-
-    public static AdvertisementContent from(AdvertisementBannerDto dto) {
-        return new AdvertisementContent(
-            dto.getLanguageCode().getDescription(),
-            dto.getMainTitle(),
-            dto.getSubTitle(),
-            dto.getContent(),
-            dto.getCreatedAt(),
-            dto.getWriterName(),
-            dto.getUpdatedAt(),
-            dto.getUpdaterName());
-    }
 }

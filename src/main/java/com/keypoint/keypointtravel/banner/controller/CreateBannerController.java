@@ -3,8 +3,10 @@ package com.keypoint.keypointtravel.banner.controller;
 
 import com.keypoint.keypointtravel.banner.dto.request.BannerListRequest;
 import com.keypoint.keypointtravel.banner.dto.request.BannerRequest;
+import com.keypoint.keypointtravel.banner.dto.request.BannerLocaleRequest;
 import com.keypoint.keypointtravel.banner.dto.response.ContentListResponse;
 import com.keypoint.keypointtravel.banner.dto.response.ImageListResponse;
+import com.keypoint.keypointtravel.banner.dto.useCase.SaveLocaleUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.SaveUseCase;
 import com.keypoint.keypointtravel.banner.dto.useCase.imageListUseCase.ImageListUseCase;
 import com.keypoint.keypointtravel.banner.service.CreateBannerService;
@@ -15,18 +17,16 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.enumType.banner.AreaCode;
 import com.keypoint.keypointtravel.global.enumType.banner.BannerCode;
 import com.keypoint.keypointtravel.global.enumType.error.BannerErrorCode;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Locale;
 
 import static com.keypoint.keypointtravel.global.constants.TourismApiConstants.*;
 
@@ -47,9 +47,8 @@ public class CreateBannerController {
         @ModelAttribute BannerListRequest bannerListRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
         TourismListUseCase useCase = tourismApiService.findTourismList(
-            findLanguageValue(locale.getLanguage()),
+            findLanguageValue(bannerListRequest.getLanguageCode()),
             bannerListRequest.getPage(),
             bannerListRequest.getSize(),
             serviceKey,
@@ -61,35 +60,33 @@ public class CreateBannerController {
         );
         return APIResponseEntity.<ContentListResponse>builder()
             .message("생성할 배너 리스트 조회")
-            .data(ContentListResponse.from(useCase.getResponse().getBody(), locale.getLanguage()))
+            .data(ContentListResponse.from(useCase.getResponse().getBody(),
+                bannerListRequest.getLanguageCode()))
             .build();
     }
 
     @GetMapping("/{contentId}/images")
     public APIResponseEntity<ImageListResponse> findContentImageList(
         @PathVariable("contentId") String contentId,
+        @RequestParam(value = "languageCode", required = false) LanguageCode languageCode,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
         ImageListUseCase useCase = tourismApiService.findImageList(
-            findLanguageValue(locale.getLanguage()), contentId, serviceKey);
+            findLanguageValue(languageCode), contentId, serviceKey);
         return APIResponseEntity.<ImageListResponse>builder()
             .message("contentId에 해당하는 이미지 리스트 조회")
             .data(ImageListResponse.of(contentId, useCase.getResponse().getBody().getItems()))
             .build();
     }
 
-    private String findLanguageValue(String language) {
-        if(language == null){
-            throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
-        }
-        if (language.equals("ko")) {
-            return KOREAN;
-        }
-        if (language.equals("en")) {
+    private String findLanguageValue(LanguageCode languageCode) {
+        if (Objects.isNull(languageCode) || languageCode.equals(LanguageCode.EN)) {
             return ENGLISH;
         }
-        if (language.equals("ja")) {
+        if (languageCode.equals(LanguageCode.KO)) {
+            return KOREAN;
+        }
+        if (languageCode.equals(LanguageCode.JA)) {
             return JAPANESE;
         }
         throw new GeneralException(BannerErrorCode.LANGUAGE_DATA_MISMATCH);
@@ -100,8 +97,7 @@ public class CreateBannerController {
         @RequestBody @Valid BannerRequest bannerRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        bannerService.saveBanner(SaveUseCase.of(bannerRequest, locale.getLanguage()));
+        bannerService.saveBanner(SaveUseCase.of(bannerRequest, bannerRequest.getLanguageCode()));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -110,11 +106,11 @@ public class CreateBannerController {
     @PostMapping("/{bannerId}")
     public ResponseEntity<Void> saveBanner(
         @PathVariable(value = "bannerId", required = false) Long bannerId,
-        @RequestBody @Valid BannerRequest BannerRequest,
+        @RequestBody @Valid BannerLocaleRequest BannerRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         //todo: 관리자 인증 로직 추가 예정
-        Locale locale = LocaleContextHolder.getLocale();
-        bannerService.saveBannerByOtherLanguage(SaveUseCase.of(BannerRequest, locale.getLanguage()), bannerId);
+        bannerService.saveBannerByOtherLanguage(
+            SaveLocaleUseCase.of(BannerRequest, bannerId));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -5,13 +5,22 @@ import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.notification.entity.Notification;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,6 +32,9 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
+
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false)
     private String email;
@@ -62,17 +74,18 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
     private Notification notification;
 
-    public Member(String email, OauthProviderType oauthProviderType) {
+    public Member(String email, String name, OauthProviderType oauthProviderType) {
         this.email = email;
+        this.name = name;
         this.oauthProviderType = oauthProviderType;
         this.role = RoleType.ROLE_UNCERTIFIED_USER;
         this.isDeleted = false;
-
     }
 
-    public Member(String email, String password) {
+    public Member(String email, String password, String name) {
         this.email = email;
         this.password = password;
+        this.name = name;
         this.role = RoleType.ROLE_CERTIFIED_USER;
         this.oauthProviderType = OauthProviderType.NONE;
         this.lastPasswordUpdatedAt = LocalDateTime.now();
@@ -80,12 +93,12 @@ public class Member extends BaseEntity {
         this.invitationCode = "";
     }
 
-    public static Member of(String email, OauthProviderType oauthProviderType) {
-        return new Member(email, oauthProviderType);
+    public static Member of(String email, String name, OauthProviderType oauthProviderType) {
+        return new Member(email, name, oauthProviderType);
     }
 
-    public static Member of(String email, String password) {
-        return new Member(email, password);
+    public static Member of(String email, String password, String name) {
+        return new Member(email, password, name);
     }
 
     public void setInvitationCode(String invitationCode) {

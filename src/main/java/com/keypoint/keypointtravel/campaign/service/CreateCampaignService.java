@@ -23,9 +23,13 @@ import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
+
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,42 +69,63 @@ public class CreateCampaignService {
      */
     @Transactional
     public Long createCampaign(CreateUseCase useCase) {
-        // 0. 서로 차단한 회원이 있는지 검증
-        useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
-        validateBlockedMembers(useCase.getMembers());
         // 1. 참여한 캠페인 수 및 프리미엄 회원인지 검증
         validatePremiumMember(useCase);
-        // 2. 커버 사진 upload File 저장
+        // 2. 참여 회원 중 캠페인 기간이 겹치는 다른 캠페인이 있는지 검증
+        validatePeriodOverlap(useCase);
+        // 3. 서로 차단한 회원이 있는지 검증
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
+            useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
+            validateBlockedMembers(useCase.getMembers());
+        }
+        // 4. 커버 사진 upload File 저장
         Long coverImageId = saveUploadFile(useCase.getCoverImage());
-        // 3. 켐페인 저장
+        // 5. 켐페인 저장
         Campaign campaign = saveCampaign(useCase, coverImageId);
-        // 4. 켐페인 예산 저장
+        // 6. 켐페인 예산 저장
         saveCampaignBudgets(campaign, useCase);
-        // 5. 회원 캠페인 저장
+        // 7. 회원 캠페인 저장
         saveMemberCampaigns(campaign, useCase);
-        // 6. 여행지 저장
+        // 8. 여행지 저장
         saveTravelLocations(campaign, useCase);
         // todo : 알림 기능 추가 예정
         return campaign.getId();
+    }
+
+    private void validatePremiumMember(CreateUseCase useCase) {
+        List<Long> memberIds = new ArrayList<>();
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
+            memberIds = useCase.getMembers().stream()
+                .map(MemberInfo::getMemberId)
+                .collect(Collectors.toList());
+        }
+        memberIds.add(useCase.getMemberId());
+        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
+        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)) {
+            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
+        }
+    }
+
+    private void validatePeriodOverlap(CreateUseCase useCase) {
+        // 회원 중 기간이 겹치는 다른 캠페인이 있는지 검증
+        List<Long> memberIds = new ArrayList<>();
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
+            memberIds = useCase.getMembers().stream()
+                .map(MemberInfo::getMemberId)
+                .collect(Collectors.toList());
+        }
+        memberIds.add(useCase.getMemberId());
+        if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate())) {
+            throw new GeneralException(CampaignErrorCode.CAMPAIGN_PERIOD_OVERLAP);
+        }
     }
 
     private void validateBlockedMembers(List<MemberInfo> members) {
         List<Long> memberIds = members.stream()
             .map(MemberInfo::getMemberId)
             .toList();
-        if(blockedMemberRepository.existsBlockedMembers(memberIds)){
+        if (blockedMemberRepository.existsBlockedMembers(memberIds)) {
             throw new GeneralException(BlockedMemberErrorCode.EXISTS_BLOCKED_MEMBER);
-        }
-    }
-
-    private void validatePremiumMember(CreateUseCase useCase){
-        List<Long> memberIds = useCase.getMembers().stream()
-            .map(MemberInfo::getMemberId)
-            .collect(Collectors.toList());
-        memberIds.add(useCase.getMemberId());
-        // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
-        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)){
-            throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
 
@@ -128,25 +153,29 @@ public class CreateCampaignService {
     }
 
     private void saveCampaignBudgets(Campaign campaign, CreateUseCase useCase) {
-        List<CampaignBudget> campaignBudgets = useCase.getBudgets().stream()
-            .map(budget -> CampaignBudget.builder()
-                .campaign(campaign)
-                .category(budget.getCategory())
-                .amount(budget.getAmount())
-                .currency(budget.getCurrency())
-                .build()).toList();
-        campaignBudgetRepository.saveAll(campaignBudgets);
+        if (useCase.getBudgets() != null && !useCase.getBudgets().isEmpty()) {
+            List<CampaignBudget> campaignBudgets = useCase.getBudgets().stream()
+                .map(budget -> CampaignBudget.builder()
+                    .campaign(campaign)
+                    .category(budget.getCategory())
+                    .amount(budget.getAmount())
+                    .currency(budget.getCurrency())
+                    .build()).toList();
+            campaignBudgetRepository.saveAll(campaignBudgets);
+        }
     }
 
     private void saveMemberCampaigns(Campaign campaign, CreateUseCase useCase) {
         List<MemberCampaign> memberCampaigns = new ArrayList<>();
         // 함께 참여하는 회원들 저장
-        for (MemberInfo memberInfo : useCase.getMembers()) {
-            if (memberInfo.getMemberId().equals(useCase.getMemberId())) {
-                continue;
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
+            for (MemberInfo memberInfo : useCase.getMembers()) {
+                if (memberInfo.getMemberId().equals(useCase.getMemberId())) {
+                    continue;
+                }
+                Member member = memberRepository.getReferenceById(memberInfo.getMemberId());
+                memberCampaigns.add(new MemberCampaign(campaign, member, false));
             }
-            Member member = memberRepository.getReferenceById(memberInfo.getMemberId());
-            memberCampaigns.add(new MemberCampaign(campaign, member, false));
         }
         // 캠페인을 생성하는 회원(캠페인 장) 저장
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
@@ -159,10 +188,12 @@ public class CreateCampaignService {
     }
 
     private void saveTravelLocations(Campaign campaign, CreateUseCase useCase) {
-        List<TravelLocation> travelLocations = useCase.getTravels().stream()
-            .map(travel -> new TravelLocation(campaign, travel.getPlaceId(), travel.getSequence()))
-            .toList();
-        travelLocationRepository.saveAll(travelLocations);
+        if (useCase.getTravels() != null && !useCase.getTravels().isEmpty()) {
+            List<TravelLocation> travelLocations = useCase.getTravels().stream()
+                .map(travel -> new TravelLocation(campaign, travel.getPlaceId(), travel.getSequence()))
+                .toList();
+            travelLocationRepository.saveAll(travelLocations);
+        }
     }
 
 
@@ -173,7 +204,8 @@ public class CreateCampaignService {
      */
     @Async
     @Transactional
-    public void sendEmail(InviteByEmailsUseCase useCase) {
+    public void sendEmail(InviteByEmailsUseCase useCase, Locale locale) {
+        LocaleContextHolder.setLocale(locale);
         // 캠페인 코드 및 로고 이미지를 포함한 이메일 전송
         // todo: 이메일 템플릿 - 초대하기 클릭 시 앱 연결 링크 추가
         SendInvitationEmailDto dto = campaignRepository.findSendInvitationEmailInfo(
@@ -184,14 +216,14 @@ public class CreateCampaignService {
         emailContent.put("campaignCode", dto.getCampaignCode());
         List<String> images = new ArrayList<>();
         images.add("static/images/main-logo.jpg");
-        EmailUtils.sendMultiEmailWithImages(
-            useCase.getEmails(), EmailTemplate.INVITE_CAMPAIGN, emailContent, images);
+        EmailUtils.sendMultiEmailWithImages(useCase.getEmails(), EmailTemplate.INVITE_CAMPAIGN,
+            new Object[]{dto.getCampaignName()}, emailContent, images);
 
         // 캠페인 이메일 초대 기록 Redis 에 저장(하루의 만료기간 설정)
         List<EmailInvitationHistory> histories = new ArrayList<>();
         for (String email : useCase.getEmails()) {
             histories.add(new EmailInvitationHistory(useCase.getCampaignId(), email,
-                useCase.getCampaignId()));
+                1));
         }
         emailInvitationHistoryRepository.saveAll(histories);
     }

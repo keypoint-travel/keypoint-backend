@@ -9,14 +9,17 @@ import com.keypoint.keypointtravel.friend.entity.Friend;
 import com.keypoint.keypointtravel.friend.repository.FriendRepository;
 import com.keypoint.keypointtravel.global.enumType.error.FriendErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
+import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPushNotificationEvent;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,10 @@ public class FriendService {
     private final MemberRepository memberRepository;
 
     private final BlockedMemberRepository blockedMemberRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final MemberDetailRepository memberDetailRepository;
 
     /**
      * 친구 생성 함수
@@ -53,6 +60,19 @@ public class FriendService {
         // 5. 친구 생성 및 저장(서로 생성하기에 두번 시행)
         friendRepository.save(buildFriend(findedMember, member));
         friendRepository.save(buildFriend(member, findedMember));
+        // 6. 친구 등록 알림 전송, 배지 부여
+        String memberName = memberRepository.findNameByMemberId(member.getId());
+        String findedMemberName = memberRepository.findNameByMemberId(findedMember.getId());
+        eventPublisher.publishEvent(FriendPushNotificationEvent.of( // 친구 수락 (친추 보낸 사람)
+            PushNotificationType.FRIEND_ACCEPTED_SENDER,
+            List.of(member.getId()),
+            findedMemberName
+        ));
+        eventPublisher.publishEvent(FriendPushNotificationEvent.of( // 친구 수락 (친추 받은 사람)
+            PushNotificationType.FRIEND_ACCEPTED_RECEIVER,
+            List.of(findedMember.getId()),
+            memberName
+        ));
     }
 
     private Friend buildFriend(Member findedMember, Member member) {

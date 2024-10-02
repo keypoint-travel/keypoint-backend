@@ -62,7 +62,10 @@ public class CommonBannerResponse {
 
     private static List<AroundTourism> createAroundTourismList(Items data, CommonTourismUseCase details) {
         return data.getItem().stream()
-            .filter(item -> Integer.parseInt(item.getContentid()) != details.getCommonTourismDto().getId())
+            .filter(item ->
+                !item.getMapx().equals(String.valueOf(details.getCommonTourismDto().getLatitude()))
+                || !item.getMapy().equals(String.valueOf(details.getCommonTourismDto().getLongitude()))
+            )
             .map(AroundTourism::from).toList();
     }
 

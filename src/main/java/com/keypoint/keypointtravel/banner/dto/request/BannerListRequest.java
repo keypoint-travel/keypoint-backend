@@ -1,5 +1,7 @@
 package com.keypoint.keypointtravel.banner.dto.request;
 
+import com.keypoint.keypointtravel.global.annotation.ValidEnum;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,4 +18,6 @@ public class BannerListRequest {
     private String cat3;
     private int page;
     private int size;
+    @ValidEnum(enumClass = LanguageCode.class)
+    private LanguageCode languageCode;
 }

@@ -8,4 +8,6 @@ public class AppleLoginRequest {
 
     @NotNull
     private String oauthCode;
+
+    private String name;
 }

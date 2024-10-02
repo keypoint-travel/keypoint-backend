@@ -18,4 +18,6 @@ public class InviteByEmailRequest {
     private String email;
 
     private Long campaignId;
+
+    private boolean resend;
 }

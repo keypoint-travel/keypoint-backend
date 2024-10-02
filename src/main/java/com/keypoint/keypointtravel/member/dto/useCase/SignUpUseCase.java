@@ -44,7 +44,6 @@ public class SignUpUseCase {
             member,
             this.gender,
             this.birth,
-            this.name,
             this.languageCode,
             this.country
         );

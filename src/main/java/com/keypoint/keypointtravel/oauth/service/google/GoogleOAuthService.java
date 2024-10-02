@@ -57,7 +57,11 @@ public class GoogleOAuthService implements OAuthService {
         String email = userInfo.getEmail();
 
         // 2. 사용자 정보 저장
-        CommonMemberDTO member = oauth2UserService.registerMember(email, OauthProviderType.GOOGLE);
+        CommonMemberDTO member = oauth2UserService.registerMember(
+            email,
+            userInfo.getName(),
+            OauthProviderType.GOOGLE
+        );
 
         // 3. OAuth 토큰 저장
         oAuthTokenService.saveOAuthToken(

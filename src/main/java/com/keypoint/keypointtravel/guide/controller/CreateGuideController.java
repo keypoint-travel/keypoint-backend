@@ -23,7 +23,7 @@ public class CreateGuideController {
 
     private final CreateGuideService createGuideService;
 
-    @PostMapping("")
+    @PostMapping
     public APIResponseEntity<Void> addGuide(
         @Valid @RequestPart(value = "guide") CreateGuideRequest request,
         @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage

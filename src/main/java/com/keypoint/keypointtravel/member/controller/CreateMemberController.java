@@ -1,7 +1,9 @@
 package com.keypoint.keypointtravel.member.controller;
 
+import com.keypoint.keypointtravel.badge.service.MemberBadgeService;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
 import com.keypoint.keypointtravel.member.dto.request.EmailVerificationRequest;
 import com.keypoint.keypointtravel.member.dto.request.MemberProfileRequest;
@@ -31,6 +33,7 @@ public class CreateMemberController {
 
     private final UpdateMemberService updateMemberService;
     private final CreateMemberService createMemberService;
+    private final MemberBadgeService badgeService;
 
 
     @PostMapping("/email/verification-request")
@@ -61,6 +64,9 @@ public class CreateMemberController {
         SignUpUseCase useCase = SignUpUseCase.from(request);
         MemberResponse result = createMemberService.registerMember(useCase);
 
+        // 회원가입 배지 발급
+        badgeService.earnBadge(result.getId(), BadgeType.SIGN_UP);
+
         return APIResponseEntity.<MemberResponse>builder()
             .message("회원 가입 성공")
             .data(result)
@@ -74,6 +80,9 @@ public class CreateMemberController {
         @Valid @RequestBody MemberProfileRequest request) {
         MemberProfileUseCase useCase = MemberProfileUseCase.of(userDetails.getId(), request);
         MemberResponse result = updateMemberService.registerMemberProfile(useCase);
+
+        // 회원가입 배지 발급
+        badgeService.earnBadge(result.getId(), BadgeType.SIGN_UP);
 
         return APIResponseEntity.<MemberResponse>builder()
             .message("소셜 로그인 개인 정보 성공")

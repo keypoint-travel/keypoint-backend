@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet author="lchy0413" id="changelog-0.03.01-240924">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="member_detail" columnName="gender" />
+      <columnExists tableName="member_detail" columnName="country" />
+      <columnExists tableName="member_detail" columnName="birth" />
+    </preConditions>
+    <dropNotNullConstraint tableName="member_detail" columnName="gender" columnDataType="varchar(255)" />
+    <dropNotNullConstraint tableName="member_detail" columnName="country" columnDataType="varchar(255)" />
+    <dropNotNullConstraint tableName="member_detail" columnName="birth" columnDataType="date" />
+  </changeSet>
+
+  <!-- 1. Add the "name" column to the "member" table -->
+  <changeSet id="changelog-0.03.02-240924" author="lchy0413">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="member" columnName="name" />
+      </not>
+    </preConditions>
+    <addColumn tableName="member">
+      <column name="name" type="varchar(255)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <!-- 2. Copy data from "member_detail.name" to "member.name" -->
+  <changeSet id="changelog-0.03.03-240924" author="lchy0413">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="member" columnName="name" />
+      <columnExists tableName="member_detail" columnName="name" />
+    </preConditions>
+    <update tableName="member">
+      <column name="name" valueComputed="(SELECT md.name FROM member_detail md WHERE md.member_id = member.member_id)"/>
+    </update>
+  </changeSet>
+
+  <!-- 3. (Optional) Drop the "name" column from "member_detail" -->
+  <changeSet id="changelog-0.03.04-240924" author="lchy0413">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="member_detail" columnName="name" />
+    </preConditions>
+    <dropColumn tableName="member_detail" columnName="name"/>
+  </changeSet>
+
+</databaseChangeLog>

@@ -5,16 +5,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.config.security.attribute.OAuthAttributes;
 import com.keypoint.keypointtravel.global.config.security.session.SessionUser;
+import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.exception.GeneralOAuth2AuthenticationException;
+import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,10 +36,6 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -129,10 +135,14 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         String email = attributes.getEmail();
 
         // 1. 이메일이 등록되어 있는지 확인
-        return registerMember(email, oauthProviderType);
+        return registerMember(email, "임시", oauthProviderType);
     }
 
-    public CommonMemberDTO registerMember(String email, OauthProviderType oauthProviderType) {
+    public CommonMemberDTO registerMember(
+        String email,
+        String name,
+        OauthProviderType oauthProviderType
+    ) {
         // 1. 이메일이 등록되어 있는지 확인
         Optional<CommonMemberDTO> memberOptional = memberRepository.findByEmailAndIsDeletedFalse(email);
 
@@ -140,12 +150,34 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         if (memberOptional.isPresent()) {
             // 2-1. 로그인 (이전에 등록되어 있는 이메일)
             CommonMemberDTO member = memberOptional.get();
-            validateOauthProvider(member, oauthProviderType);
+
+            if (member.getRole() == RoleType.ROLE_UNCERTIFIED_USER
+                && member.getOauthProviderType() != oauthProviderType) {
+                // 2-1-1. 현재 등록한 Oauth 로 변경 (Oauth type 의 변경된 경우)
+                if (name == null) {
+                    name = member.getName();
+                    LogUtils.writeWarnLog("registerMember", "Name receives null value");
+                }
+
+                memberRepository.updateOauthProviderTypeByMemberId(
+                    member.getId(),
+                    name,
+                    oauthProviderType
+                );
+            } else {
+                // 2-1-2. 유효성 검사
+                validateOauthProvider(member, oauthProviderType);
+            }
 
             return member;
         } else {
             // 2-2. 회원가입: 임시 회원으로 등록 (등록되어 있지 않은 이메일)
-            return addUser(email, oauthProviderType);
+            if (name == null) {
+                throw new GeneralException(CommonErrorCode.INVALID_REQUEST_DATA,
+                    "간편 로그인의 첫 번쨰 시도인 경우, name이 null이면 안됩니다.");
+            }
+
+            return addUser(email, name, oauthProviderType);
         }
     }
 
@@ -158,8 +190,12 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    private CommonMemberDTO addUser(String email, OauthProviderType oauthProviderType) {
-        Member newMember = new Member(email, oauthProviderType);
+    private CommonMemberDTO addUser(
+        String email,
+        String name,
+        OauthProviderType oauthProviderType
+    ) {
+        Member newMember = Member.of(email, name, oauthProviderType);
         memberRepository.save(newMember);
 
         // 초대코드 저장: 초대코드가 중복되지 않도록 문자열에 마지막에 memberId를 추가하여 저장

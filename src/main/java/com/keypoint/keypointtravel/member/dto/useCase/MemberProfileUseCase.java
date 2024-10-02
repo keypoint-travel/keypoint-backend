@@ -21,8 +21,6 @@ public class MemberProfileUseCase {
 
     private LocalDate birth;
 
-    private String name;
-
     private LanguageCode languageCode;
 
     public static MemberProfileUseCase of(Long memberId, MemberProfileRequest request) {
@@ -31,7 +29,6 @@ public class MemberProfileUseCase {
             request.getCountry(),
             request.getGender(),
             request.getBirth(),
-            request.getName(),
             request.getLanguageCode()
         );
     }
@@ -41,7 +38,6 @@ public class MemberProfileUseCase {
             member,
             this.gender,
             this.birth,
-            this.name,
             this.languageCode,
             this.country
         );

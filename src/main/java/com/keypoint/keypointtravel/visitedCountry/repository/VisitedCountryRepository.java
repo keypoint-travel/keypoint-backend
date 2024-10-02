@@ -53,7 +53,12 @@ public class VisitedCountryRepository {
             .and(memberCampaign.member.id.eq(memberId));
 
         // 정렬 기준 추가
-        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, campaign.title);
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.DESC, campaign.startDate);
+        OrderSpecifier<?> defaultOrderSpecifier = new OrderSpecifier<>(
+            Order.DESC,
+            campaign.createAt
+        );
+
         if (sortBy != null) {
             Order order = direction.equals("asc") ? Order.ASC : Order.DESC;
 
@@ -105,7 +110,7 @@ public class VisitedCountryRepository {
                 .innerJoin(memberCampaign).on(memberCampaignBuilder)
                 .innerJoin(travelLocation).on(travelLocation.campaign.id.eq(campaign.id))
                 .innerJoin(place).on(placeBuilder)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifier, defaultOrderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -131,7 +136,7 @@ public class VisitedCountryRepository {
             campaignId = queryFactory.select(campaign.id)
                 .from(campaign)
                 .innerJoin(memberCampaign).on(memberCampaignBuilder)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifier, defaultOrderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -148,7 +153,7 @@ public class VisitedCountryRepository {
             .innerJoin(memberDetail).on(memberDetail.member.id.eq(memberId))
             .innerJoin(travelLocation).on(travelLocation.campaign.id.eq(campaign.id))
             .leftJoin(place).on(place.id.eq(travelLocation.placeId))
-            .orderBy(orderSpecifier)
+            .orderBy(orderSpecifier, defaultOrderSpecifier)
             .where(campaign.id.in(campaignId))
             .transform(
                 GroupBy.groupBy(campaign.id).list(
