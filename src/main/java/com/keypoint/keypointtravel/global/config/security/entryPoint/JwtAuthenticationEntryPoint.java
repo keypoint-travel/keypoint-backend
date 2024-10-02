@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.global.dto.response.ErrorDTO;
 import com.keypoint.keypointtravel.global.enumType.error.ErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
-import com.keypoint.keypointtravel.global.utils.LogUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,11 +22,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         HttpServletResponse response,
         AuthenticationException authException
     ) throws IOException {
-        LogUtils.writeErrorLog("JwtAuthenticationEntryPoint, commence",
-            String.format(
-                "path: %s / access token: %s", request.getRequestURI(),
-                request.getHeader("Authorization")
-            ));
         setErrorResponse(response, TokenErrorCode.EXPIRED_TOKEN);
     }
 
