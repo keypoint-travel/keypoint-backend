@@ -1,14 +1,10 @@
 package com.keypoint.keypointtravel.global.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,6 +15,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Aspect
 @Component
@@ -38,6 +43,9 @@ public class LoggingConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+
         long start = System.currentTimeMillis();
 
         try {
@@ -66,7 +74,7 @@ public class LoggingConfig {
 
                 logger.info(objectMapper.writeValueAsString(requestInfo));
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(request.getRequestURI(), e);
             }
         }
     }
