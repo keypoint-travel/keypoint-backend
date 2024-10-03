@@ -5,6 +5,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.keypoint.keypointtravel.auth.redis.service.BlacklistService;
 import com.keypoint.keypointtravel.global.config.security.entryPoint.JwtAuthenticationEntryPoint;
 import com.keypoint.keypointtravel.global.config.security.filter.JwtFilter;
+import com.keypoint.keypointtravel.global.config.security.filter.LoggingFilter;
 import com.keypoint.keypointtravel.global.converter.Oauth2RequestEntityConverter;
 import com.keypoint.keypointtravel.global.handler.JwtAccessDeniedHandler;
 import com.keypoint.keypointtravel.global.handler.OAuth2AuthenticationFailureHandler;
@@ -64,6 +65,7 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain config(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+            .addFilterBefore(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(
                 new JwtFilter(jwtTokenProvider, blacklistService),
                 UsernamePasswordAuthenticationFilter.class
