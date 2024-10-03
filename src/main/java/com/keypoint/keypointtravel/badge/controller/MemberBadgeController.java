@@ -7,8 +7,13 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/badges")
@@ -17,6 +22,7 @@ public class MemberBadgeController {
 
     private final MemberBadgeService memberBadgeService;
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping()
     public APIResponseEntity<BadgeInMemberResponse> findBadgesInMember(
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -32,6 +38,7 @@ public class MemberBadgeController {
             .build();
     }
 
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @PatchMapping("/representative/{badgeId}")
     public APIResponseEntity<BadgeInMemberResponse> updateRepresentativeBadge(
         @AuthenticationPrincipal CustomUserDetails userDetails,
