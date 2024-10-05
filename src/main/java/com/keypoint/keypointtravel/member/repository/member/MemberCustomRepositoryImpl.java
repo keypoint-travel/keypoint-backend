@@ -193,6 +193,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
             .set(member.modifyAt, LocalDateTime.now())
             .set(member.modifyId, currentAuditor)
+
+            .where(member.id.eq(memberId))
             .execute();
     }
 
