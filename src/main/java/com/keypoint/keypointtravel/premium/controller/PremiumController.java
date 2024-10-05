@@ -2,16 +2,16 @@ package com.keypoint.keypointtravel.premium.controller;
 
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.premium.dto.request.AppleReceiptRequest;
 import com.keypoint.keypointtravel.premium.dto.response.RemainingPeriodResponse;
+import com.keypoint.keypointtravel.premium.dto.useCase.ApplePurchaseUseCase;
 import com.keypoint.keypointtravel.premium.dto.useCase.PremiumMemberUseCase;
 import com.keypoint.keypointtravel.premium.service.PremiumService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/premiums")
@@ -28,7 +28,7 @@ public class PremiumController {
         RemainingPeriodResponse response = premiumService.findRemainingPremiumDays(
             new PremiumMemberUseCase(userDetails.getId()));
         return APIResponseEntity.<RemainingPeriodResponse>builder()
-            .message("남은 프리미엄 기간 조히 성공")
+            .message("남은 프리미엄 기간 조회 성공")
             .data(response)
             .build();
     }
@@ -40,6 +40,16 @@ public class PremiumController {
         premiumService.startFreeTrial(new PremiumMemberUseCase(userDetails.getId()));
         return APIResponseEntity.<Void>builder()
             .message("무료체험 시작 성공")
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @PostMapping
+    public APIResponseEntity<Void> startPremium(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        premiumService.updateMemberPremium(userDetails.getId());
+        return APIResponseEntity.<Void>builder()
+            .message("프리미엄 적용 성공")
             .build();
     }
 }
