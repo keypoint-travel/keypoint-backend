@@ -68,9 +68,9 @@ public class PremiumService {
      * @Param memberId useCase
      */
     @Transactional
-    public void updateMemberPremium(Long memberId) {
-        Member member = memberRepository.getReferenceById(memberId);
-        Optional<MemberPremium> memberPremium = memberPremiumRepository.findByMemberId(memberId);
+    public void updateMemberPremium(PremiumMemberUseCase useCase) {
+        Member member = memberRepository.getReferenceById(useCase.getMemberId());
+        Optional<MemberPremium> memberPremium = memberPremiumRepository.findByMemberId(useCase.getMemberId());
         // 이미 적용했던 기록이 있는 경우
         if (memberPremium.isPresent()) {
             updateExistingMemberPremium(memberPremium.get());
@@ -98,6 +98,7 @@ public class PremiumService {
 
     private void updateFreeToPremium(MemberPremium memberPremium) {
         memberPremium.updateIsFree(false);
+        memberPremium.updateIsActive(true);
         memberPremium.updateStartedAt(LocalDateTime.now());
         memberPremium.updateExpirationAt(LocalDateTime.now().plusMonths(12));
     }

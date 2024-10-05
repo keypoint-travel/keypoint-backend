@@ -8,7 +8,6 @@ import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.BudgetInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.TravelInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.EditCampaignResponse;
-import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.UpdateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
@@ -97,7 +96,7 @@ public class EditCampaignService {
         // 3. 참여 회원 중 캠페인 기간이 겹치는 다른 캠페인이 있는지 검증
         validatePeriodOverlap(useCase);
         // 4. 서로 차단한 회원이 있는지 검증
-        if(useCase.getMembers() != null && !useCase.getMembers().isEmpty()){
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
             useCase.getMembers().add(new MemberInfo(useCase.getMemberId()));
             validateBlockedMembers(useCase.getMembers());
         }
@@ -115,16 +114,20 @@ public class EditCampaignService {
         updateTravelLocations(campaign, useCase.getTravels());
     }
 
-    private void validatePremiumMember(UpdateUseCase useCase){
-        List<Long> memberIds = new ArrayList<>();
-        if(useCase.getMembers() != null && !useCase.getMembers().isEmpty()){
-            memberIds = useCase.getMembers().stream()
-                .map(MemberInfo::getMemberId)
-                .collect(Collectors.toList());
+    private void validatePremiumMember(UpdateUseCase useCase) {
+        // 기존 참여 회원 조회
+        List<MemberCampaign> memberCampaigns = memberCampaignRepository.findAllByCampaignId(useCase.getCampaignId());
+        List<Long> foundMemberIds = memberCampaigns.stream().map((m) -> m.getMember().getId()).toList();
+        List<Long> addedMemberIds = new ArrayList<>();
+        if (useCase.getMembers() != null && !useCase.getMembers().isEmpty()) {
+            for (MemberInfo member : useCase.getMembers()) {
+                if (!foundMemberIds.contains(member.getMemberId())) {
+                    addedMemberIds.add(member.getMemberId());
+                }
+            }
         }
-        memberIds.add(useCase.getMemberId());
         // 가입한 캠페인 수가 1개 이상이지만 프리미엄 회원이 아닌지 검증
-        if(customMemberCampaignRepository.existsMultipleCampaignNotPremium(memberIds)){
+        if (customMemberCampaignRepository.existsMultipleCampaignNotPremium(addedMemberIds)) {
             throw new GeneralException(CampaignErrorCode.MULTIPLE_CAMPAIGN_NON_PREMIUM);
         }
     }
@@ -138,7 +141,7 @@ public class EditCampaignService {
                 .collect(Collectors.toList());
         }
         memberIds.add(useCase.getMemberId());
-        if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate())) {
+        if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate(), useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.CAMPAIGN_PERIOD_OVERLAP);
         }
     }

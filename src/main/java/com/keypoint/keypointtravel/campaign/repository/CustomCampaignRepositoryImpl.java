@@ -148,6 +148,18 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     }
 
     @Override
+    public boolean existsOverlappingCampaign(List<Long> memberIds, Date startDate, Date endDate, Long campaignId) {
+        // startDate, endDate 사이 기간에 해당하는 캠페인이 있는지 조회
+        List<Campaign> campaigns = queryFactory.selectFrom(campaign)
+            .innerJoin(memberCampaign).on(campaign.id.eq(memberCampaign.campaign.id))
+            .where(memberCampaign.member.id.in(memberIds)
+                .and(campaign.startDate.loe(endDate).and(campaign.endDate.goe(startDate)))
+                .and(campaign.id.ne(campaignId)))
+            .fetch();
+        return !campaigns.isEmpty();
+    }
+
+    @Override
     public boolean existsOverlappingCampaign(List<Long> memberIds, Long campaignId) {
         // startDate, endDate 사이 기간에 해당하는 캠페인이 있는지 조회
         List<Campaign> campaigns = queryFactory.selectFrom(campaign)
