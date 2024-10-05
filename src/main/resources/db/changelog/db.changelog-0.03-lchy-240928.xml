@@ -49,12 +49,12 @@
     <dropColumn tableName="member_detail" columnName="name"/>
   </changeSet>
 
-  <changeSet id="changelog-0.03.05-240924" author="lchy0413">
+  <changeSet id="changelog-0.03.05-240924-1" author="lchy0413">
     <preConditions onFail="MARK_RAN">
       <columnExists tableName="member" columnName="role" />
     </preConditions>
     <sql>
-      ALTER TABLE member MODIFY COLUMN role ENUM('ROLE_UNCERTIFIED_USER', 'ROLE_CERTIFIED_USER', 'ROLE_ADMIN');
+      ALTER TABLE member MODIFY COLUMN role ENUM('ROLE_UNCERTIFIED_USER', 'ROLE_CERTIFIED_USER', 'ROLE_ADMIN', 'ROLE_PENDING_WITHDRAWAL');
     </sql>
   </changeSet>
 
