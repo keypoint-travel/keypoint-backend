@@ -98,6 +98,7 @@ public class PremiumService {
 
     private void updateFreeToPremium(MemberPremium memberPremium) {
         memberPremium.updateIsFree(false);
+        memberPremium.updateIsActive(true);
         memberPremium.updateStartedAt(LocalDateTime.now());
         memberPremium.updateExpirationAt(LocalDateTime.now().plusMonths(12));
     }
