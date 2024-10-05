@@ -17,4 +17,6 @@ public interface MemberCustomRepository {
     List<MemberInfoDto> findCampaignMemberList(Long CampaignId);
 
     void updateMemberProfile(Long memberId, String name, Long profileImageId);
+
+    void deleteMember(Long memberId);
 }

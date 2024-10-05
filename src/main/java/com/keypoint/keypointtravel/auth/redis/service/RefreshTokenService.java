@@ -54,4 +54,18 @@ public class RefreshTokenService {
             return null;
         }
     }
+
+    /**
+     * RefreshToken을 삭제하는 함수
+     *
+     * @param email 삭제할 토큰 이메일
+     * @return
+     */
+    public void deleteRefreshTokenByEmail(String email) {
+        Optional<CommonRefreshTokenDTO> dtoOptional = refreshTokenRepository.findByEmail(email);
+        if (dtoOptional.isPresent()) {
+            CommonRefreshTokenDTO dto = dtoOptional.get();
+            refreshTokenRepository.deleteById(dto.getId());
+        }
+    }
 }

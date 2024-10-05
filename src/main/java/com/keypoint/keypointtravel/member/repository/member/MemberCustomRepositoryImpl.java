@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
@@ -179,6 +180,19 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .set(memberDetail.modifyAt, LocalDateTime.now())
             .set(memberDetail.modifyId, currentAuditor)
             .where(memberDetail.member.id.eq(memberId))
+            .execute();
+    }
+
+    @Override
+    public void deleteMember(Long memberId) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        queryFactory.update(member)
+            .set(member.isDeleted, true)
+            .set(member.role, RoleType.ROLE_PENDING_WITHDRAWAL)
+
+            .set(member.modifyAt, LocalDateTime.now())
+            .set(member.modifyId, currentAuditor)
             .execute();
     }
 

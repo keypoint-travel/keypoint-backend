@@ -49,13 +49,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     @Transactional
     @Modifying
-    @Query("UPDATE Member m SET m.isDeleted = true WHERE m.id = :id")
-    int deleteMember(
-            @Param("id") Long id
-    );
-
-    @Transactional
-    @Modifying
     @Query("UPDATE Member m "
         + "SET m.oauthProviderType = :oauthProviderType, m.name = :name "
         + "WHERE m.id = :id")
