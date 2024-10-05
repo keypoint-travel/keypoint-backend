@@ -2,12 +2,9 @@ package com.keypoint.keypointtravel.premium.controller;
 
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
-import com.keypoint.keypointtravel.premium.dto.request.AppleReceiptRequest;
 import com.keypoint.keypointtravel.premium.dto.response.RemainingPeriodResponse;
-import com.keypoint.keypointtravel.premium.dto.useCase.ApplePurchaseUseCase;
 import com.keypoint.keypointtravel.premium.dto.useCase.PremiumMemberUseCase;
 import com.keypoint.keypointtravel.premium.service.PremiumService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,7 +44,7 @@ public class PremiumController {
     @PostMapping
     public APIResponseEntity<Void> startPremium(
         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        premiumService.updateMemberPremium(userDetails.getId());
+        premiumService.updateMemberPremium(new PremiumMemberUseCase(userDetails.getId()));
         return APIResponseEntity.<Void>builder()
             .message("프리미엄 적용 성공")
             .build();
