@@ -24,5 +24,7 @@ public interface CustomCampaignRepository {
 
     boolean existsOverlappingCampaign(List<Long> memberIds, Date startDate, Date endDate);
 
+    boolean existsOverlappingCampaign(List<Long> memberIds, Date startDate, Date endDate, Long campaignId);
+
     boolean existsOverlappingCampaign(List<Long> memberIds, Long campaignId);
 }

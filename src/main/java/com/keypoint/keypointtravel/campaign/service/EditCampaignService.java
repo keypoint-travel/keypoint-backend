@@ -8,7 +8,6 @@ import com.keypoint.keypointtravel.campaign.dto.request.MemberInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.BudgetInfo;
 import com.keypoint.keypointtravel.campaign.dto.request.createRequest.TravelInfo;
 import com.keypoint.keypointtravel.campaign.dto.response.EditCampaignResponse;
-import com.keypoint.keypointtravel.campaign.dto.useCase.CreateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.UpdateUseCase;
 import com.keypoint.keypointtravel.campaign.dto.useCase.FIndCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
@@ -142,7 +141,7 @@ public class EditCampaignService {
                 .collect(Collectors.toList());
         }
         memberIds.add(useCase.getMemberId());
-        if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate())) {
+        if (campaignRepository.existsOverlappingCampaign(memberIds, useCase.getStartDate(), useCase.getEndDate(), useCase.getCampaignId())) {
             throw new GeneralException(CampaignErrorCode.CAMPAIGN_PERIOD_OVERLAP);
         }
     }
