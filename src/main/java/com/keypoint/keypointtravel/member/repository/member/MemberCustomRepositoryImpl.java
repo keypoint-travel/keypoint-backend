@@ -8,7 +8,7 @@ import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
-import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.entity.QMember;

@@ -5,11 +5,14 @@ import com.keypoint.keypointtravel.badge.dto.response.badgeInMember.Representati
 import com.keypoint.keypointtravel.badge.entity.QBadge;
 import com.keypoint.keypointtravel.badge.entity.QEarnedBadge;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.EarnedBadgeResponse;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 
@@ -52,6 +55,23 @@ public class MemberBadgeCustomRepositoryImpl implements MemberBadgeCustomReposit
             .leftJoin(inactiveFile).on(inactiveFile.id.eq(badge.inactiveImageId))
             .orderBy(badge.order.asc())
             .where(badgeBuilder)
+            .fetch();
+    }
+
+    @Override
+    public List<EarnedBadgeResponse> findEarnedBadgeByUserId(Long memberId) {
+        return queryFactory.select(
+                Projections.constructor(
+                    EarnedBadgeResponse.class,
+                    badge.id,
+                    badge.name,
+                    badge.order,
+                    uploadFile.path))
+            .from(badge)
+            .innerJoin(earnedBadge).on(earnedBadge.badge.id.eq(badge.id).and(earnedBadge.member.id.eq(memberId)))
+            .leftJoin(uploadFile).on(badge.activeImageId.eq(uploadFile.id))
+            .where(badge.isDeleted.eq(false))
+            .orderBy(badge.order.asc())
             .fetch();
     }
 
