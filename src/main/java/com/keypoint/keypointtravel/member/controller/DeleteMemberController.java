@@ -22,7 +22,7 @@ public class DeleteMemberController {
     public APIResponseEntity<Void> deleteMember(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails.getId());
+        MemberIdUseCase useCase = MemberIdUseCase.from(userDetails);
         deleteMemberService.deleteMember(useCase);
 
         return APIResponseEntity.<Void>builder()

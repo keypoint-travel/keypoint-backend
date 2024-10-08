@@ -20,6 +20,8 @@ public interface MemberCustomRepository {
 
     void updateMemberProfile(Long memberId, String name, Long profileImageId);
 
+    void deleteMember(Long memberId);
+    
     List<Long> findMemberIdsByLanguageCode(LanguageCode languageCode);
 
     List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds);

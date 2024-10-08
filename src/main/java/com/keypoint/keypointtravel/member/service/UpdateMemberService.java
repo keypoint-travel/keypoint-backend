@@ -129,9 +129,6 @@ public class UpdateMemberService {
         try {
             // 1. 언어 변경 시도
             memberDetailRepository.updateLanguage(useCase.getMemberId(), useCase.getLanguage());
-
-            // 2. 연결된 사용자 기기에 FCM 알림 전달
-            // TODO
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
@@ -170,4 +167,11 @@ public class UpdateMemberService {
         }
     }
 
+    /**
+     * 회원의 권한을 부여하는 함수
+     */
+    @Transactional
+    public void grandRole() {
+
+    }
 }
