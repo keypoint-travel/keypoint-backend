@@ -7,10 +7,11 @@ import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
-import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
@@ -180,6 +181,16 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .set(memberDetail.modifyId, currentAuditor)
             .where(memberDetail.member.id.eq(memberId))
             .execute();
+    }
+
+    @Override
+    public List<Long> findMemberIdsByLanguageCode(LanguageCode languageCode) {
+        return queryFactory
+            .select(member.id)
+            .from(member)
+            .innerJoin(memberDetail).on(memberDetail.language.eq(languageCode))
+            .where(member.isDeleted.isFalse())
+            .fetch();
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
