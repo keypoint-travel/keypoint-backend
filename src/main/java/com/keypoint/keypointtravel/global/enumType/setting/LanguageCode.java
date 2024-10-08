@@ -8,17 +8,19 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum LanguageCode {
-    EN("en-US", "영어", Locale.ENGLISH),
-    KO("ko-KR", "한국어", Locale.KOREA),
-    JA("ja", "일본어", Locale.JAPANESE);
+    EN("en-US", "en", "영어", Locale.ENGLISH),
+    KO("ko-KR", "ko", "한국어", Locale.KOREA),
+    JA("ja", "ja", "일본어", Locale.JAPANESE);
 
     private final String code;
+    private final String countryCode;
     private final String description;
     private final Locale locale;
 
     public static LanguageCode fromCode(String code) {
         for (LanguageCode languageCode : LanguageCode.values()) {
-            if (code.contains(languageCode.getCode()) || languageCode.getCode().contains(code)) {
+            if (code.contains(languageCode.getCountryCode()) || languageCode.getCountryCode()
+                .contains(code)) {
                 return languageCode;
             }
         }
