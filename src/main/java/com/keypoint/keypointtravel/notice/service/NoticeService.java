@@ -5,8 +5,10 @@ import com.keypoint.keypointtravel.global.dto.useCase.PageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.GuideErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NoticeErrorCode;
+import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeDetailResponse;
 import com.keypoint.keypointtravel.notice.dto.response.NoticeResponse;
@@ -22,10 +24,12 @@ import com.keypoint.keypointtravel.notice.entity.Notice;
 import com.keypoint.keypointtravel.notice.entity.NoticeContent;
 import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
 import com.keypoint.keypointtravel.notice.repository.NoticeRepository;
+import com.keypoint.keypointtravel.notification.event.pushNotification.NoticePushNotificationEvent;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +43,8 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final NoticeContentRepository noticeContentRepository;
     private final MemberDetailRepository memberDetailRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void saveNotice(CreateNoticeUseCase useCase) {
@@ -62,6 +68,13 @@ public class NoticeService {
 
             // 5. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
+
+            // FCM 전송
+            eventPublisher.publishEvent(NoticePushNotificationEvent.of(
+                PushNotificationType.EVENT_NOTICE,
+                memberRepository.findMemberIdsByLanguageCode(LanguageCode.EN),
+                noticeContent.getId()
+            ));
         } catch (Exception e) {
             throw new GeneralException(e);
         }
@@ -89,6 +102,13 @@ public class NoticeService {
 
             // 4. NoticeContent 저장
             noticeContentRepository.save(noticeContent);
+
+            // FCM 전송
+            eventPublisher.publishEvent(NoticePushNotificationEvent.of(
+                PushNotificationType.EVENT_NOTICE,
+                memberRepository.findMemberIdsByLanguageCode(useCase.getLanguageCode()),
+                noticeContent.getId()
+            ));
         } catch (Exception e) {
             throw new GeneralException(e);
         }
