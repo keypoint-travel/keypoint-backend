@@ -207,7 +207,6 @@ public class CreateCampaignService {
     public void sendEmail(InviteByEmailsUseCase useCase, Locale locale) {
         LocaleContextHolder.setLocale(locale);
         // 캠페인 코드 및 로고 이미지를 포함한 이메일 전송
-        // todo: 이메일 템플릿 - 초대하기 클릭 시 앱 연결 링크 추가
         SendInvitationEmailDto dto = campaignRepository.findSendInvitationEmailInfo(
             useCase.getCampaignId());
         Map<String, String> emailContent = new HashMap<>();
