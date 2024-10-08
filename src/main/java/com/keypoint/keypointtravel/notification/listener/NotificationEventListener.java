@@ -8,8 +8,8 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.FCMUtils;
-import com.keypoint.keypointtravel.member.entity.Member;
-import com.keypoint.keypointtravel.member.service.ReadMemberService;
+import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
+import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
@@ -36,7 +36,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 public class NotificationEventListener {
 
-    private final ReadMemberService readMemberService;
+    private final MemberRepository memberRepository;
     private final FCMTokenRepository fcmTokenRepository;
     private final PushNotificationHistoryService pushNotificationHistoryService;
     private final PushNotificationService pushNotificationService;
@@ -46,52 +46,40 @@ public class NotificationEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendFCMNotification(PushNotificationEvent event) {
         List<PushNotificationHistory> pushNotificationHistories = new ArrayList<>();
-        for (Long memberId : event.getMemberIds()) {
-            Member member = readMemberService.findMemberById(memberId);
-            if (!member.getNotification().isPushNotificationEnabled()) { // 알림 설정이 안되어 있는 경우
+        List<AlarmMemberUserCase> useCases = memberRepository.findAlarmMembersByMemberIds(
+            event.getMemberIds());
+
+        for (AlarmMemberUserCase useCase : useCases) {
+            Long memberId = useCase.getMemberId();
+            PushNotificationType type = event.getPushNotificationType();
+            // 알림 설정이 안되어 있는 경우
+            if (!useCase.isPushNotificationEnabled()) {
                 continue;
             }
-
-            PushNotificationType type = event.getPushNotificationType();
+            // 토큰 존재 확인
+            List<String> tokens = fcmTokenRepository.findTokenByMemberId(memberId);
+            if (tokens.isEmpty()) {
+                continue;
+            }
 
             // 1. FCM 내용 구성
             PushNotificationContent notificationMsg = PushNotificationContent.getRandomNotificationContent(
                 type
             );
             PushNotificationDTO notificationContent = pushNotificationService.generateNotificationDTO(
-                member.getName(),
-                member.getMemberDetail().getLanguage(),
+                useCase.getName(),
+                useCase.getLanguage(),
                 event,
                 notificationMsg
             );
             if (notificationContent == null) {
-                return;
+                continue;
             }
-            Object detail = pushNotificationService.generateNotificationDetail(
-                memberId,
-                type
-            );
-            FCMBodyResponse body = FCMBodyResponse.of(type, notificationContent.getBody(), detail);
-            Notification notification = Notification.builder()
-                .setTitle(notificationContent.getTitle())
-                .setBody(body.toString())
-                .build();
 
             // 2. FCM Message 생성
-            List<Message> messages = new ArrayList<>();
             Map<Integer, String> tokenMapper = new HashMap<>(); // Message hashcode&토큰 매퍼 생성 (Message에서 token을 get할 수 없음)
-            List<String> tokens = fcmTokenRepository.findTokenByMemberId(memberId);
-            for (String token : tokens) {
-                Message message = Message
-                    .builder()
-                    .setNotification(notification)
-                    .setToken(token)
-                    .build();
-                tokenMapper.put(message.hashCode(), token);
-                messages.add(
-                    message
-                );
-            }
+            List<Message> messages = generateMessages(memberId, notificationContent, type,
+                tokenMapper, tokens);
 
             // 3. FCM 전송
             List<Integer> failedHashcodes = FCMUtils.sendMultiMessage(messages);
@@ -102,7 +90,7 @@ public class NotificationEventListener {
             // 5. 이력 객체 생성
             pushNotificationHistories.add(PushNotificationHistory.of(
                 notificationContent.getPushNotificationContent(),
-                member,
+                memberRepository.getReferenceById(memberId),
                 event
             ));
         }
@@ -111,6 +99,40 @@ public class NotificationEventListener {
         event.clearMemberIds();
         pushNotificationHistoryService.savePushNotificationHistories(pushNotificationHistories);
     }
+
+    private List<Message> generateMessages(
+        Long memberId,
+        PushNotificationDTO notificationContent,
+        PushNotificationType type,
+        Map<Integer, String> tokenMapper,
+        List<String> tokens
+    ) {
+        Object detail = pushNotificationService.generateNotificationDetail(
+            memberId,
+            type
+        );
+
+        FCMBodyResponse body = FCMBodyResponse.of(type, notificationContent.getBody(), detail);
+        Notification notification = Notification.builder()
+            .setTitle(notificationContent.getTitle())
+            .setBody(body.toString())
+            .build();
+
+        List<Message> messages = new ArrayList<>();
+
+        for (String token : tokens) {
+            Message message = Message
+                .builder()
+                .setNotification(notification)
+                .setToken(token)
+                .build();
+            tokenMapper.put(message.hashCode(), token);
+            messages.add(message);
+        }
+
+        return messages;
+    }
+
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
