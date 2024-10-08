@@ -188,7 +188,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return queryFactory
             .select(member.id)
             .from(member)
-            .innerJoin(memberDetail).on(memberDetail.language.eq(languageCode))
+            .innerJoin(memberDetail)
+            .on(memberDetail.language.eq(languageCode).and(memberDetail.member.eq(member)))
             .where(member.isDeleted.isFalse())
             .fetch();
     }

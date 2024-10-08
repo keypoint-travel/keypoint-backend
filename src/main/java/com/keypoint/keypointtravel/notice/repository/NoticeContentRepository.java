@@ -25,4 +25,7 @@ public interface NoticeContentRepository
         @Param("noticeContentId") Long noticeContentId,
         @Param("languageCode") LanguageCode languageCode
     );
+
+    @Query("SELECT nc.title FROM NoticeContent nc WHERE nc.id = :noticeContentId")
+    String findTitleByNoticeContentId(@Param("noticeContentId") Long noticeContentId);
 }
