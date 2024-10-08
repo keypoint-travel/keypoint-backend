@@ -55,6 +55,42 @@
     </preConditions>
     <sql>
       ALTER TABLE member MODIFY COLUMN role ENUM('ROLE_UNCERTIFIED_USER', 'ROLE_CERTIFIED_USER', 'ROLE_ADMIN', 'ROLE_PENDING_WITHDRAWAL');
+      </sql>
+  </changeSet>
+  
+  <changeSet id="changelog-0.03.06-240924" author="lchy0413">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="push_notification_history" columnName="type" />
+    </preConditions>
+    <sql>
+      ALTER TABLE push_notification_history
+        MODIFY COLUMN type ENUM('PUSH_NOTIFICATION_BY_ADMIN',
+        'RECEIPT_REGISTER',
+        'CAMPAIGN_D_MINUS_7_1',
+        'CAMPAIGN_D_MINUS_7_2',
+        'CAMPAIGN_D_MINUS_7_3',
+        'CAMPAIGN_D_MINUS_7_4',
+        'CAMPAIGN_D_MINUS_7_5',
+        'CAMPAIGN_D_DAY_1',
+        'CAMPAIGN_D_DAY_2',
+        'CAMPAIGN_D_DAY_3',
+        'CAMPAIGN_D_DAY_4',
+        'CAMPAIGN_D_DAY_5',
+        'CAMPAIGN_INVITE',
+        'CAMPAIGN_ACCEPT_INVITER',
+        'CAMPAIGN_ACCEPT_INVITEE',
+        'CAMPAIGN_NO_EXPENSE_D1',
+        'CAMPAIGN_END',
+        'CAMPAIGN_JOIN_REQUEST',
+        'PAYMENT_COMPLETION',
+        'FRIEND_ADDED',
+        'FRIEND_ACCEPTED_RECEIVER',
+        'FRIEND_ACCEPTED_SENDER',
+        'INQUIRY_RESPONSE_COMPLETED',
+        'CAMPAIGN_D60_PASSED_1',
+        'CAMPAIGN_D60_PASSED_2',
+        'CAMPAIGN_START',
+        'EVENT_NOTICE');
     </sql>
   </changeSet>
 

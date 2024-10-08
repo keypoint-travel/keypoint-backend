@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.global.utils.MessageSourceUtils;
+import com.keypoint.keypointtravel.notice.repository.NoticeContentRepository;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBadgeDetailResponse;
 import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent.FCMContentData;
@@ -36,6 +37,7 @@ public class PushNotificationService {
     private final CampaignRepository campaignRepository;
     private final MemberBadgeService memberBadgeService;
     private final BadgeRepository badgeRepository;
+    private final NoticeContentRepository noticeContentRepository;
 
     /**
      * Notification 생성
@@ -131,17 +133,15 @@ public class PushNotificationService {
             case EVENT_NOTICE -> {
                 if (additionalData instanceof NoticeData) {
                     NoticeData data = (NoticeData) additionalData;
-                    // TODO 공지 사항 개발이 완료된 후 연결 필요
-                    // String noticeTitle = campaignRepository.findTitleByCampaignId(
-                    //         data.getNoticeId())
-                    //     .orElse("");
+                    String noticeTitle = noticeContentRepository.findTitleByNoticeContentId(
+                        data.getNoticeContentId());
 
-                    // // 1. FCM 내용 구성
-                    // content = notificationMsg.getTranslatedContent(
-                    //     null,
-                    //     campaignTitle,
-                    //     locale
-                    // );
+                    // 1. FCM 내용 구성
+                    content = notificationMsg.getTranslatedContent(
+                        noticeTitle,
+                        null,
+                        locale
+                    );
                 }
             }
             case CAMPAIGN_JOIN_REQUEST -> {

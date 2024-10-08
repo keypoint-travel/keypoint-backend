@@ -4,7 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
-import com.keypoint.keypointtravel.notification.event.pushNotification.*;
+import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignAcceptorPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignApplicantPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignLeaderPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CampaignPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.CommonPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.FriendPushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.NoticePushNotificationEvent;
+import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -60,6 +68,9 @@ public class PushNotificationEventToJsonConverter implements
                 }
                 case PUSH_NOTIFICATION_BY_ADMIN -> {
                     return objectMapper.readValue(dbData, AdminPushNotificationEvent.class);
+                }
+                case EVENT_NOTICE -> {
+                    return objectMapper.readValue(dbData, NoticePushNotificationEvent.class);
                 }
             }
 

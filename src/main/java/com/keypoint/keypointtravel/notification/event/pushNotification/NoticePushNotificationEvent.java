@@ -1,11 +1,9 @@
 package com.keypoint.keypointtravel.notification.event.pushNotification;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
-
+import java.util.List;
 import lombok.NoArgsConstructor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,18 +18,18 @@ public class NoticePushNotificationEvent extends PushNotificationEvent {
     public NoticePushNotificationEvent(
         PushNotificationType type,
         List<Long> memberIds,
-        Long noticeId
+        Long noticeContentId
     ) {
         super(type, memberIds);
-        this.additionalData = new NoticeData(noticeId);
+        this.additionalData = new NoticeData(noticeContentId);
     }
 
     public static NoticePushNotificationEvent of(
         PushNotificationType type,
         List<Long> memberIds,
-        Long noticeId
+        Long noticeContentId
     ) {
-        return new NoticePushNotificationEvent(type, memberIds, noticeId);
+        return new NoticePushNotificationEvent(type, memberIds, noticeContentId);
     }
 
     @Override
@@ -43,15 +41,15 @@ public class NoticePushNotificationEvent extends PushNotificationEvent {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class NoticeData {
 
-        @JsonProperty("noticeId") 
-        private Long noticeId;
+        @JsonProperty("noticeContentId")
+        private Long noticeContentId;
 
-        public NoticeData(Long noticeId) {
-            this.noticeId = noticeId;
+        public NoticeData(Long noticeContentId) {
+            this.noticeContentId = noticeContentId;
         }
 
-        public Long getNoticeId() {
-            return noticeId;
+        public Long getNoticeContentId() {
+            return noticeContentId;
         }
     }
 }

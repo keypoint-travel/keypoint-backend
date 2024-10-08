@@ -8,10 +8,12 @@ import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
-import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
@@ -196,6 +198,33 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
             .where(member.id.eq(memberId))
             .execute();
+    }
+
+    @Override
+    public List<Long> findMemberIdsByLanguageCode(LanguageCode languageCode) {
+        return queryFactory
+            .select(member.id)
+            .from(member)
+            .innerJoin(memberDetail)
+            .on(memberDetail.language.eq(languageCode).and(memberDetail.member.eq(member)))
+            .where(member.isDeleted.isFalse())
+            .fetch();
+    }
+
+    @Override
+    public List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds) {
+        return queryFactory.select(
+                Projections.fields(
+                    AlarmMemberUserCase.class,
+                    member.id.as("memberId"),
+                    member.name,
+                    member.memberDetail.language,
+                    member.notification.pushNotificationEnabled
+                )
+            )
+            .from(member)
+            .where(member.id.in(memberIds))
+            .fetch();
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {

@@ -1,10 +1,11 @@
 package com.keypoint.keypointtravel.member.service;
 
+import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
-import com.keypoint.keypointtravel.member.dto.response.OtherMemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReadMemberService {
 
     private final MemberRepository memberRepository;
+
+    private final BadgeRepository badgeRepository;
 
     /**
      * email로 Member의 인증에 필요한 정보를 조회하는 함수
@@ -93,9 +96,10 @@ public class ReadMemberService {
      */
     public OtherMemberProfileResponse getOtherMemberProfile(OtherMemberUseCase useCase) {
         try {
-            return memberRepository.findOtherMemberProfile(useCase.getMyId(),
+            OtherMemberProfileResponse response = memberRepository.findOtherMemberProfile(useCase.getMyId(),
                 useCase.getOtherMemberId());
-            // todo: 다른 회원의 프로필 조회 시, 해당 회원이 가지고 있는 배지 정보도 함께 조회하기 구현 필요
+            response.addBadges(badgeRepository.findEarnedBadgeByUserId(useCase.getOtherMemberId()));
+            return response;
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
