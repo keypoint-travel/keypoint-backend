@@ -12,6 +12,7 @@ import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
@@ -191,6 +192,22 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .innerJoin(memberDetail)
             .on(memberDetail.language.eq(languageCode).and(memberDetail.member.eq(member)))
             .where(member.isDeleted.isFalse())
+            .fetch();
+    }
+
+    @Override
+    public List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds) {
+        return queryFactory.select(
+                Projections.fields(
+                    AlarmMemberUserCase.class,
+                    member.id.as("memberId"),
+                    member.name,
+                    member.memberDetail.language,
+                    member.notification.pushNotificationEnabled
+                )
+            )
+            .from(member)
+            .where(member.id.in(memberIds))
             .fetch();
     }
 

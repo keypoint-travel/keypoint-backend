@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
 import java.util.List;
 
 public interface MemberCustomRepository {
@@ -20,4 +21,6 @@ public interface MemberCustomRepository {
     void updateMemberProfile(Long memberId, String name, Long profileImageId);
 
     List<Long> findMemberIdsByLanguageCode(LanguageCode languageCode);
+
+    List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds);
 }
