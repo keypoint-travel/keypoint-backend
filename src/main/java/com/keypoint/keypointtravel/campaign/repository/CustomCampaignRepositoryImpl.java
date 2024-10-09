@@ -1,9 +1,12 @@
 package com.keypoint.keypointtravel.campaign.repository;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.CampaignInfoDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.SendInvitationEmailDto;
 import com.keypoint.keypointtravel.campaign.dto.dto.TravelLocationDto;
+import com.keypoint.keypointtravel.campaign.dto.useCase.AlarmCampaignUseCase;
 import com.keypoint.keypointtravel.campaign.entity.Campaign;
 import com.keypoint.keypointtravel.campaign.entity.QCampaign;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
@@ -15,15 +18,12 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.place.entity.QCountry;
 import com.keypoint.keypointtravel.place.entity.QPlace;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import static com.querydsl.jpa.JPAExpressions.select;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.Locale;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -176,5 +176,22 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
                     )))
             .fetch();
         return !campaigns.isEmpty();
+    }
+
+    @Override
+    public List<AlarmCampaignUseCase> findAlarmCampaignByStartAt(Date date) {
+        return queryFactory
+            .selectFrom(campaign)
+            .where(campaign.startDate.goe(date).and(campaign.status.ne(Status.FINISHED)))
+            .leftJoin(memberCampaign).on(memberCampaign.campaign.eq(campaign))
+            .transform(GroupBy.groupBy(campaign.id)
+                .list(
+                    Projections.fields(
+                        AlarmCampaignUseCase.class,
+                        campaign.id.as("campaignId"),
+                        GroupBy.list(memberCampaign.member.id).as("memberIds")
+                    )
+                )
+            );
     }
 }
