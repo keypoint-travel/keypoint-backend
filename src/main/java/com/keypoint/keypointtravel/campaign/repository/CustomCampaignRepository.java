@@ -28,4 +28,6 @@ public interface CustomCampaignRepository {
     boolean existsOverlappingCampaign(List<Long> memberIds, Long campaignId);
 
     List<AlarmCampaignUseCase> findAlarmCampaignByStartAt(Date date);
+
+    List<AlarmCampaignUseCase> findAlarmCampaignByStartAtAndNoExpense(Date date);
 }

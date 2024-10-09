@@ -18,6 +18,8 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.place.entity.QCountry;
 import com.keypoint.keypointtravel.place.entity.QPlace;
+import com.keypoint.keypointtravel.receipt.entity.QReceipt;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -39,6 +41,8 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     private final QMemberCampaign memberCampaign = QMemberCampaign.memberCampaign;
 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
+
+    private final QReceipt receipt = QReceipt.receipt;
 
     @Override
     public SendInvitationEmailDto findSendInvitationEmailInfo(Long campaignId) {
@@ -182,14 +186,39 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
     public List<AlarmCampaignUseCase> findAlarmCampaignByStartAt(Date date) {
         return queryFactory
             .selectFrom(campaign)
-            .where(campaign.startDate.goe(date).and(campaign.status.ne(Status.FINISHED)))
+            .where(campaign.startDate.eq(date).and(campaign.status.ne(Status.FINISHED)))
             .leftJoin(memberCampaign).on(memberCampaign.campaign.eq(campaign))
             .transform(GroupBy.groupBy(campaign.id)
                 .list(
                     Projections.fields(
                         AlarmCampaignUseCase.class,
                         campaign.id.as("campaignId"),
-                        GroupBy.list(memberCampaign.member.id).as("memberIds")
+                        GroupBy.list(memberCampaign.member.id).as("memberIds"),
+                        campaign.startDate
+                    )
+                )
+            );
+    }
+
+    @Override
+    public List<AlarmCampaignUseCase> findAlarmCampaignByStartAtAndNoExpense(Date date) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(campaign.startDate.eq(date))
+            .and(campaign.status.ne(Status.FINISHED))
+            .and(receipt.id.isNull());
+
+        return queryFactory
+            .selectFrom(campaign)
+            .where(builder)
+            .leftJoin(memberCampaign).on(memberCampaign.campaign.eq(campaign))
+            .leftJoin(receipt).on(receipt.campaign.eq(campaign))
+            .transform(GroupBy.groupBy(campaign.id)
+                .list(
+                    Projections.fields(
+                        AlarmCampaignUseCase.class,
+                        campaign.id.as("campaignId"),
+                        GroupBy.list(memberCampaign.member.id).as("memberIds"),
+                        campaign.startDate
                     )
                 )
             );
