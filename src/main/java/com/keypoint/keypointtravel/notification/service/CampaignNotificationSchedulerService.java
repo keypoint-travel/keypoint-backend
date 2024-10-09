@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,8 @@ public class CampaignNotificationSchedulerService {
     private final CampaignRepository campaignRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    @Scheduled(cron = "0 31 * * * *", zone = "Asia/Seoul")
+    @Transactional
+    @Scheduled(cron = "0 46 * * * *", zone = "Asia/Seoul")
     //@Scheduled(cron = "0 0 0 * * *")
     public void sendCampaignDMinus7Notification() {
         // 캠페인
