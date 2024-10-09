@@ -56,11 +56,6 @@ public class NotificationEventListener {
             if (!useCase.isPushNotificationEnabled()) {
                 continue;
             }
-            // 토큰 존재 확인
-            List<String> tokens = fcmTokenRepository.findTokenByMemberId(memberId);
-            if (tokens.isEmpty()) {
-                continue;
-            }
 
             // 1. FCM 내용 구성
             PushNotificationContent notificationMsg = PushNotificationContent.getRandomNotificationContent(
@@ -76,18 +71,22 @@ public class NotificationEventListener {
                 continue;
             }
 
-            // 2. FCM Message 생성
-            Map<Integer, String> tokenMapper = new HashMap<>(); // Message hashcode&토큰 매퍼 생성 (Message에서 token을 get할 수 없음)
-            List<Message> messages = generateMessages(memberId, notificationContent, type,
-                tokenMapper, tokens);
+            // 2. 토큰이 존재할 때만 FCM 전송
+            List<String> tokens = fcmTokenRepository.findTokenByMemberId(memberId);
+            if (!tokens.isEmpty()) {
+                // 2-1. FCM Message 생성
+                Map<Integer, String> tokenMapper = new HashMap<>(); // Message hashcode&토큰 매퍼 생성 (Message에서 token을 get할 수 없음)
+                List<Message> messages = generateMessages(memberId, notificationContent, type,
+                    tokenMapper, tokens);
 
-            // 3. FCM 전송
-            List<Integer> failedHashcodes = FCMUtils.sendMultiMessage(messages);
+                // 2-2. FCM 전송
+                List<Integer> failedHashcodes = FCMUtils.sendMultiMessage(messages);
 
-            // 4. 실패한 데이터 존재 시, 토큰 삭제
-            pushNotificationService.deleteFailedToken(failedHashcodes, tokenMapper);
+                // 2-3. 실패한 데이터 존재 시, 토큰 삭제
+                pushNotificationService.deleteFailedToken(failedHashcodes, tokenMapper);
+            }
 
-            // 5. 이력 객체 생성
+            // 3. 이력 객체 생성
             pushNotificationHistories.add(PushNotificationHistory.of(
                 notificationContent.getPushNotificationContent(),
                 memberRepository.getReferenceById(memberId),
@@ -95,7 +94,7 @@ public class NotificationEventListener {
             ));
         }
 
-        // 5. 이력 저장
+        // 4. 이력 저장
         event.clearMemberIds();
         pushNotificationHistoryService.savePushNotificationHistories(pushNotificationHistories);
     }
