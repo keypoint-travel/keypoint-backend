@@ -26,7 +26,7 @@ public class CampaignNotificationSchedulerService {
     @Scheduled(cron = "0 0 0 * * *")
     public void sendCampaignDMinus7Notification() {
         try {
-            LocalDate compareDate = LocalDate.now().minusDays(7);
+            LocalDate compareDate = LocalDate.now().plusDays(7);
             int result = sendCampaignNotificationOnStartAt(
                 PushNotificationType.CAMPAIGN_D_MINUS_7,
                 DateUtils.convertLocalDateToDate(compareDate)
@@ -41,17 +41,44 @@ public class CampaignNotificationSchedulerService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 02 * * * *", zone = "Asia/Seoul")
-    //@Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void sendCampaignDMinus1Notification() {
+        try {
+            LocalDate compareDate = LocalDate.now().plusDays(1);
+            int result = sendCampaignNotificationOnStartAt(
+                PushNotificationType.CAMPAIGN_D_DAY,
+                DateUtils.convertLocalDateToDate(compareDate)
+            );
+
+            LogUtils.writeInfoLog("sendCampaignDMinus1Notification",
+                "Send notifications 1 days before campaign starts " + result);
+        } catch (Exception ex) {
+            LogUtils.writeErrorLog("sendCampaignDMinus1Notification",
+                "Fail to send notifications 1 days before campaign starts", ex);
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 23 * * * *", zone = "Asia/Seoul")
+    //@Scheduled(cron = "0 0 0 * * *")
+    public void sendCampaignNoExpenseD1Notification() {
         LocalDate compareDate = LocalDate.now().minusDays(1);
-        int result = sendCampaignNotificationOnStartAt(
-            PushNotificationType.CAMPAIGN_D_DAY,
+        List<AlarmCampaignUseCase> useCases = campaignRepository.findAlarmCampaignByStartAtAndNoExpense(
             DateUtils.convertLocalDateToDate(compareDate)
         );
 
-        LogUtils.writeInfoLog("sendCampaignDMinus1Notification",
-            "Send notifications 1 days before campaign starts " + result);
+        for (AlarmCampaignUseCase useCase : useCases) {
+            eventPublisher.publishEvent(
+                CommonPushNotificationEvent.of(
+                    PushNotificationType.CAMPAIGN_NO_EXPENSE_D1,
+                    useCase.getMemberIds()
+                )
+            );
+        }
+
+        LogUtils.writeInfoLog("sendCampaignNoExpenseD1Notification",
+            "Send notifications 1 days after campaign starts, if there is no spending "
+                + useCases.size());
     }
 
     /**
