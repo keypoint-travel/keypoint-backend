@@ -112,30 +112,30 @@ public class CampaignNotificationSchedulerService {
 
         return useCases.size();
     }
-
-    @Transactional
-    @Scheduled(cron = "0 23 * * * *", zone = "Asia/Seoul")
-    //@Scheduled(cron = "0 0 0 * * *")
-    public void sendCampaignD60PassedNotification() {
-        LocalDate compareDate = LocalDate.now().minusDays(60);
-        List<AlarmCampaignUseCase> useCases = campaignRepository.findAlarmCampaignByEndAt(
-            DateUtils.convertLocalDateToDate(compareDate)
-        );
-
-        // 60일이 지난 캠페인 조회
-        for (AlarmCampaignUseCase useCase : useCases) {
-//            eventPublisher.publishEvent(
-//                CommonPushNotificationEvent.of(
-//                    PushNotificationType.CAMPAIGN_D60_PASSED,
-//                    useCase.getMemberIds()
-//                )
-//            );
-        }
-
-        // 사용자들 중 조회한 캠페인이 마지막인 경우 알림 전달
-
-        LogUtils.writeInfoLog("sendCampaignD60PassedNotification",
-            "Send notifications when the last campaign is past 60 days "
-                + useCases.size());
-    }
+//
+//    @Transactional
+//    @Scheduled(cron = "0 23 * * * *", zone = "Asia/Seoul")
+//    //@Scheduled(cron = "0 0 0 * * *")
+//    public void sendCampaignD60PassedNotification() {
+//        LocalDate compareDate = LocalDate.now().minusDays(60);
+//        List<AlarmCampaignUseCase> useCases = campaignRepository.findAlarmCampaignByEndAt(
+//            DateUtils.convertLocalDateToDate(compareDate)
+//        );
+//
+//        // 60일이 지난 캠페인 조회
+//        for (AlarmCampaignUseCase useCase : useCases) {
+////            eventPublisher.publishEvent(
+////                CommonPushNotificationEvent.of(
+////                    PushNotificationType.CAMPAIGN_D60_PASSED,
+////                    useCase.getMemberIds()
+////                )
+////            );
+//        }
+//
+//        // 사용자들 중 조회한 캠페인이 마지막인 경우 알림 전달
+//
+//        LogUtils.writeInfoLog("sendCampaignD60PassedNotification",
+//            "Send notifications when the last campaign is past 60 days "
+//                + useCases.size());
+//    }
 }
