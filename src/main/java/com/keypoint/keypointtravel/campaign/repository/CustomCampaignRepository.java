@@ -30,4 +30,6 @@ public interface CustomCampaignRepository {
     List<AlarmCampaignUseCase> findAlarmCampaignByStartAt(Date date);
 
     List<AlarmCampaignUseCase> findAlarmCampaignByStartAtAndNoExpense(Date date);
+
+    List<AlarmCampaignUseCase> findAlarmCampaignByEndAt(Date date);
 }

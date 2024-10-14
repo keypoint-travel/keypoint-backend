@@ -223,4 +223,22 @@ public class CustomCampaignRepositoryImpl implements CustomCampaignRepository {
                 )
             );
     }
+
+    @Override
+    public List<AlarmCampaignUseCase> findAlarmCampaignByEndAt(Date date) {
+        return queryFactory
+            .selectFrom(campaign)
+            .where(campaign.endDate.eq(date))
+            .leftJoin(memberCampaign).on(memberCampaign.campaign.eq(campaign))
+            .transform(GroupBy.groupBy(campaign.id)
+                .list(
+                    Projections.fields(
+                        AlarmCampaignUseCase.class,
+                        campaign.id.as("campaignId"),
+                        GroupBy.list(memberCampaign.member.id).as("memberIds"),
+                        campaign.startDate
+                    )
+                )
+            );
+    }
 }

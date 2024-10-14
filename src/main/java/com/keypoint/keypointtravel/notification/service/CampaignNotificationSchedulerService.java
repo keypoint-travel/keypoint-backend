@@ -59,26 +59,31 @@ public class CampaignNotificationSchedulerService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 23 * * * *", zone = "Asia/Seoul")
-    //@Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void sendCampaignNoExpenseD1Notification() {
-        LocalDate compareDate = LocalDate.now().minusDays(1);
-        List<AlarmCampaignUseCase> useCases = campaignRepository.findAlarmCampaignByStartAtAndNoExpense(
-            DateUtils.convertLocalDateToDate(compareDate)
-        );
-
-        for (AlarmCampaignUseCase useCase : useCases) {
-            eventPublisher.publishEvent(
-                CommonPushNotificationEvent.of(
-                    PushNotificationType.CAMPAIGN_NO_EXPENSE_D1,
-                    useCase.getMemberIds()
-                )
+        try {
+            LocalDate compareDate = LocalDate.now().minusDays(1);
+            List<AlarmCampaignUseCase> useCases = campaignRepository.findAlarmCampaignByStartAtAndNoExpense(
+                DateUtils.convertLocalDateToDate(compareDate)
             );
-        }
 
-        LogUtils.writeInfoLog("sendCampaignNoExpenseD1Notification",
-            "Send notifications 1 days after campaign starts, if there is no spending "
-                + useCases.size());
+            for (AlarmCampaignUseCase useCase : useCases) {
+                eventPublisher.publishEvent(
+                    CommonPushNotificationEvent.of(
+                        PushNotificationType.CAMPAIGN_NO_EXPENSE_D1,
+                        useCase.getMemberIds()
+                    )
+                );
+            }
+
+            LogUtils.writeInfoLog("sendCampaignNoExpenseD1Notification",
+                "Send notifications 1 days after campaign starts, if there is no spending "
+                    + useCases.size());
+        } catch (Exception ex) {
+            LogUtils.writeErrorLog("sendCampaignNoExpenseD1Notification",
+                "Fail to send notifications 1 days after campaign starts, if there is no spending",
+                ex);
+        }
     }
 
     /**
@@ -106,5 +111,31 @@ public class CampaignNotificationSchedulerService {
         }
 
         return useCases.size();
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 23 * * * *", zone = "Asia/Seoul")
+    //@Scheduled(cron = "0 0 0 * * *")
+    public void sendCampaignD60PassedNotification() {
+        LocalDate compareDate = LocalDate.now().minusDays(60);
+        List<AlarmCampaignUseCase> useCases = campaignRepository.findAlarmCampaignByEndAt(
+            DateUtils.convertLocalDateToDate(compareDate)
+        );
+
+        // 60일이 지난 캠페인 조회
+        for (AlarmCampaignUseCase useCase : useCases) {
+//            eventPublisher.publishEvent(
+//                CommonPushNotificationEvent.of(
+//                    PushNotificationType.CAMPAIGN_D60_PASSED,
+//                    useCase.getMemberIds()
+//                )
+//            );
+        }
+
+        // 사용자들 중 조회한 캠페인이 마지막인 경우 알림 전달
+
+        LogUtils.writeInfoLog("sendCampaignD60PassedNotification",
+            "Send notifications when the last campaign is past 60 days "
+                + useCases.size());
     }
 }
