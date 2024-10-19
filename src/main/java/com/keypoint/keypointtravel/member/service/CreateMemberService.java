@@ -11,7 +11,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.EmailUtils;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
-import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
+import com.keypoint.keypointtravel.member.dto.response.AppMemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SignUpUseCase;
@@ -60,7 +60,7 @@ public class CreateMemberService {
      * @return
      */
     @Transactional
-    public MemberResponse registerMember(SignUpUseCase useCase) {
+    public AppMemberResponse registerMember(SignUpUseCase useCase) {
         try {
             String email = useCase.getEmail();
             String password = useCase.getPassword();
@@ -92,7 +92,7 @@ public class CreateMemberService {
             TokenInfoResponse response = authService.getJwtTokenInfo(email, password);
 
             String badgeUrl = badgeRepository.findByActiveBadgeUrl(BadgeType.SIGN_UP);
-            return MemberResponse.of(member, response, badgeUrl);
+            return AppMemberResponse.of(member, response, badgeUrl);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

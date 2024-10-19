@@ -8,8 +8,8 @@ import com.keypoint.keypointtravel.member.dto.request.EmailRequest;
 import com.keypoint.keypointtravel.member.dto.request.EmailVerificationRequest;
 import com.keypoint.keypointtravel.member.dto.request.MemberProfileRequest;
 import com.keypoint.keypointtravel.member.dto.request.SignUpRequest;
+import com.keypoint.keypointtravel.member.dto.response.AppMemberResponse;
 import com.keypoint.keypointtravel.member.dto.response.EmailVerificationResponse;
-import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailVerificationUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberProfileUseCase;
@@ -60,14 +60,15 @@ public class CreateMemberController {
     }
 
     @PostMapping
-    public APIResponseEntity<MemberResponse> addMember(@Valid @RequestBody SignUpRequest request) {
+    public APIResponseEntity<AppMemberResponse> addMember(
+        @Valid @RequestBody SignUpRequest request) {
         SignUpUseCase useCase = SignUpUseCase.from(request);
-        MemberResponse result = createMemberService.registerMember(useCase);
+        AppMemberResponse result = createMemberService.registerMember(useCase);
 
         // 회원가입 배지 발급
         badgeService.earnBadge(result.getId(), BadgeType.SIGN_UP);
 
-        return APIResponseEntity.<MemberResponse>builder()
+        return APIResponseEntity.<AppMemberResponse>builder()
             .message("회원 가입 성공")
             .data(result)
             .build();
@@ -75,16 +76,16 @@ public class CreateMemberController {
 
     @PreAuthorize("hasRole('ROLE_UNCERTIFIED_USER')")
     @PutMapping("/profile")
-    public APIResponseEntity<MemberResponse> addMemberProfile(
+    public APIResponseEntity<AppMemberResponse> addMemberProfile(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @Valid @RequestBody MemberProfileRequest request) {
         MemberProfileUseCase useCase = MemberProfileUseCase.of(userDetails.getId(), request);
-        MemberResponse result = updateMemberService.registerMemberProfile(useCase);
+        AppMemberResponse result = updateMemberService.registerMemberProfile(useCase);
 
         // 회원가입 배지 발급
         badgeService.earnBadge(result.getId(), BadgeType.SIGN_UP);
 
-        return APIResponseEntity.<MemberResponse>builder()
+        return APIResponseEntity.<AppMemberResponse>builder()
             .message("소셜 로그인 개인 정보 성공")
             .data(result)
             .build();

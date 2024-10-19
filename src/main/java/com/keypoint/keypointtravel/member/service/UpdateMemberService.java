@@ -10,7 +10,7 @@ import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
-import com.keypoint.keypointtravel.member.dto.response.MemberResponse;
+import com.keypoint.keypointtravel.member.dto.response.AppMemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberProfileUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdateLanguageUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdatePasswordUseCase;
@@ -64,7 +64,7 @@ public class UpdateMemberService {
      * @return
      */
     @Transactional
-    public MemberResponse registerMemberProfile(MemberProfileUseCase useCase) {
+    public AppMemberResponse registerMemberProfile(MemberProfileUseCase useCase) {
         try {
             // 1. Member 찾기
             Member member = memberRepository.findById(useCase.getMemberId())
@@ -89,7 +89,7 @@ public class UpdateMemberService {
             TokenInfoResponse token = tokenProvider.createToken(authentication);
 
             String badgeUrl = badgeRepository.findByActiveBadgeUrl(BadgeType.SIGN_UP);
-            return MemberResponse.of(member, token, badgeUrl);
+            return AppMemberResponse.of(member, token, badgeUrl);
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }

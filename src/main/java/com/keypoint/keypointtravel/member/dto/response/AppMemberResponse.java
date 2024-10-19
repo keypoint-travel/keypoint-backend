@@ -9,14 +9,14 @@ import com.keypoint.keypointtravel.member.entity.Member;
 import lombok.Data;
 
 @Data
-public class MemberResponse {
+public class AppMemberResponse {
 
     private Long id;
     private String email;
     private TokenInfoResponse token;
     private CommonBadgeResponse badge;
 
-    public MemberResponse(
+    public AppMemberResponse(
             Long id,
             String email,
             TokenInfoResponse token,
@@ -31,7 +31,7 @@ public class MemberResponse {
         );
     }
 
-    public static MemberResponse of(Member member, TokenInfoResponse token, String badgeUrl) {
-        return new MemberResponse(member.getId(), member.getEmail(), token, badgeUrl);
+    public static AppMemberResponse of(Member member, TokenInfoResponse token, String badgeUrl) {
+        return new AppMemberResponse(member.getId(), member.getEmail(), token, badgeUrl);
     }
 }
