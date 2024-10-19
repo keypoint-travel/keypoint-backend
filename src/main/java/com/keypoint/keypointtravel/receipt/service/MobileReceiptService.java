@@ -17,6 +17,7 @@ import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.ImageUtils;
 import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.entity.Member;
+import com.keypoint.keypointtravel.member.repository.memberDetail.MemberDetailRepository;
 import com.keypoint.keypointtravel.notification.event.pushNotification.CommonPushNotificationEvent;
 import com.keypoint.keypointtravel.receipt.dto.response.CampaignReceiptResponse;
 import com.keypoint.keypointtravel.receipt.dto.response.receiptResponse.ReceiptResponse;
@@ -31,6 +32,7 @@ import com.keypoint.keypointtravel.receipt.redis.service.TempReceiptService;
 import com.keypoint.keypointtravel.receipt.repository.ReceiptRepository;
 import com.keypoint.keypointtravel.uploadFile.service.UploadFileService;
 import java.awt.image.BufferedImage;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +56,7 @@ public class MobileReceiptService {
     private final TempReceiptService tempReceiptService;
     private final ApplicationEventPublisher eventPublisher;
     private final GoogleMapService googleMapService;
+    private final MemberDetailRepository memberDetailRepository;
 
 
     /**
@@ -184,7 +187,13 @@ public class MobileReceiptService {
                 paymentItemService.addPaymentItem(paymentItem.toEntity(receipt), filteredMembers);
             }
 
-            // 4. 영수증 FCM 전달
+            // 4. 영수증 등록 시간 업데이트
+            memberDetailRepository.updateRecentRegisterReceiptAt(
+                receiptMemberIds,
+                LocalDateTime.now()
+            );
+
+            // 5. 영수증 FCM 전달
             eventPublisher.publishEvent(CommonPushNotificationEvent.of(
                 PushNotificationType.RECEIPT_REGISTER,
                 receiptMemberIds.stream().toList()

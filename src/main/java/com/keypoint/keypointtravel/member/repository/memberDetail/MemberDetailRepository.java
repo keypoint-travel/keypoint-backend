@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.theme.entity.Theme;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -72,9 +73,9 @@ public interface MemberDetailRepository extends JpaRepository<MemberDetail, Long
     @Modifying
     @Query("UPDATE MemberDetail md "
         + "SET md.recentRegisterReceiptAt = :recentRegisterReceiptAt "
-        + "WHERE md.member.id = :memberId")
+        + "WHERE md.member.id in :memberIds")
     int updateRecentRegisterReceiptAt(
-        @Param("memberId") Long memberId,
+        @Param("memberIds") Set<Long> memberIds,
         @Param("recentRegisterReceiptAt") LocalDateTime recentRegisterReceiptAt
     );
 }
