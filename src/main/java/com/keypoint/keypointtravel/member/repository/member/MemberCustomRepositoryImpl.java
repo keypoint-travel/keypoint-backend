@@ -261,7 +261,16 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             builder.and(member.role.eq(role));
         }
         if (keyword != null && !keyword.isBlank()) {
-
+            builder.and(
+                member.id.stringValue().containsIgnoreCase(keyword)
+                    .or(member.name.containsIgnoreCase(keyword))
+                    .or(memberDetail.country.containsIgnoreCase(keyword))
+                    .or(GenderType.containsEnumValue(memberDetail.gender, keyword))
+                    .or(memberDetail.birth.stringValue().contains(keyword))
+                    .or(member.email.containsIgnoreCase(keyword))
+                    .or(RoleType.containsEnumValue(member.role, keyword))
+                    .or(member.createAt.stringValue().contains(keyword))
+            );
         }
 
         // 기본 정렬 기준 추가
