@@ -302,7 +302,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 case "role":
                     orderSpecifier = new OrderSpecifier<>(order, RoleType.getOrderSpecifier());
                     break;
-                case "recentRegisterReceitAt":
+                case "recentRegisterReceiptAt":
                     orderSpecifier = new OrderSpecifier<>(order, member.modifyAt); // TODO 추후 변경
                     break;
             }

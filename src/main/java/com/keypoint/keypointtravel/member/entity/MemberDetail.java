@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,14 +44,13 @@ public class MemberDetail extends BaseEntity {
     @JoinColumn(name = "representative_badge_id")
     private Badge representativeBadge;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_id")
     private Theme theme;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paid_theme_id")
     private PaidTheme paidTheme;
-
 
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
@@ -69,6 +69,9 @@ public class MemberDetail extends BaseEntity {
     private LanguageCode language;
 
     private Long profileImageId; // AttachFile과 논리적 FK
+
+    @Comment("최근 영수증 등록 시간")
+    private LocalDateTime recentRegisterReceiptAt;
 
     public MemberDetail(
         Member member,
