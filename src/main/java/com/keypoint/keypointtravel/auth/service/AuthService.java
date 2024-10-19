@@ -11,6 +11,7 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.TokenErrorCode;
 import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
@@ -103,15 +104,23 @@ public class AuthService {
             // 1. 이메일 유효성 검사
             CommonMemberDTO member = validateMemberForLogin(email);
 
+
             // 2. 비밀번호 유효성 검사
             if (!StringUtils.checkPasswordValidation(password)) {
                 throw new GeneralException(MemberErrorCode.INVALID_LOGIN_CREDENTIALS);
             }
 
-            // 3. 최근 로그인 일자 업데이트
+            // 3. 로그인 가능한 권한인지 확인
+            RoleType roleType = member.getRole();
+            if (!(roleType.equals(RoleType.ROLE_ADMIN) ||
+                roleType.equals(RoleType.ROLE_CERTIFIED_USER))) {
+                throw new GeneralException(MemberErrorCode.NOT_ALLOW_LOGIN_ROLE, roleType.name());
+            }
+
+            // 4. 최근 로그인 일자 업데이트
             updateMemberService.updateRecentLoginAtByMemberId(member.getId());
 
-            // 4. JWT 토큰 생성
+            // 5. JWT 토큰 생성
             return getJwtTokenInfo(email, password);
         } catch (BadCredentialsException ex) {
             throw new GeneralException(MemberErrorCode.INVALID_PASSWORD);
