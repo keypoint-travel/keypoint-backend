@@ -7,13 +7,16 @@ import com.keypoint.keypointtravel.blocked_member.entity.QBlockedMember;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.campaign.entity.QMemberCampaign;
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
+import com.keypoint.keypointtravel.global.enumType.member.GenderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import com.keypoint.keypointtravel.member.dto.response.AdminMemberResponse;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
+import com.keypoint.keypointtravel.member.dto.useCase.SearchAdminMemberUseCase;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
@@ -21,6 +24,9 @@ import com.keypoint.keypointtravel.theme.dto.response.MemberThemeResponse;
 import com.keypoint.keypointtravel.theme.entity.QPaidTheme;
 import com.keypoint.keypointtravel.theme.entity.QTheme;
 import com.keypoint.keypointtravel.theme.entity.QThemeColor;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -29,6 +35,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
@@ -127,7 +136,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                     member.id.as("memberId"),
                     uploadFile.path.as("profileImageUrl"),
                     member.name.as("memberName"),
-                    isBlocked(myId, otherMemberId).as("isBlocked")
+                    checkIsBlocked(myId, otherMemberId).as("isBlocked")
                 )
             )
             .from(member)
@@ -227,11 +236,102 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .fetch();
     }
 
-    private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
+    private BooleanExpression checkIsBlocked(Long myId, Long otherMemberId) {
         return selectOne()
             .from(QBlockedMember.blockedMember)
             .where(blockedMember.member.id.eq(myId)
                 .and(blockedMember.blockedMemberId.eq(otherMemberId)))
             .exists();
     }
+
+    @Override
+    public Page<AdminMemberResponse> findMembersInAdmin(SearchAdminMemberUseCase useCase) {
+        Pageable pageable = useCase.getPageable();
+        String sortBy = useCase.getSortBy();
+        String direction = useCase.getDirection();
+        String keyword = useCase.getKeyword();
+        RoleType role = useCase.getRole();
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder
+            .and(member.isDeleted.isFalse());
+
+        // 검색어 필터링
+        if (role != null) {
+            builder.and(member.role.eq(role));
+        }
+        if (keyword != null && !keyword.isBlank()) {
+
+        }
+
+        // 기본 정렬 기준 추가
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, member.id);
+
+        // 동적 정렬 기준 처리
+        if (sortBy != null) {
+            Order order = direction.equals("asc") ? Order.ASC : Order.DESC;
+
+            switch (sortBy) {
+                case "userId":
+                    orderSpecifier = new OrderSpecifier<>(order, member.id);
+                    break;
+                case "name":
+                    orderSpecifier = new OrderSpecifier<>(order, member.name);
+                    break;
+                case "country":
+                    orderSpecifier = new OrderSpecifier<>(order, memberDetail.country);
+                    break;
+                case "gender":
+                    orderSpecifier = new OrderSpecifier<>(order, GenderType.getOrderSpecifier());
+                    break;
+                case "birth":
+                    orderSpecifier = new OrderSpecifier<>(order, memberDetail.birth);
+                    break;
+                case "email":
+                    orderSpecifier = new OrderSpecifier<>(order, member.email);
+                    break;
+                case "role":
+                    orderSpecifier = new OrderSpecifier<>(order, RoleType.getOrderSpecifier());
+                    break;
+                case "recentRegisterReceitAt":
+                    orderSpecifier = new OrderSpecifier<>(order, member.modifyAt); // TODO 추후 변경
+                    break;
+            }
+        }
+
+        List<AdminMemberResponse> data = queryFactory
+            .select(
+                Projections.constructor(
+                    AdminMemberResponse.class,
+                    member.id,
+                    uploadFile.path,
+                    member.name,
+                    memberDetail.country,
+                    memberDetail.gender,
+                    memberDetail.birth,
+                    member.email,
+                    member.role,
+                    member.createAt // TODO 변경 필요
+                )
+            )
+            .from(member)
+            .innerJoin(member.memberDetail, memberDetail)
+            .leftJoin(uploadFile).on(uploadFile.id.eq(memberDetail.profileImageId))
+            .where(builder)
+            .orderBy(orderSpecifier, member.id.asc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        Long count = queryFactory
+            .select(
+                member.count()
+            )
+            .where(builder)
+            .from(member)
+            .fetchOne();
+
+        return new PageImpl<>(data, pageable, count);
+    }
+
 }

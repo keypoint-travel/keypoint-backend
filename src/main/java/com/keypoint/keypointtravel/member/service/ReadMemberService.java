@@ -4,15 +4,18 @@ import com.keypoint.keypointtravel.badge.respository.BadgeRepository;
 import com.keypoint.keypointtravel.global.enumType.error.MemberErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
+import com.keypoint.keypointtravel.member.dto.response.AdminMemberResponse;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
-import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
+import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.EmailUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.OtherMemberUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.SearchAdminMemberUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,5 +120,15 @@ public class ReadMemberService {
         } catch (Exception ex) {
             throw new GeneralException(ex);
         }
+    }
+
+    /**
+     * 유저 관리 목록 조회 함수
+     *
+     * @param useCase
+     * @return
+     */
+    public Page<AdminMemberResponse> findMembersInAdmin(SearchAdminMemberUseCase useCase) {
+        return memberRepository.findMembersInAdmin(useCase);
     }
 }
