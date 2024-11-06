@@ -17,6 +17,7 @@ import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfi
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SearchAdminMemberUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.UpdateMemberUseCase;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.keypoint.keypointtravel.premium.entity.QMemberPremium;
@@ -342,6 +343,23 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .fetchOne();
 
         return new PageImpl<>(data, pageable, count);
+    }
+
+    @Override
+    public void updateMember(UpdateMemberUseCase useCase, String encodedPassword) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+        Long memberId = useCase.getMemberId();
+
+        queryFactory.update(member)
+            .set(member.name, useCase.getName())
+            .set(member.email, useCase.getEmail())
+            .set(member.password, encodedPassword)
+            .set(member.role, useCase.getRole())
+
+            .set(member.modifyAt, LocalDateTime.now())
+            .set(member.modifyId, currentAuditor)
+            .where(member.id.eq(memberId))
+            .execute();
     }
 
 }

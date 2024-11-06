@@ -8,11 +8,13 @@ import com.keypoint.keypointtravel.global.enumType.member.OauthProviderType;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.BadgeType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.global.utils.StringUtils;
 import com.keypoint.keypointtravel.global.utils.provider.JwtTokenProvider;
 import com.keypoint.keypointtravel.member.dto.dto.CommonMemberDTO;
 import com.keypoint.keypointtravel.member.dto.response.AppMemberResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberProfileUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdateLanguageUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.UpdateMemberUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdatePasswordUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdateProfileUseCase;
 import com.keypoint.keypointtravel.member.entity.Member;
@@ -173,5 +175,60 @@ public class UpdateMemberService {
     @Transactional
     public void grandRole() {
 
+    }
+
+    /**
+     * 사용자 정보 업데이트 함수
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void updateMember(UpdateMemberUseCase useCase) {
+        CommonMemberDTO member = memberRepository.findByEmailAndIsDeletedFalse(useCase.getEmail())
+            .orElseThrow(() -> new GeneralException(MemberErrorCode.NOT_EXISTED_MEMBER));
+        RoleType previousRole = member.getRole();
+        boolean isChangedRole = member.getRole() != useCase.getRole();
+        Long memberId = useCase.getMemberId();
+
+        // 유효성 검사
+        validateMember(useCase);
+
+        // 데이터 업데이트
+        String encodedPassword = passwordEncoder.encode(useCase.getPassword());
+        memberRepository.updateMember(useCase, encodedPassword);
+
+        // 변경되는 권한별 상태 업데이트
+        if (isChangedRole) {
+            switch (useCase.getRole()) {
+                case ROLE_CERTIFIED_USER:
+                    handleCertifiedUserRole(memberId);
+                case ROLE_ADMIN:
+                    handleAdminRole(memberId);
+                case ROLE_PENDING_WITHDRAWAL:
+                    handlePendingWithdrawalRole(memberId);
+            }
+        }
+    }
+
+    private void handlePendingWithdrawalRole(Long memberId) {
+    }
+
+    private void handleAdminRole(Long memberId) {
+    }
+
+    private void handleCertifiedUserRole(Long memberId) {
+    }
+
+    private void validateMember(UpdateMemberUseCase useCase) {
+        // 이메일
+        if (memberRepository.existsByEmailAndNotIdAndIsDeletedFalse(useCase.getEmail(),
+            useCase.getMemberId())) {
+            throw new GeneralException(MemberErrorCode.DUPLICATED_EMAIL);
+        }
+
+        //  비밀번호
+        if (!StringUtils.checkPasswordValidation(useCase.getPassword())) {
+            throw new GeneralException(MemberErrorCode.INVALID_PASSWORD);
+        }
     }
 }

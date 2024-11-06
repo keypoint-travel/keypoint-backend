@@ -3,9 +3,11 @@ package com.keypoint.keypointtravel.member.controller;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.member.dto.request.UpdateLanguageRequest;
+import com.keypoint.keypointtravel.member.dto.request.UpdateMemberRequest;
 import com.keypoint.keypointtravel.member.dto.request.UpdatePasswordRequest;
 import com.keypoint.keypointtravel.member.dto.request.UpdateProfileRequest;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdateLanguageUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.UpdateMemberUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdatePasswordUseCase;
 import com.keypoint.keypointtravel.member.dto.useCase.UpdateProfileUseCase;
 import com.keypoint.keypointtravel.member.service.UpdateMemberService;
@@ -40,20 +42,19 @@ public class UpdateMemberController {
     }
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
-    @PatchMapping("profile")
-    public APIResponseEntity<Void> updateProfile(
-        @AuthenticationPrincipal CustomUserDetails userDetails,
+    @PatchMapping("management")
+    public APIResponseEntity<Void> updateMember(
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-        @Valid @RequestPart(value = "profile") UpdateProfileRequest request
+        @Valid @RequestPart(value = "member") UpdateMemberRequest request
     ) {
-        UpdateProfileUseCase useCase = UpdateProfileUseCase.from(
-            userDetails.getId(),
-            request,
-            profileImage);
-        updateMemberService.updateMemberProfile(useCase);
+        UpdateMemberUseCase useCase = UpdateMemberUseCase.of(
+            profileImage,
+            request
+        );
+        updateMemberService.updateMember(useCase);
 
         return APIResponseEntity.<Void>builder()
-            .message("사용자 프로필 정보 업데이트 성공")
+            .message("사용자 정보 업데이트 성공")
             .data(null)
             .build();
     }
@@ -69,6 +70,25 @@ public class UpdateMemberController {
 
         return APIResponseEntity.<Void>builder()
             .message("사용자 언어 설정 업데이트 성공")
+            .data(null)
+            .build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    @PatchMapping("profile")
+    public APIResponseEntity<Void> updateProfile(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+        @Valid @RequestPart(value = "profile") UpdateProfileRequest request
+    ) {
+        UpdateProfileUseCase useCase = UpdateProfileUseCase.from(
+            userDetails.getId(),
+            request,
+            profileImage);
+        updateMemberService.updateMemberProfile(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("사용자 프로필 정보 업데이트 성공")
             .data(null)
             .build();
     }

@@ -20,6 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     boolean existsByEmailAndIsDeletedFalse(String email);
 
+    boolean existsByEmailAndNotIdAndIsDeletedFalse(String email, Long memberId);
+
     @Transactional
     @Modifying
     @Query("UPDATE Member m SET m.recentLoginAt = :recentLoginAt WHERE m.id = :id")

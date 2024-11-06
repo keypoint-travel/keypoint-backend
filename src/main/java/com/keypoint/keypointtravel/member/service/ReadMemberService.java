@@ -129,6 +129,10 @@ public class ReadMemberService {
      * @return
      */
     public Page<AdminMemberResponse> findMembersInAdmin(SearchAdminMemberUseCase useCase) {
-        return memberRepository.findMembersInAdmin(useCase);
+        try {
+            return memberRepository.findMembersInAdmin(useCase);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
     }
 }

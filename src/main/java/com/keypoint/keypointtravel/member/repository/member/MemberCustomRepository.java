@@ -8,6 +8,7 @@ import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfi
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
 import com.keypoint.keypointtravel.member.dto.useCase.SearchAdminMemberUseCase;
+import com.keypoint.keypointtravel.member.dto.useCase.UpdateMemberUseCase;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
@@ -30,4 +31,6 @@ public interface MemberCustomRepository {
     List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds);
 
     Page<AdminMemberResponse> findMembersInAdmin(SearchAdminMemberUseCase useCase);
+
+    void updateMember(UpdateMemberUseCase useCase, String encodedPassword);
 }
