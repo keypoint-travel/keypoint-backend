@@ -10,6 +10,7 @@ import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
+import com.keypoint.keypointtravel.member.dto.response.StatisticResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberAlarmResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
@@ -24,6 +25,7 @@ import com.keypoint.keypointtravel.theme.entity.QThemeColor;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -225,6 +227,37 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .from(member)
             .where(member.id.in(memberIds))
             .fetch();
+    }
+
+    @Override
+    public List<StatisticResponse> findMonthlyLoginStatistics(LocalDateTime startAt,
+        LocalDateTime endAt) {
+        return queryFactory
+            .select(
+                Projections.fields(
+                    StatisticResponse.class,
+                    Expressions.stringTemplate(
+                        "DATE_FORMAT({0}, {1})",
+                        member.recentLoginAt,
+                        Expressions.constant("%Y/%m")).as("date"),
+                    member.id.count().as("value")
+                )
+            )
+            .from(member)
+            .where(member.recentLoginAt.isNotNull()
+                .and(member.recentLoginAt.goe(startAt))
+                .and(member.recentLoginAt.lt(endAt))
+            )
+            .groupBy(Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                member.recentLoginAt,
+                Expressions.constant("%Y/%m")
+            ))
+            .orderBy(Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                member.recentLoginAt,
+                Expressions.constant("%Y/%m")
+            ).asc()).fetch();
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
