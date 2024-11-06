@@ -230,8 +230,10 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public List<StatisticResponse> findMonthlyLoginStatistics(LocalDateTime startAt,
-        LocalDateTime endAt) {
+    public List<StatisticResponse> findMonthlyLoginStatistics(
+        LocalDateTime startAt,
+        LocalDateTime endAt
+    ) {
         return queryFactory
             .select(
                 Projections.fields(
@@ -256,6 +258,41 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .orderBy(Expressions.stringTemplate(
                 "DATE_FORMAT({0}, {1})",
                 member.recentLoginAt,
+                Expressions.constant("%Y/%m")
+            ).asc()).fetch();
+    }
+
+    @Override
+    public List<StatisticResponse> findMonthlySignUpStatistics(
+        LocalDateTime startAt,
+        LocalDateTime endAt
+    ) {
+        return queryFactory
+            .select(
+                Projections.fields(
+                    StatisticResponse.class,
+                    Expressions.stringTemplate(
+                        "DATE_FORMAT({0}, {1})",
+                        member.createAt,
+                        Expressions.constant("%Y/%m")).as("date"),
+                    member.id.count().as("value")
+                )
+            )
+            .from(member)
+            .where(member.createAt.isNotNull()
+                .and(member.role.ne(RoleType.ROLE_UNCERTIFIED_USER))
+                .and(member.role.ne(RoleType.ROLE_ADMIN))
+                .and(member.createAt.goe(startAt))
+                .and(member.createAt.lt(endAt))
+            )
+            .groupBy(Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                member.createAt,
+                Expressions.constant("%Y/%m")
+            ))
+            .orderBy(Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                member.createAt,
                 Expressions.constant("%Y/%m")
             ).asc()).fetch();
     }
