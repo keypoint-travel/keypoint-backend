@@ -1,10 +1,10 @@
 package com.keypoint.keypointtravel.member.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class StatisticResponse {
 
     private String date;

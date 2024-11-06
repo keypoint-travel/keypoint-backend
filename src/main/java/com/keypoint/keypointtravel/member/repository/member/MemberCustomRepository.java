@@ -3,9 +3,11 @@ package com.keypoint.keypointtravel.member.repository.member;
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
+import com.keypoint.keypointtravel.member.dto.response.StatisticResponse;
 import com.keypoint.keypointtravel.member.dto.response.memberProfile.MemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.response.otherMemberProfile.OtherMemberProfileResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.AlarmMemberUserCase;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MemberCustomRepository {
@@ -25,4 +27,6 @@ public interface MemberCustomRepository {
     List<Long> findMemberIdsByLanguageCode(LanguageCode languageCode);
 
     List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds);
+
+    List<StatisticResponse> findMonthlyLoginStatistics(LocalDateTime startAt, LocalDateTime endAt);
 }

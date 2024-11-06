@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/members/statistics")
 public class MemberStatisticController {
 
-    private static MemberStatisticService memberStatisticService;
+    private final MemberStatisticService memberStatisticService;
 
     @GetMapping("/monthly-signups")
     public APIResponseEntity<List<StatisticResponse>> getMonthlySignUpStatistics() {
