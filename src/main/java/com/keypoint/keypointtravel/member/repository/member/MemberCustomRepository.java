@@ -31,4 +31,6 @@ public interface MemberCustomRepository {
     List<StatisticResponse> findMonthlyLoginStatistics(LocalDateTime startAt, LocalDateTime endAt);
 
     List<StatisticResponse> findMonthlySignUpStatistics(LocalDateTime startAt, LocalDateTime endAt);
+
+    List<StatisticResponse> findDailyVisitorsStatistics(LocalDateTime startAt, LocalDateTime endAt);
 }
