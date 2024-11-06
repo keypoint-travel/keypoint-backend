@@ -29,4 +29,6 @@ public interface MemberCustomRepository {
     List<AlarmMemberUserCase> findAlarmMembersByMemberIds(List<Long> memberIds);
 
     List<StatisticResponse> findMonthlyLoginStatistics(LocalDateTime startAt, LocalDateTime endAt);
+
+    List<StatisticResponse> findMonthlySignUpStatistics(LocalDateTime startAt, LocalDateTime endAt);
 }

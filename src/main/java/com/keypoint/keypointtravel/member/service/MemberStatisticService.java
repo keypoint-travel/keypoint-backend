@@ -22,8 +22,21 @@ public class MemberStatisticService {
      * @return
      */
     public List<StatisticResponse> getMonthlySignUpStatistics() {
+        LocalDateTime startAt = LocalDateTime.now()
+            .minusMonths(8)
+            .withDayOfMonth(1)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        return null;
+        LocalDateTime endAt = LocalDateTime.now()
+            .plusMonths(1)
+            .withDayOfMonth(1)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        // 조회
+        return memberRepository.findMonthlySignUpStatistics(
+            startAt,
+            endAt
+        );
     }
 
     /**
