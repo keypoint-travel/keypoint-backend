@@ -22,21 +22,25 @@ public class MemberStatisticService {
      * @return
      */
     public List<StatisticResponse> getMonthlySignUpStatistics() {
-        LocalDateTime startAt = LocalDateTime.now()
-            .minusMonths(8)
-            .withDayOfMonth(1)
-            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        try {
+            LocalDateTime startAt = LocalDateTime.now()
+                .minusMonths(8)
+                .withDayOfMonth(1)
+                .withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        LocalDateTime endAt = LocalDateTime.now()
-            .plusMonths(1)
-            .withDayOfMonth(1)
-            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime endAt = LocalDateTime.now()
+                .plusMonths(1)
+                .withDayOfMonth(1)
+                .withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        // 조회
-        return memberRepository.findMonthlySignUpStatistics(
-            startAt,
-            endAt
-        );
+            // 조회
+            return memberRepository.findMonthlySignUpStatistics(
+                startAt,
+                endAt
+            );
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
     }
 
     /**
@@ -71,6 +75,18 @@ public class MemberStatisticService {
      * @return
      */
     public List<StatisticResponse> getDailyVisitorsStatistics() {
-        return null;
+        LocalDateTime startAt = LocalDateTime.now()
+            .minusMonths(2)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        LocalDateTime endAt = LocalDateTime.now()
+            .plusDays(2)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        // 조회
+        return memberRepository.findDailyVisitorsStatistics(
+            startAt,
+            endAt
+        );
     }
 }

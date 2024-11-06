@@ -297,6 +297,37 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             ).asc()).fetch();
     }
 
+    @Override
+    public List<StatisticResponse> findDailyVisitorsStatistics(LocalDateTime startAt,
+        LocalDateTime endAt) {
+        return queryFactory
+            .select(
+                Projections.fields(
+                    StatisticResponse.class,
+                    Expressions.stringTemplate(
+                        "DATE_FORMAT({0}, {1})",
+                        member.recentLoginAt,
+                        Expressions.constant("%Y/%m/%d")).as("date"),
+                    member.id.count().as("value")
+                )
+            )
+            .from(member)
+            .where(member.recentLoginAt.isNotNull()
+                .and(member.recentLoginAt.goe(startAt))
+                .and(member.recentLoginAt.lt(endAt))
+            )
+            .groupBy(Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                member.recentLoginAt,
+                Expressions.constant("%Y/%m/%d")
+            ))
+            .orderBy(Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                member.recentLoginAt,
+                Expressions.constant("%Y/%m/%d")
+            ).asc()).fetch();
+    }
+
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
         return selectOne()
             .from(QBlockedMember.blockedMember)
