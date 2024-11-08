@@ -33,7 +33,7 @@ public class Inquiry extends BaseEntity {
 
     public Inquiry(Member member, String title) {
         this.member = member;
-        this.inquiryTitle = title;
+        this.inquiryTitle = title.length() > 10 ? title.substring(0, 10) + "..." : title;
         this.isDeleted = false;
         isReplied = false;
     }
