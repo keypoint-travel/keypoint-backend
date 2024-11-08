@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "member_inquiry")
+@Table(name = "inquiry")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberInquiry extends BaseEntity {
+public class Inquiry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,10 @@ public class MemberInquiry extends BaseEntity {
     private Member member;
 
     @Column(nullable = false)
-    private String title;
+    private String inquiryTitle;
 
-    public MemberInquiry(Member member, String title) {
+    public Inquiry(Member member, String title) {
         this.member = member;
-        this.title = title;
+        this.inquiryTitle = title;
     }
 }
