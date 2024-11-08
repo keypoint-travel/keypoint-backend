@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.inquiry.controller;
 
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
+import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.inquiry.dto.request.UserInquiryRequest;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.UserInquiryUserCase;
 import com.keypoint.keypointtravel.inquiry.service.UserInquiryService;
@@ -31,6 +33,9 @@ public class UserInquiryController {
         @RequestPart(value = "image", required = false) List<MultipartFile> images,
         @RequestPart(value = "content") UserInquiryRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (images.size() > 5) {
+            throw new GeneralException(InquiryErrorCode.TOO_MANY_IMAGES);
+        }
         UserInquiryUserCase useCase = new UserInquiryUserCase(request.getContent(), images, userDetails.getId());
         userInquiryService.inquire(useCase);
         return APIResponseEntity.<Void>builder()
