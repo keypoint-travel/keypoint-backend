@@ -25,8 +25,16 @@ public class Inquiry extends BaseEntity {
     @Column(nullable = false)
     private String inquiryTitle;
 
+    @Column(nullable = false)
+    private boolean isReplied;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
+
     public Inquiry(Member member, String title) {
         this.member = member;
         this.inquiryTitle = title;
+        this.isDeleted = false;
+        isReplied = false;
     }
 }

@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.inquiry.entity;
 
+import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "inquiry_detail")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class InquiryDetail {
+public class InquiryDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
