@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInquiryRequest {
+public class InquiryRequest {
 
     @NotEmpty(message = "내용을 입력해주세요.")
     @NotBlank(message = "내용을 입력해주세요.")
