@@ -56,11 +56,48 @@ public class UserInquiryService {
         }
     }
 
+    // 1:1 문의 응답 답변하기
+    @Transactional
+    public void answer(ReplyUseCase useCase) {
+        Inquiry inquiry = inquiryRepository.findById(useCase.getInquiryId())
+            .orElseThrow(() -> new GeneralException(InquiryErrorCode.NOT_EXISTED_INQUIRY));
+        // 0. 문의 사항 검증
+        validateInquiry(inquiry, useCase.getMemberId());
+        // 1. 1:1 문의 내역에 답변 유무를 false로 변경
+        inquiry.updateIsReplied(false);
+        // 2. 1:1 문의 내용 생성
+        InquiryDetail inquiryDetail = new InquiryDetail(inquiry, useCase.getContent(), false);
+        inquiryDetailRepository.save(inquiryDetail);
+        // 3. 1:1 문의 내 이미지 있을 시, 이미지 저장
+        if (useCase.getImages() != null && !useCase.getImages().isEmpty()) {
+            useCase.getImages().forEach(image -> {
+                // 이미지 저장
+                Long imageId = saveUploadFile(image);
+                inquiryDetailImageRepository.save(new InquiryDetailImage(inquiryDetail, imageId));
+            });
+        }
+    }
+
     private Long saveUploadFile(MultipartFile image) {
         try {
             return uploadFileService.saveUploadFile(image, DirectoryConstants.INQUIRY_DIRECTORY);
         } catch (IOException e) {
             throw new GeneralException(e);
+        }
+    }
+
+    private void validateInquiry(Inquiry inquiry,Long memberId) {
+        // 1. 본인이 작성한 문의 사항인지 검증
+        if (!Objects.equals(inquiry.getMember().getId(), memberId)) {
+            throw new GeneralException(InquiryErrorCode.NOT_MATCHED_MEMBER);
+        }
+        // 2. 아직 관리자 답변이 없는지 검증(없다면 예외 처리)
+        if (!inquiry.isReplied()) {
+            throw new GeneralException(InquiryErrorCode.NOT_REPLIED_INQUIRY);
+        }
+        // 3. 삭제된 문의사항인지 검증
+        if (inquiry.isDeleted()) {
+            throw new GeneralException(InquiryErrorCode.DELETED_INQUIRY);
         }
     }
 }

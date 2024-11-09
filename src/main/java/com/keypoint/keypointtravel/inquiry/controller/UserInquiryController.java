@@ -35,4 +35,19 @@ public class UserInquiryController {
             .message("문의하기 성공")
             .build();
     }
+
+    // 1:1 추가 문의(답변)
+    @PostMapping("/{inquiryId}")
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    public APIResponseEntity<Void> addInquire(
+        @PathVariable Long inquiryId,
+        @RequestPart(value = "image", required = false) List<MultipartFile> images,
+        @RequestPart(value = "content") InquiryRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        ReplyUseCase useCase = new ReplyUseCase(inquiryId, request.getContent(), images, userDetails.getId());
+        userInquiryService.answer(useCase);
+        return APIResponseEntity.<Void>builder()
+            .message("추가 문의하기 성공")
+            .build();
+    }
 }
