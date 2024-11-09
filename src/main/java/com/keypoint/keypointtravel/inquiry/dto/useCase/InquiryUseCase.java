@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
-public class AdminInquiryUseCase {
-
-    private Long inquiryId;
+public class InquiryUseCase {
 
     private String content;
 
@@ -21,8 +19,7 @@ public class AdminInquiryUseCase {
 
     private Long memberId;
 
-    public AdminInquiryUseCase(Long inquiryId, String content, List<MultipartFile> images, Long memberId) {
-        this.inquiryId = inquiryId;
+    public InquiryUseCase(String content, List<MultipartFile> images, Long memberId) {
         this.content = content;
         this.memberId = memberId;
         this.images = new ArrayList<>();

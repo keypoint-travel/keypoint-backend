@@ -4,7 +4,7 @@ package com.keypoint.keypointtravel.inquiry.controller;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.inquiry.dto.request.InquiryRequest;
-import com.keypoint.keypointtravel.inquiry.dto.useCase.AdminInquiryUseCase;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.service.AdminInquiryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +28,7 @@ public class AdminInquiryController {
         @RequestPart(value = "content") InquiryRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         // todo : 관리자 인증 추가
-        AdminInquiryUseCase useCase = new AdminInquiryUseCase(inquiryId, request.getContent(), images, userDetails.getId());
+        ReplyUseCase useCase = new ReplyUseCase(inquiryId, request.getContent(), images, userDetails.getId());
         adminInquiryService.answer(useCase);
         return APIResponseEntity.<Void>builder()
             .message("문의 답변하기 성공")

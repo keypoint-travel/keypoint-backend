@@ -1,8 +1,10 @@
 package com.keypoint.keypointtravel.inquiry.service;
 
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
+import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.inquiry.dto.useCase.UserInquiryUserCase;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiryUseCase;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.Inquiry;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetail;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetailImage;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class UserInquiryService {
 
     // 1:1 새 문의하기
     @Transactional
-    public void inquire(UserInquiryUserCase useCase) {
+    public void inquire(InquiryUseCase useCase) {
         // 1. 1:1 문의 생성
         Member member = memberRepository.getReferenceById(useCase.getMemberId());
         Inquiry inquiry = new Inquiry(member, useCase.getContent());

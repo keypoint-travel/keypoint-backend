@@ -3,7 +3,7 @@ package com.keypoint.keypointtravel.inquiry.service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.inquiry.dto.useCase.AdminInquiryUseCase;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.Inquiry;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetail;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetailImage;
@@ -32,13 +32,11 @@ public class AdminInquiryService {
 
     // 1:1 문의 답변하기
     @Transactional
-    public void answer(AdminInquiryUseCase useCase) {
+    public void answer(ReplyUseCase useCase) {
         Inquiry inquiry = inquiryRepository.findById(useCase.getInquiryId())
             .orElseThrow(() -> new GeneralException(InquiryErrorCode.NOT_EXISTED_INQUIRY));
-        // 0. 답변이 완료된 상태 or 삭제된 상태(문의한 회원이 삭제)인지 검증
-        if (inquiry.isDeleted() || inquiry.isReplied()) {
-            throw new GeneralException(InquiryErrorCode.DELETED_OR_REPLIED_INQUIRY);
-        }
+        // 0. 문의 사항 검증
+        validateInquiry(inquiry);
         // 1. 1:1 문의 내역에 답변 유무를 true로 변경
         inquiry.updateIsReplied(true);
         // 2. 1:1 문의 답변 내용 생성
@@ -51,6 +49,17 @@ public class AdminInquiryService {
                 Long imageId = saveUploadFile(image);
                 inquiryDetailImageRepository.save(new InquiryDetailImage(inquiryDetail, imageId));
             });
+        }
+    }
+
+    private void validateInquiry(Inquiry inquiry) {
+        // 1. 답변이 완료된 상태인지 검증
+        if (inquiry.isReplied()) {
+            throw new GeneralException(InquiryErrorCode.ALREADY_REPLIED_INQUIRY);
+        }
+        // 2. 삭제된 상태(문의한 회원이 삭제)인지 검증
+        if (inquiry.isDeleted()) {
+            throw new GeneralException(InquiryErrorCode.DELETED_INQUIRY);
         }
     }
 
