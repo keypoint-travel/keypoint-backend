@@ -3,10 +3,13 @@ package com.keypoint.keypointtravel.inquiry.service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.Inquiry;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetail;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetailImage;
+import com.keypoint.keypointtravel.inquiry.repository.CustomInquiryRepository;
 import com.keypoint.keypointtravel.inquiry.repository.InquiryDetailImageRepository;
 import com.keypoint.keypointtravel.inquiry.repository.InquiryDetailRepository;
 import com.keypoint.keypointtravel.inquiry.repository.InquiryRepository;
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
 
 import java.io.IOException;
 
@@ -29,6 +33,8 @@ public class AdminInquiryService {
     private final InquiryDetailImageRepository inquiryDetailImageRepository;
 
     private final UploadFileService uploadFileService;
+
+    private final CustomInquiryRepository customInquiryRepository;
 
     // 1:1 문의 답변하기
     @Transactional
@@ -67,6 +73,15 @@ public class AdminInquiryService {
         try {
             return uploadFileService.saveUploadFile(image, DirectoryConstants.INQUIRY_DIRECTORY);
         } catch (IOException e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AdminInquiriesResponse> findInquiries(InquiriesUseCase useCase) {
+        try {
+            return customInquiryRepository.findInquiriesByAdmin(useCase);
+        } catch (Exception e) {
             throw new GeneralException(e);
         }
     }
