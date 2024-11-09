@@ -36,7 +36,11 @@ public class AdminInquiryService {
 
     private final CustomInquiryRepository customInquiryRepository;
 
-    // 1:1 문의 답변하기
+    /**
+     * 1:1 문의 답변 함수
+     *
+     * @Param inquiryId, content, images, memberId useCase
+     */
     @Transactional
     public void answer(ReplyUseCase useCase) {
         Inquiry inquiry = inquiryRepository.findById(useCase.getInquiryId())
@@ -77,6 +81,11 @@ public class AdminInquiryService {
         }
     }
 
+    /**
+     * 문의 목록 조회 함수(관리자)
+     *
+     * @Return AdminInquiriesResponse
+     */
     @Transactional(readOnly = true)
     public Page<AdminInquiriesResponse> findInquiries(InquiriesUseCase useCase) {
         try {

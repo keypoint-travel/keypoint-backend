@@ -3,11 +3,13 @@ package com.keypoint.keypointtravel.inquiry.service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.Inquiry;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetail;
 import com.keypoint.keypointtravel.inquiry.entity.InquiryDetailImage;
+import com.keypoint.keypointtravel.inquiry.repository.CustomInquiryRepository;
 import com.keypoint.keypointtravel.inquiry.repository.InquiryDetailImageRepository;
 import com.keypoint.keypointtravel.inquiry.repository.InquiryDetailRepository;
 import com.keypoint.keypointtravel.inquiry.repository.InquiryRepository;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -36,7 +39,13 @@ public class UserInquiryService {
 
     private final UploadFileService uploadFileService;
 
-    // 1:1 새 문의하기
+    private final CustomInquiryRepository customInquiryRepository;
+
+    /**
+     * 1:1 문의 생성 함수
+     *
+     * @Param content, images, memberId useCase
+     */
     @Transactional
     public void inquire(InquiryUseCase useCase) {
         // 1. 1:1 문의 생성
@@ -56,7 +65,11 @@ public class UserInquiryService {
         }
     }
 
-    // 1:1 문의 응답 답변하기
+    /**
+     * 1:1 문의 응답 답변 함수
+     *
+     * @Param inquiryId, content, images, memberId useCase
+     */
     @Transactional
     public void answer(ReplyUseCase useCase) {
         Inquiry inquiry = inquiryRepository.findById(useCase.getInquiryId())
@@ -99,5 +112,16 @@ public class UserInquiryService {
         if (inquiry.isDeleted()) {
             throw new GeneralException(InquiryErrorCode.DELETED_INQUIRY);
         }
+    }
+
+    /**
+     * 사용자 문의 목록 조회 함수
+     *
+     * @Param memberId
+     * @Return UserInquiriesResponse
+     */
+    @Transactional(readOnly = true)
+    public List<UserInquiriesResponse> findInquiries(Long memberId) {
+        return customInquiryRepository.findInquiriesByUser(memberId);
     }
 }

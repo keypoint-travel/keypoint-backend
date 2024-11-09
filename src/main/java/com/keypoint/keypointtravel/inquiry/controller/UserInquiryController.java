@@ -4,6 +4,7 @@ package com.keypoint.keypointtravel.inquiry.controller;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.inquiry.dto.request.InquiryRequest;
+import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.service.UserInquiryService;
@@ -48,6 +49,18 @@ public class UserInquiryController {
         userInquiryService.answer(useCase);
         return APIResponseEntity.<Void>builder()
             .message("추가 문의하기 성공")
+            .build();
+    }
+
+    // 1:1 문의 목록 조회
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    public APIResponseEntity<List<UserInquiriesResponse>> findInquiries(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<UserInquiriesResponse> inquiries = userInquiryService.findInquiries(userDetails.getId());
+        return APIResponseEntity.<List<UserInquiriesResponse>>builder()
+            .data(inquiries)
+            .message("문의 목록 조회 성공")
             .build();
     }
 }

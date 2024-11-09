@@ -2,9 +2,9 @@ package com.keypoint.keypointtravel.inquiry.repository;
 
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.QInquiry;
-import com.keypoint.keypointtravel.inquiry.entity.QInquiryDetail;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
 import com.querydsl.core.types.Order;
@@ -26,13 +26,26 @@ public class CustomInquiryRepository {
 
     private final QInquiry inquiry = QInquiry.inquiry;
 
-    private final QInquiryDetail inquiryDetail = QInquiryDetail.inquiryDetail;
-
     private final QMember member = QMember.member;
 
     private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
+
+    public List<UserInquiriesResponse> findInquiriesByUser(Long memberId) {
+        return queryFactory.select(
+                Projections.constructor(
+                    UserInquiriesResponse.class,
+                    inquiry.id,
+                    inquiry.isReplied,
+                    inquiry.inquiryTitle,
+                    inquiry.createAt))
+            .from(inquiry)
+            .where(inquiry.member.id.eq(memberId)
+                .and(inquiry.isDeleted.eq(false)))
+            .orderBy(inquiry.createAt.desc())
+            .fetch();
+    }
 
     public Page<AdminInquiriesResponse> findInquiriesByAdmin(InquiriesUseCase useCase) {
         // order
