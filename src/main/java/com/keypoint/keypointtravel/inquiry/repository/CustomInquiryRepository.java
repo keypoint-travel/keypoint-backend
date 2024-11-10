@@ -75,6 +75,7 @@ public class CustomInquiryRepository {
             .fetch();
     }
 
+    // 1:1 문의 목록 조회(관리자)
     public Page<AdminInquiriesResponse> findInquiriesByAdmin(InquiriesUseCase useCase) {
         // order
         OrderSpecifier<?> orderSpecifier = getOrderSpecifier(useCase.getSortBy(), useCase.getDirection());
@@ -95,6 +96,8 @@ public class CustomInquiryRepository {
             .innerJoin(inquiry.member, member)
             .innerJoin(member.memberDetail, memberDetail)
             .leftJoin(uploadFile).on(memberDetail.profileImageId.eq(uploadFile.id))
+            .innerJoin(inquiryDetail).on(inquiry.id.eq(inquiryDetail.inquiry.id))
+            .where(useCase.getContent() != null ? inquiryDetail.inquiryContent.contains(useCase.getContent()) : null)
             .orderBy(orderSpecifier)
             .offset(useCase.getPageable().getOffset())
             .limit(useCase.getPageable().getPageSize())

@@ -49,6 +49,7 @@ public class AdminInquiryController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
+        @RequestParam(name = "content", required = false) String content,
         @PageableDefault(sort = "modifyAt", direction = Sort.Direction.DESC) Pageable pageable) {
         // todo : 관리자 인증 추가
         // sortBy를 제공한 경우, direction 에 따라 정렬 객체 생성
@@ -57,7 +58,7 @@ public class AdminInquiryController {
             Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         }
-        InquiriesUseCase useCase = InquiriesUseCase.of(sortBy, direction, pageable);
+        InquiriesUseCase useCase = InquiriesUseCase.of(sortBy, direction, pageable, content);
         Page<AdminInquiriesResponse> response = adminInquiryService.findInquiries(useCase);
         return APIResponseEntity.toPage(
             "문의 목록 조회 성공",

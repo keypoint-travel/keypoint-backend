@@ -11,8 +11,12 @@ public class InquiriesUseCase {
     private String sortBy;
     private String direction;
     private Pageable pageable;
+    private String content;
 
-    public static InquiriesUseCase of(String sortBy, String direction, Pageable pageable) {
-        return new InquiriesUseCase(sortBy, direction, pageable);
+    public static InquiriesUseCase of(String sortBy, String direction, Pageable pageable, String content) {
+        if(content != null && content.isEmpty()){
+            content = null;
+        }
+        return new InquiriesUseCase(sortBy, direction, pageable, content);
     }
 }
