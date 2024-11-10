@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.inquiry.dto.request.InquiryRequest;
 import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
 import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiryResponse;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.DeleteUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.FindUserInquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
@@ -77,6 +78,19 @@ public class UserInquiryController {
         return APIResponseEntity.<UserInquiryResponse>builder()
             .data(response)
             .message("문의 상세 조회 성공")
+            .build();
+    }
+
+    // 1:1 문의 삭제
+    @DeleteMapping("/{inquiryId}")
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    public APIResponseEntity<Void> deleteInquire(
+        @PathVariable Long inquiryId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        DeleteUseCase useCase = new DeleteUseCase(inquiryId, userDetails.getId());
+        userInquiryService.delete(useCase);
+        return APIResponseEntity.<Void>builder()
+            .message("문의 사항 삭제 성공")
             .build();
     }
 }

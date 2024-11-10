@@ -41,4 +41,8 @@ public class Inquiry extends BaseEntity {
     public void updateIsReplied(boolean isReplied) {
         this.isReplied = isReplied;
     }
+
+    public void updateIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }
