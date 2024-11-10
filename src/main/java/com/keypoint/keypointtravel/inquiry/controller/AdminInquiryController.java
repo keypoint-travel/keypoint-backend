@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.inquiry.dto.request.InquiryRequest;
 import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.EditUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.service.AdminInquiryService;
@@ -32,7 +33,7 @@ public class AdminInquiryController {
     @PostMapping("/{inquiryId}")
     public APIResponseEntity<Void> inquire(
         @PathVariable Long inquiryId,
-        @RequestPart(value = "image", required = false) List<MultipartFile> images,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
         @RequestPart(value = "content") InquiryRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         // todo : 관리자 인증 추가
@@ -63,5 +64,20 @@ public class AdminInquiryController {
         return APIResponseEntity.toPage(
             "문의 목록 조회 성공",
             response);
+    }
+
+    // 1:1 문의 답변 수정
+    @PatchMapping("/{inquiryDetailId}")
+    public APIResponseEntity<Void> editInquireContent(
+        @PathVariable Long inquiryDetailId,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        @RequestPart(value = "content") InquiryRequest request,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // todo : 관리자 인증 추가
+        EditUseCase useCase = new EditUseCase(inquiryDetailId, request.getContent(), images);
+        adminInquiryService.edisAnswer(useCase);
+        return APIResponseEntity.<Void>builder()
+            .message("문의 답변 수정 성공")
+            .build();
     }
 }

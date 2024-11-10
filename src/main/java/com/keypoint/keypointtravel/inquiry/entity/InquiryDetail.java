@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "inquiry_detail")
@@ -27,9 +30,16 @@ public class InquiryDetail extends BaseEntity {
     @Column(nullable = false)
     private boolean isAdminReply;
 
+    @OneToMany(mappedBy = "inquiryDetail", orphanRemoval = true)
+    private List<InquiryDetailImage> inquiryDetailImages = new ArrayList<>();
+
     public InquiryDetail(Inquiry inquiry, String inquiryContent, boolean isAdminReply) {
         this.inquiry = inquiry;
         this.inquiryContent = inquiryContent;
         this.isAdminReply = isAdminReply;
+    }
+
+    public void updateContent(String inquiryContent) {
+        this.inquiryContent = inquiryContent;
     }
 }

@@ -30,7 +30,7 @@ public class UserInquiryController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     public APIResponseEntity<Void> inquire(
-        @RequestPart(value = "image", required = false) List<MultipartFile> images,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
         @RequestPart(value = "content") InquiryRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         InquiryUseCase useCase = new InquiryUseCase(request.getContent(), images, userDetails.getId());
@@ -45,7 +45,7 @@ public class UserInquiryController {
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     public APIResponseEntity<Void> addInquire(
         @PathVariable Long inquiryId,
-        @RequestPart(value = "image", required = false) List<MultipartFile> images,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
         @RequestPart(value = "content") InquiryRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         ReplyUseCase useCase = new ReplyUseCase(inquiryId, request.getContent(), images, userDetails.getId());

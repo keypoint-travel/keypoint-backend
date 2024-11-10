@@ -4,6 +4,7 @@ import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.EditUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.Inquiry;
@@ -56,6 +57,34 @@ public class AdminInquiryService {
         if (useCase.getImages() != null && !useCase.getImages().isEmpty()) {
             useCase.getImages().forEach(image -> {
                 // 이미지 저장
+                Long imageId = saveUploadFile(image);
+                inquiryDetailImageRepository.save(new InquiryDetailImage(inquiryDetail, imageId));
+            });
+        }
+    }
+
+    /**
+     * 1:1 문의 답변 수정 함수
+     *
+     * @Param inquiryId, content, images, memberId useCase
+     */
+    @Transactional
+    public void edisAnswer(EditUseCase useCase) {
+        // 1. 1:1 문의 답변을 이미지 리스트와 함께 조회
+        InquiryDetail inquiryDetail = customInquiryRepository.findInquiryDetailWithImages(useCase.getInquiryDetailId());
+        if (inquiryDetail == null) {
+            throw new GeneralException(InquiryErrorCode.NOT_EXISTED_INQUIRY);
+        }
+        // 2. 내용 수정
+        inquiryDetail.updateContent(useCase.getContent());
+        // 3. 이전 이미지 삭제
+        for (InquiryDetailImage image : inquiryDetail.getInquiryDetailImages()) {
+            uploadFileService.deleteUploadFile(image.getInquiryImageId());
+            inquiryDetailImageRepository.delete(image);
+        }
+        // 4. 새로운 이미지 저장
+        if (useCase.getImages() != null && !useCase.getImages().isEmpty()) {
+            useCase.getImages().forEach(image -> {
                 Long imageId = saveUploadFile(image);
                 inquiryDetailImageRepository.save(new InquiryDetailImage(inquiryDetail, imageId));
             });

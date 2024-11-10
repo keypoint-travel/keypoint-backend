@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.inquiry.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
 import com.keypoint.keypointtravel.inquiry.dto.dto.UserInquiryDto;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
+import com.keypoint.keypointtravel.inquiry.entity.InquiryDetail;
 import com.keypoint.keypointtravel.inquiry.entity.QInquiry;
 import com.keypoint.keypointtravel.inquiry.entity.QInquiryDetail;
 import com.keypoint.keypointtravel.inquiry.entity.QInquiryDetailImage;
@@ -132,5 +133,14 @@ public class CustomInquiryRepository {
             }
         }
         return orderSpecifier;
+    }
+
+    // inqueryDetail을 image를 fetch join하여 조회
+    public InquiryDetail findInquiryDetailWithImages(Long inquiryDetailId) {
+        return queryFactory.selectFrom(inquiryDetail)
+            .leftJoin(inquiryDetailImage).on(inquiryDetailImage.inquiryDetail.id.eq(inquiryDetail.id))
+            .fetchJoin()
+            .where(inquiryDetail.id.eq(inquiryDetailId))
+            .fetchOne();
     }
 }
