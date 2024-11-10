@@ -5,6 +5,8 @@ import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.inquiry.dto.request.InquiryRequest;
 import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiryResponse;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.FindUserInquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.service.UserInquiryService;
@@ -61,6 +63,20 @@ public class UserInquiryController {
         return APIResponseEntity.<List<UserInquiriesResponse>>builder()
             .data(inquiries)
             .message("문의 목록 조회 성공")
+            .build();
+    }
+
+    // 1:1 문의 상세 조회
+    @GetMapping("/{inquiryId}")
+    @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
+    public APIResponseEntity<UserInquiryResponse> findInquiry(
+        @PathVariable Long inquiryId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        FindUserInquiryUseCase useCase = new FindUserInquiryUseCase(inquiryId, userDetails.getId());
+        UserInquiryResponse response = userInquiryService.findInquiry(useCase);
+        return APIResponseEntity.<UserInquiryResponse>builder()
+            .data(response)
+            .message("문의 상세 조회 성공")
             .build();
     }
 }

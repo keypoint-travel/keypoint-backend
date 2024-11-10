@@ -4,6 +4,9 @@ import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.dto.UserInquiryDto;
+import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiryResponse;
+import com.keypoint.keypointtravel.inquiry.dto.useCase.FindUserInquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiryUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.Inquiry;
@@ -99,7 +102,7 @@ public class UserInquiryService {
         }
     }
 
-    private void validateInquiry(Inquiry inquiry,Long memberId) {
+    private void validateInquiry(Inquiry inquiry, Long memberId) {
         // 1. 본인이 작성한 문의 사항인지 검증
         if (!Objects.equals(inquiry.getMember().getId(), memberId)) {
             throw new GeneralException(InquiryErrorCode.NOT_MATCHED_MEMBER);
@@ -123,5 +126,21 @@ public class UserInquiryService {
     @Transactional(readOnly = true)
     public List<UserInquiriesResponse> findInquiries(Long memberId) {
         return customInquiryRepository.findInquiriesByUser(memberId);
+    }
+
+    /**
+     * 사용자 문의 상세 조회 함수
+     *
+     * @Param inquiryId, memberId useCase
+     * @Return UserInquiryResponse
+     */
+    @Transactional(readOnly = true)
+    public UserInquiryResponse findInquiry(FindUserInquiryUseCase useCase) {
+        List<UserInquiryDto> dtoList = customInquiryRepository
+            .findInquiryByUser(useCase.getInquiryId(), useCase.getMemberId());
+        if (dtoList.isEmpty()) {
+            throw new GeneralException(InquiryErrorCode.NOT_EXISTED_INQUIRY);
+        }
+        return new UserInquiryResponse(useCase.getInquiryId(), dtoList);
     }
 }
