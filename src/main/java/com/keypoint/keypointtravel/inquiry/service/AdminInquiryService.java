@@ -3,7 +3,9 @@ package com.keypoint.keypointtravel.inquiry.service;
 import com.keypoint.keypointtravel.global.constants.DirectoryConstants;
 import com.keypoint.keypointtravel.global.enumType.error.InquiryErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.inquiry.dto.dto.UserInquiryDto;
 import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiryResponse;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.EditUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -122,5 +125,20 @@ public class AdminInquiryService {
         } catch (Exception e) {
             throw new GeneralException(e);
         }
+    }
+
+    /**
+     * 문의 상세 조회 함수(관리자)
+     *
+     * @Param inquiryId
+     * @Return AdminInquiryResponse
+     */
+    @Transactional(readOnly = true)
+    public AdminInquiryResponse findInquiry(Long inquiryId) {
+        List<UserInquiryDto> dtoList = customInquiryRepository.findInquiry(inquiryId, null);
+        if (dtoList.isEmpty()) {
+            throw new GeneralException(InquiryErrorCode.NOT_EXISTED_INQUIRY);
+        }
+        return new AdminInquiryResponse(inquiryId, dtoList.get(dtoList.size() - 1).isAdmin(), dtoList);
     }
 }

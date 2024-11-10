@@ -138,7 +138,7 @@ public class UserInquiryService {
     @Transactional(readOnly = true)
     public UserInquiryResponse findInquiry(FindUserInquiryUseCase useCase) {
         List<UserInquiryDto> dtoList = customInquiryRepository
-            .findInquiryByUser(useCase.getInquiryId(), useCase.getMemberId());
+            .findInquiry(useCase.getInquiryId(), useCase.getMemberId());
         if (dtoList.isEmpty()) {
             throw new GeneralException(InquiryErrorCode.NOT_EXISTED_INQUIRY);
         }

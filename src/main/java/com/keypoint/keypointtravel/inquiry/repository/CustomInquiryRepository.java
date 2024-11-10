@@ -42,12 +42,12 @@ public class CustomInquiryRepository {
 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
 
-    public List<UserInquiryDto> findInquiryByUser(Long inquiryId, Long memberId) {
+    public List<UserInquiryDto> findInquiry(Long inquiryId, Long memberId) {
         return queryFactory.selectFrom(inquiryDetail)
             .leftJoin(inquiryDetailImage).on(inquiryDetailImage.inquiryDetail.id.eq(inquiryDetail.id))
             .leftJoin(uploadFile).on(inquiryDetailImage.inquiryImageId.eq(uploadFile.id))
             .where(inquiry.id.eq(inquiryId)
-                .and(inquiry.member.id.eq(memberId)))
+                .and(memberId != null ? inquiry.member.id.eq(memberId) : null))
             .transform(GroupBy.groupBy(inquiryDetail.id)
                 .list(Projections.constructor(
                     UserInquiryDto.class,

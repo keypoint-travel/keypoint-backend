@@ -6,6 +6,7 @@ import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.inquiry.dto.request.InquiryRequest;
 import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiryResponse;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.EditUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.ReplyUseCase;
@@ -78,6 +79,19 @@ public class AdminInquiryController {
         adminInquiryService.edisAnswer(useCase);
         return APIResponseEntity.<Void>builder()
             .message("문의 답변 수정 성공")
+            .build();
+    }
+
+    // 1:1 문의 상세 조회(관리자)
+    @GetMapping("/{inquiryId}")
+    public APIResponseEntity<AdminInquiryResponse> findInquiry(
+        @PathVariable Long inquiryId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // todo : 관리자 인증 추가
+        AdminInquiryResponse response = adminInquiryService.findInquiry(inquiryId);
+        return APIResponseEntity.<AdminInquiryResponse>builder()
+            .data(response)
+            .message("문의 상세 조회 성공")
             .build();
     }
 }
