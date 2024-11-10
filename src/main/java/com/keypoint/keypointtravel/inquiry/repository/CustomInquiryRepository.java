@@ -2,11 +2,16 @@ package com.keypoint.keypointtravel.inquiry.repository;
 
 import com.keypoint.keypointtravel.global.entity.QUploadFile;
 import com.keypoint.keypointtravel.inquiry.dto.response.AdminInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.response.ImageUrlResponse;
 import com.keypoint.keypointtravel.inquiry.dto.response.UserInquiriesResponse;
+import com.keypoint.keypointtravel.inquiry.dto.dto.UserInquiryDto;
 import com.keypoint.keypointtravel.inquiry.dto.useCase.InquiriesUseCase;
 import com.keypoint.keypointtravel.inquiry.entity.QInquiry;
+import com.keypoint.keypointtravel.inquiry.entity.QInquiryDetail;
+import com.keypoint.keypointtravel.inquiry.entity.QInquiryDetailImage;
 import com.keypoint.keypointtravel.member.entity.QMember;
 import com.keypoint.keypointtravel.member.entity.QMemberDetail;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -26,11 +31,34 @@ public class CustomInquiryRepository {
 
     private final QInquiry inquiry = QInquiry.inquiry;
 
+    private final QInquiryDetail inquiryDetail = QInquiryDetail.inquiryDetail;
+
+    private final QInquiryDetailImage inquiryDetailImage = QInquiryDetailImage.inquiryDetailImage;
+
     private final QMember member = QMember.member;
 
     private final QMemberDetail memberDetail = QMemberDetail.memberDetail;
 
     private final QUploadFile uploadFile = QUploadFile.uploadFile;
+
+    public List<UserInquiryDto> findInquiryByUser(Long inquiryId, Long memberId) {
+        return queryFactory.selectFrom(inquiryDetail)
+            .leftJoin(inquiryDetailImage).on(inquiryDetailImage.inquiryDetail.id.eq(inquiryDetail.id))
+            .leftJoin(uploadFile).on(inquiryDetailImage.inquiryImageId.eq(uploadFile.id))
+            .where(inquiry.id.eq(inquiryId)
+                .and(inquiry.member.id.eq(memberId)))
+            .transform(GroupBy.groupBy(inquiryDetail.id)
+                .list(Projections.constructor(
+                    UserInquiryDto.class,
+                    inquiryDetail.createAt,
+                    inquiryDetail.inquiryContent,
+                    inquiryDetail.isAdminReply,
+                    GroupBy.list(Projections.constructor(
+                        ImageUrlResponse.class,
+                        uploadFile.path)))
+                )
+            );
+    }
 
     public List<UserInquiriesResponse> findInquiriesByUser(Long memberId) {
         return queryFactory.select(
