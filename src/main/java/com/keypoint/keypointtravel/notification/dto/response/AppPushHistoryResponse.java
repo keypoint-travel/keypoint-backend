@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PushHistoryResponse {
+public class AppPushHistoryResponse {
 
     private Long historyId;
     private String title;
@@ -14,13 +14,13 @@ public class PushHistoryResponse {
     private Boolean isRead;
     private LocalDateTime arrivedAt;
 
-    public static PushHistoryResponse of(
+    public static AppPushHistoryResponse of(
         Long historyId,
         String title,
         String content,
         LocalDateTime arrivedAt,
         Boolean isRead
     ) {
-        return new PushHistoryResponse(historyId, title, content, isRead, arrivedAt);
+        return new AppPushHistoryResponse(historyId, title, content, isRead, arrivedAt);
     }
 }
