@@ -22,8 +22,10 @@ public class MemberVisitors {
     @Column(name = "member_visitors_id")
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private LocalDate date;
 
+    @Column(nullable = false)
     private long visitors;
 
     public MemberVisitors(long visitors) {
