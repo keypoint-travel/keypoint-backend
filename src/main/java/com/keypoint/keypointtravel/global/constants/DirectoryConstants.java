@@ -24,4 +24,6 @@ public class DirectoryConstants {
 
     public static String BADGE_DIRECTORY = "badge";
 
+    public static String INQUIRY_DIRECTORY = "inquiry";
+
 }
