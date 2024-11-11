@@ -3,6 +3,8 @@ package com.keypoint.keypointtravel.member.service;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.member.dto.response.StatisticResponse;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
+import com.keypoint.keypointtravel.member.repository.memberVisitors.MemberVisitorsRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberStatisticService {
 
     private final MemberRepository memberRepository;
+    private final MemberVisitorsRepository memberVisitorsRepository;
 
     /**
      * 월별 가입자 수 조회 함수 (createdAt 기준)
@@ -75,16 +78,14 @@ public class MemberStatisticService {
      * @return
      */
     public List<StatisticResponse> getDailyVisitorsStatistics() {
-        LocalDateTime startAt = LocalDateTime.now()
-            .minusMonths(2)
-            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDate startAt = LocalDate.now()
+            .minusMonths(2);
 
-        LocalDateTime endAt = LocalDateTime.now()
-            .plusDays(2)
-            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDate endAt = LocalDate.now()
+            .plusDays(2);
 
         // 조회
-        return memberRepository.findDailyVisitorsStatistics(
+        return memberVisitorsRepository.findDailyVisitorsStatistics(
             startAt,
             endAt
         );

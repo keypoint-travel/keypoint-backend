@@ -60,4 +60,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     @Query("SELECT m.name FROM Member m WHERE m.id = :memberId")
     String findNameByMemberId(@Param("memberId") Long memberId);
+
+    long countByRecentLoginAtBetween(LocalDateTime start, LocalDateTime end);
 }
