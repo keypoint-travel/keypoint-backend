@@ -4,12 +4,14 @@ import com.keypoint.keypointtravel.global.annotation.ValidEnum;
 import com.keypoint.keypointtravel.global.config.security.CustomUserDetails;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
+import com.keypoint.keypointtravel.global.dto.useCase.SearchPageAndMemberIdUseCase;
 import com.keypoint.keypointtravel.global.enumType.notification.AlarmType;
 import com.keypoint.keypointtravel.member.dto.response.IsExistedResponse;
 import com.keypoint.keypointtravel.member.dto.useCase.MemberIdUseCase;
 import com.keypoint.keypointtravel.notification.dto.request.FCMTokenRequest;
 import com.keypoint.keypointtravel.notification.dto.request.UpdateNotificationRequest;
-import com.keypoint.keypointtravel.notification.dto.response.PushHistoryResponse;
+import com.keypoint.keypointtravel.notification.dto.response.AppPushHistoryResponse;
+import com.keypoint.keypointtravel.notification.dto.response.WebPushHistoryResponse;
 import com.keypoint.keypointtravel.notification.dto.useCase.FCMTokenUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.PushHistoryIdUseCase;
 import com.keypoint.keypointtravel.notification.dto.useCase.ReadPushHistoryUseCase;
@@ -20,6 +22,7 @@ import com.keypoint.keypointtravel.notification.service.PushNotificationHistoryS
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -99,11 +102,11 @@ public class NotificationController {
 
     @PreAuthorize("hasRole('ROLE_CERTIFIED_USER')")
     @GetMapping("/push")
-    public APIResponseEntity<PageResponse<PushHistoryResponse>> findPushNotificationHistory(
+    public APIResponseEntity<PageResponse<AppPushHistoryResponse>> findPushNotificationHistory(
         @PageableDefault(size = 15, sort = "arrivedAt", direction = Sort.Direction.DESC) Pageable pageable,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         ReadPushHistoryUseCase useCase = ReadPushHistoryUseCase.of(userDetails.getId(), pageable);
-        Page<PushHistoryResponse> result = pushHistoryService.findPushHistories(useCase);
+        Page<AppPushHistoryResponse> result = pushHistoryService.findPushHistories(useCase);
 
         return APIResponseEntity.toPage(
             "푸시 알림 이력 조회 성공",
@@ -136,5 +139,35 @@ public class NotificationController {
             .message("읽지 않은 알림 존재 확인 성공")
             .data(result)
             .build();
+    }
+
+    @GetMapping("/push/management")
+    public APIResponseEntity<PageResponse<WebPushHistoryResponse>> findPushNotificationHistoryInWeb(
+        @RequestParam(name = "sort-by", required = false) String sortBy,
+        @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
+        @RequestParam(name = "keyword", required = false) String keyword,
+        @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        // sortBy를 제공한 경우, direction 에 따라 정렬 객체 생성
+        if (sortBy != null && !sortBy.isEmpty()) {
+            Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        }
+
+        SearchPageAndMemberIdUseCase useCase = SearchPageAndMemberIdUseCase.of(
+            keyword,
+            null,
+            sortBy,
+            direction,
+            pageable
+        );
+
+        Page<WebPushHistoryResponse> result = pushHistoryService.findPushNotificationHistoryInWeb(
+            useCase);
+
+        return APIResponseEntity.toPage(
+            "푸시 알림 이력 조회 성공",
+            result
+        );
     }
 }
