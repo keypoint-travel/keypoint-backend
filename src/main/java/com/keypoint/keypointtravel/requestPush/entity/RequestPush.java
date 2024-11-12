@@ -1,5 +1,37 @@
 package com.keypoint.keypointtravel.requestPush.entity;
 
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import lombok.Getter;
+
+@Entity
+@Getter
+@Table(name = "request_push")
 public class RequestPush {
 
+    @Id
+    @Column(name = "request_push_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Column(nullable = false)
+    private LanguageCode languageCode;
+
+    @Column(nullable = false)
+    private LocalDateTime reservationAt;
+
+    private RoleType roleType;
 }
