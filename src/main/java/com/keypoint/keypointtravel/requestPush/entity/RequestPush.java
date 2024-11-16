@@ -34,4 +34,18 @@ public class RequestPush {
     private LocalDateTime reservationAt;
 
     private RoleType roleType;
+
+    public RequestPush(
+        String title,
+        String content,
+        LanguageCode languageCode,
+        LocalDateTime reservationAt,
+        RoleType roleType
+    ) {
+        this.title = title;
+        this.content = content;
+        this.languageCode = languageCode;
+        this.reservationAt = reservationAt;
+        this.roleType = roleType;
+    }
 }
