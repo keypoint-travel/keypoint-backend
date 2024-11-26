@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.requestPush.dto.useCase;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.requestPush.dto.request.CreateRequestPushRequest;
+import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -33,6 +34,16 @@ public class CreateRequestPushUseCase {
             request.getTitle(),
             request.getContent(),
             request.getReservationAt()
+        );
+    }
+
+    public RequestPush toEntity() {
+        return new RequestPush(
+            title,
+            content,
+            languageCode,
+            reservationAt,
+            roleType
         );
     }
 

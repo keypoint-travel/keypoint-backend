@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class CreateRequestPushRequest {
 
-    @ValidEnum(enumClass = RoleType.class)
+    @ValidEnum(enumClass = RoleType.class, nullable = true)
     private RoleType roleType;
 
     @ValidEnum(enumClass = LanguageCode.class)

@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.requestPush.service;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -44,9 +45,15 @@ public class RequestPushService {
      */
     @Transactional
     public void addRequestPush(CreateRequestPushUseCase useCase) {
-        // 유효성 검사
-        validateRequestPush(useCase);
+        try {
+            // 유효성 검사
+            validateRequestPush(useCase);
 
-        // 생성
+            // 생성
+            RequestPush requestPush = useCase.toEntity();
+            requestPushRepository.save(requestPush);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
     }
 }
