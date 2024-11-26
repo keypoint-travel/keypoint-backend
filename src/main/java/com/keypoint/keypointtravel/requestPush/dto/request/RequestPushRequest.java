@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class CreateRequestPushRequest {
+public class RequestPushRequest {
 
     @ValidEnum(enumClass = RoleType.class, nullable = true)
     private RoleType roleType;

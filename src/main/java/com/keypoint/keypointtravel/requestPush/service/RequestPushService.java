@@ -2,7 +2,7 @@ package com.keypoint.keypointtravel.requestPush.service;
 
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class RequestPushService {
      *
      * @param useCase
      */
-    public void validateRequestPush(CreateRequestPushUseCase useCase) {
+    public void validateRequestPush(RequestPushUseCase useCase) {
         LocalDateTime reservationAt = useCase.getReservationAt();
 
         // 현재 이후의 시간인지 확인
@@ -44,7 +44,7 @@ public class RequestPushService {
      * @param useCase
      */
     @Transactional
-    public void addRequestPush(CreateRequestPushUseCase useCase) {
+    public void addRequestPush(RequestPushUseCase useCase) {
         try {
             // 유효성 검사
             validateRequestPush(useCase);
