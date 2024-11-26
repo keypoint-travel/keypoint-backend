@@ -94,4 +94,13 @@
     </sql>
   </changeSet>
 
+  <changeSet id="changelog-lchy0.03.06-241126" author="lchy0413">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="member" columnName="role" />
+    </preConditions>
+    <sql>
+      ALTER TABLE member MODIFY COLUMN role ENUM('ROLE_UNCERTIFIED_USER', 'ROLE_CERTIFIED_USER', 'ROLE_ADMIN', 'ROLE_PENDING_WITHDRAWAL', 'ROLE_PREMIUM');
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>

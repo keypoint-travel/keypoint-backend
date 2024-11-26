@@ -4,6 +4,8 @@ import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,6 +38,7 @@ public class RequestPush {
     @Column(nullable = false)
     private LocalDateTime reservationAt;
 
+    @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
     public RequestPush(

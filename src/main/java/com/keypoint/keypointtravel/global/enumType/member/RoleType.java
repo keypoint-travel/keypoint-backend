@@ -11,6 +11,7 @@ public enum RoleType {
     ROLE_CERTIFIED_USER(1, "인증 회원"),
     ROLE_ADMIN(2, "관리자"),
     ROLE_PENDING_WITHDRAWAL(3, "탈퇴 대기"),
+    ROLE_PREMIUM(4, "프리미엄 회원"),
 
     ROLE_NONE(100, "알수 없는 권한");
 
