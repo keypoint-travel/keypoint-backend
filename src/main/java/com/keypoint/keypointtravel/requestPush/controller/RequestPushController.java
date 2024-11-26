@@ -1,7 +1,13 @@
 package com.keypoint.keypointtravel.requestPush.controller;
 
+import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
+import com.keypoint.keypointtravel.requestPush.dto.request.CreateRequestPushRequest;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.service.RequestPushService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,4 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class RequestPushController {
 
     private final RequestPushService requestPushService;
+
+    @PostMapping
+    public APIResponseEntity<Void> addRequestPush(
+        @Valid @RequestBody CreateRequestPushRequest request
+    ) {
+        CreateRequestPushUseCase useCase = CreateRequestPushUseCase.from(request);
+        requestPushService.addRequestPush(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("푸시 요청 생성 성공")
+            .build();
+    }
 }
