@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.global.factory.RequestPushFactory;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestPushUseCase;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class RequestPushServiceTest {
     @DisplayName("[정상 케이스] 푸시 요청 유효성 검사를 성공한다.")
     void testValidateRequestPush_success() {
         // give
-        CreateRequestPushUseCase useCase = RequestPushFactory.createCreateRequestPushUseCase();
+        RequestPushUseCase useCase = RequestPushFactory.createCreateRequestPushUseCase();
 
         // when & then
         assertDoesNotThrow(() -> requestPushService.validateRequestPush(useCase));
@@ -36,7 +36,7 @@ class RequestPushServiceTest {
     void testValidateRequestPush_reservationAtIsNot30MinuteInterval() {
         // given
         LocalDateTime invalidTime = LocalDateTime.now().plusHours(1).withMinute(15);
-        CreateRequestPushUseCase useCase = RequestPushFactory.createCreateRequestPushUseCase(
+        RequestPushUseCase useCase = RequestPushFactory.createCreateRequestPushUseCase(
             invalidTime);
 
         // when
@@ -53,7 +53,7 @@ class RequestPushServiceTest {
     void testValidateRequestPush_reservationAtIsInThePast() {
         // given
         LocalDateTime invalidTime = LocalDateTime.now().plusHours(1).withMinute(15);
-        CreateRequestPushUseCase useCase = RequestPushFactory.createCreateRequestPushUseCase(
+        RequestPushUseCase useCase = RequestPushFactory.createCreateRequestPushUseCase(
             invalidTime);
 
         // when
