@@ -1,6 +1,9 @@
 package com.keypoint.keypointtravel.global.enumType.setting;
 
 import com.keypoint.keypointtravel.global.utils.LogUtils;
+import com.querydsl.core.types.dsl.EnumPath;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import java.util.Locale;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +31,13 @@ public enum LanguageCode {
         LogUtils.writeErrorLog("LanguageCode, fromCode",
             "Failed to find language code for language code " + code);
         return LanguageCode.EN;
+    }
+
+    public static NumberExpression<Integer> getNumberExpression(EnumPath<LanguageCode> path) {
+        return Expressions.cases()
+            .when(path.eq(LanguageCode.EN)).then(1)
+            .when(path.eq(LanguageCode.JA)).then(2)
+            .when(path.eq(LanguageCode.KO)).then(3)
+            .otherwise(4);
     }
 }

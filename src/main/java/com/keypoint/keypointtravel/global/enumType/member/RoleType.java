@@ -1,5 +1,8 @@
 package com.keypoint.keypointtravel.global.enumType.member;
 
+import com.querydsl.core.types.dsl.EnumPath;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +26,13 @@ public enum RoleType {
             .filter(t -> t.name().equals(name))
             .findFirst()
             .orElse(RoleType.ROLE_NONE);
+    }
+
+    public static NumberExpression<Integer> getNumberExpression(EnumPath<RoleType> path) {
+        return Expressions.cases()
+            .when(path.eq(RoleType.ROLE_CERTIFIED_USER)).then(1)
+            .when(path.isNull()).then(2)
+            .when(path.eq(RoleType.ROLE_PREMIUM)).then(3)
+            .otherwise(4);
     }
 }

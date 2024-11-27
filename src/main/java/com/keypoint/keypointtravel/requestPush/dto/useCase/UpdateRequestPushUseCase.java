@@ -3,14 +3,12 @@ package com.keypoint.keypointtravel.requestPush.dto.useCase;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushRequest;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
 public class UpdateRequestPushUseCase extends RequestPushUseCase {
 
-    @NotNull
     private Long requestPushId;
 
     public UpdateRequestPushUseCase(
