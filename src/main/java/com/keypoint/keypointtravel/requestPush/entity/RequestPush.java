@@ -52,7 +52,7 @@ public class RequestPush extends BaseEntity {
         this.title = title;
         this.content = content;
         this.languageCode = languageCode;
-        this.reservationAt = reservationAt;
+        this.reservationAt = reservationAt.withSecond(0).withNano(0);
         this.roleType = roleType;
     }
 }

@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.notification.event.pushNotification;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,12 +16,31 @@ public class AdminPushNotificationEvent extends PushNotificationEvent {
     }
 
     public AdminPushNotificationEvent(
+        PushNotificationType type,
+        String title,
+        String content,
+        List<Long> memberIds
+    ) {
+        super(type, memberIds);
+        this.additionalData = new FCMContentData(title, content);
+    }
+
+    public AdminPushNotificationEvent(
             PushNotificationType type,
             String title,
             String content
     ) {
         super(type, null);
         this.additionalData = new FCMContentData(title, content);
+    }
+
+    public static AdminPushNotificationEvent of(
+        PushNotificationType type,
+        String title,
+        String content,
+        List<Long> memberIds
+    ) {
+        return new AdminPushNotificationEvent(type, title, content, memberIds);
     }
 
     public String getTitle() {

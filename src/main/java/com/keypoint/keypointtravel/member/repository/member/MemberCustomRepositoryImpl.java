@@ -22,6 +22,7 @@ import com.keypoint.keypointtravel.theme.dto.response.MemberThemeResponse;
 import com.keypoint.keypointtravel.theme.entity.QPaidTheme;
 import com.keypoint.keypointtravel.theme.entity.QTheme;
 import com.keypoint.keypointtravel.theme.entity.QThemeColor;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -326,6 +327,32 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 member.recentLoginAt,
                 Expressions.constant("%Y/%m/%d")
             ).asc()).fetch();
+    }
+
+    @Override
+    public List<Long> findMemberIdByLanguageAndRole(
+        LanguageCode languageCode,
+        RoleType roleType
+    ) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(member.role.ne(RoleType.ROLE_ADMIN)
+            .and(member.role.ne(RoleType.ROLE_UNCERTIFIED_USER)));
+
+        // 조건으로 필터링
+        if (languageCode != null) {
+            booleanBuilder.and(member.memberDetail.language.eq(languageCode));
+        }
+        if (roleType != null) {
+            booleanBuilder.and(member.role.eq(roleType));
+        }
+
+        // 조회
+        return queryFactory
+            .select(member.id)
+            .from(member)
+            .where(booleanBuilder)
+            .fetch();
+
     }
 
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
