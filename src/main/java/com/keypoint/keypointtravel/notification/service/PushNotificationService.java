@@ -244,7 +244,7 @@ public class PushNotificationService {
 
         // 배지 발급을 하는 알림 타입인 경우, 배지 발급
         if (badgeType != null) {
-            return createBadgeDetailResponse(memberId, badgeType);
+            return this.createBadgeDetailResponse(memberId, badgeType);
         }
 
         return null;

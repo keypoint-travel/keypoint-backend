@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.member.repository.member;
 
 import com.keypoint.keypointtravel.campaign.dto.dto.MemberInfoDto;
+import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.member.dto.response.MemberSettingResponse;
 import com.keypoint.keypointtravel.member.dto.response.StatisticResponse;
@@ -33,4 +34,6 @@ public interface MemberCustomRepository {
     List<StatisticResponse> findMonthlySignUpStatistics(LocalDateTime startAt, LocalDateTime endAt);
 
     List<StatisticResponse> findDailyVisitorsStatistics(LocalDateTime startAt, LocalDateTime endAt);
+
+    List<Long> findMemberIdByLanguageAndRole(LanguageCode languageCode, RoleType roleType);
 }
