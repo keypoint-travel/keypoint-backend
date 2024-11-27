@@ -1,8 +1,11 @@
 package com.keypoint.keypointtravel.requestPush.service;
 
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
+import com.keypoint.keypointtravel.global.enumType.error.NotificationErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
 import java.time.LocalDateTime;
@@ -44,7 +47,7 @@ public class RequestPushService {
      * @param useCase
      */
     @Transactional
-    public void addRequestPush(RequestPushUseCase useCase) {
+    public void addRequestPush(CreateRequestPushUseCase useCase) {
         try {
             // 유효성 검사
             validateRequestPush(useCase);
@@ -53,6 +56,27 @@ public class RequestPushService {
             RequestPush requestPush = useCase.toEntity();
             requestPushRepository.save(requestPush);
         } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    /**
+     * RequestPush 생성
+     *
+     * @param useCase
+     */
+    @Transactional
+    public void updateRequestPush(UpdateRequestPushUseCase useCase) {
+        try {
+            // 유효성 검사
+            validateRequestPush(useCase);
+
+            // 수정
+            long result = requestPushRepository.updateRequestPush(useCase);
+            if (result < 1) {
+                throw new GeneralException(NotificationErrorCode.NOT_EXISTED_REQUEST_PUSH);
+            }
+        } catch (GeneralException e) {
             throw new GeneralException(e);
         }
     }

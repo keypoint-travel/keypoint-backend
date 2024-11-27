@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RequestPushRepository extends JpaRepository<RequestPush, Long> {
+public interface RequestPushRepository extends
+    JpaRepository<RequestPush, Long>,
+    RequestPushCustomRepository {
 
 }

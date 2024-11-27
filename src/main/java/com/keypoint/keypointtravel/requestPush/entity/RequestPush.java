@@ -1,5 +1,6 @@
 package com.keypoint.keypointtravel.requestPush.entity;
 
+import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import jakarta.persistence.Column;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "request_push")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestPush {
+public class RequestPush extends BaseEntity {
 
     @Id
     @Column(name = "request_push_id")
