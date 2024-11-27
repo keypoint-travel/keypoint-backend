@@ -1,8 +1,10 @@
 package com.keypoint.keypointtravel.requestPush.service;
 
+import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NotificationErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
+import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushUseCase;
@@ -10,6 +12,7 @@ import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,5 +82,19 @@ public class RequestPushService {
         } catch (GeneralException e) {
             throw new GeneralException(e);
         }
+    }
+
+    /**
+     * 푸시 요청 조회 성공
+     *
+     * @param useCase
+     * @return
+     */
+    public Page<RequestPushResponse> findRequestPushes(PageUseCase useCase) {
+//        try {
+        return requestPushRepository.findRequestPushes(useCase);
+//        } catch (Exception e) {
+//            throw new GeneralException(e);
+//        }
     }
 }

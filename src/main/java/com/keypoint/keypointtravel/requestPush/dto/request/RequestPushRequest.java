@@ -14,7 +14,7 @@ public class RequestPushRequest {
     @ValidEnum(enumClass = RoleType.class, nullable = true)
     private RoleType roleType;
 
-    @ValidEnum(enumClass = LanguageCode.class)
+    @ValidEnum(enumClass = LanguageCode.class, nullable = true)
     private LanguageCode languageCode;
 
     @NotBlank

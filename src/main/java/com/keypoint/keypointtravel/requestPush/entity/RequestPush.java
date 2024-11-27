@@ -33,7 +33,7 @@ public class RequestPush extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private LanguageCode languageCode;
 
     @Column(nullable = false)
