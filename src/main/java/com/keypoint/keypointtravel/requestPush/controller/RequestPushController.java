@@ -2,7 +2,8 @@ package com.keypoint.keypointtravel.requestPush.controller;
 
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushRequest;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushUseCase;
 import com.keypoint.keypointtravel.requestPush.service.RequestPushService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class RequestPushController {
     public APIResponseEntity<Void> addRequestPush(
         @Valid @RequestBody RequestPushRequest request
     ) {
-        RequestPushUseCase useCase = RequestPushUseCase.from(request);
+        CreateRequestPushUseCase useCase = CreateRequestPushUseCase.from(request);
         requestPushService.addRequestPush(useCase);
 
         return APIResponseEntity.<Void>builder()
@@ -37,11 +38,11 @@ public class RequestPushController {
         @PathVariable(value = "request-push-id") Long requestPushId,
         @Valid @RequestBody RequestPushRequest request
     ) {
-        RequestPushUseCase useCase = RequestPushUseCase.from(request);
-        requestPushService.addRequestPush(useCase);
+        UpdateRequestPushUseCase useCase = UpdateRequestPushUseCase.of(requestPushId, request);
+        requestPushService.updateRequestPush(useCase);
 
         return APIResponseEntity.<Void>builder()
-            .message("푸시 요청 생성 성공")
+            .message("푸시 요청 수정 성공")
             .build();
     }
 }
