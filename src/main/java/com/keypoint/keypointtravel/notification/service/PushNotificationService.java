@@ -81,8 +81,7 @@ public class PushNotificationService {
                 );
             }
             case CAMPAIGN_INVITE, CAMPAIGN_ACCEPT_INVITEE -> {
-                if (additionalData instanceof CampaignLeaderData) {
-                    CampaignLeaderData data = (CampaignLeaderData) additionalData;
+                if (additionalData instanceof CampaignLeaderData data) {
                     String campaignTitle = campaignRepository.findTitleByCampaignId(
                             data.getCampaignId())
                         .orElse("");
@@ -96,8 +95,7 @@ public class PushNotificationService {
                 }
             }
             case CAMPAIGN_ACCEPT_INVITER -> {
-                if (additionalData instanceof CampaignAcceptorData) {
-                    CampaignAcceptorData data = (CampaignAcceptorData) additionalData;
+                if (additionalData instanceof CampaignAcceptorData data) {
                     String campaignTitle = campaignRepository.findTitleByCampaignId(
                             data.getCampaignId())
                         .orElse("");
@@ -116,8 +114,7 @@ public class PushNotificationService {
                 }
             }
             case CAMPAIGN_END, CAMPAIGN_START -> {
-                if (additionalData instanceof CampaignData) {
-                    CampaignData data = (CampaignData) additionalData;
+                if (additionalData instanceof CampaignData data) {
                     String campaignTitle = campaignRepository.findTitleByCampaignId(
                             data.getCampaignId())
                         .orElse("");
@@ -131,8 +128,7 @@ public class PushNotificationService {
                 }
             }
             case EVENT_NOTICE -> {
-                if (additionalData instanceof NoticeData) {
-                    NoticeData data = (NoticeData) additionalData;
+                if (additionalData instanceof NoticeData data) {
                     String noticeTitle = noticeContentRepository.findTitleByNoticeContentId(
                         data.getNoticeContentId());
 
@@ -145,8 +141,7 @@ public class PushNotificationService {
                 }
             }
             case CAMPAIGN_JOIN_REQUEST -> {
-                if (additionalData instanceof CampaignApplicantData) {
-                    CampaignApplicantData data = (CampaignApplicantData) additionalData;
+                if (additionalData instanceof CampaignApplicantData data) {
                     String campaignTitle = campaignRepository.findTitleByCampaignId(
                             data.getCampaignId())
                         .orElse("");
@@ -160,9 +155,7 @@ public class PushNotificationService {
                 }
             }
             case FRIEND_ADDED, FRIEND_ACCEPTED_RECEIVER -> {
-                if (additionalData instanceof FriendData) {
-                    FriendData data = (FriendData) additionalData;
-
+                if (additionalData instanceof FriendData data) {
                     // 1. FCM 내용 구성
                     content = notificationMsg.getTranslatedContent(
                         data.getFriendName(),
@@ -172,9 +165,7 @@ public class PushNotificationService {
                 }
             }
             case FRIEND_ACCEPTED_SENDER -> {
-                if (additionalData instanceof FriendData) {
-                    FriendData data = (FriendData) additionalData;
-
+                if (additionalData instanceof FriendData data) {
                     // 1. FCM 내용 구성
                     title = notificationMsg.getTranslatedTitle(
                         data.getFriendName(),
@@ -186,9 +177,7 @@ public class PushNotificationService {
                 }
             }
             case PUSH_NOTIFICATION_BY_ADMIN -> {
-                if (additionalData instanceof FCMContentData) {
-                    FCMContentData data = (FCMContentData) additionalData;
-
+                if (additionalData instanceof FCMContentData data) {
                     title = data.getTitle();
                     content = data.getContent();
                 }
