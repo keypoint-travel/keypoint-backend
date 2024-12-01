@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public abstract class RequestPushUseCase {
+public abstract class RequestAlarmUseCase {
 
     private RoleType roleType;
     private LanguageCode languageCode;

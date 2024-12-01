@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.requestPush.entity;
 
 import com.keypoint.keypointtravel.global.entity.BaseEntity;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,9 +19,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "request_push")
+@Table(name = "request_alarm")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestPush extends BaseEntity {
+public class RequestAlarm extends BaseEntity {
 
     @Id
     @Column(name = "request_push_id")
@@ -42,17 +43,23 @@ public class RequestPush extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
-    public RequestPush(
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RequestAlarmType type;
+
+    public RequestAlarm(
         String title,
         String content,
         LanguageCode languageCode,
         LocalDateTime reservationAt,
-        RoleType roleType
+        RoleType roleType,
+        RequestAlarmType type
     ) {
         this.title = title;
         this.content = content;
         this.languageCode = languageCode;
         this.reservationAt = reservationAt.withSecond(0).withNano(0);
         this.roleType = roleType;
+        this.type = type;
     }
 }
