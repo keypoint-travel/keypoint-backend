@@ -2,15 +2,17 @@ package com.keypoint.keypointtravel.requestPush.dto.useCase;
 
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushRequest;
-import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
+import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushAlarmRequest;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class CreateRequestPushUseCase extends RequestPushUseCase {
+public class UpdateRequestPushAlarmUseCase extends RequestAlarmUseCase {
 
-    public CreateRequestPushUseCase(
+    private Long requestPushId;
+
+    public UpdateRequestPushAlarmUseCase(
+        Long requestPushId,
         RoleType roleType,
         LanguageCode languageCode,
         String title,
@@ -18,25 +20,20 @@ public class CreateRequestPushUseCase extends RequestPushUseCase {
         LocalDateTime reservationAt
     ) {
         super(roleType, languageCode, title, content, reservationAt);
+        this.requestPushId = requestPushId;
     }
 
-    public static CreateRequestPushUseCase from(RequestPushRequest request) {
-        return new CreateRequestPushUseCase(
+    public static UpdateRequestPushAlarmUseCase of(
+        Long requestPushId,
+        RequestPushAlarmRequest request
+    ) {
+        return new UpdateRequestPushAlarmUseCase(
+            requestPushId,
             request.getRoleType(),
             request.getLanguageCode(),
             request.getTitle(),
             request.getContent(),
             request.getReservationAt()
-        );
-    }
-
-    public RequestPush toEntity() {
-        return new RequestPush(
-            this.getTitle(),
-            this.getContent(),
-            this.getLanguageCode(),
-            this.getReservationAt(),
-            this.getRoleType()
         );
     }
 }

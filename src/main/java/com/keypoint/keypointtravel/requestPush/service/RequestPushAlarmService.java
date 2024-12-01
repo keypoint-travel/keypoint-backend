@@ -4,11 +4,11 @@ import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.CommonErrorCode;
 import com.keypoint.keypointtravel.global.enumType.error.NotificationErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
-import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushResponse;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestPushUseCase;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushUseCase;
-import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
+import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushAlarmResponse;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.RequestAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.entity.RequestAlarm;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RequestPushService {
+public class RequestPushAlarmService {
 
     private final RequestPushRepository requestPushRepository;
 
@@ -28,7 +28,7 @@ public class RequestPushService {
      *
      * @param useCase
      */
-    public void validateRequestPush(RequestPushUseCase useCase) {
+    public void validateRequestPush(RequestAlarmUseCase useCase) {
         LocalDateTime reservationAt = useCase.getReservationAt();
 
         // 현재 이후의 시간인지 확인
@@ -50,13 +50,13 @@ public class RequestPushService {
      * @param useCase
      */
     @Transactional
-    public void addRequestPush(CreateRequestPushUseCase useCase) {
+    public void addRequestPushAlarm(CreateRequestPushAlarmUseCase useCase) {
         try {
             // 유효성 검사
             validateRequestPush(useCase);
 
             // 생성
-            RequestPush requestPush = useCase.toEntity();
+            RequestAlarm requestPush = useCase.toEntity();
             requestPushRepository.save(requestPush);
         } catch (Exception e) {
             throw new GeneralException(e);
@@ -69,13 +69,13 @@ public class RequestPushService {
      * @param useCase
      */
     @Transactional
-    public void updateRequestPush(UpdateRequestPushUseCase useCase) {
+    public void updateRequestPushAlarm(UpdateRequestPushAlarmUseCase useCase) {
         try {
             // 유효성 검사
             validateRequestPush(useCase);
 
             // 수정
-            long result = requestPushRepository.updateRequestPush(useCase);
+            long result = requestPushRepository.updateRequestPushAlarm(useCase);
             if (result < 1) {
                 throw new GeneralException(NotificationErrorCode.NOT_EXISTED_REQUEST_PUSH);
             }
@@ -90,11 +90,11 @@ public class RequestPushService {
      * @param useCase
      * @return
      */
-    public Page<RequestPushResponse> findRequestPushes(PageUseCase useCase) {
-//        try {
-        return requestPushRepository.findRequestPushes(useCase);
-//        } catch (Exception e) {
-//            throw new GeneralException(e);
-//        }
+    public Page<RequestPushAlarmResponse> findRequestPushAlarms(PageUseCase useCase) {
+        try {
+            return requestPushRepository.findRequestPushAlarms(useCase);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
     }
 }

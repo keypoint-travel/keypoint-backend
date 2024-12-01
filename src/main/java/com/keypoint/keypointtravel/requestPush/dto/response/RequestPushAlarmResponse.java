@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class RequestPushResponse {
+public class RequestPushAlarmResponse {
 
     private Long requestId;
     private String roleType;
@@ -18,7 +18,7 @@ public class RequestPushResponse {
     private LocalDateTime reservationAt;
     private LocalDateTime sendAt;
 
-    public RequestPushResponse(
+    public RequestPushAlarmResponse(
         Long requestId,
         RoleType roleType,
         LanguageCode languageCode,

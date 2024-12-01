@@ -3,11 +3,11 @@ package com.keypoint.keypointtravel.requestPush.controller;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
-import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushRequest;
-import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushResponse;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushUseCase;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushUseCase;
-import com.keypoint.keypointtravel.requestPush.service.RequestPushService;
+import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushAlarmRequest;
+import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushAlarmResponse;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.service.RequestPushAlarmService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,18 +25,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/push-requests")
+@RequestMapping("/api/v1/request-alarms/push")
 @RequiredArgsConstructor
-public class RequestPushController {
+public class RequestPushAlarmController {
 
-    private final RequestPushService requestPushService;
+    private final RequestPushAlarmService requestPushAlarmService;
 
     @PostMapping
-    public APIResponseEntity<Void> addRequestPush(
-        @Valid @RequestBody RequestPushRequest request
+    public APIResponseEntity<Void> addRequestPushAlarm(
+        @Valid @RequestBody RequestPushAlarmRequest request
     ) {
-        CreateRequestPushUseCase useCase = CreateRequestPushUseCase.from(request);
-        requestPushService.addRequestPush(useCase);
+        CreateRequestPushAlarmUseCase useCase = CreateRequestPushAlarmUseCase.from(request);
+        requestPushAlarmService.addRequestPushAlarm(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("푸시 요청 생성 성공")
@@ -44,12 +44,13 @@ public class RequestPushController {
     }
 
     @PutMapping("/{request-push-id}")
-    public APIResponseEntity<Void> updateRequestPush(
+    public APIResponseEntity<Void> updateRequestPushAlarm(
         @PathVariable(value = "request-push-id") Long requestPushId,
-        @Valid @RequestBody RequestPushRequest request
+        @Valid @RequestBody RequestPushAlarmRequest request
     ) {
-        UpdateRequestPushUseCase useCase = UpdateRequestPushUseCase.of(requestPushId, request);
-        requestPushService.updateRequestPush(useCase);
+        UpdateRequestPushAlarmUseCase useCase = UpdateRequestPushAlarmUseCase.of(requestPushId,
+            request);
+        requestPushAlarmService.updateRequestPushAlarm(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("푸시 요청 수정 성공")
@@ -57,7 +58,7 @@ public class RequestPushController {
     }
 
     @GetMapping
-    public APIResponseEntity<PageResponse<RequestPushResponse>> findRequestPushes(
+    public APIResponseEntity<PageResponse<RequestPushAlarmResponse>> findRequestPushAlarms(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
         @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
@@ -73,7 +74,8 @@ public class RequestPushController {
             direction,
             pageable
         );
-        Page<RequestPushResponse> result = requestPushService.findRequestPushes(useCase);
+        Page<RequestPushAlarmResponse> result = requestPushAlarmService.findRequestPushAlarms(
+            useCase);
 
         return APIResponseEntity.toPage(
             "푸시 요청 조회 성공",

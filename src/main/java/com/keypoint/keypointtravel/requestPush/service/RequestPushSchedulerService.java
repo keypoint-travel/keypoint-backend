@@ -4,7 +4,7 @@ import com.keypoint.keypointtravel.global.enumType.notification.PushNotification
 import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent;
-import com.keypoint.keypointtravel.requestPush.entity.RequestPush;
+import com.keypoint.keypointtravel.requestPush.entity.RequestAlarm;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,13 +24,13 @@ public class RequestPushSchedulerService {
 
     @Transactional
     @Scheduled(cron = "0 0/30 * * * *")
-    public void sendRequestPushes() {
+    public void sendRequestPushAlarms() {
         try {
             LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
 
             // 1. 전송해야 하는 RequestPush 조회
-            List<RequestPush> pushes = requestPushRepository.findAllByReservationAt(now);
-            for (RequestPush push : pushes) {
+            List<RequestAlarm> pushes = requestPushRepository.findAllByReservationAt(now);
+            for (RequestAlarm push : pushes) {
                 // 1-1. 알림 전송 대상 조회
                 List<Long> memberIds = memberRepository.findMemberIdByLanguageAndRole(
                     push.getLanguageCode(),

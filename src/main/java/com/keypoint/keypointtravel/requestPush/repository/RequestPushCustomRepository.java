@@ -1,13 +1,13 @@
 package com.keypoint.keypointtravel.requestPush.repository;
 
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
-import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushResponse;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushAlarmResponse;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushAlarmUseCase;
 import org.springframework.data.domain.Page;
 
 public interface RequestPushCustomRepository {
 
-    long updateRequestPush(UpdateRequestPushUseCase useCase);
+    long updateRequestPushAlarm(UpdateRequestPushAlarmUseCase useCase);
 
-    Page<RequestPushResponse> findRequestPushes(PageUseCase useCase);
+    Page<RequestPushAlarmResponse> findRequestPushAlarms(PageUseCase useCase);
 }
