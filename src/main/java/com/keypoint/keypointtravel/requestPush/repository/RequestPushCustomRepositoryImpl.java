@@ -2,10 +2,12 @@ package com.keypoint.keypointtravel.requestPush.repository;
 
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushAlarmUseCase;
-import com.keypoint.keypointtravel.requestPush.entity.QRequestPush;
+import com.keypoint.keypointtravel.requestPush.entity.QRequestAlarm;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -24,21 +26,21 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
     private final JPAQueryFactory queryFactory;
     private final AuditorAware<String> auditorProvider;
 
-    private final QRequestPush requestPush = QRequestPush.requestPush;
+    private final QRequestAlarm requestAlarm = QRequestAlarm.requestAlarm;
 
     @Override
     public long updateRequestPushAlarm(UpdateRequestPushAlarmUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
-        return queryFactory.update(requestPush)
-            .set(requestPush.title, useCase.getTitle())
-            .set(requestPush.content, useCase.getContent())
-            .set(requestPush.languageCode, useCase.getLanguageCode())
-            .set(requestPush.reservationAt, useCase.getReservationAt())
-            .set(requestPush.roleType, useCase.getRoleType())
-            .set(requestPush.modifyAt, LocalDateTime.now())
-            .set(requestPush.modifyId, currentAuditor)
-            .where(requestPush.id.eq(useCase.getRequestPushId()))
+        return queryFactory.update(requestAlarm)
+            .set(requestAlarm.title, useCase.getTitle())
+            .set(requestAlarm.content, useCase.getContent())
+            .set(requestAlarm.languageCode, useCase.getLanguageCode())
+            .set(requestAlarm.reservationAt, useCase.getReservationAt())
+            .set(requestAlarm.roleType, useCase.getRoleType())
+            .set(requestAlarm.modifyAt, LocalDateTime.now())
+            .set(requestAlarm.modifyId, currentAuditor)
+            .where(requestAlarm.id.eq(useCase.getRequestPushId()))
             .execute();
     }
 
@@ -48,8 +50,12 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
         String sortBy = useCase.getSortBy();
         String direction = useCase.getDirection();
 
+        // 필터링
+        BooleanBuilder booleanBuilder = new BooleanBuilder()
+            .and(requestAlarm.type.eq(RequestAlarmType.PUSH));
+
         // 기본 정렬 기준 추가
-        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, requestPush.modifyAt);
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, requestAlarm.modifyAt);
 
         // 동적 정렬 기준 처리
         if (sortBy != null) {
@@ -57,35 +63,35 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
 
             switch (sortBy) {
                 case "requestId":
-                    orderSpecifier = new OrderSpecifier<>(order, requestPush.registerId);
+                    orderSpecifier = new OrderSpecifier<>(order, requestAlarm.registerId);
                     break;
                 case "roleType":
                     if (order == Order.ASC) {
-                        orderSpecifier = RoleType.getNumberExpression(requestPush.roleType)
+                        orderSpecifier = RoleType.getNumberExpression(requestAlarm.roleType)
                             .asc();
                     } else {
-                        orderSpecifier = RoleType.getNumberExpression(requestPush.roleType)
+                        orderSpecifier = RoleType.getNumberExpression(requestAlarm.roleType)
                             .desc();
                     }
                     break;
                 case "languageCode":
                     if (order == Order.ASC) {
-                        orderSpecifier = LanguageCode.getNumberExpression(requestPush.languageCode)
+                        orderSpecifier = LanguageCode.getNumberExpression(requestAlarm.languageCode)
                             .asc();
                     } else {
-                        orderSpecifier = LanguageCode.getNumberExpression(requestPush.languageCode)
+                        orderSpecifier = LanguageCode.getNumberExpression(requestAlarm.languageCode)
                             .desc();
                     }
                     break;
                 case "title":
-                    orderSpecifier = new OrderSpecifier<>(order, requestPush.title);
+                    orderSpecifier = new OrderSpecifier<>(order, requestAlarm.title);
                     break;
                 case "content":
-                    orderSpecifier = new OrderSpecifier<>(order, requestPush.content);
+                    orderSpecifier = new OrderSpecifier<>(order, requestAlarm.content);
                     break;
                 case "reservationAt":
                 case "sendAt":
-                    orderSpecifier = new OrderSpecifier<>(order, requestPush.reservationAt);
+                    orderSpecifier = new OrderSpecifier<>(order, requestAlarm.reservationAt);
                     break;
             }
         }
@@ -93,15 +99,16 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
         List<RequestPushAlarmResponse> data = queryFactory.select(
                 Projections.constructor(
                     RequestPushAlarmResponse.class,
-                    requestPush.id,
-                    requestPush.roleType,
-                    requestPush.languageCode,
-                    requestPush.title,
-                    requestPush.content,
-                    requestPush.reservationAt
+                    requestAlarm.id,
+                    requestAlarm.roleType,
+                    requestAlarm.languageCode,
+                    requestAlarm.title,
+                    requestAlarm.content,
+                    requestAlarm.reservationAt
                 )
             )
-            .from(requestPush)
+            .from(requestAlarm)
+            .where(booleanBuilder)
             .orderBy(orderSpecifier)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -109,9 +116,10 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
 
         Long count = queryFactory
             .select(
-                requestPush.count()
+                requestAlarm.count()
             )
-            .from(requestPush)
+            .from(requestAlarm)
+            .where(booleanBuilder)
             .fetchFirst();
 
         return new PageImpl<>(data, pageable, count);

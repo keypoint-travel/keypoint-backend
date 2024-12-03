@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.requestPush.service;
 
 import com.keypoint.keypointtravel.global.enumType.notification.PushNotificationType;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.global.utils.LogUtils;
 import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.notification.event.pushNotification.AdminPushNotificationEvent;
@@ -24,33 +25,42 @@ public class RequestPushSchedulerService {
 
     @Transactional
     @Scheduled(cron = "0 0/30 * * * *")
-    public void sendRequestPushAlarms() {
+    public void sendRequestAlarms() {
         try {
             LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
 
             // 1. 전송해야 하는 RequestPush 조회
-            List<RequestAlarm> pushes = requestPushRepository.findAllByReservationAt(now);
-            for (RequestAlarm push : pushes) {
-                // 1-1. 알림 전송 대상 조회
-                List<Long> memberIds = memberRepository.findMemberIdByLanguageAndRole(
-                    push.getLanguageCode(),
-                    push.getRoleType()
-                );
+            List<RequestAlarm> alarms = requestPushRepository.findAllByReservationAt(now);
+            for (RequestAlarm alarm : alarms) {
+                if (alarm.getType() == RequestAlarmType.PUSH) {
+                    sendRequestPushAlarms(alarm);
+                } else { // TODO 마켓팅 이메일 작성
 
-                // 1.2. 알림 전송
-                eventPublisher.publishEvent(AdminPushNotificationEvent.of(
-                    PushNotificationType.PUSH_NOTIFICATION_BY_ADMIN,
-                    push.getTitle(),
-                    push.getContent(),
-                    memberIds
-                ));
+                }
             }
 
-            LogUtils.writeInfoLog("sendRequestPushes",
-                "Send request pushes " + pushes.size());
+            LogUtils.writeInfoLog("sendRequestAlarms",
+                "Send request pushes " + alarms.size());
         } catch (Exception ex) {
-            LogUtils.writeErrorLog("sendRequestPushes",
+            LogUtils.writeErrorLog("sendRequestAlarms",
                 "Fail to request pushes", ex);
         }
+    }
+
+    @Transactional
+    public void sendRequestPushAlarms(RequestAlarm alarm) {
+        // 1-1. 알림 전송 대상 조회
+        List<Long> memberIds = memberRepository.findMemberIdByLanguageAndRole(
+            alarm.getLanguageCode(),
+            alarm.getRoleType()
+        );
+
+        // 1.2. 알림 전송
+        eventPublisher.publishEvent(AdminPushNotificationEvent.of(
+            PushNotificationType.PUSH_NOTIFICATION_BY_ADMIN,
+            alarm.getTitle(),
+            alarm.getContent(),
+            memberIds
+        ));
     }
 }
