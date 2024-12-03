@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class RequestPushServiceTest {
 
     @InjectMocks
-    private RequestPushAlarmService requestPushService;
+    private RequestAlarmServiceImpl requestPushService;
 
     @Test
     @DisplayName("[정상 케이스] 푸시 요청 유효성 검사를 성공한다.")

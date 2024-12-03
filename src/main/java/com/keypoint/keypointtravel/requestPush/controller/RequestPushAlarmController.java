@@ -3,11 +3,12 @@ package com.keypoint.keypointtravel.requestPush.controller;
 import com.keypoint.keypointtravel.global.dto.response.APIResponseEntity;
 import com.keypoint.keypointtravel.global.dto.response.PageResponse;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushAlarmRequest;
-import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushAlarmResponse;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestPushAlarmUseCase;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushAlarmUseCase;
-import com.keypoint.keypointtravel.requestPush.service.RequestPushAlarmService;
+import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.service.RequestAlarmServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,14 +30,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RequestPushAlarmController {
 
-    private final RequestPushAlarmService requestPushAlarmService;
+    private static final RequestAlarmType REQUEST_ALARM_TYPE = RequestAlarmType.PUSH;
+    private final RequestAlarmServiceImpl requestPushAlarmService;
 
     @PostMapping
     public APIResponseEntity<Void> addRequestPushAlarm(
         @Valid @RequestBody RequestPushAlarmRequest request
     ) {
-        CreateRequestPushAlarmUseCase useCase = CreateRequestPushAlarmUseCase.from(request);
-        requestPushAlarmService.addRequestPushAlarm(useCase);
+        CreateRequestAlarmUseCase useCase = CreateRequestAlarmUseCase.of(
+            request,
+            REQUEST_ALARM_TYPE
+        );
+        requestPushAlarmService.addRequestAlarm(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("푸시 요청 생성 성공")
@@ -48,9 +53,9 @@ public class RequestPushAlarmController {
         @PathVariable(value = "request-push-id") Long requestPushId,
         @Valid @RequestBody RequestPushAlarmRequest request
     ) {
-        UpdateRequestPushAlarmUseCase useCase = UpdateRequestPushAlarmUseCase.of(requestPushId,
+        UpdateRequestAlarmUseCase useCase = UpdateRequestAlarmUseCase.of(requestPushId,
             request);
-        requestPushAlarmService.updateRequestPushAlarm(useCase);
+        requestPushAlarmService.updateRequestAlarm(useCase);
 
         return APIResponseEntity.<Void>builder()
             .message("푸시 요청 수정 성공")
@@ -58,7 +63,7 @@ public class RequestPushAlarmController {
     }
 
     @GetMapping
-    public APIResponseEntity<PageResponse<RequestPushAlarmResponse>> findRequestPushAlarms(
+    public APIResponseEntity<PageResponse<RequestAlarmResponse>> findRequestPushAlarms(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
         @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
@@ -74,7 +79,7 @@ public class RequestPushAlarmController {
             direction,
             pageable
         );
-        Page<RequestPushAlarmResponse> result = requestPushAlarmService.findRequestPushAlarms(
+        Page<RequestAlarmResponse> result = requestPushAlarmService.findRequestAlarms(
             useCase);
 
         return APIResponseEntity.toPage(

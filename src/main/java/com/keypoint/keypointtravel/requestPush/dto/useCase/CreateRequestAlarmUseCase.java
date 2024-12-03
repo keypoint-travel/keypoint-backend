@@ -9,25 +9,31 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class CreateRequestPushAlarmUseCase extends RequestAlarmUseCase {
+public class CreateRequestAlarmUseCase extends RequestAlarmUseCase {
 
-    public CreateRequestPushAlarmUseCase(
+    private RequestAlarmType type;
+
+    public CreateRequestAlarmUseCase(
         RoleType roleType,
         LanguageCode languageCode,
         String title,
         String content,
-        LocalDateTime reservationAt
+        LocalDateTime reservationAt,
+        RequestAlarmType type
     ) {
         super(roleType, languageCode, title, content, reservationAt);
+        this.type = type;
     }
 
-    public static CreateRequestPushAlarmUseCase from(RequestPushAlarmRequest request) {
-        return new CreateRequestPushAlarmUseCase(
+    public static CreateRequestAlarmUseCase of(RequestPushAlarmRequest request,
+        RequestAlarmType type) {
+        return new CreateRequestAlarmUseCase(
             request.getRoleType(),
             request.getLanguageCode(),
             request.getTitle(),
             request.getContent(),
-            request.getReservationAt()
+            request.getReservationAt(),
+            type
         );
     }
 
@@ -38,7 +44,7 @@ public class CreateRequestPushAlarmUseCase extends RequestAlarmUseCase {
             this.getLanguageCode(),
             this.getReservationAt(),
             this.getRoleType(),
-            RequestAlarmType.PUSH
+            type
         );
     }
 }
