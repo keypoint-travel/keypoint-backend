@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.requestPush.service;
 
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.DeleteRequestAlarmUseCase;
@@ -29,7 +30,7 @@ public interface RequestAlarmService {
      * @param useCase 페이지네이션 정보
      * @return
      */
-    Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase);
+    Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase, RequestAlarmType type);
 
     /**
      * 요청 알림 삭제

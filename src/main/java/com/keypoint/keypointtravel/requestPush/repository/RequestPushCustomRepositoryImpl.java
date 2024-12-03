@@ -47,14 +47,15 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
     }
 
     @Override
-    public Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase) {
+    public Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase,
+        RequestAlarmType type) {
         Pageable pageable = useCase.getPageable();
         String sortBy = useCase.getSortBy();
         String direction = useCase.getDirection();
 
         // 필터링
         BooleanBuilder booleanBuilder = new BooleanBuilder()
-            .and(requestAlarm.type.eq(RequestAlarmType.PUSH))
+            .and(requestAlarm.type.eq(type))
             .and(requestAlarm.isDeleted.isFalse());
 
         // 기본 정렬 기준 추가

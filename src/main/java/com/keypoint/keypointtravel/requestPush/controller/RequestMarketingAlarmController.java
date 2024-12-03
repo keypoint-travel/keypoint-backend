@@ -28,15 +28,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/request-alarms/push")
+@RequestMapping("/api/v1/request-alarms/marketing")
 @RequiredArgsConstructor
-public class RequestPushAlarmController {
+public class RequestMarketingAlarmController {
 
-    private static final RequestAlarmType REQUEST_ALARM_TYPE = RequestAlarmType.PUSH;
+    private static final RequestAlarmType REQUEST_ALARM_TYPE = RequestAlarmType.MARKETING;
     private final RequestAlarmServiceImpl requestPushAlarmService;
 
     @PostMapping
-    public APIResponseEntity<Void> addRequestPushAlarm(
+    public APIResponseEntity<Void> addRequestMarketingAlarm(
         @Valid @RequestBody RequestPushAlarmRequest request
     ) {
         CreateRequestAlarmUseCase useCase = CreateRequestAlarmUseCase.of(
@@ -51,7 +51,7 @@ public class RequestPushAlarmController {
     }
 
     @PutMapping("/{request-push-id}")
-    public APIResponseEntity<Void> updateRequestPushAlarm(
+    public APIResponseEntity<Void> updateRequestMarketingAlarm(
         @PathVariable(value = "request-push-id") Long requestPushId,
         @Valid @RequestBody RequestPushAlarmRequest request
     ) {
@@ -65,7 +65,7 @@ public class RequestPushAlarmController {
     }
 
     @GetMapping
-    public APIResponseEntity<PageResponse<RequestAlarmResponse>> findRequestPushAlarms(
+    public APIResponseEntity<PageResponse<RequestAlarmResponse>> findRequestMarketingAlarms(
         @RequestParam(name = "sort-by", required = false) String sortBy,
         @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
         @PageableDefault(sort = "modifyAt", direction = Sort.Direction.ASC) Pageable pageable
@@ -93,7 +93,7 @@ public class RequestPushAlarmController {
     }
 
     @DeleteMapping
-    public APIResponseEntity<Void> deleteRequestPushAlarm(
+    public APIResponseEntity<Void> deleteRequestMarketingAlarm(
         @RequestParam("request-ids") Long[] requestIds
     ) {
         DeleteRequestAlarmUseCase useCase = DeleteRequestAlarmUseCase.from(requestIds);

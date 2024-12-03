@@ -1,6 +1,7 @@
 package com.keypoint.keypointtravel.requestPush.repository;
 
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.DeleteRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
@@ -10,7 +11,7 @@ public interface RequestPushCustomRepository {
 
     long updateRequestAlarm(UpdateRequestAlarmUseCase useCase);
 
-    Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase);
+    Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase, RequestAlarmType type);
 
     void deleteRequestAlarm(DeleteRequestAlarmUseCase useCase);
 }
