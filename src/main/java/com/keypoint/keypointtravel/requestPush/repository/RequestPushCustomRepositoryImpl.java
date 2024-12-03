@@ -4,8 +4,8 @@ import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
-import com.keypoint.keypointtravel.requestPush.dto.response.RequestPushAlarmResponse;
-import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestPushAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.entity.QRequestAlarm;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -29,7 +29,7 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
     private final QRequestAlarm requestAlarm = QRequestAlarm.requestAlarm;
 
     @Override
-    public long updateRequestPushAlarm(UpdateRequestPushAlarmUseCase useCase) {
+    public long updateRequestPushAlarm(UpdateRequestAlarmUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
         return queryFactory.update(requestAlarm)
@@ -45,7 +45,7 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
     }
 
     @Override
-    public Page<RequestPushAlarmResponse> findRequestPushAlarms(PageUseCase useCase) {
+    public Page<RequestAlarmResponse> findRequestPushAlarms(PageUseCase useCase) {
         Pageable pageable = useCase.getPageable();
         String sortBy = useCase.getSortBy();
         String direction = useCase.getDirection();
@@ -96,9 +96,9 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
             }
         }
 
-        List<RequestPushAlarmResponse> data = queryFactory.select(
+        List<RequestAlarmResponse> data = queryFactory.select(
                 Projections.constructor(
-                    RequestPushAlarmResponse.class,
+                    RequestAlarmResponse.class,
                     requestAlarm.id,
                     requestAlarm.roleType,
                     requestAlarm.languageCode,

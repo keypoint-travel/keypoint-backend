@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class UpdateRequestPushAlarmUseCase extends RequestAlarmUseCase {
+public class UpdateRequestAlarmUseCase extends RequestAlarmUseCase {
 
     private Long requestPushId;
 
-    public UpdateRequestPushAlarmUseCase(
+    public UpdateRequestAlarmUseCase(
         Long requestPushId,
         RoleType roleType,
         LanguageCode languageCode,
@@ -23,11 +23,11 @@ public class UpdateRequestPushAlarmUseCase extends RequestAlarmUseCase {
         this.requestPushId = requestPushId;
     }
 
-    public static UpdateRequestPushAlarmUseCase of(
+    public static UpdateRequestAlarmUseCase of(
         Long requestPushId,
         RequestPushAlarmRequest request
     ) {
-        return new UpdateRequestPushAlarmUseCase(
+        return new UpdateRequestAlarmUseCase(
             requestPushId,
             request.getRoleType(),
             request.getLanguageCode(),
