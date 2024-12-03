@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.enumType.error.NotificationErrorCode;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.DeleteRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.entity.RequestAlarm;
 import com.keypoint.keypointtravel.requestPush.repository.RequestPushRepository;
@@ -54,7 +55,7 @@ public class RequestAlarmServiceImpl implements RequestAlarmService {
             commonRequestAlarmService.validateRequestPush(useCase);
 
             // 수정
-            long result = requestPushRepository.updateRequestPushAlarm(useCase);
+            long result = requestPushRepository.updateRequestAlarm(useCase);
             if (result < 1) {
                 throw new GeneralException(NotificationErrorCode.NOT_EXISTED_REQUEST_PUSH);
             }
@@ -72,7 +73,21 @@ public class RequestAlarmServiceImpl implements RequestAlarmService {
     @Override
     public Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase) {
         try {
-            return requestPushRepository.findRequestPushAlarms(useCase);
+            return requestPushRepository.findRequestAlarms(useCase);
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
+    }
+
+    /**
+     * 요청 알림 삭제
+     *
+     * @param useCase 삭제할 요청 알림 아이디
+     */
+    @Override
+    public void deleteRequestAlarm(DeleteRequestAlarmUseCase useCase) {
+        try {
+            requestPushRepository.deleteRequestAlarm(useCase);
         } catch (Exception e) {
             throw new GeneralException(e);
         }

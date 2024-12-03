@@ -5,6 +5,7 @@ import com.keypoint.keypointtravel.global.enumType.member.RoleType;
 import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.global.enumType.setting.LanguageCode;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.DeleteRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.entity.QRequestAlarm;
 import com.querydsl.core.BooleanBuilder;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class RequestPushCustomRepositoryImpl implements RequestPushCustomRepository {
@@ -29,7 +31,7 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
     private final QRequestAlarm requestAlarm = QRequestAlarm.requestAlarm;
 
     @Override
-    public long updateRequestPushAlarm(UpdateRequestAlarmUseCase useCase) {
+    public long updateRequestAlarm(UpdateRequestAlarmUseCase useCase) {
         String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
 
         return queryFactory.update(requestAlarm)
@@ -45,14 +47,15 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
     }
 
     @Override
-    public Page<RequestAlarmResponse> findRequestPushAlarms(PageUseCase useCase) {
+    public Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase) {
         Pageable pageable = useCase.getPageable();
         String sortBy = useCase.getSortBy();
         String direction = useCase.getDirection();
 
         // 필터링
         BooleanBuilder booleanBuilder = new BooleanBuilder()
-            .and(requestAlarm.type.eq(RequestAlarmType.PUSH));
+            .and(requestAlarm.type.eq(RequestAlarmType.PUSH))
+            .and(requestAlarm.isDeleted.isFalse());
 
         // 기본 정렬 기준 추가
         OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, requestAlarm.modifyAt);
@@ -123,5 +126,18 @@ public class RequestPushCustomRepositoryImpl implements RequestPushCustomReposit
             .fetchFirst();
 
         return new PageImpl<>(data, pageable, count);
+    }
+
+    @Override
+    @Transactional
+    public void deleteRequestAlarm(DeleteRequestAlarmUseCase useCase) {
+        String currentAuditor = auditorProvider.getCurrentAuditor().orElse(null);
+
+        queryFactory.update(requestAlarm)
+            .set(requestAlarm.isDeleted, true)
+            .set(requestAlarm.modifyAt, LocalDateTime.now())
+            .set(requestAlarm.modifyId, currentAuditor)
+            .where(requestAlarm.id.in(useCase.getRequestIds()))
+            .execute();
     }
 }

@@ -7,6 +7,7 @@ import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType
 import com.keypoint.keypointtravel.requestPush.dto.request.RequestPushAlarmRequest;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.DeleteRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.service.RequestAlarmServiceImpl;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -86,5 +88,17 @@ public class RequestPushAlarmController {
             "푸시 요청 조회 성공",
             result
         );
+    }
+
+    @DeleteMapping
+    public APIResponseEntity<Void> deleteRequestPushAlarm(
+        @RequestParam("request-ids") Long[] requestIds
+    ) {
+        DeleteRequestAlarmUseCase useCase = DeleteRequestAlarmUseCase.from(requestIds);
+        requestPushAlarmService.deleteRequestAlarm(useCase);
+
+        return APIResponseEntity.<Void>builder()
+            .message("푸시 요청 삭제 성공")
+            .build();
     }
 }

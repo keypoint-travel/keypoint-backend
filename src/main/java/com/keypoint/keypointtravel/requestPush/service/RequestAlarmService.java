@@ -3,6 +3,7 @@ package com.keypoint.keypointtravel.requestPush.service;
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestAlarmUseCase;
+import com.keypoint.keypointtravel.requestPush.dto.useCase.DeleteRequestAlarmUseCase;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.UpdateRequestAlarmUseCase;
 import org.springframework.data.domain.Page;
 
@@ -29,4 +30,11 @@ public interface RequestAlarmService {
      * @return
      */
     Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase);
+
+    /**
+     * 요청 알림 삭제
+     *
+     * @param useCase 삭제할 요청 알림 아이디
+     */
+    void deleteRequestAlarm(DeleteRequestAlarmUseCase useCase);
 }
