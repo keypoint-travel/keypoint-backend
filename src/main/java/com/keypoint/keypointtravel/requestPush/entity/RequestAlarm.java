@@ -47,6 +47,9 @@ public class RequestAlarm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RequestAlarmType type;
 
+    @Column(nullable = false)
+    private boolean isDeleted;
+
     public RequestAlarm(
         String title,
         String content,
@@ -61,5 +64,6 @@ public class RequestAlarm extends BaseEntity {
         this.reservationAt = reservationAt.withSecond(0).withNano(0);
         this.roleType = roleType;
         this.type = type;
+        this.isDeleted = false;
     }
 }
