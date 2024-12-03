@@ -2,6 +2,7 @@ package com.keypoint.keypointtravel.requestPush.service;
 
 import com.keypoint.keypointtravel.global.dto.useCase.PageUseCase;
 import com.keypoint.keypointtravel.global.enumType.error.NotificationErrorCode;
+import com.keypoint.keypointtravel.global.enumType.notification.RequestAlarmType;
 import com.keypoint.keypointtravel.global.exception.GeneralException;
 import com.keypoint.keypointtravel.requestPush.dto.response.RequestAlarmResponse;
 import com.keypoint.keypointtravel.requestPush.dto.useCase.CreateRequestAlarmUseCase;
@@ -71,9 +72,11 @@ public class RequestAlarmServiceImpl implements RequestAlarmService {
      * @return
      */
     @Override
-    public Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase) {
+    public Page<RequestAlarmResponse> findRequestAlarms(PageUseCase useCase,
+        RequestAlarmType type
+    ) {
         try {
-            return requestPushRepository.findRequestAlarms(useCase);
+            return requestPushRepository.findRequestAlarms(useCase, type);
         } catch (Exception e) {
             throw new GeneralException(e);
         }
