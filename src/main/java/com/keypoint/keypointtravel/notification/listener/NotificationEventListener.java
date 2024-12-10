@@ -13,6 +13,7 @@ import com.keypoint.keypointtravel.member.repository.member.MemberRepository;
 import com.keypoint.keypointtravel.notification.dto.dto.PushNotificationDTO;
 import com.keypoint.keypointtravel.notification.dto.response.fcmBody.FCMBodyResponse;
 import com.keypoint.keypointtravel.notification.entity.PushNotificationHistory;
+import com.keypoint.keypointtravel.notification.event.marketingNotification.AdminMarketingNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.marketingNotification.MarketingNotificationEvent;
 import com.keypoint.keypointtravel.notification.event.pushNotification.PushNotificationEvent;
 import com.keypoint.keypointtravel.notification.repository.fcmToken.FCMTokenRepository;
@@ -134,15 +135,23 @@ public class NotificationEventListener {
 
 
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendMarketingNotification(MarketingNotificationEvent event) {
         MarketingNotificationType type = event.getMarketingNotificationType();
         EmailTemplate emailTemplate = type.getTemplate();
 
-        EmailUtils.sendMultiEmail(
-            event.getMemberEmails()
-            , emailTemplate,
-            null
-        );
+        switch (type) {
+            case ADMIN -> {
+                if (event instanceof AdminMarketingNotificationEvent data) {
+                    EmailUtils.sendMultiEmail(
+                        data.getMemberEmails(),
+                        data.getTitle(),
+                        emailTemplate,
+                        data.getEmailContent()
+                    );
+                }
+            }
+        }
     }
 }

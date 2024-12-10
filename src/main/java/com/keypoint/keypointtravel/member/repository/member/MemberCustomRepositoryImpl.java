@@ -355,6 +355,33 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     }
 
+    @Override
+    public List<String> findEmailByLanguageAndRole(
+        LanguageCode languageCode,
+        RoleType roleType
+    ) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(member.isDeleted.isFalse())
+            .and(member.role.ne(RoleType.ROLE_ADMIN)
+                .and(member.role.ne(RoleType.ROLE_UNCERTIFIED_USER)));
+
+        // 조건으로 필터링
+        if (languageCode != null) {
+            booleanBuilder.and(member.memberDetail.language.eq(languageCode));
+        }
+        if (roleType != null) {
+            booleanBuilder.and(member.role.eq(roleType));
+        }
+
+        // 조회
+        return queryFactory
+            .select(member.email)
+            .from(member)
+            .where(booleanBuilder)
+            .fetch();
+
+    }
+
     private BooleanExpression isBlocked(Long myId, Long otherMemberId) {
         return selectOne()
             .from(QBlockedMember.blockedMember)
