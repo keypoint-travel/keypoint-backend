@@ -36,4 +36,6 @@ public interface MemberCustomRepository {
     List<StatisticResponse> findDailyVisitorsStatistics(LocalDateTime startAt, LocalDateTime endAt);
 
     List<Long> findMemberIdByLanguageAndRole(LanguageCode languageCode, RoleType roleType);
+
+    List<String> findEmailByLanguageAndRole(LanguageCode languageCode, RoleType roleType);
 }

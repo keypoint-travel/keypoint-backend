@@ -74,14 +74,15 @@ public class EmailUtils {
      */
     public static void sendMultiEmail(
         List<String> receivers,
+        String title,
         EmailTemplate template,
         Map<String, String> emailContent
     ) {
         try {
             // 이메일 전송을 위한 MimeMessageHelper 객체 생성
             MimeMessageHelper msgHelper = prepareMessage(template, emailContent, false);
-            msgHelper.setSubject(template.getSubject());
-            msgHelper.setTo(receivers.toArray(new String[receivers.size()]));
+            msgHelper.setSubject(title);
+            msgHelper.setBcc(receivers.toArray(new String[receivers.size()]));
             // 이메일 전송
             javaMailSender.send(msgHelper.getMimeMessage());
 
